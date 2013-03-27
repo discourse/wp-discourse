@@ -127,7 +127,10 @@ class Discourse {
     $discourse_id = get_post_meta($postid, 'discourse_post_id', true);
     $options = get_option('discourse');
     $post = get_post($post_id);
+
+
     $baked = apply_filters('the_content', $raw);
+    $baked = "<small>Originally published at: " . get_permalink($postid) . "</small><br>" . $baked;
 
     $data = array(
       'wp-id' => $postid,
