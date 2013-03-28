@@ -71,11 +71,61 @@ class Discourse {
 	}
 
   function comments_number($count) {
-    return "100 Replies";
+    global $post;
+    if(self::use_discourse_comments($post->ID)){
+      self::sync_comments($post->ID);
+      $count = get_post_meta($post->ID, 'discourse_comments_count', true);
+      if(!$count){
+        $count = "";
+      }
+    } 
+    
+    return $count;
+  }
+
+  function use_discourse_comments($postid){
+    return get_post_meta($postid, 'publish_to_discourse', true) == 1 && 
+      get_post_meta($postid, 'discourse_post_id', true) > 0;
+  }
+
+  function sync_comments($postid) {
+    global $wpdb;
+
+    # every 10 minutes do a json call to sync comment count and top comments
+    $last_sync = (int)get_post_meta($postid, 'discourse_last_sync', true);
+    $time = date_timestamp_get(date_create());
+    if(true || $last_sync + 60 * 10 < $time) {  
+
+      $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
+      if($got_lock->got_it == "1") {
+
+        $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=5';
+        $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
+        $context  = stream_context_create($soptions);
+        $result = file_get_contents($permalink, false, $context);
+        $json = json_decode($result);
+
+        delete_post_meta($postid, 'discourse_comments_count');
+        add_post_meta($postid, 'discourse_comments_count', $json->posts_count - 1 , true);
+
+        delete_post_meta($postid, 'discourse_comments_raw');
+        add_post_meta($postid, 'discourse_comments_raw', $result , true);
+
+        delete_post_meta($postid, 'discourse_last_sync');
+        add_post_meta($postid, 'discourse_last_sync', $time, true);
+        $wpdb->get_results("SELECT RELEASE_LOCK('discourse_lock')");
+      }
+    }
   }
 
   function comments_template($old) {
-    return dirname(__FILE__) . '/comments.php';
+    global $post;
+    if(self::use_discourse_comments($post->ID)) {
+      self::sync_comments($post->ID);
+      return dirname(__FILE__) . '/comments.php'; 
+    } 
+
+    return $old;
   }
 
 	/*
@@ -141,6 +191,7 @@ class Discourse {
       'post[category]' => $options['publish-category']
     );
 
+
     if(!$discourse_id > 0) {
       $url =  $options['url'] .'/posts';
 
@@ -168,8 +219,17 @@ class Discourse {
       $context  = stream_context_create($soptions);
       $result = file_get_contents($url, false, $context);
       $json = json_decode($result);
+
+      if(isset($json->post)) {
+        $json = $json->post;
+      }
       
       # todo may have $json->errors with list of errors
+    }
+
+    if(isset($json->topic_slug)){
+      delete_post_meta($postid,'discourse_permalink');
+      add_post_meta($postid,'discourse_permalink', $options['url'] . '/t/' . $json->topic_slug . '/' . $json->topic_id, true);
     }
   }
 
