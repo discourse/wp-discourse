@@ -94,7 +94,7 @@ class Discourse {
     # every 10 minutes do a json call to sync comment count and top comments
     $last_sync = (int)get_post_meta($postid, 'discourse_last_sync', true);
     $time = date_timestamp_get(date_create());
-    if(true || $last_sync + 60 * 10 < $time) {  
+    if($last_sync + 60 * 10 < $time) {  
 
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
