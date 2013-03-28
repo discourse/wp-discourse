@@ -5,7 +5,7 @@
   $discourse_url_name = preg_replace("(https?://)", "", $options['url'] );
   $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
 
-  $more_replies = $discourse_info->posts_count - count($discourse_info->posts);
+  $more_replies = $discourse_info->posts_count - count($discourse_info->posts) - 1;
 
   if($more_replies == 0) {
     $more_replies = "";
