@@ -28,7 +28,7 @@
 
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-<h2 id="comments-title"> Notable replies to “<?php echo $post->post_title ?>”</h2>
+<h2 id="comments-title">Notable Replies</h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
@@ -36,7 +36,8 @@
 				<div class="comment-author vcard">
         <img alt="" src="<?php avatar($post->avatar_template,68) ?>" class="avatar avatar-68 photo avatar-default" height="68" width="68">
           <a href="<?php homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo $post->name ?></a>
-          on <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
+          <br/>
+          <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
 </div>
             <div class="comment-content"><?php echo $post->cooked ?></div>
         </li>
