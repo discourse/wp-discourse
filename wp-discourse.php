@@ -41,8 +41,8 @@ class Discourse {
 	);
 
 	public function __construct() {
-		register_activation_hook(__FILE__,array(__CLASS__, 'install' )); 
-		register_uninstall_hook(__FILE__,array( __CLASS__, 'uninstall' )); 
+		register_activation_hook(__FILE__,array(__CLASS__, 'install' ));
+		register_uninstall_hook(__FILE__,array( __CLASS__, 'uninstall' ));
 		add_action( 'init', array( $this, 'init' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ));
@@ -62,7 +62,7 @@ class Discourse {
 	public function init() {
 		//Allow translations
 		load_plugin_textdomain( 'discourse', false, basename(dirname(__FILE__)).'/languages');
-    
+
     //replace comments with discourse comments
 
     add_filter('comments_number', array($this,'comments_number'));
@@ -80,15 +80,15 @@ class Discourse {
       if(!$count){
         $count = "Leave a reply";
       } else {
-        $count = $count == 1 ? "1 Reply" : $count . " Replies"; 
+        $count = $count == 1 ? "1 Reply" : $count . " Replies";
       }
-    } 
-    
+    }
+
     return $count;
   }
 
   function use_discourse_comments($postid){
-    return get_post_meta($postid, 'publish_to_discourse', true) == 1 && 
+    return get_post_meta($postid, 'publish_to_discourse', true) == 1 &&
       get_post_meta($postid, 'discourse_post_id', true) > 0;
   }
 
@@ -98,7 +98,7 @@ class Discourse {
     # every 10 minutes do a json call to sync comment count and top comments
     $last_sync = (int)get_post_meta($postid, 'discourse_last_sync', true);
     $time = date_timestamp_get(date_create());
-    if($last_sync + 60 * 10 < $time) {  
+    if($last_sync + 60 * 10 < $time) {
 
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
@@ -127,8 +127,8 @@ class Discourse {
     global $post;
     if(self::use_discourse_comments($post->ID)) {
       self::sync_comments($post->ID);
-      return dirname(__FILE__) . '/comments.php'; 
-    } 
+      return dirname(__FILE__) . '/comments.php';
+    }
 
     return $old;
   }
@@ -176,7 +176,7 @@ class Discourse {
     add_post_meta($_POST['ID'], 'publish_to_discourse', $publish, true);
 
     return $postid;
-  } 
+  }
 
   function sync_to_discourse($postid, $title, $raw) {
     $discourse_id = get_post_meta($postid, 'discourse_post_id', true);
@@ -185,11 +185,12 @@ class Discourse {
 
 
     $baked = apply_filters('the_content', $raw);
+    $baked = wp_trim_words($baked);
     $baked = "<small>Originally published at: " . get_permalink($postid) . "</small><br>" . $baked;
 
     $data = array(
       'wp-id' => $postid,
-      'api_key' => $options['api-key'], 
+      'api_key' => $options['api-key'],
       'api_username' => $options['publish-username'],
       'title' => $title,
       'post[raw]' => $baked,
@@ -217,7 +218,7 @@ class Discourse {
         add_post_meta($postid, 'discourse_post_id', $discourse_id, true);
       }
 
-    } 
+    }
     else {
       # for now the updates are just causing grief, leave'em out
       return;
@@ -230,7 +231,7 @@ class Discourse {
       if(isset($json->post)) {
         $json = $json->post;
       }
-      
+
       # todo may have $json->errors with list of errors
     }
 
