@@ -159,14 +159,13 @@ class Discourse {
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
-    add_action ( 'transition_post_status', array($this, 'post_status_changed'), 10, 3 );
+    add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
   }
-
-  function post_status_changed($old, $new, $post){
-    if($post->post_type == "revision") { return; }
-    if($new == 'publish' && get_post_meta($post->ID, 'publish_to_discourse', true) == 1) {
-      self::sync_to_discourse($post->ID, $post->post_title, $post->post_content);
-    }
+  
+  function publish_post_to_discourse($postid){
+	$post = get_post($postid);
+	if (get_post_status($postid) != "publish" || !get_post_meta($postid, 'publish_to_discourse', true)) return;
+    self::sync_to_discourse($postid, $post->post_title, $post->post_content);
   }
 
   function save_postdata($postid)
@@ -190,7 +189,7 @@ class Discourse {
   function sync_to_discourse($postid, $title, $raw) {
     $discourse_id = get_post_meta($postid, 'discourse_post_id', true);
     $options = get_option('discourse');
-    $post = get_post($post_id);
+    $post = get_post($postid);
 
 
     $excerpt = apply_filters('the_content', $raw);
