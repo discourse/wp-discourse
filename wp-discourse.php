@@ -71,6 +71,10 @@ class Discourse {
     add_filter('comments_number', array($this,'comments_number'));
     add_filter('comments_template', array($this,'comments_template'));
 
+    $plugin_dir = plugin_dir_url(__FILE__);
+    wp_register_style('discourse_comments', $plugin_dir . 'css/style.css');
+    wp_enqueue_style('discourse_comments');
+
 	}
 
   function comments_number($count) {
