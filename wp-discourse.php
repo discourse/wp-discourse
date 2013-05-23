@@ -257,7 +257,12 @@ class Discourse {
   function publish_to_discourse()
   {
     global $post;
-    $value = get_post_meta($post->ID, 'publish_to_discourse', true);
+    $options = get_option('discourse');
+    if($post->post_status=="auto-draft") {
+      $value = $options['auto-publish'];
+    } else {
+      $value = get_post_meta($post->ID, 'publish_to_discourse', true);
+    }
     echo '<div class="misc-pub-section misc-pub-section-last">
          <span>'
          . '<label><input type="checkbox"' . (!empty($value) ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
