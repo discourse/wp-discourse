@@ -165,11 +165,12 @@ class Discourse {
     add_action( 'save_post', array($this, 'save_postdata'));
     add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
   }
-  
+
   function publish_post_to_discourse($postid){
-	$post = get_post($postid);
-	if (get_post_status($postid) != "publish" || !get_post_meta($postid, 'publish_to_discourse', true)) return;
-    self::sync_to_discourse($postid, $post->post_title, $post->post_content);
+    $post = get_post($postid);
+    if (get_post_status($postid) == "publish" && get_post_meta($postid, 'publish_to_discourse', true)) {
+      self::sync_to_discourse($postid, $post->post_title, $post->post_content);
+    }
   }
 
   function save_postdata($postid)
@@ -261,9 +262,15 @@ class Discourse {
   {
     global $post;
     $value = get_post_meta($post->ID, 'publish_to_discourse', true);
+    if ($value == NULL) {
+      $options = get_option('discourse');
+      if(isset($options['auto-publish'])) {
+        $value = ($options['auto-publish'] == 1);
+      }
+    }
     echo '<div class="misc-pub-section misc-pub-section-last">
          <span>'
-         . '<label><input type="checkbox"' . (!empty($value) ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
+         . '<label><input type="checkbox"' . ($value ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
     .'</span></div>';
   }
 
