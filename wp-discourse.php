@@ -23,7 +23,13 @@ Author URI: http://www.discourse.org
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 class Discourse {
+	public static function homepage($url, $post) {
+	echo $url . "/users/" . strtolower($post->username);
+	}
 
+	public static function avatar($template, $size) {
+	echo str_replace("{size}", $size, $template);
+	}
 	var $domain = 'discourse';
 
 	//Version
