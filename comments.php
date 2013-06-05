@@ -14,46 +14,38 @@
   } else {
     $more_replies = $more_replies . " more replies";
   }
-
-  function homepage($url, $post) {
-    echo $url . "/users/" . strtolower($post->username);
-  }
-
-  function avatar($template, $size) {
-    echo str_replace("{size}", $size, $template);
-  }
 ?>
 
 <?php # var_dump($discourse_info->posts) ?>
 
-<div id="comments">
+<div class="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-<h2 id="comments-title">Notable Replies</h2>
+  <h2 class="comments-title">Notable Replies</h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
-        <li class="comment">
+      <li class="comment">
 				<div class="comment-author vcard">
-        <img alt="" src="<?php avatar($post->avatar_template,68) ?>" class="avatar avatar-68 photo avatar-default" height="68" width="68">
-          <a href="<?php homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a>
-          <br/>
-          <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
-</div>
-            <div class="comment-content"><?php echo $post->cooked ?></div>
-        </li>
+          <img alt="" src="<?php Discourse::avatar($post->avatar_template,68) ?>" class="avatar avatar-68 photo avatar-default" height="68" width="68">
+            <a href="<?php Discourse::homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a>
+            <br/>
+            <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
+        </div>
+        <div class="comment-content"><?php echo $post->cooked ?></div>
+      </li>
       <?php } ?>
 
 		</ol>
 
 
 
-    <div id="respond">
-        <h3 id="reply-title"><a href="<?php echo $permalink ?>">Continue the discussion</a> at <?php echo $discourse_url_name ?></h3>
+    <div class="respond">
+        <h3 class="reply-title"><a href="<?php echo $permalink ?>">Continue the discussion</a> at <?php echo $discourse_url_name ?></h3>
         <?php if(count($discourse_info->posts) > 0) { ?>
         <p class='more-replies'><?php echo $more_replies ?></p>
         <p>
           <?php foreach($discourse_info->participants as &$participant) { ?>
-            <img alt="" src="<?php avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
+            <img alt="" src="<?php Discourse::avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
           <?php } ?>
         </p>
         <?php } ?>
