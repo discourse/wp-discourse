@@ -216,8 +216,8 @@ class Discourse {
       'api_key' => $options['api-key'],
       'api_username' => $options['publish-username'],
       'title' => $title,
-      'post[raw]' => $baked,
-      'post[category]' => $options['publish-category']
+      'raw' => $baked,
+      'category' => $options['publish-category']
     );
 
 
