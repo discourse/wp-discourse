@@ -174,7 +174,7 @@ class Discourse {
 
   function publish_post_to_discourse($postid){
     $post = get_post($postid);
-    if (get_post_status($postid) == "publish" && get_post_meta($postid, 'publish_to_discourse', true) && !is_custom_post_type($postid)) {
+    if (get_post_status($postid) == "publish" && get_post_meta($postid, 'publish_to_discourse', true) && !self::is_custom_post_type($postid)) {
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
