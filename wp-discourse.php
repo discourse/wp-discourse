@@ -101,8 +101,9 @@ class Discourse {
   }
 
   function use_discourse_comments($postid){
-    return get_post_meta($postid, 'publish_to_discourse', true) == 1 &&
-      get_post_meta($postid, 'discourse_post_id', true) > 0;
+    return get_post_meta($postid, 'publish_to_discourse', true) == 1;
+      // in the past we used to do this, however we would like to hijack a publish if needed;
+      // && get_post_meta($postid, 'discourse_post_id', true) > 0;
   }
 
   function sync_comments($postid) {
@@ -116,23 +117,32 @@ class Discourse {
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
 
-        $discourse_options =  get_option('discourse');
-        $comment_count = intval($discourse_options['max-comments']);
-        $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=' . $comment_count;
-        $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
-        $context  = stream_context_create($soptions);
-        $result = file_get_contents($permalink, false, $context);
-        $json = json_decode($result);
+        if(get_post_status($postid) == "publish") {
 
-        delete_post_meta($postid, 'discourse_comments_count');
-        add_post_meta($postid, 'discourse_comments_count', $json->posts_count - 1 , true);
+          # workaround unpublished posts, publish if needed
+          # if you have a scheduled post we never seem to be called
+          if(!(get_post_meta($postid, 'discourse_post_id', true) > 0)){
+            self::publish_post_to_discourse($postid);
+          }
 
-        delete_post_meta($postid, 'discourse_comments_raw');
+          $discourse_options =  get_option('discourse');
+          $comment_count = intval($discourse_options['max-comments']);
+          $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=' . $comment_count;
+          $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
+          $context  = stream_context_create($soptions);
+          $result = file_get_contents($permalink, false, $context);
+          $json = json_decode($result);
 
-        add_post_meta($postid, 'discourse_comments_raw', $wpdb->escape($result) , true);
+          delete_post_meta($postid, 'discourse_comments_count');
+          add_post_meta($postid, 'discourse_comments_count', $json->posts_count - 1 , true);
 
-        delete_post_meta($postid, 'discourse_last_sync');
-        add_post_meta($postid, 'discourse_last_sync', $time, true);
+          delete_post_meta($postid, 'discourse_comments_raw');
+
+          add_post_meta($postid, 'discourse_comments_raw', $wpdb->escape($result) , true);
+
+          delete_post_meta($postid, 'discourse_last_sync');
+          add_post_meta($postid, 'discourse_last_sync', $time, true);
+        }
         $wpdb->get_results("SELECT RELEASE_LOCK('discourse_lock')");
       }
     }
@@ -178,7 +188,7 @@ class Discourse {
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
-  
+
   function is_custom_post_type( $post = NULL ){
     $all_custom_post_types = get_post_types( array ( '_builtin' => FALSE ) );
 
