@@ -18,9 +18,9 @@
 
 <?php # var_dump($discourse_info->posts) ?>
 
-<div class="comments">
+<div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-  <h2 class="comments-title">Notable Replies</h2>
+  <h2 id="comments-title">Notable Replies</h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
