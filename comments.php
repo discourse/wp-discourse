@@ -14,6 +14,8 @@
   } else {
     $more_replies = $more_replies . " more replies";
   }
+
+  $link_text = count($discourse_info->posts) == 0 ? "Start the discussion" : "Continue the discussion";
 ?>
 
 <?php # var_dump($discourse_info->posts) ?>
@@ -40,7 +42,7 @@
 
 
     <div class="respond">
-        <h3 class="reply-title"><a href="<?php echo $permalink ?>">Continue the discussion</a> at <?php echo $discourse_url_name ?></h3>
+        <h3 class="reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
         <?php if(count($discourse_info->posts) > 0) { ?>
         <p class='more-replies'><?php echo $more_replies ?></p>
         <p>
