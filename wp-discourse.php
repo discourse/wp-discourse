@@ -81,6 +81,7 @@ class Discourse {
     wp_register_style('discourse_comments', $plugin_dir . 'css/style.css');
     wp_enqueue_style('discourse_comments');
 
+    add_action( 'xmlrpc_publish_post', array($this, 'xmlrpc_publish_post_to_discourse'));
 	}
 
   function comments_number($count) {
@@ -185,7 +186,6 @@ class Discourse {
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
     add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
-    add_action( 'xmlrpc_publish_post', array($this, 'xmlrpc_publish_post_to_discourse'));
   }
 
   function publish_post_to_discourse($postid){
@@ -199,6 +199,10 @@ class Discourse {
   function xmlrpc_publish_post_to_discourse($postid){
     $post = get_post($postid);
     if (get_post_status($postid) == "publish" && !self::is_custom_post_type($postid)) {
+
+      // we assume you always want to publish to discourse via xmlrpc since we can't ask
+      add_post_meta($postid, 'publish_to_discourse', true, true);
+
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
