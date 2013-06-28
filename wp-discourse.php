@@ -127,7 +127,7 @@ class Discourse {
 
           $discourse_options =  get_option('discourse');
           $comment_count = intval($discourse_options['max-comments']);
-          $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=' . $comment_count;
+          $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '/wordpress.json?best=' . $comment_count;
           $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
           $context  = stream_context_create($soptions);
           $result = file_get_contents($permalink, false, $context);
@@ -185,11 +185,20 @@ class Discourse {
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
     add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
+    add_action( 'xmlrpc_publish_post', array($this, 'xmlrpc_publish_post_to_discourse'));
   }
 
   function publish_post_to_discourse($postid){
     $post = get_post($postid);
     if (get_post_status($postid) == "publish" && get_post_meta($postid, 'publish_to_discourse', true) && !self::is_custom_post_type($postid)) {
+      self::sync_to_discourse($postid, $post->post_title, $post->post_content);
+    }
+  }
+
+  // When publishing by xmlrpc, ignore the `publish_to_discourse` option
+  function xmlrpc_publish_post_to_discourse($postid){
+    $post = get_post($postid);
+    if (get_post_status($postid) == "publish" && !self::is_custom_post_type($postid)) {
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
