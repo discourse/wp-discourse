@@ -133,8 +133,13 @@ class Discourse {
           $result = file_get_contents($permalink, false, $context);
           $json = json_decode($result);
 
+          $posts_count = $json->posts_count - 1;
+          if ($posts_count < 0) {
+            $posts_count = 0;
+          }
+
           delete_post_meta($postid, 'discourse_comments_count');
-          add_post_meta($postid, 'discourse_comments_count', $json->posts_count - 1 , true);
+          add_post_meta($postid, 'discourse_comments_count', $posts_count, true);
 
           delete_post_meta($postid, 'discourse_comments_raw');
 
