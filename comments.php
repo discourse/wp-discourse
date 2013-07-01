@@ -7,15 +7,17 @@
   $more_replies = $discourse_info->filtered_posts_count - count($discourse_info->posts) - 1;
   $show_fullname = $options['use-fullname-in-comments'] == 1;
 
+  $more = count($discourse_info->posts) == 0 ? "" : "more ";
+
   if($more_replies == 0) {
     $more_replies = "";
   } elseif($more_replies == 1) {
-    $more_replies = "1 more reply";
+    $more_replies = "1 " . $more . "reply";
   } else {
-    $more_replies = $more_replies . " more replies";
+    $more_replies = $more_replies . " " . $more . "replies";
   }
 
-  $link_text = count($discourse_info->posts) == 0 ? "Start the discussion" : "Continue the discussion";
+  $link_text = count($discourse_info->filtered_posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
 ?>
 
 <?php # var_dump($discourse_info->posts) ?>
@@ -43,7 +45,7 @@
 
     <div class="respond">
         <h3 class="reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
-        <?php if(count($discourse_info->posts) > 0) { ?>
+        <?php if(count($discourse_info->posts) > 0 || $more_replies > 0) { ?>
         <p class='more-replies'><?php echo $more_replies ?></p>
         <p>
           <?php foreach($discourse_info->participants as &$participant) { ?>

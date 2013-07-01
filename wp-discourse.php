@@ -46,7 +46,10 @@ class Discourse {
     'max-comment'=>5,
     'use-discourse-comments'=>0,
     'use-fullname-in-comments'=>1,
-    'publish-format'=>'<small>Originally published at: {blogurl}</small><br>{excerpt}'
+    'publish-format'=>'<small>Originally published at: {blogurl}</small><br>{excerpt}',
+    'min-score'=>30,
+    'min-replies'=>5,
+    'min-trust-level'=>1
 	);
 
 	public function __construct() {
@@ -128,7 +131,13 @@ class Discourse {
 
           $discourse_options =  get_option('discourse');
           $comment_count = intval($discourse_options['max-comments']);
-          $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '/wordpress.json?best=' . $comment_count;
+          $min_trust_level = intval($discourse_options['min-trust-level']);
+          $min_score = intval($discourse_options['min-score']);
+          $min_replies = intval($discourse_options['min-replies']);
+
+          $options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score . '&min_replies=' . $min_replies;
+
+          $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '/wordpress.json?' . $options;
           $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
           $context  = stream_context_create($soptions);
           $result = file_get_contents($permalink, false, $context);
@@ -182,6 +191,9 @@ class Discourse {
     add_settings_field('discourse_max_comments', 'Max visible comments', array($this, 'max_comments_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_use_fullname_in_comments', 'Full name in comments', array($this, 'use_fullname_in_comments_checkbox'), 'discourse', 'default_discourse');
 
+    add_settings_field('discourse_min_replies', 'Min number of replies', array($this, 'min_replies_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_min_score', 'Min score of posts', array($this, 'min_score_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_min_trust_level', 'Min trust level', array($this, 'min_trust_level_input'), 'discourse', 'default_discourse');
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
@@ -370,6 +382,18 @@ class Discourse {
 
   function use_discourse_comments_checkbox(){
     self::checkbox_input('use-discourse-comments', 'Use Discourse to comment on Discourse published posts (hiding existing comment section)');
+  }
+
+  function min_replies_input(){
+    self::text_input('min-replies', 'Minimum replies required prior to pulling comments across');
+  }
+
+  function min_trust_level_input(){
+    self::text_input('min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)');
+  }
+
+  function min_score_input(){
+    self::text_input('min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)');
   }
 
   function checkbox_input($option, $description) {
