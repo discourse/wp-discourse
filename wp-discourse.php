@@ -198,6 +198,13 @@ class Discourse {
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
     add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
+
+    add_filter('user_contactmethods', array($this, 'extend_user_profile'), 10, 1);
+  }
+
+  function extend_user_profile($fields) {
+    $fields['discourse_username'] = 'Discourse Username';
+    return $fields;
   }
 
   function publish_post_to_discourse($postid){
@@ -268,13 +275,19 @@ class Discourse {
     $baked = str_replace("{excerpt}", $excerpt, $baked);
     $baked = str_replace("{blogurl}", get_permalink($postid), $baked);
 
+    $username = get_the_author_meta('discourse_username', $post->post_author);
+    if(!$username || strlen($username) < 2) {
+      $username = $options['publish-username'];
+    }
+
     $data = array(
       'wp-id' => $postid,
       'api_key' => $options['api-key'],
-      'api_username' => $options['publish-username'],
+      'api_username' => $username,
       'title' => $title,
       'raw' => $baked,
-      'category' => $options['publish-category']
+      'category' => $options['publish-category'],
+      'skip_validations' => "true"
     );
 
 
@@ -353,7 +366,7 @@ class Discourse {
   }
 
   function publish_username_input(){
-    self::text_input('publish-username', 'Discourse username of publisher');
+    self::text_input('publish-username', 'Discourse username of publisher (will be overriden if Discourse Username is specified on user)');
   }
 
   function publish_category_input(){
