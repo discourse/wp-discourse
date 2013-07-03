@@ -6,7 +6,10 @@
   $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
   $more_replies = $discourse_info->filtered_posts_count - count($discourse_info->posts) - 1;
   $show_fullname = $options['use-fullname-in-comments'] == 1;
-
+  $comments_title = $options['custom-comments-title'];
+  if(!$comments_title || strlen(trim($comments_title)) == 0) {
+    $comments_title = 'Notable Replies';
+  }
   $more = count($discourse_info->posts) == 0 ? "" : "more ";
 
   if($more_replies == 0) {
@@ -20,11 +23,9 @@
   $link_text = count($discourse_info->filtered_posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
 ?>
 
-<?php # var_dump($discourse_info->posts) ?>
-
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-  <h2 id="comments-title">Notable Replies</h2>
+    <h2 id="comments-title"><?php echo $comments_title ?></h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>

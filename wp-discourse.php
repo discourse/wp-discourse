@@ -49,7 +49,10 @@ class Discourse {
     'publish-format'=>'<small>Originally published at: {blogurl}</small><br>{excerpt}',
     'min-score'=>30,
     'min-replies'=>5,
-    'min-trust-level'=>1
+    'min-trust-level'=>1,
+    'custom-comments-title'=>'',
+    'bypass-trust-level-score'=>50,
+    'debug-mode'=>0
 	);
 
 	public function __construct() {
@@ -112,11 +115,12 @@ class Discourse {
 
   function sync_comments($postid) {
     global $wpdb;
+    $discourse_options =  get_option('discourse');
 
     # every 10 minutes do a json call to sync comment count and top comments
     $last_sync = (int)get_post_meta($postid, 'discourse_last_sync', true);
     $time = date_timestamp_get(date_create());
-    if($last_sync + 60 * 10 < $time) {
+    if(intval($discourse_options['debug-mode']) == 1 || $last_sync + 60 * 10 < $time) {
 
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
@@ -129,13 +133,14 @@ class Discourse {
             self::publish_post_to_discourse($postid);
           }
 
-          $discourse_options =  get_option('discourse');
           $comment_count = intval($discourse_options['max-comments']);
           $min_trust_level = intval($discourse_options['min-trust-level']);
           $min_score = intval($discourse_options['min-score']);
           $min_replies = intval($discourse_options['min-replies']);
+          $bypass_trust_level_score = intval($discourse_options['bypass-trust-level-score']);
 
-          $options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score . '&min_replies=' . $min_replies;
+          $options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
+          $options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
 
           $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '/wordpress.json?' . $options;
           $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
@@ -194,6 +199,10 @@ class Discourse {
     add_settings_field('discourse_min_replies', 'Min number of replies', array($this, 'min_replies_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_min_score', 'Min score of posts', array($this, 'min_score_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_min_trust_level', 'Min trust level', array($this, 'min_trust_level_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_bypass_trust_level_score', 'Bypass trust level score', array($this, 'bypass_trust_level_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_custom_comment_title', 'Custom comments title', array($this, 'custom_comment_input'), 'discourse', 'default_discourse');
+
+    add_settings_field('discourse_debug_mode', 'Debug mode', array($this, 'debug_mode_checkbox'), 'discourse', 'default_discourse');
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
@@ -287,7 +296,7 @@ class Discourse {
       'title' => $title,
       'raw' => $baked,
       'category' => $options['publish-category'],
-      'skip_validations' => "true"
+      'skip_validations' => 'true'
     );
 
 
@@ -407,6 +416,19 @@ class Discourse {
 
   function min_score_input(){
     self::text_input('min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)');
+  }
+
+  function custom_comment_input(){
+    self::text_input('custom-comments-title', 'Custom comments title (default: Notable Replies)');
+  }
+
+  function bypass_trust_level_input(){
+    self::text_input('bypass-trust-level-score', 'Bypass trust level check on posts with this score');
+  }
+
+
+  function debug_mode_checkbox(){
+    self::checkbox_input('debug-mode', '(always refresh comments)');
   }
 
   function checkbox_input($option, $description) {
