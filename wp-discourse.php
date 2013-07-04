@@ -284,6 +284,9 @@ class Discourse {
     $baked = $options['publish-format'];
     $baked = str_replace("{excerpt}", $excerpt, $baked);
     $baked = str_replace("{blogurl}", get_permalink($postid), $baked);
+    $author_id=$post->post_author;
+    $author = get_the_author_meta( "display_name", $author_id );
+    $baked = str_replace("{author}", $author, $baked);
 
     $username = get_the_author_meta('discourse_username', $post->post_author);
     if(!$username || strlen($username) < 2) {
