@@ -52,7 +52,8 @@ class Discourse {
     'min-trust-level'=>1,
     'custom-comments-title'=>'',
     'bypass-trust-level-score'=>50,
-    'debug-mode'=>0
+    'debug-mode'=>0,
+    'only-show-moderator-liked'=>0
 	);
 
 	public function __construct() {
@@ -143,6 +144,10 @@ class Discourse {
           $options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
           $options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
 
+          if (isset($discourse_options['only-show-moderator-liked']) && intval($discourse_options['only-show-moderator-liked']) == 1) {
+            $options = $options . "&only_moderator_liked=true";
+          }
+
           $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '/wordpress.json?' . $options;
           $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
           $context  = stream_context_create($soptions);
@@ -204,6 +209,7 @@ class Discourse {
     add_settings_field('discourse_custom_comment_title', 'Custom comments title', array($this, 'custom_comment_input'), 'discourse', 'default_discourse');
 
     add_settings_field('discourse_debug_mode', 'Debug mode', array($this, 'debug_mode_checkbox'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array($this, 'only_show_moderator_liked_checkbox'), 'discourse', 'default_discourse');
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
     add_action( 'save_post', array($this, 'save_postdata'));
@@ -427,9 +433,12 @@ class Discourse {
     self::text_input('bypass-trust-level-score', 'Bypass trust level check on posts with this score');
   }
 
-
   function debug_mode_checkbox(){
     self::checkbox_input('debug-mode', '(always refresh comments)');
+  }
+
+  function only_show_moderator_liked_checkbox(){
+    self::checkbox_input('only-show-moderator-liked', 'Yes');
   }
 
   function checkbox_input($option, $description) {
