@@ -88,7 +88,9 @@ class Discourse {
     wp_register_style('discourse_comments', $plugin_dir . 'css/style.css');
     wp_enqueue_style('discourse_comments');
 
+    add_action( 'save_post', array($this, 'save_postdata'));
     add_action( 'xmlrpc_publish_post', array($this, 'xmlrpc_publish_post_to_discourse'));
+    add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
 	}
 
   function comments_number($count) {
@@ -212,8 +214,7 @@ class Discourse {
     add_settings_field('discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array($this, 'only_show_moderator_liked_checkbox'), 'discourse', 'default_discourse');
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
-    add_action( 'save_post', array($this, 'save_postdata'));
-    add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
+
 
     add_filter('user_contactmethods', array($this, 'extend_user_profile'), 10, 1);
   }
@@ -225,7 +226,9 @@ class Discourse {
 
   function publish_post_to_discourse($postid){
     $post = get_post($postid);
-    if (get_post_status($postid) == "publish" && get_post_meta($postid, 'publish_to_discourse', true) && !self::is_custom_post_type($postid)) {
+    if (get_post_status($postid) == "publish" &&
+        (self::publish_active() || get_post_meta($postid, 'publish_to_discourse', true)) &&
+        !self::is_custom_post_type($postid)) {
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
@@ -234,10 +237,6 @@ class Discourse {
   function xmlrpc_publish_post_to_discourse($postid){
     $post = get_post($postid);
     if (get_post_status($postid) == "publish" && !self::is_custom_post_type($postid)) {
-
-      // we assume you always want to publish to discourse via xmlrpc since we can't ask
-      add_post_meta($postid, 'publish_to_discourse', true, true);
-
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
@@ -259,10 +258,18 @@ class Discourse {
     return in_array( $current_post_type, $custom_types );
   }
 
+  function publish_active() {
+    if (isset($_POST['showed_publish_option'])) {
+      return $_POST['publish_to_discourse'] == "1";
+    } else {
+      return true;
+    }
+  }
+
   function save_postdata($postid)
   {
     if ( !current_user_can( 'edit_page', $postid ) ) return $postid;
-    if(empty($postid) || !isset($_POST['publish_to_discourse'])) return $postid;
+    if(empty($postid)) return $postid;
 
     # trust me ... WordPress is crazy like this, try changing a title.
     if(!isset($_POST['ID'])) return $postid;
@@ -271,9 +278,7 @@ class Discourse {
         delete_post_meta($_POST['ID'], 'publish_to_discourse');
     }
 
-    $publish = $_POST['publish_to_discourse'];
-
-    add_post_meta($_POST['ID'], 'publish_to_discourse', $publish, true);
+    add_post_meta($_POST['ID'], 'publish_to_discourse', self::publish_active() ? "1" : null, true);
 
     return $postid;
   }
@@ -367,6 +372,7 @@ class Discourse {
 
     echo '<div class="misc-pub-section misc-pub-section-last">
          <span>'
+         . '<input type="hidden" name="showed_publish_option" value="1">'
          . '<label><input type="checkbox"' . ($value ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
     .'</span></div>';
   }
