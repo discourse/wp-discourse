@@ -94,8 +94,6 @@ class Discourse {
 	}
 
   function comments_number($count) {
-
-
     global $post;
     if(self::use_discourse_comments($post->ID)){
       self::sync_comments($post->ID);
@@ -111,9 +109,15 @@ class Discourse {
   }
 
   function use_discourse_comments($postid){
-    return get_post_meta($postid, 'publish_to_discourse', true) == 1;
-      // in the past we used to do this, however we would like to hijack a publish if needed;
-      // && get_post_meta($postid, 'discourse_post_id', true) > 0;
+    // we may have a missing "publish_to_discourse" ... if it is missing AND
+    //  the post is 7 days or younger, just publish it
+    //
+    // note: codex api says get_post_meta will return "" if the setting is missing
+    //  tested and it is the case
+
+    $setting = get_post_meta($postid, 'publish_to_discourse', true);
+    $a_week = 604800;
+    return $setting == "1" || ($setting == "" && (time() - get_the_time('U',$postid)) < $a_week) ;
   }
 
   function sync_comments($postid) {
@@ -226,9 +230,10 @@ class Discourse {
 
   function publish_post_to_discourse($postid){
     $post = get_post($postid);
-    if (get_post_status($postid) == "publish" &&
-        (self::publish_active() || get_post_meta($postid, 'publish_to_discourse', true)) &&
-        !self::is_custom_post_type($postid)) {
+    if (  get_post_status($postid) == "publish" &&
+          self::use_discourse_comments($postid) &&
+          !self::is_custom_post_type($postid)
+       ) {
 
       // This seems a little redundant after `save_postdata` but when using the Press This
       // widget it updates the field as it should.
@@ -284,7 +289,7 @@ class Discourse {
         delete_post_meta($_POST['ID'], 'publish_to_discourse');
     }
 
-    add_post_meta($_POST['ID'], 'publish_to_discourse', self::publish_active() ? "1" : null, true);
+    add_post_meta($_POST['ID'], 'publish_to_discourse', self::publish_active() ? "1" : "0", true);
 
     return $postid;
   }
@@ -379,7 +384,7 @@ class Discourse {
     echo '<div class="misc-pub-section misc-pub-section-last">
          <span>'
          . '<input type="hidden" name="showed_publish_option" value="1">'
-         . '<label><input type="checkbox"' . ($value ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
+         . '<label><input type="checkbox"' . (($value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
     .'</span></div>';
   }
 
