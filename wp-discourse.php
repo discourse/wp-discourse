@@ -313,6 +313,10 @@ class Discourse {
     $author_id=$post->post_author;
     $author = get_the_author_meta( "display_name", $author_id );
     $baked = str_replace("{author}", $author, $baked);
+    $thumb = wp_get_attachment_image_src( get_post_thumbnail_id($postid), 'thumbnail' );
+    $baked = str_replace("{thumbnail}", "![image](".$thumb['0'].")", $baked);
+    $featured = wp_get_attachment_image_src( get_post_thumbnail_id($postid), 'full' );
+    $baked = str_replace("{featuredimage}", "![image](".$featured['0'].")", $baked);
 
     $username = get_the_author_meta('discourse_username', $post->post_author);
     if(!$username || strlen($username) < 2) {
