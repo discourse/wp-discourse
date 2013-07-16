@@ -302,6 +302,10 @@ class Discourse {
 
     $excerpt = apply_filters('the_content', $raw);
     $excerpt = wp_trim_words($excerpt);
+    
+    if(function_exists('discourse_custom_excerpt')){
+        $excerpt = discourse_custom_excerpt($postid);
+    }
 
     $baked = $options['publish-format'];
     $baked = str_replace("{excerpt}", $excerpt, $baked);
