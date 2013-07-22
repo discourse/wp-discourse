@@ -43,6 +43,7 @@ class Discourse {
     'publish-category'=>'',
     'auto-publish'=>0,
     'auto-update'=>0,
+    'auto-track'=>1,
     'max-comment'=>5,
     'use-discourse-comments'=>0,
     'use-fullname-in-comments'=>1,
@@ -204,6 +205,8 @@ class Discourse {
     add_settings_field('discourse_publish_format', 'Publish format', array($this, 'publish_format_textarea'), 'discourse', 'default_discourse');
     add_settings_field('discourse_auto_publish', 'Auto Publish', array($this, 'auto_publish_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_auto_update', 'Auto Update Posts', array($this, 'auto_update_checkbox'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_auto_track', 'Auto Track Published Topics', array($this, 'auto_track_checkbox'), 'discourse', 'default_discourse');
+
     add_settings_field('discourse_use_discourse_comments', 'Use Discourse Comments', array($this, 'use_discourse_comments_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_max_comments', 'Max visible comments', array($this, 'max_comments_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_use_fullname_in_comments', 'Full name in comments', array($this, 'use_fullname_in_comments_checkbox'), 'discourse', 'default_discourse');
@@ -294,7 +297,18 @@ class Discourse {
     return $postid;
   }
 
-  function sync_to_discourse($postid, $title, $raw) {
+  function sync_to_discourse($postid, $title, $raw){
+    global $wpdb;
+
+    // this avoids a double sync, just 1 is allowed to go through at a time
+    $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 5) got_it");
+    if($got_lock) {
+      self::sync_to_discourse_work($postid, $title, $raw);
+      $wpdb->get_results("SELECT RELEASE_LOCK('discourse_sync_lock')");
+    }
+  }
+
+  function sync_to_discourse_work($postid, $title, $raw) {
     $discourse_id = get_post_meta($postid, 'discourse_post_id', true);
     $options = get_option('discourse');
     $post = get_post($postid);
@@ -302,7 +316,7 @@ class Discourse {
 
     $excerpt = apply_filters('the_content', $raw);
     $excerpt = wp_trim_words($excerpt);
-    
+
     if(function_exists('discourse_custom_excerpt')){
         $excerpt = discourse_custom_excerpt($postid);
     }
@@ -330,7 +344,8 @@ class Discourse {
       'title' => $title,
       'raw' => $baked,
       'category' => $options['publish-category'],
-      'skip_validations' => 'true'
+      'skip_validations' => 'true',
+      'auto_track' => ($options['auto-track'] == "1" ? 'true' : 'false')
     );
 
 
@@ -431,6 +446,10 @@ class Discourse {
 
   function auto_publish_checkbox(){
     self::checkbox_input('auto-publish', 'Publish all new posts to Discourse');
+  }
+
+  function auto_track_checkbox(){
+    self::checkbox_input('auto-track', 'Author automatically tracks pulished Discourse topics');
   }
 
   function auto_update_checkbox(){
