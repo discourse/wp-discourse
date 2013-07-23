@@ -301,7 +301,7 @@ class Discourse {
     global $wpdb;
 
     // this avoids a double sync, just 1 is allowed to go through at a time
-    $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 5) got_it");
+    $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it");
     if($got_lock) {
       self::sync_to_discourse_work($postid, $title, $raw);
       $wpdb->get_results("SELECT RELEASE_LOCK('discourse_sync_lock')");
