@@ -235,7 +235,7 @@ class Discourse {
     $post = get_post($postid);
     if (  get_post_status($postid) == "publish" &&
           self::use_discourse_comments($postid) &&
-          !self::is_custom_post_type($postid)
+          self::is_valid_sync_post_type($postid)
        ) {
 
       // This seems a little redundant after `save_postdata` but when using the Press This
@@ -249,28 +249,19 @@ class Discourse {
   // When publishing by xmlrpc, ignore the `publish_to_discourse` option
   function xmlrpc_publish_post_to_discourse($postid){
     $post = get_post($postid);
-    if (get_post_status($postid) == "publish" && !self::is_custom_post_type($postid)) {
+    if (get_post_status($postid) == "publish" && self::is_valid_sync_post_type($postid)) {
       add_post_meta($postid, 'publish_to_discourse', "1", true);
       self::sync_to_discourse($postid, $post->post_title, $post->post_content);
     }
   }
 
-  function is_custom_post_type( $post = NULL ){
-    $all_custom_post_types = get_post_types( array ( '_builtin' => FALSE ) );
-
-    // there are no custom post types
-    if ( empty ( $all_custom_post_types ) )
-        return FALSE;
-
-    $custom_types      = array_keys( $all_custom_post_types );
-    $current_post_type = get_post_type( $post );
-
-    // could not detect current type
-    if ( ! $current_post_type )
-        return FALSE;
-
-    return in_array( $current_post_type, $custom_types );
-  }
+  function is_valid_sync_post_type( $postid = NULL ){
+      // is_single() etc. is not reliable
+      $allowed_post_types = array("post", "page");
+      $current_post_type = get_post_type( $postid );
+      
+      return in_array( $current_post_type, $allowed_post_types );
+    }
 
   function publish_active() {
     if (isset($_POST['showed_publish_option'])) {
