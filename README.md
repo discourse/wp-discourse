@@ -1,8 +1,8 @@
 wp-discourse
 ============
 
-This plugin allows you to *optionally* publish your WordPress blog posts on a Discourse instance. 
+This WordPress plugin allows you to use Discourse as a community engine for your WordPress blog.
 
-Once published, WordPress will fetch the best 5 comments from the Discourse topic and surplant the existing comments section.
+Each WordPress post can optionally create an associated Discourse topic.
 
-Comments and post metadata is synchronized every 10 minutes.
+The plugin will periodicially sync the "best" posts in those topics back to the WordPress blog entry as comments.
