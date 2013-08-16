@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP-Discourse
 Description: Allows you to publish your posts to a Discourse instance and view top Discourse comments on your blog
-Version: 0.0.1
+Version: 0.5.0
 Author: Sam Saffron
 Author URI: http://www.discourse.org
 */
