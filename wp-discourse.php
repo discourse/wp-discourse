@@ -6,7 +6,7 @@ Version: 0.5.0
 Author: Sam Saffron, Robin Ward
 Author URI: http://www.discourse.org
 */
-/*  Copyright 2011 Sam Saffron (sam.saffron@discourse.org)
+/*  Copyright 2013 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
