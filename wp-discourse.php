@@ -477,6 +477,10 @@ class Discourse {
   function custom_comment_input(){
     self::text_input('custom-comments-title', 'Custom comments title (default: Notable Replies)');
   }
+  
+  function custom_excerpt_length(){
+    self::text_input('custom-excerpt-length', 'Custom excerpt length in words (default: 55)');
+  }
 
   function bypass_trust_level_input(){
     self::text_input('bypass-trust-level-score', 'Bypass trust level check on posts with this score');
