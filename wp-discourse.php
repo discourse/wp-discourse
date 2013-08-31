@@ -52,6 +52,7 @@ class Discourse {
     'min-replies'=>5,
     'min-trust-level'=>1,
     'custom-comments-title'=>'',
+    'custom-excerpt-length'=>'55',
     'bypass-trust-level-score'=>50,
     'debug-mode'=>0,
     'only-show-moderator-liked'=>0
@@ -216,6 +217,7 @@ class Discourse {
     add_settings_field('discourse_min_trust_level', 'Min trust level', array($this, 'min_trust_level_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_bypass_trust_level_score', 'Bypass trust level score', array($this, 'bypass_trust_level_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_custom_comment_title', 'Custom comments title', array($this, 'custom_comment_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_custom_excerpt_length', 'Custom excerpt length', array($this, 'custom_excerpt_length'), 'discourse', 'default_discourse');
 
     add_settings_field('discourse_debug_mode', 'Debug mode', array($this, 'debug_mode_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array($this, 'only_show_moderator_liked_checkbox'), 'discourse', 'default_discourse');
@@ -315,7 +317,7 @@ class Discourse {
 
 
     $excerpt = apply_filters('the_content', $raw);
-    $excerpt = wp_trim_words($excerpt);
+    $excerpt = wp_trim_words($excerpt, $options['custom_excerpt_length']);
 
     if(function_exists('discourse_custom_excerpt')){
         $excerpt = discourse_custom_excerpt($postid);
