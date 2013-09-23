@@ -317,7 +317,7 @@ class Discourse {
 
 
     $excerpt = apply_filters('the_content', $raw);
-    $excerpt = wp_trim_words($excerpt, $options['custom_excerpt_length']);
+    $excerpt = wp_trim_words($excerpt, $options['custom-excerpt-length']);
 
     if(function_exists('discourse_custom_excerpt')){
         $excerpt = discourse_custom_excerpt($postid);
