@@ -32,7 +32,7 @@
       <?php foreach($discourse_info->posts as &$post) { ?>
       <li class="comment">
 				<div class="comment-author vcard">
-          <img alt="" src="<?php Discourse::avatar($post->avatar_template,68) ?>" class="avatar avatar-68 photo avatar-default" height="68" width="68">
+          <img alt="" src="<?php Discourse::avatar($post->avatar_template,64) ?>" class="avatar avatar-64 photo avatar-default" height="64" width="64">
             <a href="<?php Discourse::homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a>
             <br/>
             <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
