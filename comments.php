@@ -5,12 +5,6 @@
   $discourse_url_name = preg_replace("(https?://)", "", $options['url'] );
   $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
   $more_replies = $discourse_info->posts_count - count($discourse_info->posts) - 1;
-  /*
-  $show_fullname = $options['use-fullname-in-comments'] == 1;
-  $comments_title = $options['custom-comments-title'];
-  if(!$comments_title || strlen(trim($comments_title)) == 0) {
-    $comments_title = 'Notable Replies';
-  }*/
   $more = count($discourse_info->posts) == 0 ? "" : "more ";
 
   if($more_replies == 0) {
@@ -20,8 +14,6 @@
   } else {
     $more_replies = $more_replies . " " . $more . "replies";
   }
-
-  //$link_text = count($discourse_info->posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
 
   $discourse_html = '';
   $comments_html = '';
