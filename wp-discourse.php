@@ -54,10 +54,30 @@ class Discourse {
     'bypass-trust-level-score'=>50,
     'debug-mode'=>0,
     'only-show-moderator-liked'=>0,
-    'replies-html'=>'',
-    'no-replies-html' => '',
-    'comment-html' => '',
-    'participant-html' => '',
+    'replies-html'=>'<div id="comments">
+	<h2 id="comments-title">Notable Replies</h2>
+	<ol class="commentlist">{comments}</ol>
+	<div class="respond">
+		<h3 class="reply-title"><a href="{topic_url}">Continue the discussion</a> at {discourse_url_name}</h3>
+		<p class="more-replies">{more_replies}</p>
+		<p>{participants}</p>
+	</div><!-- #respond -->
+</div>',
+    'no-replies-html' => '<div id="comments">
+	<div class="respond">
+		<h3 class="reply-title"><a href="{topic_url}">Start the discussion</a> at {discourse_url_name}</h3>
+	</div><!-- #respond -->
+</div>',
+    'comment-html' => '<li class="comment">
+	<div class="comment-author vcard">
+		<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64" width="64">
+		<a href="{topic_url}" rel="external" class="url">{fullname}</a>
+		<br/>
+		<time pubdate="" datetime="{comment_created_at}">{comment_created_at}</time>
+	</div>
+	<div class="comment-content">{comment_body}</div>
+</li>',
+    'participant-html' => '<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25"/>',
 	);
 
 	public function __construct() {
