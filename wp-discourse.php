@@ -24,11 +24,11 @@ Author URI: http://www.discourse.org
 */
 class Discourse {
 	public static function homepage($url, $post) {
-	echo $url . "/users/" . strtolower($post->username);
+	return $url . "/users/" . strtolower($post->username);
 	}
 
 	public static function avatar($template, $size) {
-	echo str_replace("{size}", $size, $template);
+	return str_replace("{size}", $size, $template);
 	}
 	var $domain = 'discourse';
 
@@ -503,15 +503,15 @@ class Discourse {
   }
 
   function template_replies_html(){
-    self::text_area('replies-html', 'HTML template to use when there are replies<br/>Available tags: ');
+    self::text_area('replies-html', 'HTML template to use when there are replies<br/>Available tags: <small>{comments}, {discourse_url}, {topic_url}</small>');
   }
 
   function template_no_replies_html(){
-    self::text_area('no-replies-html', 'HTML template to use when there are no replies<br/>Available tags: ');
+    self::text_area('no-replies-html', 'HTML template to use when there are no replies<br/>Available tags: <small>{comments}, {discourse_url}, {topic_url}</small>');
   }
 
   function template_comment_html(){
-    self::text_area('comment-html', 'HTML template to use for each comment<br/>Available tags: ');
+    self::text_area('comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}, {comment_url}</small>');
   }
 
 
