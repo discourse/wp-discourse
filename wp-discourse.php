@@ -46,12 +46,10 @@ class Discourse {
     'auto-track'=>1,
     'max-comment'=>5,
     'use-discourse-comments'=>0,
-    'use-fullname-in-comments'=>1,
     'publish-format'=>'<small>Originally published at: {blogurl}</small><br>{excerpt}',
     'min-score'=>30,
     'min-replies'=>5,
     'min-trust-level'=>1,
-    'custom-comments-title'=>'',
     'custom-excerpt-length'=>'55',
     'bypass-trust-level-score'=>50,
     'debug-mode'=>0,
@@ -213,13 +211,11 @@ class Discourse {
 
     add_settings_field('discourse_use_discourse_comments', 'Use Discourse Comments', array($this, 'use_discourse_comments_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_max_comments', 'Max visible comments', array($this, 'max_comments_input'), 'discourse', 'default_discourse');
-    add_settings_field('discourse_use_fullname_in_comments', 'Full name in comments', array($this, 'use_fullname_in_comments_checkbox'), 'discourse', 'default_discourse');
 
     add_settings_field('discourse_min_replies', 'Min number of replies', array($this, 'min_replies_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_min_score', 'Min score of posts', array($this, 'min_score_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_min_trust_level', 'Min trust level', array($this, 'min_trust_level_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_bypass_trust_level_score', 'Bypass trust level score', array($this, 'bypass_trust_level_input'), 'discourse', 'default_discourse');
-    add_settings_field('discourse_custom_comment_title', 'Custom comments title', array($this, 'custom_comment_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_custom_excerpt_length', 'Custom excerpt length', array($this, 'custom_excerpt_length'), 'discourse', 'default_discourse');
 
     add_settings_field('discourse_debug_mode', 'Debug mode', array($this, 'debug_mode_checkbox'), 'discourse', 'default_discourse');
@@ -450,10 +446,6 @@ class Discourse {
     self::text_input('max-comments', 'Maximum number of comments to display');
   }
 
-  function use_fullname_in_comments_checkbox(){
-    self::checkbox_input('use-fullname-in-comments', 'Use the users full name in blog comment section');
-  }
-
   function auto_publish_checkbox(){
     self::checkbox_input('auto-publish', 'Publish all new posts to Discourse');
   }
@@ -480,10 +472,6 @@ class Discourse {
 
   function min_score_input(){
     self::text_input('min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)');
-  }
-
-  function custom_comment_input(){
-    self::text_input('custom-comments-title', 'Custom comments title (default: Notable Replies)');
   }
 
   function custom_excerpt_length(){
