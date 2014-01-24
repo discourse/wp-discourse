@@ -25,6 +25,7 @@
 
   $discourse_html = '';
   $comments_html = '';
+  $participants_html = '';
   if(count($discourse_info->posts) > 0) {
 	foreach($discourse_info->posts as &$post) {
 		$comment_html = wp_kses_post($options['comment-html']);
@@ -39,12 +40,24 @@
 		$comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
 		$comments_html .= $comment_html;
 	}
+	foreach($discourse_info->participants as &$participant) {
+		$participant_html = wp_kses_post($options['participant-html']);
+		$participant_html = str_replace('{discourse_url}', esc_url($options['url']), $participant_html);
+		$participant_html = str_replace('{topic_url}', $permalink, $participant_html);
+		$participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
+		$participant_html = str_replace('{user_url}', Discourse::homepage($options['url'],$participant), $participant_html);
+		$participant_html = str_replace('{username}', $participant->username, $participant_html);
+		$participant_html = str_replace('{fullname}', $participant->name, $participant_html);
+		$participants_html .= $participant_html;
+	}
 	$discourse_html = wp_kses_post($options['replies-html']);
+	$discourse_html = str_replace('{more_replies}', $more_replies, $discourse_html);
   } else {
 	$discourse_html = wp_kses_post($options['no-replies-html']);
   }
   $discourse_html = str_replace('{discourse_url}', esc_url($options['url']), $discourse_html);
   $discourse_html = str_replace('{topic_url}', $permalink, $discourse_html);
   $discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
+  $discourse_html = str_replace('{participants}', $participants_html, $discourse_html);
   echo $discourse_html;
 ?>

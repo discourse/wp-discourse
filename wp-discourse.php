@@ -57,6 +57,7 @@ class Discourse {
     'replies-html'=>'',
     'no-replies-html' => '',
     'comment-html' => '',
+    'participant-html' => '',
 	);
 
 	public function __construct() {
@@ -224,6 +225,7 @@ class Discourse {
     add_settings_field('discourse_template_replies', 'HTML Template to use when there are replies', array($this, 'template_replies_html'), 'discourse', 'default_discourse');
     add_settings_field('discourse_template_no_replies', 'HTML Template to use when there are no replies', array($this, 'template_no_replies_html'), 'discourse', 'default_discourse');
     add_settings_field('discourse_template_comment', 'HTML Template to use for each comment', array($this, 'template_comment_html'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_participant_comment', 'HTML Template to use for each participant', array($this, 'template_participant_html'), 'discourse', 'default_discourse');
 
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
@@ -491,7 +493,7 @@ class Discourse {
   }
 
   function template_replies_html(){
-    self::text_area('replies-html', 'HTML template to use when there are replies<br/>Available tags: <small>{comments}, {discourse_url}, {topic_url}</small>');
+    self::text_area('replies-html', 'HTML template to use when there are replies<br/>Available tags: <small>{comments}, {discourse_url}, {topic_url}, {more_replies}, {participants}</small>');
   }
 
   function template_no_replies_html(){
@@ -500,6 +502,10 @@ class Discourse {
 
   function template_comment_html(){
     self::text_area('comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}, {comment_url}</small>');
+  }
+
+  function template_participant_html(){
+    self::text_area('participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}</small>');
   }
 
 
