@@ -22,6 +22,7 @@
 	foreach($discourse_info->posts as &$post) {
 		$comment_html = wp_kses_post($options['comment-html']);
 		$comment_html = str_replace('{discourse_url}', esc_url($options['url']), $comment_html);
+		$comment_html = str_replace('{discourse_url_name}', $discourse_url_name, $comment_html);
 		$comment_html = str_replace('{topic_url}', $permalink, $comment_html);
 		//$comment_html = str_replace('{comment_url}', $permalink."/".$post->post_number, $comment_html); //post_number appears to be missing
 		$comment_html = str_replace('{avatar_url}', Discourse::avatar($post->avatar_template,64), $comment_html);
@@ -35,6 +36,7 @@
 	foreach($discourse_info->participants as &$participant) {
 		$participant_html = wp_kses_post($options['participant-html']);
 		$participant_html = str_replace('{discourse_url}', esc_url($options['url']), $participant_html);
+		$participant_html = str_replace('{discourse_url_name}', $discourse_url_name, $participant_html);
 		$participant_html = str_replace('{topic_url}', $permalink, $participant_html);
 		$participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
 		$participant_html = str_replace('{user_url}', Discourse::homepage($options['url'],$participant), $participant_html);
@@ -48,6 +50,7 @@
 	$discourse_html = wp_kses_post($options['no-replies-html']);
   }
   $discourse_html = str_replace('{discourse_url}', esc_url($options['url']), $discourse_html);
+  $discourse_html = str_replace('{discourse_url_name}', $discourse_url_name, $discourse_html);
   $discourse_html = str_replace('{topic_url}', $permalink, $discourse_html);
   $discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
   $discourse_html = str_replace('{participants}', $participants_html, $discourse_html);
