@@ -451,7 +451,7 @@ class Discourse {
   }
 
   function auto_track_checkbox(){
-    self::checkbox_input('auto-track', 'Author automatically tracks pulished Discourse topics');
+    self::checkbox_input('auto-track', 'Author automatically tracks published Discourse topics');
   }
 
   function auto_update_checkbox(){
