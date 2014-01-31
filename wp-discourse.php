@@ -4,7 +4,7 @@ Plugin Name: WP-Discourse
 Description: Allows you to publish your posts to a Discourse instance and view top Discourse comments on your blog
 Version: 0.5.5
 Author: Sam Saffron, Robin Ward
-Author URI: http://www.discourse.org
+Author URI: https://github.com/discourse/wp-discourse/
 */
 /*  Copyright 2013 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
