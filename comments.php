@@ -27,7 +27,6 @@
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
     <h2 id="comments-title"><?php echo $comments_title ?></h2>
-<?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
       <li class="comment">
@@ -44,6 +43,7 @@
 		</ol>
 
 
+<?php } ?>
 
     <div class="respond">
         <h3 class="reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
