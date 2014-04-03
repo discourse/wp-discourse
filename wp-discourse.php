@@ -332,6 +332,7 @@ class Discourse {
 
     $data = array(
       'wp-id' => $postid,
+      'embed_url' => get_permalink($postid),
       'api_key' => $options['api-key'],
       'api_username' => $username,
       'title' => $title,
