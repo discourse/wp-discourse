@@ -172,7 +172,7 @@ class Discourse {
 
           delete_post_meta($postid, 'discourse_comments_raw');
 
-          add_post_meta($postid, 'discourse_comments_raw', $wpdb->escape($result) , true);
+          add_post_meta($postid, 'discourse_comments_raw', esc_sql($result) , true);
 
           delete_post_meta($postid, 'discourse_last_sync');
           add_post_meta($postid, 'discourse_last_sync', $time, true);
