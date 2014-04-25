@@ -95,6 +95,10 @@ class Discourse {
     add_action( 'publish_post', array($this, 'publish_post_to_discourse'));
 	}
 
+  function get_plugin_options() {
+    return wp_parse_args( get_option('discourse'), Discourse::$options );
+  }
+
   function comments_number($count) {
     global $post;
     if(self::use_discourse_comments($post->ID)){
@@ -391,7 +395,7 @@ class Discourse {
   {
     global $post;
 
-    $options = get_option('discourse');
+    $options = self::get_plugin_options();
     if($post->post_status=="auto-draft") {
       $value = $options['auto-publish'];
     } else {
