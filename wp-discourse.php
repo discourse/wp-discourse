@@ -43,6 +43,7 @@ class Discourse {
     'publish-category'=>'',
     'auto-publish'=>0,
     'auto-update'=>0,
+    'allowed_post_types'=>array("post", "page"),
     'auto-track'=>1,
     'max-comment'=>5,
     'use-discourse-comments'=>0,
@@ -212,6 +213,8 @@ class Discourse {
     add_settings_field('discourse_auto_update', 'Auto Update Posts', array($this, 'auto_update_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_auto_track', 'Auto Track Published Topics', array($this, 'auto_track_checkbox'), 'discourse', 'default_discourse');
 
+    add_settings_field('discourse_allowed_post_types', 'Post Types to publish to Discourse', array($this, 'post_types_select'), 'discourse', 'default_discourse');
+
     add_settings_field('discourse_use_discourse_comments', 'Use Discourse Comments', array($this, 'use_discourse_comments_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_max_comments', 'Max visible comments', array($this, 'max_comments_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_use_fullname_in_comments', 'Full name in comments', array($this, 'use_fullname_in_comments_checkbox'), 'discourse', 'default_discourse');
@@ -263,7 +266,7 @@ class Discourse {
 
   function is_valid_sync_post_type( $postid = NULL ){
       // is_single() etc. is not reliable
-      $allowed_post_types = array("post", "page");
+      $allowed_post_types = get_option('discourse_allowed_post_types');
       $current_post_type = get_post_type( $postid );
       
       return in_array( $current_post_type, $allowed_post_types );
@@ -396,17 +399,21 @@ class Discourse {
     global $post;
 
     $options = self::get_plugin_options();
-    if($post->post_status=="auto-draft") {
-      $value = $options['auto-publish'];
-    } else {
-      $value = get_post_meta($post->ID, 'publish_to_discourse', true);
-    }
 
-    echo '<div class="misc-pub-section misc-pub-section-last">
-         <span>'
-         . '<input type="hidden" name="showed_publish_option" value="1">'
-         . '<label><input type="checkbox"' . (($value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
-    .'</span></div>';
+    if( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
+
+      if($post->post_status=="auto-draft") {
+        $value = $options['auto-publish'];
+      } else {
+        $value = get_post_meta($post->ID, 'publish_to_discourse', true);
+      }
+
+      echo '<div class="misc-pub-section misc-pub-section-last">
+           <span>'
+           . '<input type="hidden" name="showed_publish_option" value="1">'
+           . '<label><input type="checkbox"' . (($value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
+      .'</span></div>';
+    }
   }
 
 
@@ -448,6 +455,10 @@ class Discourse {
 
   function auto_track_checkbox(){
     self::checkbox_input('auto-track', 'Author automatically tracks published Discourse topics');
+  }
+
+  function post_types_select(){
+    self::post_type_select_input('allowed_post_types', get_post_types() );
   }
 
   function auto_update_checkbox(){
@@ -503,6 +514,28 @@ class Discourse {
 
 <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> /> <?php echo $description ?>
     <?php
+
+  }
+
+  function post_type_select_input($option, $post_types) {
+
+    $options = get_option( 'discourse' );
+
+    echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
+
+    foreach ($post_types as $post_type) {
+      
+      if (array_key_exists($option, $options) and in_array($post_type, $options[$option]) ) {
+        $value = 'selected';
+      } else {
+        $value = '';
+      }
+
+      echo "<option ".$value." value='".$post_type."''>".$post_type."</option>";
+
+    }
+
+    echo '</select>';
 
   }
 
