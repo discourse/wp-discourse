@@ -129,7 +129,7 @@ class Discourse {
 
   function sync_comments($postid) {
     global $wpdb;
-    $discourse_options =  get_option('discourse');
+    $discourse_options = self::get_plugin_options();
 
     # every 10 minutes do a json call to sync comment count and top comments
     $last_sync = (int)get_post_meta($postid, 'discourse_last_sync', true);
@@ -167,20 +167,22 @@ class Discourse {
           $result = file_get_contents($permalink, false, $context);
           $json = json_decode($result);
 
-          $posts_count = $json->posts_count - 1;
-          if ($posts_count < 0) {
-            $posts_count = 0;
+          if (isset($json->posts_count)) {
+            $posts_count = $json->posts_count - 1;
+            if ($posts_count < 0) {
+              $posts_count = 0;
+            }
+
+            delete_post_meta($postid, 'discourse_comments_count');
+            add_post_meta($postid, 'discourse_comments_count', $posts_count, true);
+
+            delete_post_meta($postid, 'discourse_comments_raw');
+
+            add_post_meta($postid, 'discourse_comments_raw', esc_sql($result) , true);
+
+            delete_post_meta($postid, 'discourse_last_sync');
+            add_post_meta($postid, 'discourse_last_sync', $time, true);
           }
-
-          delete_post_meta($postid, 'discourse_comments_count');
-          add_post_meta($postid, 'discourse_comments_count', $posts_count, true);
-
-          delete_post_meta($postid, 'discourse_comments_raw');
-
-          add_post_meta($postid, 'discourse_comments_raw', esc_sql($result) , true);
-
-          delete_post_meta($postid, 'discourse_last_sync');
-          add_post_meta($postid, 'discourse_last_sync', $time, true);
         }
         $wpdb->get_results("SELECT RELEASE_LOCK('discourse_lock')");
       }
@@ -273,10 +275,10 @@ class Discourse {
     }
 
   function publish_active() {
-    if (isset($_POST['showed_publish_option'])) {
+    if (isset($_POST['showed_publish_option']) && isset($_POST['publish_to_discourse'])) {
       return $_POST['publish_to_discourse'] == "1";
     } else {
-      return true;
+      return false;
     }
   }
 
@@ -310,7 +312,7 @@ class Discourse {
 
   function sync_to_discourse_work($postid, $title, $raw) {
     $discourse_id = get_post_meta($postid, 'discourse_post_id', true);
-    $options = get_option('discourse');
+    $options = self::get_plugin_options();
     $post = get_post($postid);
 
 
@@ -354,7 +356,14 @@ class Discourse {
       $url =  $options['url'] .'/posts';
 
       // use key 'http' even if you send the request to https://...
-      $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'POST','content' => http_build_query($data)));
+      $soptions = array(
+        'http' => array(
+          'ignore_errors' => true, 
+          'method'  => 'POST',
+          'content' => http_build_query($data),
+          'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
+        )
+      );
       $context  = stream_context_create($soptions);
       $result = file_get_contents($url, false, $context);
       $json = json_decode($result);
@@ -394,14 +403,12 @@ class Discourse {
   }
 
 
-  function publish_to_discourse()
-  {
+  function publish_to_discourse() {
     global $post;
 
     $options = self::get_plugin_options();
 
     if( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
-
       if($post->post_status=="auto-draft") {
         $value = $options['auto-publish'];
       } else {
