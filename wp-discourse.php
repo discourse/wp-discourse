@@ -243,7 +243,7 @@ class Discourse {
 		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
-			add_post_meta( $postid, 'publish_to_discourse', "1", true );
+			add_post_meta( $postid, 'publish_to_discourse', '1', true );
 
 			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
 		}
@@ -307,7 +307,7 @@ class Discourse {
 
 		// this avoids a double sync, just 1 is allowed to go through at a time
 		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
-		if( $got_lock) {
+		if ( $got_lock) {
 			self::sync_to_discourse_work( $postid, $title, $raw );
 			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
@@ -317,7 +317,6 @@ class Discourse {
 		$discourse_id 	= get_post_meta( $postid, 'discourse_post_id', true );
 		$options 		= self::get_plugin_options();
 		$post 			= get_post( $postid );
-
 
 		$excerpt = apply_filters( 'the_content', $raw );
 		$excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
@@ -354,7 +353,6 @@ class Discourse {
 			'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
 		);
 
-
 		if( ! $discourse_id > 0 ) {
 			$url =  $options['url'] .'/posts';
 
@@ -376,7 +374,6 @@ class Discourse {
 			if( property_exists( $json, 'id' ) ) {
 				$discourse_id = (int) $json->id;
 			}
-
 
 			if( isset( $discourse_id ) && $discourse_id > 0 ) {
 				add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
