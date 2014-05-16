@@ -227,7 +227,7 @@ class Discourse {
 		add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'default_discourse' );
 
-		add_action( 'post_submitbox_misc_actions', array( $this,'publish_to_discourse' ) );
+		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
 
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1);
@@ -240,7 +240,7 @@ class Discourse {
 
 	function publish_post_to_discourse( $postid ){
 		$post = get_post( $postid );
-		if ( get_post_status( $postid ) == "publish" && self::is_valid_sync_post_type( $postid ) ) {
+		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
 			add_post_meta( $postid, 'publish_to_discourse', "1", true );
@@ -259,12 +259,22 @@ class Discourse {
 	}
 
 	function is_valid_sync_post_type( $postid = NULL ){
-			// is_single() etc. is not reliable
-			$allowed_post_types = get_option( 'discourse_allowed_post_types' );
-			$current_post_type = get_post_type( $postid );
-			
-			return in_array( $current_post_type, $allowed_post_types );
-		}
+		// is_single() etc. is not reliable
+		$allowed_post_types = $this->get_allowed_post_types();
+		$current_post_type 	= get_post_type( $postid );
+
+		return in_array( $current_post_type, $allowed_post_types );
+	}
+
+	function get_allowed_post_types() {
+		$selected_post_types = get_option( 'discourse_allowed_post_types' );
+
+		/** If no post type is explicitly set then use the defaults */
+		if ( empty( $selected_post_types ) )
+			$selected_post_types = self::$options['allowed_post_types'];
+
+		return $selected_post_types;
+	}
 
 	function publish_active() {
 		if (isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) )
