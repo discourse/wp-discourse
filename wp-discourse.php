@@ -240,9 +240,10 @@ class Discourse {
 
 	function publish_post_to_discourse( $postid ){
 		$post = get_post( $postid );
-		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
+		if ( self::publish_active() && get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
+
 			add_post_meta( $postid, 'publish_to_discourse', '1', true );
 
 			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
@@ -277,7 +278,7 @@ class Discourse {
 	}
 
 	function publish_active() {
-		if (isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) )
+		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) )
 			return $_POST['publish_to_discourse'] == '1';
 
 		return false;
