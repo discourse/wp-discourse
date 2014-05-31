@@ -152,12 +152,13 @@ class Discourse {
 
 					$options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
 					$options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
+					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=system';
 
 					if ( isset( $discourse_options['only-show-moderator-liked'] ) && intval( $discourse_options['only-show-moderator-liked'] ) == 1 ) {
 						$options = $options . '&only_moderator_liked=true';
 					}
 
-					$permalink 	= (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
+					$permalink 	= (string) get_post_meta( $postid, 'discourse_permalink', true ) . '.json?' . $options;
 					$soptions 	= array( 'http' => array( 'ignore_errors' => true, 'method'  => 'GET' ) );
 					$context  	= stream_context_create( $soptions );
 					$result 	= file_get_contents( $permalink, false, $context );
