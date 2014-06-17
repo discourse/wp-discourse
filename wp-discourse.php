@@ -43,7 +43,6 @@ class Discourse {
 		'publish-username' 			=> '',
 		'publish-category' 			=> '',
 		'auto-publish' 				=> 0,
-		'auto-update' 				=> 0,
 		'allowed_post_types' 		=> array( 'post', 'page' ),
 		'auto-track' 				=> 1,
 		'max-comment' 				=> 5,
@@ -208,7 +207,6 @@ class Discourse {
 		add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'default_discourse' );
-		add_settings_field( 'discourse_auto_update', 'Auto Update Posts', array( $this, 'auto_update_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'default_discourse' );
 
 		add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'default_discourse' );
@@ -466,10 +464,6 @@ class Discourse {
 
 	function post_types_select(){
 		self::post_type_select_input( 'allowed_post_types', get_post_types() );
-	}
-
-	function auto_update_checkbox(){
-		self::checkbox_input( 'auto-update', 'Update published blog posts on Discourse' );
 	}
 
 	function use_discourse_comments_checkbox(){
