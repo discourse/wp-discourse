@@ -38,35 +38,34 @@
 
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-    <h2 id="comments-title"><?php echo $comments_title ?></h2>
-		<ol class="commentlist">
-      <?php foreach($discourse_info->posts as &$post) { ?>
-      <li class="comment">
-				<div class="comment-author vcard">
-          <img alt="" src="<?php Discourse::avatar($post->avatar_template,64) ?>" class="avatar avatar-64 photo avatar-default" height="64" width="64">
-            <a href="<?php Discourse::homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a>
-            <br/>
-            <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
-        </div>
-        <div class="comment-content"><?php echo $post->cooked ?></div>
-      </li>
-      <?php } ?>
+  <h2 id="comments-title"><?php echo $comments_title ?></h2>
+  <ol class="commentlist">
+    <?php foreach($discourse_info->posts as &$post) { ?>
+    <li class="comment">
+  		<div class="comment-author vcard">
+        <img alt="" src="<?php Discourse::avatar($post->avatar_template,64) ?>" class="avatar avatar-64 photo avatar-default" height="64" width="64">
+          <a href="<?php Discourse::homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a>
+          <br/>
+          <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
+      </div>
+      <div class="comment-content"><?php echo $post->cooked ?></div>
+    </li>
+    <?php } ?>
 
-		</ol>
-
+  </ol>
 
 <?php } ?>
 
-    <div class="respond">
-        <h3 class="reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
-        <?php if(count($discourse_info->posts) > 0 || $more_replies > 0) { ?>
-        <p class='more-replies'><?php echo $more_replies ?></p>
-        <p>
-          <?php foreach($discourse_info->participants as &$participant) { ?>
-            <img alt="" src="<?php Discourse::avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
-          <?php } ?>
-        </p>
+  <div class="respond">
+      <h3 class="reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
+      <?php if(count($discourse_info->posts) > 0 || $more_replies > 0) { ?>
+      <p class='more-replies'><?php echo $more_replies ?></p>
+      <p>
+        <?php foreach($discourse_info->participants as &$participant) { ?>
+          <img alt="" src="<?php Discourse::avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
         <?php } ?>
-    </div><!-- #respond -->
+      </p>
+      <?php } ?>
+  </div><!-- #respond -->
 
 </div>

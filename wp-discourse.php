@@ -38,25 +38,25 @@ class Discourse {
 
 	//Options and defaults
 	static $options = array(
-		'url' 						=> '',
-		'api-key' 					=> '',
-		'publish-username' 			=> '',
-		'publish-category' 			=> '',
-		'auto-publish' 				=> 0,
-		'auto-update' 				=> 0,
-		'allowed_post_types' 		=> array( 'post', 'page' ),
-		'auto-track' 				=> 1,
-		'max-comment' 				=> 5,
-		'use-discourse-comments' 	=> 0,
-		'use-fullname-in-comments' 	=> 1,
-		'publish-format' 			=> '<small>Originally published at: {blogurl}</small><br>{excerpt}',
-		'min-score' 				=> 30,
-		'min-replies' 				=> 5,
-		'min-trust-level' 			=> 1,
-		'custom-comments-title' 	=> '',
-		'custom-excerpt-length' 	=> '55',
-		'bypass-trust-level-score' 	=> 50,
-		'debug-mode' 				=> 0,
+		'url' => '',
+		'api-key' => '',
+		'publish-username' => '',
+		'publish-category' => '',
+		'auto-publish' => 0,
+		'auto-update' => 0,
+		'allowed_post_types' => array( 'post', 'page' ),
+		'auto-track' => 1,
+		'max-comment' => 5,
+		'use-discourse-comments' => 0,
+		'use-fullname-in-comments' => 1,
+		'publish-format' => '<small>Originally published at: {blogurl}</small><br>{excerpt}',
+		'min-score' => 30,
+		'min-replies' => 5,
+		'min-trust-level' => 1,
+		'custom-comments-title' => '',
+		'custom-excerpt-length' => '55',
+		'bypass-trust-level-score' => 50,
+		'debug-mode' => 0,
 		'only-show-moderator-liked' => 0
 	);
 
@@ -130,12 +130,12 @@ class Discourse {
 		$discourse_options = self::get_plugin_options();
 
 		# every 10 minutes do a json call to sync comment count and top comments
-		$last_sync 	= (int ) get_post_meta( $postid, 'discourse_last_sync', true );
-		$time 		= date_create()->format( 'U' );
-		$debug 		= isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
+		$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
+		$time = date_create()->format( 'U' );
+		$debug = isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
 
 		if( $debug || $last_sync + 60 * 10 < $time ) {
-			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0) got_it");
+			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0) got_it" );
 			if( $got_lock->got_it == '1' ) {
 				if( get_post_status( $postid ) == 'publish' ) {
 					# workaround unpublished posts, publish if needed
@@ -144,11 +144,11 @@ class Discourse {
 						self::publish_post_to_discourse( $postid );
 					}
 
-					$comment_count 				= intval( $discourse_options['max-comments'] );
-					$min_trust_level 			= intval( $discourse_options['min-trust-level'] );
-					$min_score 					= intval( $discourse_options['min-score'] );
-					$min_replies 				= intval( $discourse_options['min-replies'] );
-					$bypass_trust_level_score 	= intval( $discourse_options['bypass-trust-level-score'] );
+					$comment_count = intval( $discourse_options['max-comments'] );
+					$min_trust_level = intval( $discourse_options['min-trust-level'] );
+					$min_score = intval( $discourse_options['min-score'] );
+					$min_replies = intval( $discourse_options['min-replies'] );
+					$bypass_trust_level_score = intval( $discourse_options['bypass-trust-level-score'] );
 
 					$options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
 					$options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
@@ -157,15 +157,15 @@ class Discourse {
 						$options = $options . '&only_moderator_liked=true';
 					}
 
-					$permalink 	= (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
-					$soptions 	= array( 'http' => array( 'ignore_errors' => true, 'method'  => 'GET' ) );
-					$context  	= stream_context_create( $soptions );
-					$result 	= file_get_contents( $permalink, false, $context );
-					$json 		= json_decode( $result );
+					$permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
+					$soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'GET' ) );
+					$context = stream_context_create( $soptions );
+					$result = file_get_contents( $permalink, false, $context );
+					$json = json_decode( $result );
 
 					if ( isset( $json->posts_count ) ) {
 						$posts_count = $json->posts_count - 1;
-						if ( $posts_count < 0) {
+						if ( $posts_count < 0 ) {
 							$posts_count = 0;
 						}
 
@@ -315,9 +315,9 @@ class Discourse {
 	}
 
 	function sync_to_discourse_work( $postid, $title, $raw ) {
-		$discourse_id 	= get_post_meta( $postid, 'discourse_post_id', true );
-		$options 		= self::get_plugin_options();
-		$post 			= get_post( $postid );
+		$discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
+		$options = self::get_plugin_options();
+		$post = get_post( $postid );
 
 		$excerpt = apply_filters( 'the_content', $raw );
 		$excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
@@ -326,16 +326,16 @@ class Discourse {
 			$excerpt = discourse_custom_excerpt( $postid );
 		}
 
-		$baked 		= $options['publish-format'];
-		$baked 		= str_replace( "{excerpt}", $excerpt, $baked );
-		$baked 		= str_replace( "{blogurl}", get_permalink( $postid ), $baked );
-		$author_id 	=$post->post_author;
-		$author 	= get_the_author_meta( 'display_name', $author_id );
-		$baked 		= str_replace( "{author}", $author, $baked);
-		$thumb 		= wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'thumbnail' );
-		$baked 		= str_replace( "{thumbnail}", "![image](".$thumb['0'].")", $baked );
-		$featured 	= wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'full' );
-		$baked 		= str_replace( "{featuredimage}", "![image](".$featured['0'].")", $baked );
+		$baked = $options['publish-format'];
+		$baked = str_replace( "{excerpt}", $excerpt, $baked );
+		$baked = str_replace( "{blogurl}", get_permalink( $postid ), $baked );
+		$author_id = $post->post_author;
+		$author = get_the_author_meta( 'display_name', $author_id );
+		$baked = str_replace( "{author}", $author, $baked);
+		$thumb = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'thumbnail' );
+		$baked = str_replace( "{thumbnail}", "![image](".$thumb['0'].")", $baked );
+		$featured = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'full' );
+		$baked = str_replace( "{featuredimage}", "![image](".$featured['0'].")", $baked );
 
 		$username = get_the_author_meta( 'discourse_username', $post->post_author );
 		if( ! $username || strlen( $username ) < 2 ) {
@@ -366,9 +366,9 @@ class Discourse {
 					'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
 				)
 			);
-			$context  	= stream_context_create( $soptions );
-			$result 	= file_get_contents( $url, false, $context );
-			$json 		= json_decode( $result );
+			$context = stream_context_create( $soptions );
+			$result = file_get_contents( $url, false, $context );
+			$json = json_decode( $result );
 
 			#todo may have $json->errors with list of errors
 
@@ -385,7 +385,7 @@ class Discourse {
 			return;
 			$url = $options['url'] .'/posts/' . $discourse_id ;
 			$soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'PUT','content' => http_build_query( $data) ));
-			$context  = stream_context_create( $soptions);
+			$context = stream_context_create( $soptions);
 			$result = file_get_contents( $url, false, $context );
 			$json = json_decode( $result );
 
@@ -518,7 +518,7 @@ class Discourse {
 		}
 
 		?>
-<input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> /> <?php echo $description ?>
+		<input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> /> <?php echo $description ?>
 		<?php
 
 	}
@@ -555,7 +555,7 @@ class Discourse {
 		}
 
 		?>
-<input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='text' value='<?php echo esc_attr( $value ); ?>' /> <?php echo $description ?>
+		<input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='text' value='<?php echo esc_attr( $value ); ?>' /> <?php echo $description ?>
 		<?php
 
 	}
@@ -570,10 +570,11 @@ class Discourse {
 		}
 
 		?>
-<textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_attr( $value ); ?></textarea><br><?php echo $description ?>
+		<textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_attr( $value ); ?></textarea><br><?php echo $description ?>
 		<?php
 
 	}
+
 	function discourse_validate_options( $input ) {
 		return $input;
 	}
