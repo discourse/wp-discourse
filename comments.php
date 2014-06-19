@@ -32,7 +32,7 @@
     $more_replies = $more_replies . " " . $more . "replies";
   }
 
-  $link_text = ($discourse_info->posts_count) ? "Continue the discussion" : "Start the discussion";
+  $link_text = ($discourse_info->posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
 
 ?>
 
