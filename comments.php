@@ -15,7 +15,7 @@
 
   //Wear some protection in the event our metadata doesn't look how we expect it to
   $discourse_info = (object)wp_parse_args((array)$discourse_info, $defaults);
-  
+
   $more_replies = $discourse_info->posts_count - count($discourse_info->posts) - 1;
   $show_fullname = $options['use-fullname-in-comments'] == 1;
   $comments_title = $options['custom-comments-title'];
@@ -32,7 +32,7 @@
     $more_replies = $more_replies . " " . $more . "replies";
   }
 
-  $link_text = count($discourse_info->posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
+  $link_text = ($discourse_info->posts_count) ? "Continue the discussion" : "Start the discussion";
 
 ?>
 

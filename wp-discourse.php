@@ -6,7 +6,7 @@ Version: 0.5.6
 Author: Sam Saffron, Robin Ward
 Author URI: https://github.com/discourse/wp-discourse/
 */
-/*  Copyright 2013 Civilized Discourse Construction Kit, Inc (team@discourse.org)
+/*  Copyright 2014 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
 	This program is free software; you can redistribute it and/or modify
 	it under the terms of the GNU General Public License as published by
@@ -133,7 +133,7 @@ class Discourse {
 		$last_sync 	= (int ) get_post_meta( $postid, 'discourse_last_sync', true );
 		$time 		= date_create()->format( 'U' );
 		$debug 		= isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
-		
+
 		if( $debug || $last_sync + 60 * 10 < $time ) {
 			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0) got_it");
 			if( $got_lock->got_it == '1' ) {
@@ -285,14 +285,14 @@ class Discourse {
 	}
 
 	function save_postdata( $postid ) {
-		if ( ! current_user_can( 'edit_page', $postid ) ) 
+		if ( ! current_user_can( 'edit_page', $postid ) )
 			return $postid;
-		
-		if ( empty( $postid ) ) 
+
+		if ( empty( $postid ) )
 			return $postid;
 
 		# trust me ... WordPress is crazy like this, try changing a title.
-		if( ! isset( $_POST['ID'] ) ) 
+		if( ! isset( $_POST['ID'] ) )
 			return $postid;
 
 		if( $_POST['action'] == 'editpost' )
@@ -360,7 +360,7 @@ class Discourse {
 			// use key 'http' even if you send the request to https://...
 			$soptions = array(
 				'http' => array(
-					'ignore_errors' => true, 
+					'ignore_errors' => true,
 					'method'  => 'POST',
 					'content' => http_build_query( $data ),
 					'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
@@ -491,7 +491,7 @@ class Discourse {
 	function custom_comment_input(){
 		self::text_input( 'custom-comments-title', 'Custom comments title (default: Notable Replies)' );
 	}
-	
+
 	function custom_excerpt_length(){
 		self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)' );
 	}
@@ -530,7 +530,7 @@ class Discourse {
 		echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
 
 		foreach ( $post_types as $post_type ) {
-			
+
 			if (array_key_exists( $option, $options) and in_array( $post_type, $options[$option] ) ) {
 				$value = 'selected';
 			} else {
@@ -562,7 +562,7 @@ class Discourse {
 
 	function text_area( $option, $description) {
 		$options = get_option( 'discourse' );
-		
+
 		if ( array_key_exists( $option, $options ) ) {
 			$value = $options[$option];
 		} else {
