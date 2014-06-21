@@ -33,10 +33,10 @@ class Discourse {
 
 	var $domain = 'discourse';
 
-	//Version
+	// Version
 	static $version ='0.0.1';
 
-	//Options and defaults
+	// Options and defaults
 	static $options = array(
 		'url' => '',
 		'api-key' => '',
@@ -68,22 +68,22 @@ class Discourse {
 		add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
 	}
 
-	static function install(){
+	static function install() {
 		update_option( 'discourse_version', self::$version );
 		add_option( 'discourse', self::$options );
 	}
 
-	static function uninstall(){
+	static function uninstall() {
 		delete_option( 'discourse_version' );
 		delete_option( 'discourse' );
 	}
 
 
 	public function init() {
-		//Allow translations
+		// allow translations
 		load_plugin_textdomain( 'discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		//replace comments with discourse comments
+		// replace comments with discourse comments
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ) );
 
@@ -115,8 +115,8 @@ class Discourse {
 		return $count;
 	}
 
-	function use_discourse_comments( $postid ){
-		/** If use comments is disabled bail out */
+	function use_discourse_comments( $postid ) {
+		// If "use comments" is disabled, bail out
 		$options = self::get_plugin_options();
 		if ( ! $options['use-discourse-comments'] )
 			return 0;
@@ -135,11 +135,11 @@ class Discourse {
 		$debug = isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
 
 		if( $debug || $last_sync + 60 * 10 < $time ) {
-			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0) got_it" );
+			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
 			if( $got_lock->got_it == '1' ) {
 				if( get_post_status( $postid ) == 'publish' ) {
-					# workaround unpublished posts, publish if needed
-					# if you have a scheduled post we never seem to be called
+					// workaround unpublished posts, publish if needed
+					// if you have a scheduled post we never seem to be called
 					if( ! ( get_post_meta( $postid, 'discourse_post_id', true ) > 0 ) ) {
 						self::publish_post_to_discourse( $postid );
 					}
@@ -185,7 +185,7 @@ class Discourse {
 		}
 	}
 
-	function comments_template( $old) {
+	function comments_template( $old ) {
 		global $post;
 
 		if( self::use_discourse_comments( $post->ID ) ) {
@@ -199,9 +199,10 @@ class Discourse {
 	/*
 	* Settings
 	*/
-	public function admin_init(){
+	public function admin_init() {
 		register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
 		add_settings_section( 'default_discourse', 'Default Settings', array( $this, 'init_default_settings' ), 'discourse' );
+
 		add_settings_field( 'discourse_url', 'Url', array( $this, 'url_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'default_discourse' );
@@ -210,25 +211,20 @@ class Discourse {
 		add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_auto_update', 'Auto Update Posts', array( $this, 'auto_update_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'default_discourse' );
-
 		add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'default_discourse' );
-
 		add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_use_fullname_in_comments', 'Full name in comments', array( $this, 'use_fullname_in_comments_checkbox' ), 'discourse', 'default_discourse' );
-
 		add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_min_score', 'Min score of posts', array( $this, 'min_score_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_min_trust_level', 'Min trust level', array( $this, 'min_trust_level_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_custom_comment_title', 'Custom comments title', array( $this, 'custom_comment_input' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'default_discourse' );
-
 		add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'default_discourse' );
 		add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'default_discourse' );
 
 		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
-
 
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1);
 	}
@@ -238,7 +234,7 @@ class Discourse {
 		return $fields;
 	}
 
-	function publish_post_to_discourse( $postid ){
+	function publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
 		if ( self::publish_active() && get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
@@ -251,7 +247,7 @@ class Discourse {
 	}
 
 	// When publishing by xmlrpc, ignore the `publish_to_discourse` option
-	function xmlrpc_publish_post_to_discourse( $postid ){
+	function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
 		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
 			add_post_meta( $postid, 'publish_to_discourse', '1', true );
@@ -259,7 +255,7 @@ class Discourse {
 		}
 	}
 
-	function is_valid_sync_post_type( $postid = NULL ){
+	function is_valid_sync_post_type( $postid = NULL ) {
 		// is_single() etc. is not reliable
 		$allowed_post_types = $this->get_allowed_post_types();
 		$current_post_type 	= get_post_type( $postid );
@@ -291,7 +287,7 @@ class Discourse {
 		if ( empty( $postid ) )
 			return $postid;
 
-		# trust me ... WordPress is crazy like this, try changing a title.
+		// trust me ... WordPress is crazy like this, try changing a title.
 		if( ! isset( $_POST['ID'] ) )
 			return $postid;
 
@@ -303,7 +299,7 @@ class Discourse {
 		return $postid;
 	}
 
-	function sync_to_discourse( $postid, $title, $raw ){
+	function sync_to_discourse( $postid, $title, $raw ) {
 		global $wpdb;
 
 		// this avoids a double sync, just 1 is allowed to go through at a time
@@ -379,9 +375,8 @@ class Discourse {
 			if( isset( $discourse_id ) && $discourse_id > 0 ) {
 				add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
 			}
-		}
-		else {
-			# for now the updates are just causing grief, leave'em out
+		} else {
+			// for now the updates are just causing grief, leave'em out
 			return;
 			$url = $options['url'] .'/posts/' . $discourse_id ;
 			$soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'PUT','content' => http_build_query( $data) ));
@@ -393,10 +388,10 @@ class Discourse {
 				$json = $json->post;
 			}
 
-			# todo may have $json->errors with list of errors
+			// todo may have $json->errors with list of errors
 		}
 
-		if( isset( $json->topic_slug ) ){
+		if( isset( $json->topic_slug ) ) {
 			delete_post_meta( $postid, 'discourse_permalink' );
 			add_post_meta( $postid, 'discourse_permalink', $options['url'] . '/t/' . $json->topic_slug . '/' . $json->topic_id, true );
 		}
@@ -428,27 +423,27 @@ class Discourse {
 
 	}
 
-	function url_input(){
+	function url_input() {
 		self::text_input( 'url', 'Enter your discourse url Eg: http://discuss.mysite.com' );
 	}
 
-	function api_key_input(){
+	function api_key_input() {
 		self::text_input( 'api-key', '' );
 	}
 
-	function publish_username_input(){
+	function publish_username_input() {
 		self::text_input( 'publish-username', 'Discourse username of publisher (will be overriden if Discourse Username is specified on user)' );
 	}
 
-	function publish_category_input(){
+	function publish_category_input() {
 		self::text_input( 'publish-category', 'Category post will be published in Discourse (optional)' );
 	}
 
-	function publish_format_textarea(){
+	function publish_format_textarea() {
 		self::text_area( 'publish-format', 'Markdown format for published articles, use {excerpt} for excerpt and {blogurl} for the url of the blog post' );
 	}
 
-	function max_comments_input(){
+	function max_comments_input() {
 		self::text_input( 'max-comments', 'Maximum number of comments to display' );
 	}
 
@@ -456,60 +451,59 @@ class Discourse {
 		self::checkbox_input( 'use-fullname-in-comments', 'Use the users full name in blog comment section' );
 	}
 
-	function auto_publish_checkbox(){
+	function auto_publish_checkbox() {
 		self::checkbox_input( 'auto-publish', 'Publish all new posts to Discourse' );
 	}
 
-	function auto_track_checkbox(){
+	function auto_track_checkbox() {
 		self::checkbox_input( 'auto-track', 'Author automatically tracks published Discourse topics' );
 	}
 
-	function post_types_select(){
+	function post_types_select() {
 		self::post_type_select_input( 'allowed_post_types', get_post_types() );
 	}
 
-	function auto_update_checkbox(){
+	function auto_update_checkbox() {
 		self::checkbox_input( 'auto-update', 'Update published blog posts on Discourse' );
 	}
 
-	function use_discourse_comments_checkbox(){
+	function use_discourse_comments_checkbox() {
 		self::checkbox_input( 'use-discourse-comments', 'Use Discourse to comment on Discourse published posts (hiding existing comment section)' );
 	}
 
-	function min_replies_input(){
+	function min_replies_input() {
 		self::text_input( 'min-replies', 'Minimum replies required prior to pulling comments across' );
 	}
 
-	function min_trust_level_input(){
+	function min_trust_level_input() {
 		self::text_input( 'min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)' );
 	}
 
-	function min_score_input(){
+	function min_score_input() {
 		self::text_input( 'min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)' );
 	}
 
-	function custom_comment_input(){
+	function custom_comment_input() {
 		self::text_input( 'custom-comments-title', 'Custom comments title (default: Notable Replies)' );
 	}
 
-	function custom_excerpt_length(){
+	function custom_excerpt_length() {
 		self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)' );
 	}
 
-	function bypass_trust_level_input(){
+	function bypass_trust_level_input() {
 		self::text_input( 'bypass-trust-level-score', 'Bypass trust level check on posts with this score' );
 	}
 
-	function debug_mode_checkbox(){
+	function debug_mode_checkbox() {
 		self::checkbox_input( 'debug-mode', '(always refresh comments)' );
 	}
 
-	function only_show_moderator_liked_checkbox(){
+	function only_show_moderator_liked_checkbox() {
 		self::checkbox_input( 'only-show-moderator-liked', 'Yes' );
 	}
 
 	function checkbox_input( $option, $description) {
-
 		$options = get_option( 'discourse' );
 		if (array_key_exists( $option, $options) and $options[$option] == 1) {
 			$value = 'checked="checked"';
@@ -520,11 +514,9 @@ class Discourse {
 		?>
 		<input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> /> <?php echo $description ?>
 		<?php
-
 	}
 
 	function post_type_select_input( $option, $post_types) {
-
 		$options = get_option( 'discourse' );
 
 		echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
@@ -538,7 +530,6 @@ class Discourse {
 			}
 
 			echo "<option ".$value." value='".$post_type."''>".$post_type."</option>";
-
 		}
 
 		echo '</select>';
