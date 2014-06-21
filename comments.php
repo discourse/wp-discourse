@@ -2,7 +2,7 @@
   $custom = get_post_custom();
   $options = get_option('discourse');
   $permalink = (string)$custom['discourse_permalink'][0];
-  $discourse_url_name = preg_replace("(https?://)", "", $options['url'] );
+  $discourse_url_name = preg_replace( "(https?://)", "", $options['url'] );
   if(isset($custom['discourse_comments_raw']))
     $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
   else
@@ -13,11 +13,11 @@
     'participants' => array()
   );
 
-  //Wear some protection in the event our metadata doesn't look how we expect it to
+  // Add some protection in the event our metadata doesn't look how we expect it to
   $discourse_info = (object)wp_parse_args((array)$discourse_info, $defaults);
 
-  $more_replies = $discourse_info->posts_count - count($discourse_info->posts) - 1;
-  $show_fullname = $options['use-fullname-in-comments'] == 1;
+  $more_replies = ($discourse_info->posts_count - count($discourse_info->posts) - 1);
+  $show_fullname = ($options['use-fullname-in-comments'] == 1);
   $comments_title = $options['custom-comments-title'];
   if(!$comments_title || strlen(trim($comments_title)) == 0) {
     $comments_title = 'Notable Replies';
@@ -51,7 +51,6 @@
       <div class="comment-content"><?php echo $post->cooked ?></div>
     </li>
     <?php } ?>
-
   </ol>
 
 <?php } ?>
