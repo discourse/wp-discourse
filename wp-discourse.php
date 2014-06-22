@@ -561,6 +561,7 @@ class Discourse {
 	}
 
 	function discourse_validate_options( $input ) {
+		$input['url'] = untrailingslashit( $input['url'] );
 		return $input;
 	}
 
