@@ -5,7 +5,7 @@ This WordPress plugin allows you to **use Discourse as a community engine for yo
 
 - Each WordPress blog post can *optionally* create an associated Discourse topic.
 
-- Use Discourse to comment on associated Discourse topic.
+- Use Discourse to comment on blog post with associated Discourse topic.
 
 - Periodicially sync the "best" posts in those Discourse topics back to the associated WordPress blog entry as WordPress comments.
 
