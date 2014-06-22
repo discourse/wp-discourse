@@ -45,7 +45,7 @@ class Discourse {
 		'auto-publish' => 0,
 		'allowed_post_types' => array( 'post', 'page' ),
 		'auto-track' => 1,
-		'max-comment' => 5,
+		'max-comments' => 5,
 		'use-discourse-comments' => 0,
 		'use-fullname-in-comments' => 1,
 		'publish-format' => '<small>Originally published at: {blogurl}</small><br>{excerpt}',
