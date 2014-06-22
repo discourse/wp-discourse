@@ -4,7 +4,7 @@ Plugin Name: WP-Discourse
 Description: Allows you to publish your posts to a Discourse instance and view top Discourse comments on your blog
 Version: 0.5.6
 Author: Sam Saffron, Robin Ward
-Author URI: https://github.com/discourse/wp-discourse/
+Author URI: https://github.com/discourse/wp-discourse
 */
 /*  Copyright 2014 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
@@ -128,7 +128,7 @@ class Discourse {
 		global $wpdb;
 		$discourse_options = self::get_plugin_options();
 
-		# every 10 minutes do a json call to sync comment count and top comments
+		// every 10 minutes do a json call to sync comment count and top comments
 		$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
 		$time = date_create()->format( 'U' );
 		$debug = isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
@@ -364,7 +364,7 @@ class Discourse {
 			$result = file_get_contents( $url, false, $context );
 			$json = json_decode( $result );
 
-			#todo may have $json->errors with list of errors
+			// todo may have $json->errors with list of errors
 
 			if( property_exists( $json, 'id' ) ) {
 				$discourse_id = (int) $json->id;
