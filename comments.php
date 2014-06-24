@@ -31,7 +31,7 @@
   } else {
     $more_replies = $more_replies . " " . $more . "replies";
   }
-  
+
   $discourse_html = '';
   $comments_html = '';
   $participants_html = '';

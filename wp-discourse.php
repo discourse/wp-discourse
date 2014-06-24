@@ -145,7 +145,7 @@ class Discourse {
 	function use_discourse_comments( $postid ) {
 		// If "use comments" is disabled, bail out
 		$options = self::get_plugin_options();
-		if ( ! $options['use-discourse-comments'] ){
+		if ( ! $options['use-discourse-comments'] ) {
 			return 0;
 		}
 
