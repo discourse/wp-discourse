@@ -145,8 +145,9 @@ class Discourse {
 	function use_discourse_comments( $postid ) {
 		// If "use comments" is disabled, bail out
 		$options = self::get_plugin_options();
-		if ( ! $options['use-discourse-comments'] )
+		if ( ! $options['use-discourse-comments'] ){
 			return 0;
+		}
 
 		$setting = get_post_meta( $postid, 'publish_to_discourse', true );
 		return $setting == '1';
@@ -295,32 +296,38 @@ class Discourse {
 		$selected_post_types = get_option( 'discourse_allowed_post_types' );
 
 		/** If no post type is explicitly set then use the defaults */
-		if ( empty( $selected_post_types ) )
+		if ( empty( $selected_post_types ) ) {
 			$selected_post_types = self::$options['allowed_post_types'];
+		}
 
 		return $selected_post_types;
 	}
 
 	function publish_active() {
-		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) )
+		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) ) {
 			return $_POST['publish_to_discourse'] == '1';
+		}
 
 		return false;
 	}
 
 	function save_postdata( $postid ) {
-		if ( ! current_user_can( 'edit_page', $postid ) )
+		if ( ! current_user_can( 'edit_page', $postid ) ) {
 			return $postid;
+		}
 
-		if ( empty( $postid ) )
+		if ( empty( $postid ) ) {
 			return $postid;
+		}
 
 		// trust me ... WordPress is crazy like this, try changing a title.
-		if( ! isset( $_POST['ID'] ) )
+		if( ! isset( $_POST['ID'] ) ) {
 			return $postid;
+		}
 
-		if( $_POST['action'] == 'editpost' )
+		if( $_POST['action'] == 'editpost' ) {
 			delete_post_meta( $_POST['ID'], 'publish_to_discourse' );
+		}
 
 		add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
 
@@ -332,7 +339,7 @@ class Discourse {
 
 		// this avoids a double sync, just 1 is allowed to go through at a time
 		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
-		if ( $got_lock) {
+		if ( $got_lock ) {
 			self::sync_to_discourse_work( $postid, $title, $raw );
 			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
@@ -346,7 +353,7 @@ class Discourse {
 		$excerpt = apply_filters( 'the_content', $raw );
 		$excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
 
-		if ( function_exists( 'discourse_custom_excerpt' ) ){
+		if ( function_exists( 'discourse_custom_excerpt' ) ) {
 			$excerpt = discourse_custom_excerpt( $postid );
 		}
 
@@ -519,19 +526,19 @@ class Discourse {
 		self::checkbox_input( 'only-show-moderator-liked', 'Yes' );
 	}
 
-	function template_replies_html(){
+	function template_replies_html() {
 		self::text_area( 'replies-html', 'HTML template to use when there are replies<br/>Available tags: <small>{comments}, {discourse_url}, {discourse_url_name}, {topic_url}, {more_replies}, {participants}</small>' );
 	}
 
-	function template_no_replies_html(){
+	function template_no_replies_html() {
 		self::text_area( 'no-replies-html', 'HTML template to use when there are no replies<br/>Available tags: <small>{comments}, {discourse_url}, {discourse_url_name}, {topic_url}</small>' );
 	}
 
-	function template_comment_html(){
+	function template_comment_html() {
 		self::text_area( 'comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}, {comment_url}</small>' );
 	}
 
-	function template_participant_html(){
+	function template_participant_html() {
 		self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}</small>' );
 	}
 
@@ -609,8 +616,8 @@ class Discourse {
 
 	function discourse_options_page() {
 		if ( !current_user_can( 'manage_options' ) )  {
-		wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
-	}
+			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+		}
 		?>
 		<div class="wrap">
 				<h2>Discourse Options</h2>
