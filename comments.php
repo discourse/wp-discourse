@@ -32,48 +32,44 @@
     $more_replies = $more_replies . " " . $more . "replies";
   }
 
-  $link_text = ($discourse_info->posts_count - 1) == 0 ? "Start the discussion" : "Continue the discussion";
+  $discourse_html = '';
+  $comments_html = '';
+  $participants_html = '';
+  if(count($discourse_info->posts) > 0) {
+    foreach($discourse_info->posts as &$post) {
+      $comment_html = wp_kses_post($options['comment-html']);
+      $comment_html = str_replace('{discourse_url}', esc_url($options['url']), $comment_html);
+      $comment_html = str_replace('{discourse_url_name}', $discourse_url_name, $comment_html);
+      $comment_html = str_replace('{topic_url}', $permalink, $comment_html);
+      $comment_html = str_replace('{avatar_url}', Discourse::avatar($post->avatar_template,64), $comment_html);
+      $comment_html = str_replace('{user_url}', Discourse::homepage($options['url'],$post), $comment_html);
+      $comment_html = str_replace('{username}', $post->username, $comment_html);
+      $comment_html = str_replace('{fullname}', $post->name, $comment_html);
+      $comment_html = str_replace('{comment_body}', $post->cooked, $comment_html); // emoticons don't have absolute urls
+      $comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
+      $comments_html .= $comment_html;
+    }
+    foreach($discourse_info->participants as &$participant) {
+      $participant_html = wp_kses_post($options['participant-html']);
+      $participant_html = str_replace('{discourse_url}', esc_url($options['url']), $participant_html);
+      $participant_html = str_replace('{discourse_url_name}', $discourse_url_name, $participant_html);
+      $participant_html = str_replace('{topic_url}', $permalink, $participant_html);
+      $participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
+      $participant_html = str_replace('{user_url}', Discourse::homepage($options['url'],$participant), $participant_html);
+      $participant_html = str_replace('{username}', $participant->username, $participant_html);
+      $participant_html = str_replace('{fullname}', $participant->name, $participant_html);
+      $participants_html .= $participant_html;
+    }
+    $discourse_html = wp_kses_post($options['replies-html']);
+    $discourse_html = str_replace('{more_replies}', $more_replies, $discourse_html);
+  } else {
+    $discourse_html = wp_kses_post($options['no-replies-html']);
+  }
+  $discourse_html = str_replace('{discourse_url}', esc_url($options['url']), $discourse_html);
+  $discourse_html = str_replace('{discourse_url_name}', $discourse_url_name, $discourse_html);
+  $discourse_html = str_replace('{topic_url}', $permalink, $discourse_html);
+  $discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
+  $discourse_html = str_replace('{participants}', $participants_html, $discourse_html);
+  echo $discourse_html;
 
 ?>
-
-<div id="comments" class="comments-area">
-<?php if(count($discourse_info->posts) > 0) { ?>
-  <h2 class="comments-title"><?php echo $comments_title ?></h2>
-  <ol class="comment-list">
-    <?php foreach($discourse_info->posts as &$post) { ?>
-
-    <li class="comment even thread-even depth-1">
-      <article class="comment-body">
-        <footer class="comment-meta">
-          <div class="comment-author vcard">
-            <img alt="" src="<?php Discourse::avatar($post->avatar_template,64) ?>" class="avatar avatar-64 photo avatar-default" height="64" width="64">
-            <b class="fn"><a href="<?php Discourse::homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo ($show_fullname ? $post->name : $post->username) ?></a></b>
-            <span class="says">says:</span>
-          </div><!-- .comment-author -->
-
-          <div class="comment-metadata">
-            <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
-          </div><!-- .comment-metadata -->
-        </footer><!-- .comment-meta -->
-        <div class="comment-content"><?php echo $post->cooked ?></div><!-- .comment-content -->
-      </article><!-- .comment-body -->
-    </li>
-
-    <?php } ?>
-  </ol>
-
-<?php } ?>
-
-  <div class="respond" class="comment-respond">
-      <h3 id="reply-title" class="comment-reply-title"><a href="<?php echo $permalink ?>"><?php echo $link_text ?></a> at <?php echo $discourse_url_name ?></h3>
-      <?php if(count($discourse_info->posts) > 0 || $more_replies > 0) { ?>
-      <p class='more-replies'><?php echo $more_replies ?></p>
-      <p class="comment-reply-title">
-        <?php foreach($discourse_info->participants as &$participant) { ?>
-          <img alt="" src="<?php Discourse::avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
-        <?php } ?>
-      </p>
-      <?php } ?>
-  </div><!-- #respond -->
-
-</div>
