@@ -118,6 +118,9 @@ class Discourse {
 		wp_register_style( 'discourse_comments', $plugin_dir . 'css/style.css' );
 		wp_enqueue_style( 'discourse_comments' );
 
+		wp_register_script( 'discourse_comments_js', $plugin_dir . 'js/discourse.js', array( 'jquery' ));
+		wp_enqueue_script( 'discourse_comments_js' );
+		
 		add_action( 'save_post', array( $this, 'save_postdata' ) );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		add_action( 'publish_post', array( $this, 'publish_post_to_discourse' ) );
