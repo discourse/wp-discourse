@@ -268,7 +268,8 @@ class Discourse {
 	}
 
 	function publish_post_to_discourse( $new_status, $old_status, $post ) {
-		if ( self::publish_active() && $new_status == 'publish' && $old_status != 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
+		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
+		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && $old_status != 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
 
