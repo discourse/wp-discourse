@@ -123,7 +123,7 @@ class Discourse {
 		
 		add_action( 'save_post', array( $this, 'save_postdata' ) );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
-		add_action( 'publish_post', array( $this, 'publish_post_to_discourse' ) );
+		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
 	}
 
 	function get_plugin_options() {
@@ -172,7 +172,8 @@ class Discourse {
 					// workaround unpublished posts, publish if needed
 					// if you have a scheduled post we never seem to be called
 					if( ! ( get_post_meta( $postid, 'discourse_post_id', true ) > 0 ) ) {
-						self::publish_post_to_discourse( $postid );
+						$post = get_post( $postid );
+						self::publish_post_to_discourse( 'publish', 'notpublish', $post );
 					}
 
 					$comment_count = intval( $discourse_options['max-comments'] );
@@ -266,15 +267,15 @@ class Discourse {
 		return $fields;
 	}
 
-	function publish_post_to_discourse( $postid ) {
-		$post = get_post( $postid );
-		if ( self::publish_active() && get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
+	function publish_post_to_discourse( $new_status, $old_status, $post ) {
+		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
+		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && $old_status != 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
 
-			add_post_meta( $postid, 'publish_to_discourse', '1', true );
+			add_post_meta( $post->ID, 'publish_to_discourse', '1', true );
 
-			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
+			self::sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
 		}
 	}
 
