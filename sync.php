@@ -18,4 +18,3 @@ foreach( $last_posts as $post ) : setup_postdata($post);
     }
   }
 endforeach;
-?>
