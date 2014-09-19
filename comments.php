@@ -3,10 +3,11 @@
   $options = get_option('discourse');
   $permalink = (string)$custom['discourse_permalink'][0];
   $discourse_url_name = preg_replace( "(https?://)", "", $options['url'] );
-  if(isset($custom['discourse_comments_raw']))
+  if(isset($custom['discourse_comments_raw'])) {
     $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
-  else
+  } else{
     $discourse_info = array();
+  }
   $defaults = array(
     'posts_count' => 0,
     'posts' => array(),
