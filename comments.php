@@ -17,10 +17,6 @@
   $discourse_info = (object)wp_parse_args((array)$discourse_info, $defaults);
 
   $more_replies = ($discourse_info->posts_count - count($discourse_info->posts) - 1);
-  $comments_title = $options['custom-comments-title'];
-  if(!$comments_title || strlen(trim($comments_title)) == 0) {
-    $comments_title = 'Notable Replies';
-  }
   $more = count($discourse_info->posts) == 0 ? "" : "more ";
 
   if($more_replies == 0) {
