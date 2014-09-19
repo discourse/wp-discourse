@@ -67,5 +67,3 @@
   $discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
   $discourse_html = str_replace('{participants}', $participants_html, $discourse_html);
   echo $discourse_html;
-
-?>
