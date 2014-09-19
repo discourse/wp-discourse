@@ -59,8 +59,7 @@ if(count($discourse_info->posts) > 0) {
       '{topic_url}' => $permalink,
       '{avatar_url}' => Discourse::avatar($participant->avatar_template,64),
       '{user_url}' => Discourse::homepage($options['url'],$participant),
-      '{username}' => $participant->username,
-      '{fullname}' => $participant->name
+      '{username}' => $participant->username
     );
     $participant_html = str_replace(array_keys($replace_array), array_values($replace_array), $participant_html);
     $participants_html .= $participant_html;
