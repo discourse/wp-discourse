@@ -28,6 +28,9 @@ class Discourse {
   }
 
   public static function avatar( $template, $size ) {
+    $options = self::get_plugin_options();
+    $template_http = parse_url($template);
+    $template = $options["url"] . $template_http["path"];
     return str_replace( "{size}", $size, $template );
   }
 
