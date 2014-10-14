@@ -126,7 +126,7 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
   }
 
-  function get_plugin_options() {
+  public static function get_plugin_options() {
     return wp_parse_args( get_option( 'discourse' ), Discourse::$options );
   }
 
