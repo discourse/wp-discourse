@@ -74,8 +74,8 @@ class Discourse {
         </a>
         <div class="CommentContent">
           <div class="CommentHeader">
-            <a class="CommentDate" href="{topic_url}" target="_blank">{comment_created_at}</a>
-            <a class="CommentAuthor" href="{topic_url}" target="_blank">{username}:</a>
+            <a class="CommentDate" href="{comment_url}" target="_blank">{comment_created_at}</a>
+            <a class="CommentAuthor" href="{comment_url}" target="_blank">{username}:</a>
           </div>
           <div class="CommentMessage">{comment_body}</div>
         </div>
@@ -117,7 +117,7 @@ class Discourse {
 
     wp_register_script( 'discourse_comments_js', $plugin_dir . 'js/discourse.js', array( 'jquery' ));
     wp_enqueue_script( 'discourse_comments_js' );
-    
+
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
