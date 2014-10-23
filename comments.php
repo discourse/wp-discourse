@@ -33,6 +33,8 @@ $comments_html = '';
 $participants_html = '';
 if(count($discourse_info->posts) > 0) {
   foreach($discourse_info->posts as &$post) {
+    if (property_exists($post, 'cooked_hidden') && $post->cooked_hidden) continue;
+
     $comment_html = wp_kses_post($options['comment-html']);
 
     $replace_array = array(
