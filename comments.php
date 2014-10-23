@@ -46,6 +46,7 @@ if(count($discourse_info->posts) > 0) {
       '{username}' => $post->username,
       '{fullname}' => $post->name,
       '{comment_body}' => Discourse::comment_cooked($post->cooked),
+      '{comment_url}' => "{$permalink}/{$post->post_number}",
       '{comment_created_at}' => mysql2date(get_option('date_format'), $post->created_at)
     );
 
