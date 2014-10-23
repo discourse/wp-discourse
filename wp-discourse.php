@@ -34,6 +34,13 @@ class Discourse {
     return str_replace( "{size}", $size, $template );
   }
 
+  public static function comment_cooked( $comment ) {
+    $options = self::get_plugin_options();
+
+    $comment = preg_replace("/src='\/([^'']+)'/", "src='{$options['url']}/$1'", $comment);
+    return $comment;
+  }
+
   var $domain = 'discourse';
 
   // Version

@@ -45,7 +45,7 @@ if(count($discourse_info->posts) > 0) {
       '{user_url}' => Discourse::homepage($options['url'],$post),
       '{username}' => $post->username,
       '{fullname}' => $post->name,
-      '{comment_body}' => $post->cooked,
+      '{comment_body}' => Discourse::comment_cooked($post->cooked),
       '{comment_created_at}' => mysql2date(get_option('date_format'), $post->created_at)
     );
 
