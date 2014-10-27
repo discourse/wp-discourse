@@ -130,7 +130,7 @@ class Discourse {
     
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
-    add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
+    add_action( 'save_post', array( $this, 'publish_post_to_discourse' ), 10, 2 );
   }
 
   public static function get_plugin_options() {
@@ -274,9 +274,9 @@ class Discourse {
     return $fields;
   }
 
-  function publish_post_to_discourse( $new_status, $old_status, $post ) {
+  function publish_post_to_discourse( $post_id, $post ) {
     $publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
-    if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
+    if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && self::is_valid_sync_post_type( $post->ID ) ) {
       // This seems a little redundant after `save_postdata` but when using the Press This
       // widget it updates the field as it should.
 
@@ -360,6 +360,7 @@ class Discourse {
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
     $options = self::get_plugin_options();
     $post = get_post( $postid );
+    $post_primary_category = get_post_meta( $postid, 'primary_category', true);
 
     $excerpt = apply_filters( 'the_content', $raw );
     $excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
@@ -384,6 +385,26 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
+    // WP => Discourse category map
+    $discourse_category_map = array(
+      '6523' => '26', // HTML/CSS
+      '407'  => '33', // JavaScript
+      '37'   => '31', // PHP
+      '8'    => '34', // Ruby
+      '410'  => '29', // Mobile
+      '6131' => '48', // Design & UX
+      '6132' => '42', // Business
+      '5849' => '30', // WordPress
+      '4386' => '47', // Web Foundations
+    );
+
+    // check for category mapping
+    if (array_key_exists($post_primary_category, $discourse_category_map)) {
+      $publish_category = $discourse_category_map[$post_primary_category];
+    } else {
+      $publish_category = $options['publish-category'];
+    }
+
     $data = array(
       'wp-id' => $postid,
       'embed_url' => get_permalink( $postid ),
@@ -391,7 +412,7 @@ class Discourse {
       'api_username' => $username,
       'title' => $title,
       'raw' => $baked,
-      'category' => $options['publish-category'],
+      'category' => $publish_category,
       'skip_validations' => 'true',
       'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
     );
