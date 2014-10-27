@@ -130,7 +130,7 @@ class Discourse {
     
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
-    add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
+    add_action( 'save_post', array( $this, 'publish_post_to_discourse' ), 10, 2 );
   }
 
   public static function get_plugin_options() {
@@ -274,9 +274,9 @@ class Discourse {
     return $fields;
   }
 
-  function publish_post_to_discourse( $new_status, $old_status, $post ) {
+  function publish_post_to_discourse( $post_id, $post ) {
     $publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
-    if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
+    if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && self::is_valid_sync_post_type( $post->ID ) ) {
       // This seems a little redundant after `save_postdata` but when using the Press This
       // widget it updates the field as it should.
 
