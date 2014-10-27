@@ -360,6 +360,7 @@ class Discourse {
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
     $options = self::get_plugin_options();
     $post = get_post( $postid );
+    $post_primary_category = get_post_meta( $postid, 'primary_category', true);
 
     $excerpt = apply_filters( 'the_content', $raw );
     $excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
@@ -384,6 +385,26 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
+    // WP => Discourse category map
+    $discourse_category_map = array(
+      '6523' => '26', // HTML/CSS
+      '407'  => '33', // JavaScript
+      '37'   => '31', // PHP
+      '8'    => '34', // Ruby
+      '410'  => '29', // Mobile
+      '6131' => '48', // Design & UX
+      '6132' => '42', // Business
+      '5849' => '30', // WordPress
+      '4386' => '47', // Web Foundations
+    );
+
+    // check for category mapping
+    if (array_key_exists($post_primary_category, $discourse_category_map)) {
+      $publish_category = $discourse_category_map[$post_primary_category];
+    } else {
+      $publish_category = $options['publish-category'];
+    }
+
     $data = array(
       'wp-id' => $postid,
       'embed_url' => get_permalink( $postid ),
@@ -391,7 +412,7 @@ class Discourse {
       'api_username' => $username,
       'title' => $title,
       'raw' => $baked,
-      'category' => $options['publish-category'],
+      'category' => $publish_category,
       'skip_validations' => 'true',
       'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
     );
