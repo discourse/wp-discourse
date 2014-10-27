@@ -37,7 +37,7 @@ class Discourse {
   public static function comment_cooked( $comment ) {
     $options = self::get_plugin_options();
 
-    $comment = preg_replace("/src='\/([^'']+)'/", "src='{$options['url']}/$1'", $comment);
+    $comment = preg_replace("/src=(\"|')\/(\w[^\/][^\"']+)('|\")/", "src=\"{$options['url']}/$2\"", $comment);
     return $comment;
   }
 
