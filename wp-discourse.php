@@ -54,6 +54,7 @@ class Discourse {
     'custom-excerpt-length' => '55',
     'bypass-trust-level-score' => 50,
     'debug-mode' => 0,
+    'full-post-content' => 0,
     'only-show-moderator-liked' => 0,
     'replies-html' => '<div id="comments" class="comments-area">
   <h2 class="comments-title">Notable Replies</h2>
@@ -120,7 +121,7 @@ class Discourse {
 
     wp_register_script( 'discourse_comments_js', $plugin_dir . 'js/discourse.js', array( 'jquery' ));
     wp_enqueue_script( 'discourse_comments_js' );
-    
+
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
@@ -251,11 +252,12 @@ class Discourse {
     add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_template_replies', 'HTML Template to use when there are replies', array( $this, 'template_replies_html' ), 'discourse', 'default_discourse' );
-      add_settings_field( 'discourse_template_no_replies', 'HTML Template to use when there are no replies', array( $this, 'template_no_replies_html' ), 'discourse', 'default_discourse' );
-      add_settings_field( 'discourse_template_comment', 'HTML Template to use for each comment', array( $this, 'template_comment_html' ), 'discourse', 'default_discourse' );
-      add_settings_field( 'discourse_participant_comment', 'HTML Template to use for each participant', array( $this, 'template_participant_html' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_template_no_replies', 'HTML Template to use when there are no replies', array( $this, 'template_no_replies_html' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_template_comment', 'HTML Template to use for each comment', array( $this, 'template_comment_html' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_participant_comment', 'HTML Template to use for each participant', array( $this, 'template_participant_html' ), 'discourse', 'default_discourse' );
 
     add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
@@ -353,9 +355,14 @@ class Discourse {
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
     $options = self::get_plugin_options();
     $post = get_post( $postid );
+    $use_full_post = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
 
-    $excerpt = apply_filters( 'the_content', $raw );
-    $excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
+    if ($use_full_post) {
+      $excerpt = $raw;
+    } else {
+      $excerpt = apply_filters( 'the_content', $raw );
+      $excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
+    }
 
     if ( function_exists( 'discourse_custom_excerpt' ) ) {
       $excerpt = discourse_custom_excerpt( $postid );
@@ -524,6 +531,10 @@ class Discourse {
 
   function debug_mode_checkbox() {
     self::checkbox_input( 'debug-mode', '(always refresh comments)' );
+  }
+
+  function full_post_checkbox() {
+    self::checkbox_input( 'full-post-content', 'Use the full post for content rather than an excerpt.' );
   }
 
   function only_show_moderator_liked_checkbox() {
