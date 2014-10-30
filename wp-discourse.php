@@ -439,6 +439,32 @@ class Discourse {
         $discourse_id = (int) $json->id;
       }
 
+      if ( property_exists( $json, 'topic_id' ) ) {
+        $topic_id = (int) $json->topic_id;
+
+        // add article tag
+        $url = $options['url'] . '/tagger/set_tags';
+
+        $data = array(
+          'api_key' => $options['api-key'],
+          'api_username' => $username,
+          'topic_id' => $topic_id,
+          'tags' => 'article'
+        );
+
+        $soptions = array(
+          'http' => array(
+            'ignore_errors' => true,
+            'method' => 'POST',
+            'content' => http_build_query( $data ),
+            'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
+          )
+        );
+
+        $context = stream_context_create( $soptions );
+        $result = file_get_contents( $url, false, $context );
+      }
+
       if( isset( $discourse_id ) && $discourse_id > 0 ) {
         add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
       }
