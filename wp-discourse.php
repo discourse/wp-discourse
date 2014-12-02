@@ -398,6 +398,7 @@ class Discourse {
       '6132' => '42', // Business
       '5849' => '30', // WordPress
       '4386' => '47', // Web Foundations
+      '422'  => '47', // Web
     );
 
     // check for category mapping
