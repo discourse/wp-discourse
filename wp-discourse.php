@@ -382,7 +382,8 @@ class Discourse {
       "{blogurl}" => get_permalink( $postid ),
       "{author}" => $author,
       "{thumbnail}" => "![image](".$thumb['0'].")",
-      "{featuredimage}" => "![image](".$featured['0'].")"
+      "{featuredimage}" => "![image](".$featured['0'].")",
+      "http://www.sitepoint.com/wp-content/uploads/" => "http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/"
     );
 
     $baked = str_replace(array_keys($replace), array_values($replace), $baked);
