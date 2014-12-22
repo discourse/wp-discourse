@@ -22,6 +22,51 @@ Author URI: https://github.com/discourse/wp-discourse
   along with this program; if not, write to the Free Software
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
+
+// SSO Helper Class from ArmedGuy : https://github.com/ArmedGuy/discourse_sso_php
+class Discourse_SSO {
+  private $sso_secret;
+  
+  function __construct($secret) {
+    $this->sso_secret = $secret;
+  }
+  
+  public function validate($payload, $sig) {
+    $payload = urldecode($payload);
+    if(hash_hmac("sha256", $payload, $this->sso_secret) === $sig) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
+  public function getNonce($payload) {
+    $payload = urldecode($payload);
+    $query = array();
+    parse_str(base64_decode($payload), $query);
+    if(isset($query["nonce"])) {
+      return $query["nonce"];
+    } else {
+      throw new Exception("Nonce not found in payload!");
+    }
+  }
+  public function buildLoginString($params) {
+    if(!isset($params["external_id"])) {
+      throw new Exception("Missing required parameter 'external_id'");
+    }
+    if(!isset($params["nonce"])) {
+      throw new Exception("Missing required parameter 'nonce'");
+    }
+    if(!isset($params["email"])) {
+      throw new Exception("Missing required parameter 'email'");
+    }
+    $payload = base64_encode(http_build_query($params));
+    $sig = hash_hmac("sha256", $payload, $this->sso_secret);
+    
+    return http_build_query(array("sso" => $payload, "sig" => $sig));
+  }
+}
+
 class Discourse {
   public static function homepage( $url, $post ) {
     return $url . "/users/" . strtolower( $post->username );
@@ -40,6 +85,8 @@ class Discourse {
   static $options = array(
     'url' => '',
     'api-key' => '',
+    'enable-sso' => 0,
+    'sso-secret' => '',
     'publish-username' => '',
     'publish-category' => '',
     'auto-publish' => 0,
@@ -114,6 +161,7 @@ class Discourse {
     // replace comments with discourse comments
     add_filter( 'comments_number', array( $this, 'comments_number' ) );
     add_filter( 'comments_template', array( $this, 'comments_template' ) );
+    add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 
     $plugin_dir = plugin_dir_url( __FILE__ );
     wp_register_style( 'discourse_comments', $plugin_dir . 'css/style.css' );
@@ -125,6 +173,101 @@ class Discourse {
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
+    add_action( 'parse_request', array( $this, 'sso_parse_request' ) );
+  }
+
+  function sso_add_query_vars( $vars ) {
+      $vars[] = "sso";
+      $vars[] = "sig";
+      return $vars;
+  }
+
+  // SSO Request Processing from Adam Capirola : https://gist.github.com/adamcapriola/11300529
+  function sso_parse_request( $wp )
+  {
+    $discourse_options = self::get_plugin_options();
+
+    // only process requests with "my-plugin=ajax-handler"
+    if ( isset( $discourse_options['enable-sso'] ) && 
+         intval( $discourse_options['enable-sso'] ) == 1 &&
+         array_key_exists('sso', $wp->query_vars) && 
+         array_key_exists('sig', $wp->query_vars) ) {
+
+      // Not logged in to WordPress, redirect to WordPress login page with redirect back to here
+      if ( ! is_user_logged_in() ) {
+
+        // Preserve sso and sig parameters
+        $redirect = add_query_arg();
+        
+        // Change %0A to %0B so it's not stripped out in wp_sanitize_redirect
+        $redirect = str_replace( '%0A', '%0B', $redirect );
+
+        // Build login URL
+        $login = wp_login_url( $redirect );
+
+        // Redirect to login
+        wp_redirect( $login );
+        exit;
+      }
+      else {        
+        // Check for helper class
+        if ( ! class_exists( 'Discourse_SSO' ) ) {
+          // Error message
+          echo( 'Helper class is not properly included.' );
+          exit;
+        }
+
+        // Payload and signature
+        $payload = $wp->query_vars['sso'];
+        $sig = $wp->query_vars['sig'];
+
+        // Change %0B back to %0A
+        $payload = urldecode( str_replace( '%0B', '%0A', urlencode( $payload ) ) );
+
+        // Validate signature
+        $sso_secret = $discourse_options['sso-secret'];
+        $sso = new Discourse_SSO( $sso_secret );
+        if ( ! ( $sso->validate( $payload, $sig ) ) ) {          
+          // Error message
+          echo( 'Invalid request.' );
+          exit;
+        }
+
+        // Nonce    
+        $nonce = $sso->getNonce( $payload );
+
+        // Current user info
+        global $current_user;
+        get_currentuserinfo();
+
+        // Map information
+        $params = array(
+          'nonce' => $nonce,
+          'name' => $current_user->display_name,
+          'username' => $current_user->user_login,
+          'email' => $current_user->user_email,
+          'about_me' => $current_user->description,
+          'external_id' => $current_user->ID,
+          'avatar_url' => self::get_avatar_url($current_user->ID)
+        );
+
+        // Build login string
+        $q = $sso->buildLoginString( $params );
+
+        // Redirect back to Discourse
+        wp_redirect( $discourse_options['url'] . '/session/sso_login?' . $q );
+        exit;
+      }
+    }
+  }
+
+  function get_avatar_url( $user_id ) {
+    $avatar = get_avatar( $user_id );
+    $doc = new DOMDocument();
+    $doc->loadHTML( $avatar );
+    $xpath = new DOMXPath( $doc );
+    $src = $xpath->evaluate( 'string(//img/@src)' );
+    return $src;
   }
 
   function get_plugin_options() {
@@ -238,6 +381,8 @@ class Discourse {
 
     add_settings_field( 'discourse_url', 'Url', array( $this, 'url_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'default_discourse' );
@@ -475,6 +620,14 @@ class Discourse {
 
   function api_key_input() {
     self::text_input( 'api-key', '' );
+  }
+
+  function enable_sso_checkbox() {
+    self::checkbox_input( 'enable-sso', 'Enable SSO to Discourse' );
+  }
+
+  function sso_secret_input() {
+    self::text_input( 'sso-secret', '' );
   }
 
   function publish_username_input() {
