@@ -529,6 +529,16 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
+    $categories = get_the_category();
+    if ($categories){
+      foreach($categories as $category) {
+        if ( in_category( $category->name, $postid ) ) {
+          $options['publish-category'] = $category->name;
+          break;
+        }
+      }
+    }
+
     $data = array(
       'wp-id' => $postid,
       'embed_url' => get_permalink( $postid ),
