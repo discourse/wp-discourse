@@ -332,6 +332,7 @@ class Discourse {
           if ( isset( $discourse_options['only-show-moderator-liked'] ) && intval( $discourse_options['only-show-moderator-liked'] ) == 1 ) {
             $options = $options . '&only_moderator_liked=true';
           }
+          $options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
           $permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
           $soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'GET' ) );
