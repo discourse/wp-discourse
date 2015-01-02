@@ -1,7 +1,11 @@
 <?php
 $custom = get_post_custom();
 $options = get_option('discourse');
+$is_enable_sso = (isset( $options['enable-sso'] ) && intval( $options['enable-sso'] ) == 1);
 $permalink = (string)$custom['discourse_permalink'][0];
+if($is_enable_sso) {
+  $permalink = esc_url($options['url']) . '/session/sso?return_path=' . $permalink;
+} 
 $discourse_url_name = preg_replace( "(https?://)", "", $options['url'] );
 if(isset($custom['discourse_comments_raw'])) {
   $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
