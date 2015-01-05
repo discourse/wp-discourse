@@ -141,6 +141,7 @@ class Discourse {
     add_action( 'init', array( $this, 'init' ) );
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
+    add_action( 'wp_footer', array( $this, 'discourse_comments_js' ), 100 );
   }
 
   static function install() {
@@ -163,14 +164,28 @@ class Discourse {
     add_filter( 'comments_template', array( $this, 'comments_template' ) );
     add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 
-    $plugin_dir = plugin_dir_url( __FILE__ );
-    wp_register_script( 'discourse_comments_js', $plugin_dir . 'js/discourse.js', array( 'jquery' ));
-    wp_enqueue_script( 'discourse_comments_js' );
+    wp_enqueue_script( 'jquery' );
 
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_request', array( $this, 'sso_parse_request' ) );
+  }
+
+  function discourse_comments_js() {
+    if ( wp_script_is( 'jquery', 'done' ) ) {
+  ?>
+    <script>
+    jQuery(document).ready(function() {
+      jQuery('.lazyYT').each(function() {
+        var id = jQuery(this).data('youtube-id'),
+            url = 'https://www.youtube.com/watch?v=' + id;
+        jQuery(this).replaceWith('<a href="' + url + '">' + url + '</a>');
+      });
+    });
+    </script>
+  <?php
+    }
   }
 
   function sso_add_query_vars( $vars ) {
