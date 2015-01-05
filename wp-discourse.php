@@ -448,9 +448,9 @@ class Discourse {
     }
 
     $category = $options['publish-category'];
-    if ($category === '') {
+    if ( $category === '' ) {
       $categories = get_the_category();
-      foreach($categories as $category) {
+      foreach ( $categories as $category ) {
         if ( in_category( $category->name, $postid ) ) {
           $category = $category->name;
           break;
