@@ -15,7 +15,7 @@ class DiscourseAdmin {
     register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
     add_settings_section( 'default_discourse', 'Default Settings', array( $this, 'init_default_settings' ), 'discourse' );
 
-    add_settings_field( 'discourse_url', 'Url', array( $this, 'url_input' ), 'discourse', 'default_discourse' );
+    add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'default_discourse' );
     add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'default_discourse' );
@@ -55,7 +55,7 @@ class DiscourseAdmin {
   }
 
   function url_input() {
-    self::text_input( 'url', 'Enter your discourse url Eg: http://discuss.mysite.com' );
+    self::text_input( 'url', '' );
   }
 
   function api_key_input() {
