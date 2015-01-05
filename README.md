@@ -1,27 +1,41 @@
-wp-discourse
-============
+# wp-discourse
 
-This WordPress plugin allows you to **use Discourse as a community engine for your WordPress blog**. The basic function of the plugin is:
+This WordPress plugin allows you to **use Discourse as a community engine for your WordPress blog**.
 
-- Each WordPress blog post can *optionally* create an associated Discourse topic.
+## Features
 
-- Use Discourse to comment on blog post with associated Discourse topic.
+* Optinally publish all new posts to Discourse automatically
+* Use Discourse to comment on blog posts with associated Discourse topics
+* Periodicially sync the "best" posts in Discourse topics back to the associated WordPress blog entry as WordPress comments
+* Enable SSO to Discourse
+* Define format of post on Discourse
+* Set username of post on Discourse
+* Set published category on Discourse
+* Allow author to automatically track published Discourse topics
+* Show comments on Discourse based on post score and commenter trust level
 
-- Periodicially sync the "best" posts in those Discourse topics back to the associated WordPress blog entry as WordPress comments.
+## Installation
 
+If you're using Composer to manage WordPress, add WP-Discourse to your project's dependencies. Run:
 
-Here's a screenshot of WP-Discourse in action at [How-To Geek](http://www.howtogeek.com/180175/warning-your-browser-extensions-are-spying-on-you/), which is a WordPress blog backed with a Discourse forum:
+```sh
+composer require discourse/wp-discourse 0.6.2
+```
 
-[![](https://raw2.github.com/discourse/discourse-docimages/master/wordpress/wordpress-plugin-sample-screenhot-small.png)](https://raw2.github.com/discourse/discourse-docimages/master/wordpress/wordpress-plugin-sample-screenhot.png)
+Or manually add it to your `composer.json`:
 
-And there are tons of options:
-
-![](https://raw.github.com/discourse/discourse-docimages/master/wordpress/discourse-wp-plugin.png)
+```json
+"require": {
+  "php": ">=5.3.0",
+  "wordpress": "4.1",
+  "discourse/wp-discourse": "0.6.2"
+}
+```
 
 ## Contributing
 
-1. Fork it
+1. Fork this repo
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create a new pull request
