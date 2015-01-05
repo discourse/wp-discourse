@@ -26,11 +26,11 @@ Author URI: https://github.com/discourse/wp-discourse
 // SSO Helper Class from ArmedGuy : https://github.com/ArmedGuy/discourse_sso_php
 class Discourse_SSO {
   private $sso_secret;
-  
+
   function __construct($secret) {
     $this->sso_secret = $secret;
   }
-  
+
   public function validate($payload, $sig) {
     $payload = urldecode($payload);
     if(hash_hmac("sha256", $payload, $this->sso_secret) === $sig) {
@@ -39,7 +39,7 @@ class Discourse_SSO {
       return false;
     }
   }
-  
+
   public function getNonce($payload) {
     $payload = urldecode($payload);
     $query = array();
@@ -62,7 +62,7 @@ class Discourse_SSO {
     }
     $payload = base64_encode(http_build_query($params));
     $sig = hash_hmac("sha256", $payload, $this->sso_secret);
-    
+
     return http_build_query(array("sso" => $payload, "sig" => $sig));
   }
 }
@@ -188,9 +188,9 @@ class Discourse {
     $discourse_options = self::get_plugin_options();
 
     // only process requests with "my-plugin=ajax-handler"
-    if ( isset( $discourse_options['enable-sso'] ) && 
+    if ( isset( $discourse_options['enable-sso'] ) &&
          intval( $discourse_options['enable-sso'] ) == 1 &&
-         array_key_exists('sso', $wp->query_vars) && 
+         array_key_exists('sso', $wp->query_vars) &&
          array_key_exists('sig', $wp->query_vars) ) {
 
       // Not logged in to WordPress, redirect to WordPress login page with redirect back to here
@@ -198,7 +198,7 @@ class Discourse {
 
         // Preserve sso and sig parameters
         $redirect = add_query_arg();
-        
+
         // Change %0A to %0B so it's not stripped out in wp_sanitize_redirect
         $redirect = str_replace( '%0A', '%0B', $redirect );
 
@@ -209,7 +209,7 @@ class Discourse {
         wp_redirect( $login );
         exit;
       }
-      else {        
+      else {
         // Check for helper class
         if ( ! class_exists( 'Discourse_SSO' ) ) {
           // Error message
@@ -227,13 +227,13 @@ class Discourse {
         // Validate signature
         $sso_secret = $discourse_options['sso-secret'];
         $sso = new Discourse_SSO( $sso_secret );
-        if ( ! ( $sso->validate( $payload, $sig ) ) ) {          
+        if ( ! ( $sso->validate( $payload, $sig ) ) ) {
           // Error message
           echo( 'Invalid request.' );
           exit;
         }
 
-        // Nonce    
+        // Nonce
         $nonce = $sso->getNonce( $payload );
 
         // Current user info
@@ -528,16 +528,6 @@ class Discourse {
     $username = get_the_author_meta( 'discourse_username', $post->post_author );
     if( ! $username || strlen( $username ) < 2 ) {
       $username = $options['publish-username'];
-    }
-
-    $categories = get_the_category();
-    if ($categories){
-      foreach($categories as $category) {
-        if ( in_category( $category->name, $postid ) ) {
-          $options['publish-category'] = $category->name;
-          break;
-        }
-      }
     }
 
     $data = array(
