@@ -33,6 +33,9 @@ class Discourse {
     return str_replace( "{size}", $size, $template );
   }
 
+  // Version
+  static $version ='0.6.2';
+
   // Options and defaults
   static $options = array(
     'url' => '',
