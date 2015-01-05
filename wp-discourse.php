@@ -326,7 +326,7 @@ class Discourse {
 
     if( self::use_discourse_comments( $post->ID ) ) {
       self::sync_comments( $post->ID );
-      return dirname(__FILE__) . '/comments.php';
+      return dirname(__FILE__) . '/templates/comments.php';
     }
 
     return $old;
