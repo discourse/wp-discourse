@@ -27,3 +27,6 @@ Plugin URI: https://github.com/discourse/wp-discourse
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
+
+$discourse = new Discourse();
+$discourse_admin = new DiscourseAdmin();

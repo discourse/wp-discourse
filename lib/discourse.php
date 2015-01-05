@@ -495,5 +495,3 @@ class Discourse {
     }
   }
 }
-
-$discourse = new Discourse();

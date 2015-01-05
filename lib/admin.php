@@ -259,5 +259,3 @@ class DiscourseAdmin {
     }
   }
 }
-
-$discourse_admin = new DiscourseAdmin();
