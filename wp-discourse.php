@@ -137,7 +137,6 @@ class Discourse {
 
   public function __construct() {
     register_activation_hook( __FILE__, array( __CLASS__, 'install' ) );
-    register_uninstall_hook( __FILE__, array( __CLASS__, 'uninstall' ) );
     add_action( 'init', array( $this, 'init' ) );
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
@@ -148,12 +147,6 @@ class Discourse {
     update_option( 'discourse_version', self::$version );
     add_option( 'discourse', self::$options );
   }
-
-  static function uninstall() {
-    delete_option( 'discourse_version' );
-    delete_option( 'discourse' );
-  }
-
 
   public function init() {
     // allow translations
