@@ -237,6 +237,26 @@ class DiscourseAdmin {
     </div>
     <?php
   }
+
+  function publish_to_discourse() {
+    global $post;
+
+    $options = self::get_plugin_options();
+
+    if( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
+      if( $post->post_status == 'auto-draft' ) {
+        $value = $options['auto-publish'];
+      } else {
+        $value = get_post_meta( $post->ID, 'publish_to_discourse', true );
+      }
+
+      echo '<div class="misc-pub-section misc-pub-section-last">
+           <span>'
+           . '<input type="hidden" name="showed_publish_option" value="1">'
+           . '<label><input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
+      .'</span></div>';
+    }
+  }
 }
 
 $discourse_admin = new DiscourseAdmin();
