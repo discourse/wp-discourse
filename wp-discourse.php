@@ -542,6 +542,17 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
+    $category = $options['publish-category'];
+    if ($category === '') {
+      $categories = get_the_category();
+      foreach($categories as $category) {
+        if ( in_category( $category->name, $postid ) ) {
+          $category = $category->name;
+          break;
+        }
+      }
+    }
+
     $data = array(
       'wp-id' => $postid,
       'embed_url' => get_permalink( $postid ),
@@ -549,7 +560,7 @@ class Discourse {
       'api_username' => $username,
       'title' => $title,
       'raw' => $baked,
-      'category' => $options['publish-category'],
+      'category' => $category,
       'skip_validations' => 'true',
       'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
     );
