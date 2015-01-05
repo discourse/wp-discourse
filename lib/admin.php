@@ -241,7 +241,8 @@ class DiscourseAdmin {
   function publish_to_discourse() {
     global $post;
 
-    $options = self::get_plugin_options();
+    $discourse = new Discourse();
+    $options = $discourse->get_plugin_options();
 
     if( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
       if( $post->post_status == 'auto-draft' ) {
