@@ -2,6 +2,8 @@
 /**
  * WP-Discourse admin settings
  */
+require_once('discourse.php');
+
 class DiscourseAdmin {
   public function __construct() {
     add_action( 'admin_init', array( $this, 'admin_init' ) );
@@ -241,8 +243,7 @@ class DiscourseAdmin {
   function publish_to_discourse() {
     global $post;
 
-    $discourse = new Discourse();
-    $options = $discourse->get_plugin_options();
+    $options = Discourse::get_plugin_options();
 
     if( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
       if( $post->post_status == 'auto-draft' ) {
