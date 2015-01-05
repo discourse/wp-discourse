@@ -164,9 +164,6 @@ class Discourse {
     add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 
     $plugin_dir = plugin_dir_url( __FILE__ );
-    wp_register_style( 'discourse_comments', $plugin_dir . 'css/style.css' );
-    wp_enqueue_style( 'discourse_comments' );
-
     wp_register_script( 'discourse_comments_js', $plugin_dir . 'js/discourse.js', array( 'jquery' ));
     wp_enqueue_script( 'discourse_comments_js' );
 
