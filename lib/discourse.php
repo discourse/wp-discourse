@@ -303,7 +303,7 @@ class Discourse {
 
     if( self::use_discourse_comments( $post->ID ) ) {
       self::sync_comments( $post->ID );
-      return dirname(__FILE__) . '/templates/comments.php';
+      return WPDISCOURSE_PATH . '/templates/comments.php';
     }
 
     return $old;
