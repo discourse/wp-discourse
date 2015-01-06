@@ -24,9 +24,13 @@ Plugin URI: https://github.com/discourse/wp-discourse
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 */
 
+define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
+
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 
 $discourse = new Discourse();
 $discourse_admin = new DiscourseAdmin();
+
+register_activation_hook( __FILE__, array( $discourse, 'install' ) );
