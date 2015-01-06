@@ -69,7 +69,6 @@ class Discourse {
   );
 
   public function __construct() {
-    register_activation_hook( __FILE__, array( __CLASS__, 'install' ) );
     add_action( 'init', array( $this, 'init' ) );
     add_action( 'wp_footer', array( $this, 'discourse_comments_js' ), 100 );
   }
