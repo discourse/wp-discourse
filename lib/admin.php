@@ -145,7 +145,7 @@ class DiscourseAdmin {
   }
 
   function template_comment_html() {
-    self::text_area( 'comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}, {comment_url}</small>' );
+    self::text_area( 'comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}</small>' );
   }
 
   function template_participant_html() {
