@@ -1,3 +1,6 @@
+### HEAD
+* Fix asset URLs on synced Discourse comments
+
 ### 0.6.3: January 31st, 2015
 * Add CHANGELOG
 * Move comments template into new folder

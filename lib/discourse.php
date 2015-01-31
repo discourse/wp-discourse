@@ -206,6 +206,12 @@ class Discourse {
     return $src;
   }
 
+  static function convert_relative_img_src_to_absolute($url, $content) {
+    $search = '#<img src="((?!\s*[\'"]?(?:https?:)?//)\s*([\'"]))?#';
+    $replace = "<img src=\"{$url}$1";
+    return preg_replace($search, $replace, $content);
+  }
+
   static function get_plugin_options() {
     return wp_parse_args( get_option( 'discourse' ), Discourse::$options );
   }
