@@ -5,7 +5,7 @@ $is_enable_sso = (isset( $options['enable-sso'] ) && intval( $options['enable-ss
 $permalink = (string)$custom['discourse_permalink'][0];
 if($is_enable_sso) {
   $permalink = esc_url($options['url']) . '/session/sso?return_path=' . $permalink;
-} 
+}
 $discourse_url_name = preg_replace( "(https?://)", "", $options['url'] );
 if(isset($custom['discourse_comments_raw'])) {
   $discourse_info = json_decode($custom['discourse_comments_raw'][0]);
@@ -32,26 +32,27 @@ if($more_replies == 0) {
   $more_replies = $more_replies . " " . $more . "replies";
 }
 
+$discourse_url = esc_url($options['url']);
 $discourse_html = '';
 $comments_html = '';
 $participants_html = '';
 if(count($discourse_info->posts) > 0) {
   foreach($discourse_info->posts as &$post) {
     $comment_html = wp_kses_post($options['comment-html']);
-    $comment_html = str_replace('{discourse_url}', esc_url($options['url']), $comment_html);
+    $comment_html = str_replace('{discourse_url}', $discourse_url, $comment_html);
     $comment_html = str_replace('{discourse_url_name}', $discourse_url_name, $comment_html);
     $comment_html = str_replace('{topic_url}', $permalink, $comment_html);
     $comment_html = str_replace('{avatar_url}', Discourse::avatar($post->avatar_template,64), $comment_html);
     $comment_html = str_replace('{user_url}', Discourse::homepage($options['url'],$post), $comment_html);
     $comment_html = str_replace('{username}', $post->username, $comment_html);
     $comment_html = str_replace('{fullname}', $post->name, $comment_html);
-    $comment_html = str_replace('{comment_body}', $post->cooked, $comment_html); // emoticons don't have absolute urls
+    $comment_html = str_replace('{comment_body}', Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked), $comment_html);
     $comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
     $comments_html .= $comment_html;
   }
   foreach($discourse_info->participants as &$participant) {
     $participant_html = wp_kses_post($options['participant-html']);
-    $participant_html = str_replace('{discourse_url}', esc_url($options['url']), $participant_html);
+    $participant_html = str_replace('{discourse_url}', $discourse_url, $participant_html);
     $participant_html = str_replace('{discourse_url_name}', $discourse_url_name, $participant_html);
     $participant_html = str_replace('{topic_url}', $permalink, $participant_html);
     $participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
@@ -65,7 +66,7 @@ if(count($discourse_info->posts) > 0) {
 } else {
   $discourse_html = wp_kses_post($options['no-replies-html']);
 }
-$discourse_html = str_replace('{discourse_url}', esc_url($options['url']), $discourse_html);
+$discourse_html = str_replace('{discourse_url}', $discourse_url, $discourse_html);
 $discourse_html = str_replace('{discourse_url_name}', $discourse_url_name, $discourse_html);
 $discourse_html = str_replace('{topic_url}', $permalink, $discourse_html);
 $discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
