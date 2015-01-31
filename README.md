@@ -19,7 +19,7 @@ This WordPress plugin allows you to **use Discourse as a community engine for yo
 If you're using Composer to manage WordPress, add WP-Discourse to your project's dependencies. Run:
 
 ```sh
-composer require discourse/wp-discourse 0.6.2
+composer require discourse/wp-discourse 0.6.3
 ```
 
 Or manually add it to your `composer.json`:
@@ -28,7 +28,7 @@ Or manually add it to your `composer.json`:
 "require": {
   "php": ">=5.3.0",
   "wordpress": "4.1",
-  "discourse/wp-discourse": "0.6.2"
+  "discourse/wp-discourse": "0.6.3"
 }
 ```
 
