@@ -6,6 +6,7 @@ Version: 0.6.3
 Author: Sam Saffron, Robin Ward
 Author URI: https://github.com/discourse/wp-discourse
 Plugin URI: https://github.com/discourse/wp-discourse
+GitHub Plugin URI: https://github.com/discourse/wp-discourse
 */
 /*  Copyright 2014 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
