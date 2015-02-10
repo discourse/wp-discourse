@@ -199,11 +199,8 @@ class Discourse {
 
   function get_avatar_url( $user_id ) {
     $avatar = get_avatar( $user_id );
-    $doc = new DOMDocument();
-    $doc->loadHTML( $avatar );
-    $xpath = new DOMXPath( $doc );
-    $src = $xpath->evaluate( 'string(//img/@src)' );
-    return $src;
+    if( preg_match( "/src=['\"](.*?)['\"]/i", $avatar, $matches ) )
+      return utf8_uri_encode( $matches[1] );
   }
 
   static function convert_relative_img_src_to_absolute($url, $content) {
