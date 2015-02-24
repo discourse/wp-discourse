@@ -215,9 +215,13 @@ class DiscourseAdmin {
 
   }
 
-  function discourse_validate_options( $input ) {
-    $input['url'] = untrailingslashit( $input['url'] );
-    return $input;
+  function discourse_validate_options( $inputs ) {
+    foreach ( $inputs as $key => $input ) {
+      $inputs[ $key ] = trim( $input );
+    }
+
+    $inputs['url'] = untrailingslashit( $inputs['url'] );
+    return $inputs;
   }
 
   function discourse_admin_menu(){
