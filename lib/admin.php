@@ -223,8 +223,8 @@ class DiscourseAdmin {
 
     foreach( $categories as $category ){
       printf( '<option value="%s"%s>%s</option>',
-        $category['slug'],
-        selected( $options['publish-category'], $category['slug'], false ),
+        $category['id'],
+        selected( $options['publish-category'], $category['id'], false ),
         $category['name']
       );
     }
