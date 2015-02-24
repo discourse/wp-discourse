@@ -5,7 +5,11 @@
 require_once('discourse.php');
 
 class DiscourseAdmin {
+  protected $options;
+
   public function __construct() {
+    $this->options = get_option( 'discourse' );
+
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
   }
@@ -16,9 +20,12 @@ class DiscourseAdmin {
   public function admin_init() {
     register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
     add_settings_section( 'discourse_wp_api', 'Common Settings', array( $this, 'init_default_settings' ), 'discourse' );
-    add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
-    add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_default_settings' ), 'discourse' );
-    add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
+
+    if( !empty( $this->options['url'] ) && !empty( $this->options['api-key'] ) ){
+      add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
+      add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_default_settings' ), 'discourse' );
+      add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    }
 
     add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
     add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'discourse_wp_api' );
@@ -161,7 +168,7 @@ class DiscourseAdmin {
   }
 
   function checkbox_input( $option, $description) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
     if (array_key_exists( $option, $options) and $options[$option] == 1) {
       $value = 'checked="checked"';
     } else {
@@ -175,7 +182,7 @@ class DiscourseAdmin {
   }
 
   function post_type_select_input( $option, $post_types) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
 
@@ -195,7 +202,7 @@ class DiscourseAdmin {
   }
 
   function text_input( $option, $description ) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
       $value = $options[$option];
@@ -211,7 +218,7 @@ class DiscourseAdmin {
   }
 
   function text_area( $option, $description) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
       $value = $options[$option];
