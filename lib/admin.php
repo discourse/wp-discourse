@@ -77,7 +77,7 @@ class DiscourseAdmin {
   }
 
   function publish_category_input() {
-    self::text_input( 'publish-category', 'Category post will be published in Discourse (optional)' );
+    self::category_select( 'publish-category', 'Category post will be published in Discourse (optional)' );
   }
 
   function publish_format_textarea() {
@@ -182,7 +182,54 @@ class DiscourseAdmin {
     }
 
     echo '</select>';
+  }
 
+
+  function category_select( $option, $description ) {
+    $options = get_option( 'discourse' );
+    $url = $options['url'] . '/categories.json';
+
+    $url = add_query_arg( array(
+      "api_key" => $options['api-key'] ,
+      "api_username" => $options['publish-username']
+    ), $url );
+
+    $remote = get_transient( "discourse_settings_categories_cache" );
+
+    if( empty( $remote ) ){
+      $remote = wp_remote_get( $url );
+
+      if( is_wp_error( $remote ) ) {
+        self::text_input( $option, $description );
+        return;
+      }
+
+      $remote = wp_remote_retrieve_body( $remote );
+
+      if( is_wp_error( $remote ) ) {
+        self::text_input( $option, $description );
+        return;
+      }
+
+      $remote = json_decode( $remote, true );
+
+      set_transient( "discourse_settings_categories_cache", $remote, HOUR_IN_SECONDS );
+    }
+
+    $categories = $remote['category_list']['categories'];
+
+    echo "<select id='discourse[{$option}]' name='discourse[{$option}]'>";
+    echo '<option></option>';
+
+    foreach( $categories as $category ){
+      printf( '<option value="%s"%s>%s</option>',
+        $category['slug'],
+        selected( $options['publish-category'], $category['slug'], false ),
+        $category['name']
+      );
+    }
+
+    echo '</select>';
   }
 
   function text_input( $option, $description ) {
