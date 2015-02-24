@@ -172,13 +172,13 @@ class DiscourseAdmin {
 
     foreach ( $post_types as $post_type ) {
 
-      if (array_key_exists( $option, $options) and in_array( $post_type, $options[$option] ) ) {
+      if ( array_key_exists( $option, $options) and in_array( $post_type, $options[$option] ) ) {
         $value = 'selected';
       } else {
         $value = '';
       }
 
-      echo "<option ".$value." value='".$post_type."''>".$post_type."</option>";
+      echo "<option ".$value." value='".$post_type."'>".$post_type."</option>";
     }
 
     echo '</select>';
