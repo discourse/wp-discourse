@@ -167,7 +167,7 @@ class DiscourseAdmin {
     self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}</small>' );
   }
 
-  function checkbox_input( $option, $description) {
+  function checkbox_input( $option, $label, $description = '' ) {
     $options = $this->options;
     if (array_key_exists( $option, $options) and $options[$option] == 1) {
       $value = 'checked="checked"';
@@ -176,7 +176,10 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> />
+    <label>
+      <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> />
+      <?php echo $label ?>
+    </label>
     <p class="description"><?php echo $description ?></p>
     <?php
   }
