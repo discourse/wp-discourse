@@ -284,7 +284,7 @@ class DiscourseAdmin {
 
   function discourse_validate_options( $inputs ) {
     foreach ( $inputs as $key => $input ) {
-      $inputs[ $key ] = trim( $input );
+      $inputs[ $key ] = gettype( $input ) == 'string' ? trim( $input ) : $input;
     }
 
     $inputs['url'] = untrailingslashit( $inputs['url'] );
