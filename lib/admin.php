@@ -5,7 +5,11 @@
 require_once('discourse.php');
 
 class DiscourseAdmin {
+  protected $options;
+
   public function __construct() {
+    $this->options = get_option( 'discourse' );
+
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
   }
@@ -15,32 +19,43 @@ class DiscourseAdmin {
    */
   public function admin_init() {
     register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
-    add_settings_section( 'default_discourse', 'Default Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    add_settings_section( 'discourse_wp_api', 'Common Settings', array( $this, 'init_default_settings' ), 'discourse' );
 
-    add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_min_score', 'Min score of posts', array( $this, 'min_score_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_min_trust_level', 'Min trust level', array( $this, 'min_trust_level_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_template_replies', 'HTML Template to use when there are replies', array( $this, 'template_replies_html' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_template_no_replies', 'HTML Template to use when there are no replies', array( $this, 'template_no_replies_html' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_template_comment', 'HTML Template to use for each comment', array( $this, 'template_comment_html' ), 'discourse', 'default_discourse' );
-    add_settings_field( 'discourse_participant_comment', 'HTML Template to use for each participant', array( $this, 'template_participant_html' ), 'discourse', 'default_discourse' );
+    if( !empty( $this->options['url'] ) && !empty( $this->options['api-key'] ) ){
+      add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
+      add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_default_settings' ), 'discourse' );
+      add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    }
+
+    add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
+    add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'discourse_wp_api' );
+    add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'discourse_wp_api' );
+
+    add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'discourse_wp_sso' );
+    add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
+
+    add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
+
+    add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'discourse_wp_publish' );
+
+    add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_score', 'Min score of posts', array( $this, 'min_score_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_trust_level', 'Min trust level', array( $this, 'min_trust_level_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'discourse_comments' );
+
+    add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_template_replies', 'HTML Template to use when there are replies', array( $this, 'template_replies_html' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_template_no_replies', 'HTML Template to use when there are no replies', array( $this, 'template_no_replies_html' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_template_comment', 'HTML Template to use for each comment', array( $this, 'template_comment_html' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_participant_comment', 'HTML Template to use for each participant', array( $this, 'template_participant_html' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'discourse_comments' );
 
     add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
@@ -152,8 +167,8 @@ class DiscourseAdmin {
     self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}</small>' );
   }
 
-  function checkbox_input( $option, $description) {
-    $options = get_option( 'discourse' );
+  function checkbox_input( $option, $label, $description = '' ) {
+    $options = $this->options;
     if (array_key_exists( $option, $options) and $options[$option] == 1) {
       $value = 'checked="checked"';
     } else {
@@ -161,12 +176,16 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> /> <?php echo $description ?>
+    <label>
+      <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> />
+      <?php echo $label ?>
+    </label>
+    <p class="description"><?php echo $description ?></p>
     <?php
   }
 
   function post_type_select_input( $option, $post_types) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
 
@@ -186,7 +205,7 @@ class DiscourseAdmin {
   }
 
   function text_input( $option, $description ) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
       $value = $options[$option];
@@ -195,13 +214,14 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='text' value='<?php echo esc_attr( $value ); ?>' /> <?php echo $description ?>
+    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='text' value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
+    <p class="description"><?php echo $description ?></p>
     <?php
 
   }
 
   function text_area( $option, $description) {
-    $options = get_option( 'discourse' );
+    $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
       $value = $options[$option];
@@ -210,7 +230,8 @@ class DiscourseAdmin {
     }
 
     ?>
-    <textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_textarea( $value ); ?></textarea><br><?php echo $description ?>
+    <textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_textarea( $value ); ?></textarea>
+    <p class="description"><?php echo $description ?></p>
     <?php
 
   }
