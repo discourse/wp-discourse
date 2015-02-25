@@ -1,4 +1,7 @@
-### HEAD
+### 0.6.4: February 24th, 2015
+* Minor re-organization of the settings page
+* Fetch categories from remote
+* Add fixes for allowed post types
 * Fix asset URLs on synced Discourse comments
 
 ### 0.6.3: January 31st, 2015
