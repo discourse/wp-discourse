@@ -342,7 +342,8 @@ class Discourse {
   }
 
   function get_allowed_post_types() {
-    $selected_post_types = get_option( 'discourse_allowed_post_types' );
+    $discourse_options = self::get_plugin_options();
+    $selected_post_types = $discourse_options['allowed_post_types'];
 
     /** If no post type is explicitly set then use the defaults */
     if ( empty( $selected_post_types ) ) {
