@@ -1,3 +1,6 @@
+### 0.6.5: February 28th, 2015
+* Whitespaces should be stripped only on strings
+
 ### 0.6.4: February 24th, 2015
 * Minor re-organization of the settings page
 * Fetch categories from remote

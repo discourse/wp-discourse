@@ -12,7 +12,7 @@ class Discourse {
   }
 
   // Version
-  static $version ='0.6.4';
+  static $version ='0.6.5';
 
   // Options and defaults
   static $options = array(
