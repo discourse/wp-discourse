@@ -204,7 +204,7 @@ class Discourse {
   }
 
   static function convert_relative_img_src_to_absolute($url, $content) {
-    $search = '#<img src="((?!\s*[\'"]?(?:https?:)?//)\s*([\'"]))?#';
+    $search = '#<img src="((?!\s*[\'"]?(?:https?:)?\/\/)\s*([\'"]))?#';
     $replace = "<img src=\"{$url}$1";
     return preg_replace($search, $replace, $content);
   }
