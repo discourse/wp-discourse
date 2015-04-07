@@ -173,8 +173,7 @@ class Discourse {
         $nonce = $sso->getNonce( $payload );
 
         // Current user info
-        global $current_user;
-        get_currentuserinfo();
+        $current_user = wp_get_current_user();
 
         // Map information
         $params = array(
