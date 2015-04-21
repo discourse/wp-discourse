@@ -18,6 +18,10 @@ $defaults = array(
   'participants' => array()
 );
 
+// add <time> tag to WP allowed html tags
+global $allowedposttags;
+$allowedposttags['time'] = array('datetime'=>array());
+
 // use custom datetime format string if provided, else global date format
 $datetime_format = $options['custom-datetime-format'] == '' ? get_option('date_format') : $options['custom-datetime-format'];
 
