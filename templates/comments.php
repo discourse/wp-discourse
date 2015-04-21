@@ -18,6 +18,10 @@ $defaults = array(
   'participants' => array()
 );
 
+// add <time> tag to WP allowed html tags
+global $allowedposttags;
+$allowedposttags['time'] = array('datetime'=>array());
+
 // Add some protection in the event our metadata doesn't look how we expect it to
 $discourse_info = (object)wp_parse_args((array)$discourse_info, $defaults);
 
