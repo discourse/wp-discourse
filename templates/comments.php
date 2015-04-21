@@ -18,6 +18,9 @@ $defaults = array(
   'participants' => array()
 );
 
+// use custom datetime format string if provided, else global date format
+$datetime_format = $options['custom-datetime-format'] == '' ? get_option('date_format') : $options['custom-datetime-format'];
+
 // Add some protection in the event our metadata doesn't look how we expect it to
 $discourse_info = (object)wp_parse_args((array)$discourse_info, $defaults);
 
@@ -47,7 +50,7 @@ if(count($discourse_info->posts) > 0) {
     $comment_html = str_replace('{username}', $post->username, $comment_html);
     $comment_html = str_replace('{fullname}', $post->name, $comment_html);
     $comment_html = str_replace('{comment_body}', Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked), $comment_html);
-    $comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
+    $comment_html = str_replace('{comment_created_at}', mysql2date($datetime_format, $post->created_at), $comment_html);
     $comments_html .= $comment_html;
   }
   foreach($discourse_info->participants as &$participant) {

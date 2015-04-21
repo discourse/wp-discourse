@@ -47,6 +47,7 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_min_trust_level', 'Min trust level', array( $this, 'min_trust_level_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_custom_datetime_format', 'Custom Datetime Format', array( $this, 'custom_datetime_format' ), 'discourse', 'discourse_comments' );
 
     add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_template_replies', 'HTML Template to use when there are replies', array( $this, 'template_replies_html' ), 'discourse', 'discourse_comments' );
@@ -131,6 +132,10 @@ class DiscourseAdmin {
 
   function custom_excerpt_length() {
     self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)' );
+  }
+
+  function custom_datetime_format(){
+    self::text_input( 'custom-datetime-format', 'Custom comment meta datetime string format (default: "' . get_option('date_format') . '"). See <a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">this</a> for more info.' );
   }
 
   function bypass_trust_level_input() {
