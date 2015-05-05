@@ -396,6 +396,7 @@ class Discourse {
   }
 
   function sync_to_discourse_work( $postid, $title, $raw ) {
+    remove_filter('the_content', 'wpautop');
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
     $options = self::get_plugin_options();
     $post = get_post( $postid );
