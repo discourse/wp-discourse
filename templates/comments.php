@@ -43,37 +43,46 @@ $participants_html = '';
 if(count($discourse_info->posts) > 0) {
   foreach($discourse_info->posts as &$post) {
     $comment_html = wp_kses_post($options['comment-html']);
-    $comment_html = str_replace('{discourse_url}', $discourse_url, $comment_html);
-    $comment_html = str_replace('{discourse_url_name}', $discourse_url_name, $comment_html);
-    $comment_html = str_replace('{topic_url}', $permalink, $comment_html);
-    $comment_html = str_replace('{avatar_url}', Discourse::avatar($post->avatar_template,64), $comment_html);
-    $comment_html = str_replace('{user_url}', Discourse::homepage($options['url'],$post), $comment_html);
-    $comment_html = str_replace('{username}', $post->username, $comment_html);
-    $comment_html = str_replace('{fullname}', $post->name, $comment_html);
-    $comment_html = str_replace('{comment_body}', Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked), $comment_html);
-    $comment_html = str_replace('{comment_url}', "{$permalink}/{$post->post_number}";
-    $comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
-    $comments_html .= $comment_html;
+
+    $replace_array = array(
+      '{discourse_url}' => $discourse_url,
+      '{discourse_url_name}' => $discourse_url_name,
+      '{topic_url}' => $permalink,
+      '{avatar_url}' => Discourse::avatar($post->avatar_template,64),
+      '{user_url}' => Discourse::homepage($options['url'],$post),
+      '{username}' => $post->username,
+      '{fullname}' => $post->name,
+      '{comment_body}' => Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked),
+      '{comment_url}' => "{$permalink}/{$post->post_number}",
+      '{comment_created_at}' => mysql2date(get_option('date_format'), $post->created_at)
+    );
+
+    $comments_html .= str_replace(array_keys($replace_array), array_values($replace_array), $comment_html);
   }
   foreach($discourse_info->participants as &$participant) {
     $participant_html = wp_kses_post($options['participant-html']);
-    $participant_html = str_replace('{discourse_url}', $discourse_url, $participant_html);
-    $participant_html = str_replace('{discourse_url_name}', $discourse_url_name, $participant_html);
-    $participant_html = str_replace('{topic_url}', $permalink, $participant_html);
-    $participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
-    $participant_html = str_replace('{user_url}', Discourse::homepage($options['url'],$participant), $participant_html);
-    $participant_html = str_replace('{username}', $participant->username, $participant_html);
-    $participant_html = str_replace('{fullname}', $participant->name, $participant_html);
-    $participants_html .= $participant_html;
+
+    $replace_array = array(
+      '{discourse_url}' => $discourse_url,
+      '{discourse_url_name}' => $discourse_url_name,
+      '{topic_url}' => $permalink,
+      '{avatar_url}' => Discourse::avatar($participant->avatar_template,64),
+      '{user_url}' => Discourse::homepage($options['url'],$participant),
+      '{username}' => $participant->username
+    );
+    $participants_html .= str_replace(array_keys($replace_array), array_values($replace_array), $participant_html);
   }
   $discourse_html = wp_kses_post($options['replies-html']);
   $discourse_html = str_replace('{more_replies}', $more_replies, $discourse_html);
 } else {
   $discourse_html = wp_kses_post($options['no-replies-html']);
 }
-$discourse_html = str_replace('{discourse_url}', $discourse_url, $discourse_html);
-$discourse_html = str_replace('{discourse_url_name}', $discourse_url_name, $discourse_html);
-$discourse_html = str_replace('{topic_url}', $permalink, $discourse_html);
-$discourse_html = str_replace('{comments}', $comments_html, $discourse_html);
-$discourse_html = str_replace('{participants}', $participants_html, $discourse_html);
+$replace_array = array(
+  '{discourse_url}' => $discourse_url,
+  '{discourse_url_name}' => $discourse_url_name,
+  '{topic_url}' => $permalink,
+  '{comments}' => $comments_html,
+  '{participants}' => $participants_html
+);
+$discourse_html = str_replace(array_keys($replace_array), array_values($replace_array), $discourse_html);
 echo $discourse_html;
