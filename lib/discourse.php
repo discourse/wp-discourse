@@ -402,6 +402,7 @@ class Discourse {
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
     $options = self::get_plugin_options();
     $post = get_post( $postid );
+    $post_primary_category = get_post_meta( $postid, 'primary_category', true);
     $use_full_post = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
 
     if ($use_full_post) {
@@ -435,12 +436,32 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
-    $category = $options['publish-category'];
-    if ( $category === '' ) {
+    // WP => Discourse category map
+    $discourse_category_map = array(
+      '6523' => '25', // HTML/CSS
+      '407'  => '33', // JavaScript
+      '37'   => '31', // PHP
+      '8'    => '34', // Ruby
+      '410'  => '29', // Mobile
+      '6131' => '48', // Design & UX
+      '6132' => '42', // Business
+      '5849' => '30', // WordPress
+      '4386' => '47', // Web Foundations
+      '422'  => '47', // Web
+      '7574' => '47', // Developer Center
+    );
+    // check for category mapping
+    if (array_key_exists($post_primary_category, $discourse_category_map)) {
+      $publish_category = $discourse_category_map[$post_primary_category];
+    } else {
+      $publish_category = $options['publish-category'];
+    }
+
+    if ( $publish_category === '' ) {
       $categories = get_the_category();
-      foreach ( $categories as $category ) {
-        if ( in_category( $category->name, $postid ) ) {
-          $category = $category->name;
+      foreach ( $categories as $publish_category ) {
+        if ( in_category( $publish_category->name, $postid ) ) {
+          $publish_category = $publish_category->name;
           break;
         }
       }
@@ -453,7 +474,7 @@ class Discourse {
       'api_username' => $username,
       'title' => $title,
       'raw' => $baked,
-      'category' => $category,
+      'category' => $publish_category,
       'skip_validations' => 'true',
       'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
     );
