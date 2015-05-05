@@ -476,7 +476,8 @@ class Discourse {
       'raw' => $baked,
       'category' => $publish_category,
       'skip_validations' => 'true',
-      'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
+      'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' ),
+      'tags' => array('article')
     );
 
     if( ! $discourse_id > 0 ) {
