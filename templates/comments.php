@@ -51,6 +51,7 @@ if(count($discourse_info->posts) > 0) {
     $comment_html = str_replace('{username}', $post->username, $comment_html);
     $comment_html = str_replace('{fullname}', $post->name, $comment_html);
     $comment_html = str_replace('{comment_body}', Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked), $comment_html);
+    $comment_html = str_replace('{comment_url}', "{$permalink}/{$post->post_number}";
     $comment_html = str_replace('{comment_created_at}', mysql2date(get_option('date_format'), $post->created_at), $comment_html);
     $comments_html .= $comment_html;
   }
