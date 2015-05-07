@@ -8,6 +8,9 @@ class Discourse {
   }
 
   public static function avatar( $template, $size ) {
+    $options = self::get_plugin_options();
+    $template_http = parse_url($template);
+    $template = $options["url"] . $template_http["path"];
     return str_replace( "{size}", $size, $template );
   }
 
@@ -201,12 +204,7 @@ class Discourse {
   }
 
   static function convert_relative_img_src_to_absolute($url, $content) {
-    if( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content) )
-      return $content;
-
-    $search = '#<img src="((?!\s*[\'"]?(?:https?:)?\/\/)\s*([\'"]))?#';
-    $replace = "<img src=\"{$url}$1";
-    return preg_replace($search, $replace, $content);
+    return preg_replace("/src=(\"|')\/(\w[^\/][^\"']+)('|\")/", "src=\"{$url}/$2\"", $content);
   }
 
   static function get_plugin_options() {
