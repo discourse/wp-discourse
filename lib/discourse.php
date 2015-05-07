@@ -394,9 +394,36 @@ class Discourse {
   }
 
   function sync_to_discourse_work( $postid, $title, $raw ) {
+    $options = self::get_plugin_options();
+
+    //check if we already have this url in discourse
+    $soptions = array(
+      'http' => array(
+        'ignore_errors' => true,
+        'method'  => 'GET',
+        'content' => http_build_query(array(
+          'embed_url' => get_permalink( $postid ),
+          'api_key' => $options['api-key'],
+          'api_username' => 'system'
+          )
+        )
+      )
+    );
+    $url =  $options['url'] .'/embed/info';
+
+    $context = stream_context_create( $soptions );
+    $result = file_get_contents( $url, false, $context );
+    $json = json_decode( $result );
+
+    if ($json->post_id != 0) {
+      add_post_meta( $postid, 'discourse_post_id', (int)$json->post_id, true );
+      delete_post_meta( $postid, 'discourse_permalink' );
+      add_post_meta( $postid, 'discourse_permalink', $options['url'] . '/t/' . $json->topic_slug . '/' . $json->topic_id, true );
+      return;
+    }
+
     remove_filter('the_content', 'wpautop');
     $discourse_id = get_post_meta( $postid, 'discourse_post_id', true );
-    $options = self::get_plugin_options();
     $post = get_post( $postid );
     $post_primary_category = get_post_meta( $postid, 'primary_category', true);
     $use_full_post = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
