@@ -16,6 +16,12 @@ This WordPress plugin allows you to **use Discourse as a community engine for yo
 
 ## Installation
 
+### Plugin manager from your `wp-admin`
+
+Download the [latest release](https://github.com/discourse/wp-discourse/releases) and upload it in the WordPress admin from Plugins > Add New > Upload Plugin.
+
+### Composer
+
 If you're using Composer to manage WordPress, add WP-Discourse to your project's dependencies. Run:
 
 ```sh
