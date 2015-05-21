@@ -51,7 +51,6 @@ if(count($discourse_info->posts) > 0) {
       '{avatar_url}' => Discourse::avatar($post->avatar_template,64),
       '{user_url}' => Discourse::homepage($options['url'],$post),
       '{username}' => $post->username,
-      '{fullname}' => $post->name,
       '{comment_body}' => Discourse::convert_relative_img_src_to_absolute($discourse_url, $post->cooked),
       '{comment_url}' => "{$permalink}/{$post->post_number}",
       '{comment_created_at}' => mysql2date(get_option('date_format'), $post->created_at)
