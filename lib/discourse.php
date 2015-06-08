@@ -105,6 +105,14 @@ class Discourse {
             url = 'https://www.youtube.com/watch?v=' + id;
         jQuery(this).replaceWith('<a href="' + url + '">' + url + '</a>');
       });
+      jQuery('a.mention').each(function() {
+        <?php
+          $discourse_options = self::get_plugin_options();
+          $discourse_url = $discourse_options['url'];
+        ?>
+        var discourse_url = '<?php echo $discourse_url; ?>';
+        jQuery(this).attr("href", discourse_url + jQuery(this).attr("href"));
+      });
     });
     </script>
   <?php
