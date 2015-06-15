@@ -111,7 +111,7 @@ class Discourse {
           $discourse_url = $discourse_options['url'];
         ?>
         var discourse_url = '<?php echo $discourse_url; ?>';
-        jQuery(this).attr("href", discourse_url + jQuery(this).attr("href"));
+        jQuery(this).attr('href', discourse_url + jQuery(this).attr('href'));
       });
     });
     </script>
