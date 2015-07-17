@@ -146,7 +146,7 @@ class Discourse {
         $redirect = str_replace( '%0A', '%0B', $redirect );
 
         // Build login URL
-        $login = wp_login_url( $redirect );
+        $login = wp_login_url( esc_url_raw( $redirect ) );
 
         // Redirect to login
         wp_redirect( $login );
