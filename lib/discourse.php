@@ -92,7 +92,7 @@ class Discourse {
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
-    add_action( 'parse_request', array( $this, 'sso_parse_request' ) );
+    add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
   }
 
   function discourse_comments_js() {
