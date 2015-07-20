@@ -286,23 +286,27 @@ class Discourse {
 
           $permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
           $result = wp_remote_get( $permalink );
-          $json = json_decode( $result['body'] );
+          if ( is_wp_error( $result ) ) {
+             error_log( $result->get_error_message() );
+          } else {
+            $json = json_decode( $result['body'] );
 
-          if ( isset( $json->posts_count ) ) {
-            $posts_count = $json->posts_count - 1;
-            if ( $posts_count < 0 ) {
-              $posts_count = 0;
+            if ( isset( $json->posts_count ) ) {
+              $posts_count = $json->posts_count - 1;
+              if ( $posts_count < 0 ) {
+                $posts_count = 0;
+              }
+
+              delete_post_meta( $postid, 'discourse_comments_count' );
+              add_post_meta( $postid, 'discourse_comments_count', $posts_count, true );
+
+              delete_post_meta( $postid, 'discourse_comments_raw' );
+
+              add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) , true );
+
+              delete_post_meta( $postid, 'discourse_last_sync' );
+              add_post_meta( $postid, 'discourse_last_sync', $time, true );
             }
-
-            delete_post_meta( $postid, 'discourse_comments_count' );
-            add_post_meta( $postid, 'discourse_comments_count', $posts_count, true );
-
-            delete_post_meta( $postid, 'discourse_comments_raw' );
-
-            add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) , true );
-
-            delete_post_meta( $postid, 'discourse_last_sync' );
-            add_post_meta( $postid, 'discourse_last_sync', $time, true );
           }
         }
         $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" );
@@ -470,16 +474,20 @@ class Discourse {
         'body' => http_build_query( $data ),
       );
       $result = wp_remote_post( $url, $post_options);
-      $json = json_decode( $result['body'] );
+      if ( is_wp_error( $result ) ) {
+        error_log( $result->get_error_message() );
+      } else {
+        $json = json_decode( $result['body'] );
 
-      // todo may have $json->errors with list of errors
+        // todo may have $json->errors with list of errors
 
-      if( property_exists( $json, 'id' ) ) {
-        $discourse_id = (int) $json->id;
-      }
+        if( property_exists( $json, 'id' ) ) {
+          $discourse_id = (int) $json->id;
+        }
 
-      if( isset( $discourse_id ) && $discourse_id > 0 ) {
-        add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
+        if( isset( $discourse_id ) && $discourse_id > 0 ) {
+          add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
+        }
       }
     } else {
       // for now the updates are just causing grief, leave'em out
