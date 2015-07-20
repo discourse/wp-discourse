@@ -285,10 +285,8 @@ class Discourse {
           $options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
           $permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
-          $soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'GET' ) );
-          $context = stream_context_create( $soptions );
-          $result = file_get_contents( $permalink, false, $context );
-          $json = json_decode( $result );
+          $result = wp_remote_get( $permalink );
+          $json = json_decode( $result['body'] );
 
           if ( isset( $json->posts_count ) ) {
             $posts_count = $json->posts_count - 1;
@@ -301,7 +299,7 @@ class Discourse {
 
             delete_post_meta( $postid, 'discourse_comments_raw' );
 
-            add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result ) , true );
+            add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) , true );
 
             delete_post_meta( $postid, 'discourse_last_sync' );
             add_post_meta( $postid, 'discourse_last_sync', $time, true );
@@ -466,17 +464,13 @@ class Discourse {
       $url =  $options['url'] .'/posts';
 
       // use key 'http' even if you send the request to https://...
-      $soptions = array(
-        'http' => array(
-          'ignore_errors' => true,
-          'method'  => 'POST',
-          'content' => http_build_query( $data ),
-          'header' => "Content-Type: application/x-www-form-urlencoded\r\n"
-        )
+      $post_options = array(
+        'timeout' => 30,
+        'method' => 'POST',
+        'body' => http_build_query( $data ),
       );
-      $context = stream_context_create( $soptions );
-      $result = file_get_contents( $url, false, $context );
-      $json = json_decode( $result );
+      $result = wp_remote_post( $url, $post_options);
+      $json = json_decode( $result['body'] );
 
       // todo may have $json->errors with list of errors
 
@@ -491,10 +485,9 @@ class Discourse {
       // for now the updates are just causing grief, leave'em out
       return;
       $url = $options['url'] .'/posts/' . $discourse_id ;
-      $soptions = array( 'http' => array( 'ignore_errors' => true, 'method'  => 'PUT','content' => http_build_query( $data) ));
-      $context = stream_context_create( $soptions);
-      $result = file_get_contents( $url, false, $context );
-      $json = json_decode( $result );
+      $post_options = array( 'method' => 'PUT', 'body' => http_build_query( $data ) );
+      $result = wp_remote_post( $url, $post_options );
+      $json = json_decode( $result['body'] );
 
       if(isset( $json->post ) ) {
         $json = $json->post;
