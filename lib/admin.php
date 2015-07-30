@@ -41,6 +41,8 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'discourse_wp_publish' );
 
     add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_show_existing_comments', 'Show Existing WP Comments', array( $this, 'show_existing_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_existing_comments_heading', 'Existing Comments Heading', array( $this, 'existing_comments_heading_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_min_score', 'Min score of posts', array( $this, 'min_score_input' ), 'discourse', 'discourse_comments' );
@@ -114,7 +116,15 @@ class DiscourseAdmin {
   }
 
   function use_discourse_comments_checkbox() {
-    self::checkbox_input( 'use-discourse-comments', 'Use Discourse to comment on Discourse published posts (hiding existing comment section)' );
+    self::checkbox_input( 'use-discourse-comments', 'Use Discourse to comment on Discourse published posts' );
+  }
+
+  function show_existing_comments_checkbox() {
+    self::checkbox_input( 'show-existing-comments', 'Display existing WordPress comments beneath Discourse comments' );
+  }
+
+  function existing_comments_heading_input() {
+    self::text_input( 'existing-comments-heading', 'Heading for existing WordPress comments (e.g. "Historical Comment Archive")' );
   }
 
   function min_replies_input() {

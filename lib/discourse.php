@@ -319,9 +319,19 @@ class Discourse {
 
     if( self::use_discourse_comments( $post->ID ) ) {
       self::sync_comments( $post->ID );
-      return WPDISCOURSE_PATH . '/templates/comments.php';
+      $options = self::get_plugin_options();
+      $num_WP_comments = get_comments_number();
+      if ( ! $options['show-existing-comments'] || $num_WP_comments == 0 ) {
+        // only show the Discourse comments
+        return WPDISCOURSE_PATH . '/templates/comments.php';
+      } else {
+        // show the Discourse comments then show the existing WP comments (in $old)
+        include WPDISCOURSE_PATH . '/templates/comments.php';
+        echo '<div class="discourse-existing-comments-heading">' . $options['existing-comments-heading'] . '</div>';
+        return $old;
+      }
     }
-
+    // show the existing WP comments
     return $old;
   }
 
