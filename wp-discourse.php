@@ -2,7 +2,7 @@
 /*
 Plugin Name: WP-Discourse
 Description: Use Discourse as a community engine for your WordPress blog
-Version: 0.6.5
+Version: 0.6.6
 Author: Sam Saffron, Robin Ward
 Author URI: https://github.com/discourse/wp-discourse
 Plugin URI: https://github.com/discourse/wp-discourse

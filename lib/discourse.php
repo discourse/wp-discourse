@@ -12,7 +12,7 @@ class Discourse {
   }
 
   // Version
-  static $version ='0.6.5';
+  static $version ='0.6.6';
 
   // Options and defaults
   static $options = array(
@@ -136,7 +136,7 @@ class Discourse {
     if (isset( $discourse_options['enable-sso'] ) &&
         intval( $discourse_options['enable-sso'] ) == 1 &&
         isset( $_GET['request'] ) && $_GET['request'] == 'logout' ) {
-          
+
       wp_logout();
       wp_redirect( $discourse_options['url'] );
       exit;
