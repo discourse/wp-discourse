@@ -130,6 +130,19 @@ class Discourse {
   {
     $discourse_options = self::get_plugin_options();
 
+    // sync logout from Discourse to WordPress from Adam Capirola : https://meta.discourse.org/t/wordpress-integration-guide/27531
+    // to make this work, enter a URL of the form "http://my-wp-blog.com/?request=logout" in the "logout redirect"
+    // field in your Discourse admin
+    if (isset( $discourse_options['enable-sso'] ) &&
+        intval( $discourse_options['enable-sso'] ) == 1 &&
+        isset( $_GET['request'] ) && $_GET['request'] == 'logout' ) {
+          
+      wp_logout();
+      wp_redirect( $discourse_options['url'] );
+      exit;
+    }
+    // end logout processing
+
     // only process requests with "my-plugin=ajax-handler"
     if ( isset( $discourse_options['enable-sso'] ) &&
          intval( $discourse_options['enable-sso'] ) == 1 &&
