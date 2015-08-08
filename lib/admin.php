@@ -42,6 +42,7 @@ class DiscourseAdmin {
 
     add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_show_existing_comments', 'Show Existing WP Comments', array( $this, 'show_existing_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_redirect_without_login', 'Redirect Without Login', array( $this, 'redirect_without_login_checkbox' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_existing_comments_heading', 'Existing Comments Heading', array( $this, 'existing_comments_heading_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'discourse_comments' );
@@ -122,6 +123,10 @@ class DiscourseAdmin {
 
   function show_existing_comments_checkbox() {
     self::checkbox_input( 'show-existing-comments', 'Display existing WordPress comments beneath Discourse comments' );
+  }
+
+  function redirect_without_login_checkbox() {
+    self::checkbox_input( 'redirect-without-login', 'Do not force login for link to Discourse comments thread<br />(No effect if not using SSO)' );
   }
 
   function existing_comments_heading_input() {
