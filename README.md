@@ -4,9 +4,9 @@ This WordPress plugin allows you to **use Discourse as a community engine for yo
 
 ## Features
 
-* Optinally publish all new posts to Discourse automatically
+* Optionally publish all new posts to Discourse automatically
 * Use Discourse to comment on blog posts with associated Discourse topics
-* Periodicially sync the "best" posts in Discourse topics back to the associated WordPress blog entry as WordPress comments
+* Periodically sync the "best" posts in Discourse topics back to the associated WordPress blog entry as WordPress comments
 * Enable SSO to Discourse
 * Define format of post on Discourse
 * Set username of post on Discourse
