@@ -220,12 +220,6 @@ class Discourse {
     }
   }
 
-  function get_avatar_url( $user_id ) {
-    $avatar = get_avatar( $user_id );
-    if( preg_match( "/src=['\"](.*?)['\"]/i", $avatar, $matches ) )
-      return utf8_uri_encode( $matches[1] );
-  }
-
   static function convert_relative_img_src_to_absolute($url, $content) {
     if( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content) )
       return $content;
