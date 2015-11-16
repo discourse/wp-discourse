@@ -196,6 +196,8 @@ class Discourse {
         // Current user info
         global $current_user;
         get_currentuserinfo();
+        $current_user_id = get_current_user_id();
+        $avatar = get_avatar_url($current_user_id);
 
         // Map information
         $params = array(
@@ -205,7 +207,7 @@ class Discourse {
           'email' => $current_user->user_email,
           'about_me' => $current_user->description,
           'external_id' => $current_user->ID,
-          'avatar_url' => self::get_avatar_url($current_user->ID)
+          'avatar_url' => $avatar
         );
 
         // Build login string
