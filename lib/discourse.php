@@ -205,7 +205,7 @@ class Discourse {
           'email' => $current_user->user_email,
           'about_me' => $current_user->description,
           'external_id' => $current_user->ID,
-          'avatar_url' => self::get_avatar_url($current_user->ID)
+          'avatar_url' => get_avatar_url(get_current_user_id())
         );
 
         // Build login string
@@ -216,12 +216,6 @@ class Discourse {
         exit;
       }
     }
-  }
-
-  function get_avatar_url( $user_id ) {
-    $avatar = get_avatar( $user_id );
-    if( preg_match( "/src=['\"](.*?)['\"]/i", $avatar, $matches ) )
-      return utf8_uri_encode( $matches[1] );
   }
 
   static function convert_relative_img_src_to_absolute($url, $content) {
