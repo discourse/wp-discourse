@@ -344,9 +344,17 @@ class Discourse {
 
   function publish_post_to_discourse( $new_status, $old_status, $post ) {
     $publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
+
+    $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
     if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
       // This seems a little redundant after `save_postdata` but when using the Press This
       // widget it updates the field as it should.
+
+      // This could be improved, need to be validated
+      if( isset( $_POST['publish_post_category'] ) ){
+        #delete_post_meta( $post->ID, 'publish_post_category');
+        add_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
+      }
 
       add_post_meta( $post->ID, 'publish_to_discourse', '1', true );
 
@@ -409,6 +417,12 @@ class Discourse {
       delete_post_meta( $_POST['ID'], 'publish_to_discourse' );
     }
 
+    if ( isset( $_POST['publish_post_category'] ) ){
+      delete_post_meta($_POST['ID'], 'publish_post_category');
+      add_post_meta( $_POST['ID'], 'publish_post_category',  $_POST['publish_post_category'], true );
+    }
+
+
     add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
 
     return $postid;
@@ -458,7 +472,12 @@ class Discourse {
       $username = $options['publish-username'];
     }
 
-    $category = $options['publish-category'];
+    // Get publish category of a post
+    $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
+    $publish_post_category =  $post->publish_post_category;
+    $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+    $category = isset( $publish_post_category ) ? $publish_post_category : $default_category;
+
     if ( $category === '' ) {
       $categories = get_the_category();
       foreach ( $categories as $category ) {
@@ -483,7 +502,6 @@ class Discourse {
 
     if( ! $discourse_id > 0 ) {
       $url =  $options['url'] .'/posts';
-
       // use key 'http' even if you send the request to https://...
       $post_options = array(
         'timeout' => 30,
