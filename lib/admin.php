@@ -33,6 +33,7 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
 
     add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_publish_category_update', 'Force category update', array( $this, 'publish_category_input_update' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
 
@@ -93,7 +94,11 @@ class DiscourseAdmin {
   }
 
   function publish_category_input() {
-    self::category_select( 'publish-category', 'Category post will be published in Discourse (optional)' );
+    self::category_select( 'publish-category', 'Default category used to published in Discourse (optional)' );
+  }
+
+  function publish_category_input_update() {
+    self::checkbox_input( 'publish-category-update', 'Update the discourse publish category list, normaly set for an hour (normaly set to refresh every hour)' );
   }
 
   function publish_format_textarea() {
@@ -144,7 +149,7 @@ class DiscourseAdmin {
     self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)' );
   }
 
-  function custom_datetime_format(){
+  function custom_datetime_format() {
     self::text_input( 'custom-datetime-format', 'Custom comment meta datetime string format (default: "' . get_option('date_format') . '"). See <a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">this</a> for more info.' );
   }
 
@@ -216,8 +221,7 @@ class DiscourseAdmin {
     echo '</select>';
   }
 
-
-  function category_select( $option, $description ) {
+  function get_discourse_categories( $force_update='0' ) {
     $options = get_option( 'discourse' );
     $url = $options['url'] . '/categories.json';
 
@@ -225,22 +229,24 @@ class DiscourseAdmin {
       "api_key" => $options['api-key'] ,
       "api_username" => $options['publish-username']
     ), $url );
+    $force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
 
     $remote = get_transient( "discourse_settings_categories_cache" );
-
-    if( empty( $remote ) ){
+    $cache = $remote;
+    if( empty($remote) or $force_update == '1' ) {
       $remote = wp_remote_get( $url );
 
-      if( is_wp_error( $remote ) ) {
-        self::text_input( $option, $description );
-        return;
+      if( is_wp_error( $remote ) and ! empty( $cache ) ) {
+        $remote = $cache;
+      }
+      elseif(is_wp_error( $remote )) {
+        return $remote;
       }
 
       $remote = wp_remote_retrieve_body( $remote );
 
       if( is_wp_error( $remote ) ) {
-        self::text_input( $option, $description );
-        return;
+        return $remote;
       }
 
       $remote = json_decode( $remote, true );
@@ -249,16 +255,34 @@ class DiscourseAdmin {
     }
 
     $categories = $remote['category_list']['categories'];
-    $selected = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+    return $categories;
+  }
 
-    echo "<select id='discourse[{$option}]' name='discourse[{$option}]'>";
+  function category_select( $option, $description ) {
+    $options = get_option( 'discourse' );
+
+    $force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
+    $categories = self::get_discourse_categories($force_update);
+
+    if( is_wp_error( $categories ) ) {
+     self::text_input( $option, $description );
+     return;
+    }
+
+   $selected = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+   $name = "discourse[{$option}]";
+   self::option_input($name, $categories, $selected);
+  }
+
+  function option_input( $name, $group, $selected ) {
+    echo "<select id='$name' name='$name'>";
     echo '<option></option>';
 
-    foreach( $categories as $category ){
+    foreach( $group as $item ) {
       printf( '<option value="%s"%s>%s</option>',
-        $category['id'],
-        selected( $selected, $category['id'], false ),
-        $category['name']
+       $item['id'],
+       selected( $selected, $item['id'], false ),
+       $item['name']
       );
     }
 
@@ -306,7 +330,7 @@ class DiscourseAdmin {
     return $inputs;
   }
 
-  function discourse_admin_menu(){
+  function discourse_admin_menu() {
     add_options_page( 'Discourse', 'Discourse', 'manage_options', 'discourse', array ( $this, 'discourse_options_page' ) );
   }
 
@@ -316,12 +340,12 @@ class DiscourseAdmin {
     }
     ?>
     <div class="wrap">
-        <h2>Discourse Options</h2>
-        <form action="options.php" method="POST">
-            <?php settings_fields( 'discourse' ); ?>
-            <?php do_settings_sections( 'discourse' ); ?>
-            <?php submit_button(); ?>
-        </form>
+      <h2>Discourse Options</h2>
+      <form action="options.php" method="POST">
+        <?php settings_fields( 'discourse' ); ?>
+        <?php do_settings_sections( 'discourse' ); ?>
+        <?php submit_button(); ?>
+      </form>
     </div>
     <?php
   }
@@ -338,11 +362,26 @@ class DiscourseAdmin {
         $value = get_post_meta( $post->ID, 'publish_to_discourse', true );
       }
 
-      echo '<div class="misc-pub-section misc-pub-section-last">
-           <span>'
-           . '<input type="hidden" name="showed_publish_option" value="1">'
-           . '<label><input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
-      .'</span></div>';
+      $categories = self::get_discourse_categories('0');
+      if( is_wp_error( $categories ) ) {
+        echo '<span>Unable to retrieve discourse categories at this time. Please save draft to refresh the page.</span>';
+      }
+      else {
+        echo '<div class="misc-pub-section misc-pub-section-last">
+        <span>'
+         . '<input type="hidden" name="showed_publish_option" value="1">';
+
+
+         print "<label>";
+         $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
+         $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+         $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
+         self::option_input('publish_post_category', $categories, $selected);
+         echo ' Discourse Category</label>';
+
+         echo '<label><input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
+         .'</span></div>';
+      }
     }
   }
 }
