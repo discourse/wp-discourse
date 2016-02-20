@@ -20,7 +20,7 @@ class Discourse {
     'api-key' => '',
     'enable-sso' => 0,
     'sso-secret' => '',
-    'publish-username' => '',
+    'publish-username' => 'system',
     'publish-category' => '',
     'auto-publish' => 0,
     'allowed_post_types' => array( 'post', 'page' ),
