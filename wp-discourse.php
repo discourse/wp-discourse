@@ -26,6 +26,7 @@ GitHub Plugin URI: https://github.com/discourse/wp-discourse
 */
 
 define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
+define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/admin.php' );
