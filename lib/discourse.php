@@ -96,7 +96,7 @@ class Discourse {
 
   function discourse_comments_js() {
     // Allowed post type
-    if ( is_singular( $this->get_allowed_post_types() ) ) {
+    if ( is_singular( self::get_allowed_post_types() ) ) {
       // Publish to Discourse enabled
       if ( self::use_discourse_comments( get_the_ID() ) ) {
         // Enqueue script
