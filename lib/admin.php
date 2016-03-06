@@ -74,11 +74,16 @@ class DiscourseAdmin {
   }
 
   function url_input() {
-    self::text_input( 'url', '' );
+    self::text_input( 'url', 'e.g. http://discourse.example.com' );
   }
 
   function api_key_input() {
-    self::text_input( 'api-key', '' );
+    $discourse_options = Discourse::get_plugin_options();
+    if ( isset( $discourse_options['url'] ) && ! empty( $discourse_options['url'] ) ) {
+      self::text_input( 'api-key', 'Found at <a href="' . esc_url( $discourse_options['url'] ) . '/admin/api" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api</a>' );
+    } else {
+      self::text_input( 'api-key', 'Found at http://discourse.example.com/admin/api' );
+    }
   }
 
   function enable_sso_checkbox() {

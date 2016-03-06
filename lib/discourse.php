@@ -20,10 +20,10 @@ class Discourse {
     'api-key' => '',
     'enable-sso' => 0,
     'sso-secret' => '',
-    'publish-username' => '',
+    'publish-username' => 'system',
     'publish-category' => '',
     'auto-publish' => 0,
-    'allowed_post_types' => array( 'post', 'page' ),
+    'allowed_post_types' => array( 'post' ),
     'auto-track' => 1,
     'max-comments' => 5,
     'use-discourse-comments' => 0,
@@ -31,7 +31,7 @@ class Discourse {
     'min-score' => 30,
     'min-replies' => 5,
     'min-trust-level' => 1,
-    'custom-excerpt-length' => '55',
+    'custom-excerpt-length' => 55,
     'bypass-trust-level-score' => 50,
     'debug-mode' => 0,
     'full-post-content' => 0,
@@ -70,7 +70,6 @@ class Discourse {
 
   public function __construct() {
     add_action( 'init', array( $this, 'init' ) );
-    add_action( 'wp_footer', array( $this, 'discourse_comments_js' ), 100 );
   }
 
   static function install() {
@@ -87,7 +86,7 @@ class Discourse {
     add_filter( 'comments_template', array( $this, 'comments_template' ) );
     add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 
-    wp_enqueue_script( 'jquery' );
+    add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 
     add_action( 'save_post', array( $this, 'save_postdata' ) );
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
@@ -96,26 +95,25 @@ class Discourse {
   }
 
   function discourse_comments_js() {
-    if ( wp_script_is( 'jquery', 'done' ) ) {
-  ?>
-    <script>
-    jQuery(document).ready(function() {
-      jQuery('.lazyYT').each(function() {
-        var id = jQuery(this).data('youtube-id'),
-            url = 'https://www.youtube.com/watch?v=' + id;
-        jQuery(this).replaceWith('<a href="' + url + '">' + url + '</a>');
-      });
-      jQuery('a.mention').each(function() {
-        <?php
-          $discourse_options = self::get_plugin_options();
-          $discourse_url = $discourse_options['url'];
-        ?>
-        var discourse_url = '<?php echo $discourse_url; ?>';
-        jQuery(this).attr('href', discourse_url + jQuery(this).attr('href'));
-      });
-    });
-    </script>
-  <?php
+    // Allowed post type
+    if ( is_singular( self::get_allowed_post_types() ) ) {
+      // Publish to Discourse enabled
+      if ( self::use_discourse_comments( get_the_ID() ) ) {
+        // Enqueue script
+        wp_enqueue_script(
+          'discourse-comments-js',
+          WPDISCOURSE_URL . '/js/comments.js',
+          array( 'jquery' ),
+          self::$version,
+          true
+        );
+        // Localize script
+        $discourse_options = self::get_plugin_options();
+        $data = array(
+          'url' => $discourse_options['url'],
+        );
+        wp_localize_script( 'discourse-comments-js', 'discourse', $data );
+      }
     }
   }
 
