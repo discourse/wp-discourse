@@ -485,19 +485,18 @@ class Discourse {
       }
     }
 
-    $data = array(
-      'wp-id' => $postid,
-      'embed_url' => get_permalink( $postid ),
-      'api_key' => $options['api-key'],
-      'api_username' => $username,
-      'title' => $title,
-      'raw' => $baked,
-      'category' => $category,
-      'skip_validations' => 'true',
-      'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
-    );
-
     if( ! $discourse_id > 0 ) {
+      $data = array(
+          'wp-id' => $postid,
+          'embed_url' => get_permalink( $postid ),
+          'api_key' => $options['api-key'],
+          'api_username' => $username,
+          'title' => $title,
+          'raw' => $baked,
+          'category' => $category,
+          'skip_validations' => 'true',
+          'auto_track' => ( $options['auto-track'] == "1" ? 'true' : 'false' )
+      );
       $url =  $options['url'] .'/posts';
       // use key 'http' even if you send the request to https://...
       $post_options = array(
@@ -506,6 +505,7 @@ class Discourse {
         'body' => http_build_query( $data ),
       );
       $result = wp_remote_post( $url, $post_options);
+
       if ( is_wp_error( $result ) ) {
         error_log( $result->get_error_message() );
       } else {
@@ -522,18 +522,35 @@ class Discourse {
         }
       }
     } else {
-      // for now the updates are just causing grief, leave'em out
-      return;
+      $data = array(
+          'api_key' => $options['api-key'],
+          'api_username' => $username,
+          'post[raw]' => $baked,
+          'skip_validations' => 'true',
+      );
       $url = $options['url'] .'/posts/' . $discourse_id ;
-      $post_options = array( 'method' => 'PUT', 'body' => http_build_query( $data ) );
-      $result = wp_remote_post( $url, $post_options );
-      $json = json_decode( $result['body'] );
+      $post_options = array(
+          'timeout' => 30,
+          'method' => 'PUT',
+          'body' => http_build_query( $data ),
+      );
+      $result = wp_remote_post( $url, $post_options);
 
-      if(isset( $json->post ) ) {
-        $json = $json->post;
+      if ( is_wp_error( $result ) ) {
+        error_log( $result->get_error_message() );
+      } else {
+        $json = json_decode( $result['body'] );
+
+        // todo may have $json->errors with list of errors
+
+        if( property_exists( $json, 'id' ) ) {
+          $discourse_id = (int) $json->id;
+        }
+
+        if( isset( $discourse_id ) && $discourse_id > 0 ) {
+          add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
+        }
       }
-
-      // todo may have $json->errors with list of errors
     }
 
     if( isset( $json->topic_slug ) ) {
