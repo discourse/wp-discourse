@@ -5,6 +5,6 @@ jQuery(document).ready(function() {
 		jQuery(this).replaceWith('<a href="' + url + '">' + url + '</a>');
 	});
 	jQuery('a.mention').each(function() {
-		jQuery(this).attr('href', discourse_url + jQuery(this).attr('href'));
+		jQuery(this).attr('href', discourse.url + jQuery(this).attr('href'));
 	});
 });
