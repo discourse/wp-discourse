@@ -187,7 +187,7 @@ class DiscourseAdmin {
   }
 
   function template_participant_html() {
-    self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}</small>' );
+    self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}</small>' );
   }
 
   function checkbox_input( $option, $label, $description = '' ) {

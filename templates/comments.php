@@ -65,7 +65,6 @@ if(count($discourse_info->posts) > 0) {
     $participant_html = str_replace('{avatar_url}', Discourse::avatar($participant->avatar_template,64), $participant_html);
     $participant_html = str_replace('{user_url}', Discourse::homepage($options['url'],$participant), $participant_html);
     $participant_html = str_replace('{username}', $participant->username, $participant_html);
-    $participant_html = str_replace('{fullname}', $participant->name, $participant_html);
     $participants_html .= $participant_html;
   }
   $discourse_html = wp_kses_post($options['replies-html']);
