@@ -27,6 +27,7 @@ class Discourse {
     'auto-track' => 1,
     'max-comments' => 5,
     'use-discourse-comments' => 0,
+    'show-existing-comments' => 0,
     'publish-format' => '<small>Originally published at: {blogurl}</small><br>{excerpt}',
     'min-score' => 30,
     'min-replies' => 5,
