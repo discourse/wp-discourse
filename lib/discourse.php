@@ -151,7 +151,7 @@ class Discourse {
       if ( ! is_user_logged_in() ) {
 
         // Preserve sso and sig parameters
-        $redirect = add_query_arg();
+        $redirect = add_query_arg( NULL, NULL );
 
         // Change %0A to %0B so it's not stripped out in wp_sanitize_redirect
         $redirect = str_replace( '%0A', '%0B', $redirect );
