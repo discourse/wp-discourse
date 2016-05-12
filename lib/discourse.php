@@ -80,7 +80,7 @@ class Discourse {
 
   public function init() {
     // allow translations
-    load_plugin_textdomain( 'discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
+    load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
     // replace comments with discourse comments
     add_filter( 'comments_number', array( $this, 'comments_number' ) );
@@ -93,6 +93,12 @@ class Discourse {
     add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+    add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+  }
+
+  function admin_styles() {
+    wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
+    wp_enqueue_style( 'wp_discourse_admin' );
   }
 
   function discourse_comments_js() {

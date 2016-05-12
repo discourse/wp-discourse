@@ -137,19 +137,19 @@ class DiscourseAdmin {
   }
 
   function min_replies_input() {
-    self::text_input( 'min-replies', 'Minimum replies required prior to pulling comments across', 'number' );
+    self::text_input( 'min-replies', 'Minimum replies required prior to pulling comments across', 'number', 0 );
   }
 
   function min_trust_level_input() {
-    self::text_input( 'min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)', 'number' );
+    self::text_input( 'min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)', 'number', 0 );
   }
 
   function min_score_input() {
-    self::text_input( 'min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)', 'number' );
+    self::text_input( 'min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)', 'number', 0 );
   }
 
   function custom_excerpt_length() {
-    self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)', 'number' );
+    self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)', 'number', 0 );
   }
 
   function custom_datetime_format() {
@@ -157,7 +157,7 @@ class DiscourseAdmin {
   }
 
   function bypass_trust_level_input() {
-    self::text_input( 'bypass-trust-level-score', 'Bypass trust level check on posts with this score', 'number' );
+    self::text_input( 'bypass-trust-level-score', 'Bypass trust level check on posts with this score', 'number', 0 );
   }
 
   function debug_mode_checkbox() {
@@ -193,7 +193,7 @@ class DiscourseAdmin {
     if (array_key_exists( $option, $options) and $options[$option] == 1) {
       $value = 'checked="checked"';
     } else {
-      $value = '';
+      $value = '0';
     }
 
     ?>
@@ -296,7 +296,7 @@ class DiscourseAdmin {
     echo '</select>';
   }
 
-  function text_input( $option, $description, $type = null ) {
+  function text_input( $option, $description, $type = null, $min = null ) {
     $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
@@ -306,7 +306,10 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo  esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]' type='text' value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
+    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'
+           type="<?php echo isset( $type ) ? $type : 'text'; ?>"
+           <?php if ( isset( $min ) ) echo 'min="' . $min . '"'; ?>
+           value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
     <p class="description"><?php echo esc_html( $description ); ?></p>
     <?php
   }
@@ -328,12 +331,13 @@ class DiscourseAdmin {
   }
 
   function discourse_validate_options( $inputs ) {
+    $output = array();
     foreach ( $inputs as $key => $input ) {
-      $inputs[ $key ] = is_string( $input ) ? trim( $input ) : $input;
+      $filter = 'validate_' . str_replace( '-', '_', $key );
+      $output[$key] = apply_filters( $filter, $input );
     }
 
-    $inputs['url'] = untrailingslashit( $inputs['url'] );
-    return $inputs;
+    return $output;
   }
 
   function discourse_admin_menu() {
