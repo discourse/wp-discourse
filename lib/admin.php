@@ -238,20 +238,25 @@ class DiscourseAdmin {
 
     $remote = get_transient( "discourse_settings_categories_cache" );
     $cache = $remote;
-    if( empty($remote) or $force_update == '1' ) {
-      $remote = wp_remote_get( $url );
 
-      if( is_wp_error( $remote ) and ! empty( $cache ) ) {
-        $remote = $cache;
-      }
-      elseif(is_wp_error( $remote )) {
-        return $remote;
+    if( empty($remote) || $force_update == '1' ) {
+      $remote = wp_remote_get( $url );
+      $invalid_response = wp_remote_retrieve_response_code( $remote ) != 200;
+
+      if ( is_wp_error( $remote ) || $invalid_response ) {
+        if ( array_key_exists( 'category_list', $cache ) ) {
+          $categories = $cache['category_list']['categories'];
+          return $categories;
+        } else {
+          // We're not going to get anything useful by returning $remote.
+          return null;
+        }
       }
 
       $remote = wp_remote_retrieve_body( $remote );
 
       if( is_wp_error( $remote ) ) {
-        return $remote;
+        return null;
       }
 
       $remote = json_decode( $remote, true );
