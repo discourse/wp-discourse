@@ -244,7 +244,7 @@ class DiscourseAdmin {
       $invalid_response = wp_remote_retrieve_response_code( $remote ) != 200;
 
       if ( is_wp_error( $remote ) || $invalid_response ) {
-        if ( array_key_exists( 'category_list', $cache ) ) {
+        if ( ! empty( $cache ) ) {
           $categories = $cache['category_list']['categories'];
           return $categories;
         } else {
