@@ -22,7 +22,7 @@ class DiscourseAdmin {
     add_settings_section( 'discourse_wp_api', 'Common Settings', array( $this, 'init_default_settings' ), 'discourse' );
 
     add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
-    add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_comment_settings' ), 'discourse' );
     add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
 
     add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
@@ -34,7 +34,6 @@ class DiscourseAdmin {
 
     add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_publish_category_update', 'Force category update', array( $this, 'publish_category_input_update' ), 'discourse', 'discourse_wp_publish' );
-    add_settings_field( 'discourse_publish_format', 'Publish format', array( $this, 'publish_format_textarea' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
 
     add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'discourse_wp_publish' );
@@ -53,10 +52,6 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_custom_datetime_format', 'Custom Datetime Format', array( $this, 'custom_datetime_format' ), 'discourse', 'discourse_comments' );
 
     add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_template_replies', 'HTML Template to use when there are replies', array( $this, 'template_replies_html' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_template_no_replies', 'HTML Template to use when there are no replies', array( $this, 'template_no_replies_html' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_template_comment', 'HTML Template to use for each comment', array( $this, 'template_comment_html' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_participant_comment', 'HTML Template to use for each participant', array( $this, 'template_participant_html' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'discourse_comments' );
 
     add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
@@ -69,7 +64,19 @@ class DiscourseAdmin {
     return $fields;
   }
 
-  function init_default_settings() {}
+  function init_default_settings() {
+  }
+
+  function init_comment_settings() {
+    ?>
+
+    <p class="documentation-link">
+      <em><?php _e( 'For documentation on customizing the plugin\'s html, visit ', 'wp-discourse'); ?></em>
+      <a href="https://github.com/scossar/wp-discourse/wiki/Template-Customization">https://github.com/scossar/wp-discourse/wiki/Template-Customization</a>
+    </p>
+
+    <?php
+  }
 
   function url_input() {
     self::text_input( 'url', 'e.g. http://discourse.example.com', 'url' );
@@ -102,10 +109,6 @@ class DiscourseAdmin {
 
   function publish_category_input_update() {
     self::checkbox_input( 'publish-category-update', 'Update the discourse publish category list, normaly set for an hour (normaly set to refresh every hour)' );
-  }
-
-  function publish_format_textarea() {
-    self::text_area( 'publish-format', 'Markdown format for published articles, use {excerpt} for excerpt and {blogurl} for the url of the blog post' );
   }
 
   function max_comments_input() {
@@ -170,22 +173,6 @@ class DiscourseAdmin {
 
   function only_show_moderator_liked_checkbox() {
     self::checkbox_input( 'only-show-moderator-liked', 'Yes' );
-  }
-
-  function template_replies_html() {
-    self::text_area( 'replies-html', 'HTML template to use when there are replies<br/>Available tags: <small>{comments}, {discourse_url}, {discourse_url_name}, {topic_url}, {more_replies}, {participants}</small>' );
-  }
-
-  function template_no_replies_html() {
-    self::text_area( 'no-replies-html', 'HTML template to use when there are no replies<br/>Available tags: <small>{comments}, {discourse_url}, {discourse_url_name}, {topic_url}</small>' );
-  }
-
-  function template_comment_html() {
-    self::text_area( 'comment-html', 'HTML template to use for each comment<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}, {fullname}, {comment_body}, {comment_created_at}</small>' );
-  }
-
-  function template_participant_html() {
-    self::text_area( 'participant-html', 'HTML template to use for each participant<br/>Available tags: <small>{discourse_url}, {discourse_url_name}, {topic_url}, {avatar_url}, {user_url}, {username}</small>' );
   }
 
   function checkbox_input( $option, $label, $description = '' ) {
@@ -281,7 +268,7 @@ class DiscourseAdmin {
    $name = "discourse[$option]";
    self::option_input($name, $categories, $selected);
   }
-  
+
   function option_input( $name, $group, $selected ) {
     echo '<select id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '">';
 
@@ -351,6 +338,10 @@ class DiscourseAdmin {
     ?>
     <div class="wrap">
       <h2>Discourse Options</h2>
+      <p class="documentation-link">
+        <em><?php _e( 'The WP Discourse plugin documentation can be found at ', 'wp-discourse'); ?></em>
+        <a href="https://github.com/scossar/wp-discourse/wiki">https://github.com/scossar/wp-discourse/wiki</a>
+      </p>
       <form action="options.php" method="POST">
         <?php settings_fields( 'discourse' ); ?>
         <?php do_settings_sections( 'discourse' ); ?>

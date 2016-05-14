@@ -2,6 +2,8 @@
 /**
  * WP-Discourse
  */
+use WPDiscourse\Templates as Templates;
+
 class Discourse {
   public static function homepage( $url, $post ) {
     return $url . "/users/" . strtolower( $post->username );
@@ -28,7 +30,6 @@ class Discourse {
     'max-comments' => 5,
     'use-discourse-comments' => 0,
     'show-existing-comments' => 0,
-    'publish-format' => '<small>Originally published at: {blogurl}</small><br>{excerpt}',
     'min-score' => 30,
     'min-replies' => 5,
     'min-trust-level' => 1,
@@ -36,37 +37,7 @@ class Discourse {
     'bypass-trust-level-score' => 50,
     'debug-mode' => 0,
     'full-post-content' => 0,
-    'only-show-moderator-liked' => 0,
-    'replies-html' => '<div id="comments" class="comments-area">
-  <h2 class="comments-title">Notable Replies</h2>
-  <ol class="comment-list">{comments}</ol>
-  <div class="respond" class="comment-respond">
-    <h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">Continue the discussion</a> at {discourse_url_name}</h3>
-    <p class="more-replies">{more_replies}</p>
-    <p class="comment-reply-title">{participants}</p>
-  </div><!-- #respond -->
-</div>',
-      'no-replies-html' => '<div id="comments" class="comments-area">
-  <div class="respond" class="comment-respond">
-    <h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">Start the discussion</a> at {discourse_url_name}</h3>
-  </div><!-- #respond -->
- </div>',
-      'comment-html' => '<li class="comment even thread-even depth-1">
-  <article class="comment-body">
-    <footer class="comment-meta">
-      <div class="comment-author vcard">
-        <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64" width="64">
-        <b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
-        <span class="says">says:</span>
-      </div><!-- .comment-author -->
-      <div class="comment-metadata">
-        <time pubdate="" datetime="{comment_created_at}">{comment_created_at}</time>
-      </div><!-- .comment-metadata -->
-    </footer><!-- .comment-meta -->
-    <div class="comment-content">{comment_body}</div><!-- .comment-content -->
-  </article><!-- .comment-body -->
-</li>',
-      'participant-html' => '<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25">'
+    'only-show-moderator-liked' => 0
   );
 
   public function __construct() {
@@ -459,7 +430,8 @@ class Discourse {
       $excerpt = discourse_custom_excerpt( $postid );
     }
 
-    $baked = $options['publish-format'];
+    // trim to keep the Discourse markdown parser from treating this as code.
+    $baked = trim( Templates\HTMLTemplates::publish_format_html() );
     $baked = str_replace( "{excerpt}", $excerpt, $baked );
     $baked = str_replace( "{blogurl}", get_permalink( $postid ), $baked );
     $author_id = $post->post_author;
