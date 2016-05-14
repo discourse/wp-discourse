@@ -12,6 +12,7 @@ class DiscourseAdmin {
 
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
+    add_action( 'load-settings_page_discourse', array( $this, 'connection_status_notice' ) );
   }
 
   /**
@@ -388,5 +389,50 @@ class DiscourseAdmin {
          .'</span></div>';
       }
     }
+  }
+
+  function connection_status_notice() {
+    if ( ! $this->test_api_credentials() ) {
+      add_action( 'admin_notices' , array( $this, 'disconnected' ) );
+    } else {
+      add_action( 'admin_notices', array($this, 'connected' ) );
+    }
+  }
+
+  function disconnected() {
+    ?>
+    <div class="notice notice-warning is-dismissible">
+      <p>
+        <strong><?php _e( "You are not currently connected to a Discourse forum. Check your settings for 'Discourse Url', 'API Key', and 'Publishing username'. ", 'wp-discourse' ); ?></strong>
+      </p>
+    </div>
+    <?php
+  }
+
+  function connected() {
+    ?>
+    <div class="notice notice-success is-dismissible">
+      <p>
+        <strong><?php _e( "You are connected to Discourse!", 'wp-discourse' ); ?></strong>
+      </p>
+    </div>
+    <?php
+  }
+
+  protected function test_api_credentials() {
+    $options = $this->options;
+    $url = array_key_exists( 'url', $options ) ? $options['url'] . '/categories.json' : '';
+
+    $url = add_query_arg( array(
+      "api_key" => array_key_exists( 'api-key', $options  ) ? $options['api-key'] : '' ,
+      "api_username" => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
+    ), $url );
+    $response = wp_remote_get( $url );
+    $invalid_response = wp_remote_retrieve_response_code( $response ) != 200;
+
+    if ( is_wp_error( $response ) || $invalid_response ) {
+      return false;
+    }
+    return true;
   }
 }
