@@ -248,15 +248,14 @@ class DiscourseAdmin {
           $categories = $cache['category_list']['categories'];
           return $categories;
         } else {
-          // We're not going to get anything useful by returning $remote.
-          return null;
+          return new WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
         }
       }
 
       $remote = wp_remote_retrieve_body( $remote );
 
       if( is_wp_error( $remote ) ) {
-        return null;
+        return $remote;
       }
 
       $remote = json_decode( $remote, true );
