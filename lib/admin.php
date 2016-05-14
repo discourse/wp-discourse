@@ -74,7 +74,7 @@ class DiscourseAdmin {
   }
 
   function url_input() {
-    self::text_input( 'url', 'e.g. http://discourse.example.com' );
+    self::text_input( 'url', 'e.g. http://discourse.example.com', 'url' );
   }
 
   function api_key_input() {
@@ -111,7 +111,7 @@ class DiscourseAdmin {
   }
 
   function max_comments_input() {
-    self::text_input( 'max-comments', 'Maximum number of comments to display' );
+    self::text_input( 'max-comments', 'Maximum number of comments to display', 'number' );
   }
 
   function auto_publish_checkbox() {
@@ -139,19 +139,19 @@ class DiscourseAdmin {
   }
 
   function min_replies_input() {
-    self::text_input( 'min-replies', 'Minimum replies required prior to pulling comments across' );
+    self::text_input( 'min-replies', 'Minimum replies required prior to pulling comments across', 'number' );
   }
 
   function min_trust_level_input() {
-    self::text_input( 'min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)' );
+    self::text_input( 'min-trust-level', 'Minimum trust level required prior to pulling comments across (0-5)', 'number' );
   }
 
   function min_score_input() {
-    self::text_input( 'min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)' );
+    self::text_input( 'min-score', 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)', 'number' );
   }
 
   function custom_excerpt_length() {
-    self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)' );
+    self::text_input( 'custom-excerpt-length', 'Custom excerpt length in words (default: 55)', 'number' );
   }
 
   function custom_datetime_format() {
@@ -159,7 +159,7 @@ class DiscourseAdmin {
   }
 
   function bypass_trust_level_input() {
-    self::text_input( 'bypass-trust-level-score', 'Bypass trust level check on posts with this score' );
+    self::text_input( 'bypass-trust-level-score', 'Bypass trust level check on posts with this score', 'number' );
   }
 
   function debug_mode_checkbox() {
@@ -294,7 +294,7 @@ class DiscourseAdmin {
     echo '</select>';
   }
 
-  function text_input( $option, $description ) {
+  function text_input( $option, $description, $type = null ) {
     $options = $this->options;
 
     if ( array_key_exists( $option, $options ) ) {
@@ -304,7 +304,7 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='text' value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
+    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type="<?php echo isset( $type ) ? $type : 'text'; ?>" value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
     <p class="description"><?php echo $description ?></p>
     <?php
 
