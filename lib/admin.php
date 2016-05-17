@@ -403,7 +403,7 @@ class DiscourseAdmin {
     ?>
     <div class="notice notice-warning is-dismissible">
       <p>
-        <strong><?php _e( "You are not currently connected to a Discourse forum. Check your settings for 'Discourse Url', 'API Key', and 'Publishing username'. ", 'wp-discourse' ); ?></strong>
+        <strong><?php _e( "You are not currently connected to a Discourse forum. Check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. ", 'wp-discourse' ); ?></strong>
       </p>
     </div>
     <?php
