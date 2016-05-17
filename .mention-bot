@@ -1,3 +1,6 @@
 {
-  "userBlacklist": ['tnorthcutt']
+  "userBlacklist": [
+    'tnorthcutt',
+    'retlehs'
+    ]
 }
