@@ -2,7 +2,6 @@
 /**
  * WP-Discourse admin settings
  */
-require_once('discourse.php');
 
 class DiscourseAdmin {
   protected $options;
@@ -69,9 +68,7 @@ class DiscourseAdmin {
     return $fields;
   }
 
-  function init_default_settings() {
-
-  }
+  function init_default_settings() {}
 
   function url_input() {
     self::text_input( 'url', 'e.g. http://discourse.example.com', 'url' );
@@ -200,10 +197,10 @@ class DiscourseAdmin {
 
     ?>
     <label>
-      <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type='checkbox' value='1' <?php echo $value?> />
-      <?php echo $label ?>
+      <input id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]' type='checkbox' value='1' <?php echo $value; ?> />
+      <?php echo esc_html( $label ); ?>
     </label>
-    <p class="description"><?php echo $description ?></p>
+    <p class="description"><?php echo esc_html( $description ); ?></p>
     <?php
   }
 
@@ -220,12 +217,13 @@ class DiscourseAdmin {
         $value = '';
       }
 
-      echo "<option ".$value." value='".$post_type."'>".$post_type."</option>";
+      echo "<option ".$value." value='" . esc_attr( $post_type ) . "'>" . esc_html( $post_type ) . "</option>";
     }
 
     echo '</select>';
   }
 
+  // Todo: this method takes a $force_update argument, but it is never used. It uses the value from the options instead.
   function get_discourse_categories( $force_update='0' ) {
     $options = get_option( 'discourse' );
     $url = $options['url'] . '/categories.json';
@@ -279,19 +277,18 @@ class DiscourseAdmin {
     }
 
    $selected = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-   $name = "discourse[{$option}]";
+   $name = "discourse[$option]";
    self::option_input($name, $categories, $selected);
   }
-
+  
   function option_input( $name, $group, $selected ) {
-    echo "<select id='$name' name='$name'>";
-    echo '<option></option>';
+    echo '<select id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '">';
 
     foreach( $group as $item ) {
       printf( '<option value="%s"%s>%s</option>',
-       $item['id'],
+       esc_attr( $item['id'] ),
        selected( $selected, $item['id'], false ),
-       $item['name']
+       esc_html( $item['name'] )
       );
     }
 
@@ -308,10 +305,9 @@ class DiscourseAdmin {
     }
 
     ?>
-    <input id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]' type="<?php echo isset( $type ) ? $type : 'text'; ?>" value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
-    <p class="description"><?php echo $description ?></p>
+    <input id='discourse_<?php echo  esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]' type='text' value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
+    <p class="description"><?php echo esc_html( $description ); ?></p>
     <?php
-
   }
 
   function text_area( $option, $description) {
@@ -324,8 +320,8 @@ class DiscourseAdmin {
     }
 
     ?>
-    <textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_textarea( $value ); ?></textarea>
-    <p class="description"><?php echo $description ?></p>
+    <textarea cols=100 rows=6 id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]'><?php echo esc_textarea( $value ); ?></textarea>
+    <p class="description"><?php echo esc_html( $description ); ?></p>
     <?php
 
   }
@@ -376,12 +372,9 @@ class DiscourseAdmin {
         echo '<span>Unable to retrieve discourse categories at this time. Please save draft to refresh the page.</span>';
       }
       else {
-        echo '<div class="misc-pub-section misc-pub-section-last">
-        <span>'
-         . '<input type="hidden" name="showed_publish_option" value="1">';
+        echo '<div class="misc-pub-section misc-pub-section-last"><span>' .
+             '<input type="hidden" name="showed_publish_option" value="1"><label>';
 
-
-         print "<label>";
          $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
          $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
          $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
