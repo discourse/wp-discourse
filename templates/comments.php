@@ -1,10 +1,12 @@
 <?php
-$custom        = get_post_custom();
-$options       = get_option( 'discourse' );
-$is_enable_sso = ( isset( $options['enable-sso'] ) && intval( $options['enable-sso'] ) == 1 );
-$permalink     = esc_url( $custom['discourse_permalink'][0] );
-if ( $is_enable_sso ) {
-  $permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
+use WPDiscourse\Templates as Templates;
+
+$custom = get_post_custom();
+$options = get_option('discourse');
+$is_enable_sso = (isset( $options['enable-sso'] ) && intval( $options['enable-sso'] ) == 1);
+$permalink = (string)$custom['discourse_permalink'][0];
+if($is_enable_sso) {
+  $permalink = esc_url($options['url']) . '/session/sso?return_path=' . $permalink;
 }
 $discourse_url_name = preg_replace( "(https?://)", "", esc_url( $options['url'] ) );
 if ( isset( $custom['discourse_comments_raw'] ) ) {
@@ -46,7 +48,7 @@ $participants_html = '';
 
 if ( count( $discourse_info->posts ) > 0 ) {
   foreach ( $discourse_info->posts as &$post ) {
-    $comment_html = wp_kses_post( $options['comment-html'] );
+    $comment_html = wp_kses_post( Templates\HTMLTemplates::comment_html() );
     $comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
     $comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
     $comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
@@ -62,7 +64,7 @@ if ( count( $discourse_info->posts ) > 0 ) {
     $comments_html .= $comment_html;
   }
   foreach ( $discourse_info->participants as &$participant ) {
-    $participant_html = wp_kses_post( $options['participant-html'] );
+    $participant_html = wp_kses_post( Templates\HTMLTemplates::participant_html() );
     $participant_html = str_replace( '{discourse_url}', $discourse_url, $participant_html );
     $participant_html = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
     $participant_html = str_replace( '{topic_url}', $permalink, $participant_html );
@@ -73,10 +75,10 @@ if ( count( $discourse_info->posts ) > 0 ) {
     $participant_html = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
     $participants_html .= $participant_html;
   }
-  $discourse_html = wp_kses_post( $options['replies-html'] );
+  $discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html() );
   $discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 } else {
-  $discourse_html = wp_kses_post( $options['no-replies-html'] );
+  $discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html() );
 }
 $discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 $discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
