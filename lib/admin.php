@@ -72,7 +72,7 @@ class DiscourseAdmin {
 
     <p class="documentation-link">
       <em><?php _e( 'For documentation on customizing the plugin\'s html, visit ', 'wp-discourse'); ?></em>
-      <a href="https://github.com/scossar/wp-discourse/wiki/Template-Customization">https://github.com/scossar/wp-discourse/wiki/Template-Customization</a>
+      <a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">https://github.com/discourse/wp-discourse/wiki/Template-Customization</a>
     </p>
 
     <?php
@@ -340,7 +340,7 @@ class DiscourseAdmin {
       <h2>Discourse Options</h2>
       <p class="documentation-link">
         <em><?php _e( 'The WP Discourse plugin documentation can be found at ', 'wp-discourse'); ?></em>
-        <a href="https://github.com/scossar/wp-discourse/wiki">https://github.com/scossar/wp-discourse/wiki</a>
+        <a href="https://github.com/discourse/wp-discourse/wiki">https://github.com/discourse/wp-discourse/wiki</a>
       </p>
       <form action="options.php" method="POST">
         <?php settings_fields( 'discourse' ); ?>
