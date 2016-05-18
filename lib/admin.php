@@ -285,6 +285,12 @@ class DiscourseAdmin {
 
   function text_input( $option, $description, $type = null, $min = null ) {
     $options = $this->options;
+    $allowed = array(
+      'a' => array(
+        'href' => array(),
+        'target' => array()
+      )
+    );
 
     if ( array_key_exists( $option, $options ) ) {
       $value = $options[$option];
@@ -297,7 +303,7 @@ class DiscourseAdmin {
            type="<?php echo isset( $type ) ? $type : 'text'; ?>"
            <?php if ( isset( $min ) ) echo 'min="' . $min . '"'; ?>
            value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr" />
-    <p class="description"><?php echo esc_html( $description ); ?></p>
+    <p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
     <?php
   }
 
