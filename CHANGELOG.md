@@ -1,3 +1,20 @@
+### 0.7.0: May 18th, 2016
+* Move templates out of options ([#194](https://github.com/discourse/wp-discourse/pull/194))
+* Validate settings ([#189](https://github.com/discourse/wp-discourse/pull/189))
+* Add notices to indicate connection status ([#193](https://github.com/discourse/wp-discourse/pull/193))
+* Sanitize admin options page ([#196](https://github.com/discourse/wp-discourse/pull/196))
+* Sanitize comment template output ([#195](https://github.com/discourse/wp-discourse/pull/195))
+* Add type argument to text input method ([#192](https://github.com/discourse/wp-discourse/pull/192))
+* Use cached categories when there is a configuration error ([#191](https://github.com/discourse/wp-discourse/pull/191))
+* Fix name property not available in participants array ([#187](https://github.com/discourse/wp-discourse/pull/187))
+* Use `wp_get_current_user` ([#185](https://github.com/discourse/wp-discourse/pull/185))
+* Fix `add_query_arg` undefined offset notice ([#184](https://github.com/discourse/wp-discourse/pull/184))
+* Update Discourse post on WP post update ([#176](https://github.com/discourse/wp-discourse/pull/176))
+* Better method for including comments script and other small tweaks ([#181](https://github.com/discourse/wp-discourse/pull/181))
+* Allow choosing Discourse category per post ([#177](https://github.com/discourse/wp-discourse/pull/177))
+* Replace avatar URL function ([#172](https://github.com/discourse/wp-discourse/pull/172))
+* Fix timezone for custom timestamp ([#162](https://github.com/discourse/wp-discourse/pull/162))
+
 ### 0.6.6: July 30th, 2015
 * Add custom datetime format string to admin settings ([#160](https://github.com/discourse/wp-discourse/pull/160))
 * Add a log entry when HTTP request fails ([#159](https://github.com/discourse/wp-discourse/pull/159))
