@@ -4,6 +4,8 @@ Plugin Name: WP-Discourse
 Description: Use Discourse as a community engine for your WordPress blog
 Version: 0.6.6
 Author: Sam Saffron, Robin Ward
+Text Domain: wp-discourse
+Domain Path: /languages
 Author URI: https://github.com/discourse/wp-discourse
 Plugin URI: https://github.com/discourse/wp-discourse
 GitHub Plugin URI: https://github.com/discourse/wp-discourse
@@ -29,10 +31,12 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 
 require_once( __DIR__ . '/lib/discourse.php' );
+require_once( __DIR__ . '/lib/settings-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 
 $discourse = new Discourse();
+$discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse_admin = new DiscourseAdmin();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
