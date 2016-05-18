@@ -108,15 +108,16 @@ class SettingsValidator {
   }
 
   public function validate_url( $input ) {
-    // URL regex: see https://gist.github.com/gruber/8891611
-    $regex = '$(?i)\b((?:https?:(?:/{1,3}|[a-z0-9%])|[a-z0-9.\-]+[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)/)(?:[^\s()<>{}\[\]]+|\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\))+(?:\([^\s()]*?\([^\s()]+\)[^\s()]*?\)|\([^\s]+?\)|[^\s`!()\[\]{};:\'".,<>?«»“”‘’])|(?:(?<!@)[a-z0-9]+(?:[.\-][a-z0-9]+)*[.](?:com|net|org|edu|gov|mil|aero|asia|biz|cat|coop|info|int|jobs|mobi|museum|name|post|pro|tel|travel|xxx|ac|ad|ae|af|ag|ai|al|am|an|ao|aq|ar|as|at|au|aw|ax|az|ba|bb|bd|be|bf|bg|bh|bi|bj|bm|bn|bo|br|bs|bt|bv|bw|by|bz|ca|cc|cd|cf|cg|ch|ci|ck|cl|cm|cn|co|cr|cs|cu|cv|cx|cy|cz|dd|de|dj|dk|dm|do|dz|ec|ee|eg|eh|er|es|et|eu|fi|fj|fk|fm|fo|fr|ga|gb|gd|ge|gf|gg|gh|gi|gl|gm|gn|gp|gq|gr|gs|gt|gu|gw|gy|hk|hm|hn|hr|ht|hu|id|ie|il|im|in|io|iq|ir|is|it|je|jm|jo|jp|ke|kg|kh|ki|km|kn|kp|kr|kw|ky|kz|la|lb|lc|li|lk|lr|ls|lt|lu|lv|ly|ma|mc|md|me|mg|mh|mk|ml|mm|mn|mo|mp|mq|mr|ms|mt|mu|mv|mw|mx|my|mz|na|nc|ne|nf|ng|ni|nl|no|np|nr|nu|nz|om|pa|pe|pf|pg|ph|pk|pl|pm|pn|pr|ps|pt|pw|py|qa|re|ro|rs|ru|rw|sa|sb|sc|sd|se|sg|sh|si|sj|Ja|sk|sl|sm|sn|so|sr|ss|st|su|sv|sx|sy|sz|tc|td|tf|tg|th|tj|tk|tl|tm|tn|to|tp|tr|tt|tv|tw|tz|ua|ug|uk|us|uy|uz|va|vc|ve|vg|vi|vn|vu|wf|ws|ye|yt|yu|za|zm|zw)\b/?(?!@)))$';
+    $escaped_url = esc_url_raw( $input );
 
-    if ( preg_match( $regex, $input ) ) {
-      return esc_url_raw( untrailingslashit( $input ) );
+    // FIlTER_VALIDATE_URL doesn't check the protocol / esc_url_raw returns an empty string
+    // unless the protocol is in the default protocol array.
+    if ( filter_var( $input, FILTER_VALIDATE_URL ) && $escaped_url ) {
+      return untrailingslashit( $escaped_url );
     } else {
       add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
 
-      return esc_url_raw( $input );
+      return esc_url_raw( $escaped_url );
     }
   }
 
@@ -206,7 +207,7 @@ class SettingsValidator {
       __( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
       $this->use_discourse_comments );
   }
-  
+
   public function validate_min_score( $input ) {
     return $this->validate_int( $input, 'min_score', 0, null,
       __( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
@@ -270,7 +271,7 @@ class SettingsValidator {
   public function validate_sso_secret( $input ) {
     if ( strlen( sanitize_text_field( $input) ) >= 10 ) {
       return sanitize_text_field( $input );
-      
+
       // Only add a settings error if sso is enabled, otherwise just sanitize the input.
     } elseif ( $this->sso_enabled ) {
       add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key setting must be at least 10 characters long.', 'wp-discourse' ) );
@@ -309,7 +310,7 @@ class SettingsValidator {
     if ( filter_var( $input, FILTER_VALIDATE_INT, array( 'options' => $options ) ) === false ) {
       if ( $add_error ) {
         add_settings_error( 'discourse', $option_id, $error_message );
-        
+
         return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
       }
 
