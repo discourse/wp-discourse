@@ -105,6 +105,8 @@ class SettingsValidator {
     add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
     add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
     add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
+    add_filter( 'validate_woocommerce_support', array( $this, 'validate_woocommerce_support' ) );
+    add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
   }
 
   public function validate_url( $input ) {
@@ -281,6 +283,22 @@ class SettingsValidator {
     } else {
       return sanitize_text_field( $input );
     }
+  }
+
+  public function validate_woocommerce_support( $input ) {
+    return $this->sanitize_checkbox( $input );
+  }
+
+  public function validate_login_path( $input ) {
+    if ( $this->sso_enabled && $input ) {
+      $regex = '/$(\/[a-z0-9\-]*)*/';
+      if ( ! preg_match( $regex, $input ) ) {
+        add_settings_error( 'discourse', 'login_path', __( 'You have given an invalid file path', 'wp-discourse' ) );
+        return $this->sanitize_text( $input );
+      }
+      return $this->sanitize_text( $input );
+    }
+    return $this->sanitize_text( $input );
   }
 
   // Helper methods
