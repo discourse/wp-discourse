@@ -40,7 +40,7 @@ class Discourse {
     'full-post-content' => 0,
     'only-show-moderator-liked' => 0,
     'woocommerce-support' => 0,
-    'login-path' => 'wp-login.php'
+    'login-path' => ''
   );
 
   public function __construct() {
