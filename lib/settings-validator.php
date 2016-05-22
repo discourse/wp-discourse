@@ -291,11 +291,12 @@ class SettingsValidator {
 
   public function validate_login_path( $input ) {
     if ( $this->sso_enabled && $input ) {
-      // todo: improve regex
-      $regex = '/^\/([a-z0-9\-]*)*/';
+      
+      $regex = '/^\/([a-z0-9\-]+)(\/[a-z0-9\-]+)*(\/)?$/';
       if ( ! preg_match( $regex, $input ) ) {
-        add_settings_error( 'discourse', 'login_path', __( 'You have given an invalid file path', 'wp-discourse' ) );
+        add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
         return $this->sanitize_text( $input );
+        
       }
       return $this->sanitize_text( $input );
     }

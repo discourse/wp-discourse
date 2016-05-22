@@ -87,7 +87,7 @@ class DiscourseAdmin {
   }
 
   function wordpress_login_path() {
-    self::text_input( 'login-path', '(Optional) The path to your login page.' );
+    self::text_input( 'login-path', '(Optional) The path to your login page. It should start with \'/\'. Leave blank to use the default WordPress login page.' );
   }
 
   function api_key_input() {
