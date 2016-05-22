@@ -57,7 +57,7 @@ class Discourse {
 
     // replace comments with discourse comments
     add_filter( 'comments_number', array( $this, 'comments_number' ) );
-    add_filter( 'comments_template', array( $this, 'comments_template' ) );
+    add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
     add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
     add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 
