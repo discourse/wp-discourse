@@ -298,8 +298,10 @@ class SettingsValidator {
         return $this->sanitize_text( $input );
         
       }
+      // It's valid
       return $this->sanitize_text( $input );
     }
+    // Sanitize, but don't validate. SSO is not enabled.
     return $this->sanitize_text( $input );
   }
 

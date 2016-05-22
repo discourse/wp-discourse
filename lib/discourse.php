@@ -69,33 +69,35 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
-    
+
     if ( self::get_plugin_options()['woocommerce-support'] ) {
       $woocommerce = Woocommerce\WoocommerceSupport::get_instance();
       add_filter( $woocommerce->get_comments_number_filter(), array( $this, 'comments_number' ) );
-      
+
     }
   }
-  
+
+  // If a value has been supplied for the 'login-path' option, use it instead of
+  // the default WordPress login path.
   function set_login_url( $login_url, $redirect ) {
     $options = self::get_plugin_options();
     if ( $options['login-path'] ) {
       $login_url = $options['login-path'];
-      
+
       if ( !empty( $redirect ) ) {
         return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
-        
+
       } else {
         return $login_url;
       }
     }
-    
+
     if ( !empty( $redirect ) ) {
       return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
     } else {
       return $login_url;
     }
-    
+
   }
 
   function admin_styles() {
