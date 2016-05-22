@@ -23,6 +23,7 @@ class DiscourseAdmin {
 
     add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
     add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_comment_settings' ), 'discourse' );
+    add_settings_section( 'discourse_plugin_support', 'Plugin Support', array( $this, 'init_default_settings' ), 'discourse' ); 
     add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
 
     add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
@@ -39,6 +40,8 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'discourse_wp_publish' );
+    
+    add_settings_field( 'discourse_woocommerce_support', 'Add WooCommerce support', array( $this, 'woocommerce_support'), 'discourse', 'discourse_plugin_support' );
 
     add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
     add_settings_field( 'discourse_show_existing_comments', 'Show Existing WP Comments', array( $this, 'show_existing_comments_checkbox' ), 'discourse', 'discourse_comments' );
@@ -173,6 +176,10 @@ class DiscourseAdmin {
 
   function only_show_moderator_liked_checkbox() {
     self::checkbox_input( 'only-show-moderator-liked', 'Yes' );
+  }
+  
+  function woocommerce_support() {
+    self::checkbox_input( 'woocommerce-support', 'Enable support for the Woocommerce plugin' );
   }
 
   function checkbox_input( $option, $label, $description = '' ) {

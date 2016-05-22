@@ -37,7 +37,8 @@ class Discourse {
     'bypass-trust-level-score' => 50,
     'debug-mode' => 0,
     'full-post-content' => 0,
-    'only-show-moderator-liked' => 0
+    'only-show-moderator-liked' => 0,
+    'woocommerce-support' => 0
   );
 
   public function __construct() {
