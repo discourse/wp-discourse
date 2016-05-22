@@ -37,6 +37,7 @@ require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
+require_once( __DIR__ . '/lib/plugin-support/woocommerce_support.php' );
 
 $discourse = new Discourse();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();

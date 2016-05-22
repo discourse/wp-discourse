@@ -3,6 +3,7 @@
  * WP-Discourse
  */
 use WPDiscourse\Templates as Templates;
+use WPDiscourse\PluginSupport\WoocommerceSupport as Woocommerce;
 
 class Discourse {
   public static function homepage( $url, $post ) {
@@ -68,6 +69,12 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+    
+    if ( self::get_plugin_options()['woocommerce-support'] ) {
+      $woocommerce = Woocommerce\WoocommerceSupport::get_instance();
+      add_filter( $woocommerce->get_comments_number_filter(), array( $this, 'comments_number' ) );
+      
+    }
   }
   
   function set_login_url( $login_url, $redirect ) {
