@@ -7,6 +7,7 @@ class WooCommerceSupport {
 
   function __construct( \Discourse $discourse ) {
     $this->discourse = $discourse;
+    
     add_filter( 'woocommerce_login_redirect', array( $this, 'set_redirect' ) );
     add_filter( 'woocommerce_product_review_count', array( $this->discourse, 'comments_number' ) );
   }
