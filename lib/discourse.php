@@ -38,7 +38,6 @@ class Discourse {
     'debug-mode' => 0,
     'full-post-content' => 0,
     'only-show-moderator-liked' => 0,
-    'woocommerce-support' => 0,
     'login-path' => ''
   );
 
