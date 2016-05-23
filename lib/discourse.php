@@ -3,7 +3,6 @@
  * WP-Discourse
  */
 use WPDiscourse\Templates as Templates;
-use WPDiscourse\PluginSupport\WoocommerceSupport as Woocommerce;
 
 class Discourse {
   public static function homepage( $url, $post ) {
