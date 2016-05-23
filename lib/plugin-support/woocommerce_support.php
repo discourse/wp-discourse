@@ -1,7 +1,7 @@
 <?php
-namespace WPDiscourse\PluginSupport\WoocommerceSupport;
+namespace WPDiscourse\PluginSupport;
 
-class WoocommerceSupport {
+class WooCommerceSupport {
   private static $instance = null;
   protected $comments_number_filter = 'woocommerce_product_review_count';
 
@@ -15,8 +15,9 @@ class WoocommerceSupport {
 
   private function __construct() {
     add_filter( 'woocommerce_login_redirect', array( $this, 'set_redirect' ) );
+    add_filter( 'woocommerce_product_review_count', array( $this, 'comments_number' ) );
   }
-  
+
   function set_redirect( $redirect ) {
     if ( array_key_exists( 'redirect_to', $_GET ) ) {
       $redirect = $_GET['redirect_to'];
@@ -25,8 +26,9 @@ class WoocommerceSupport {
     return $redirect;
   }
 
-  function get_comments_number_filter() {
-    return $this->comments_number_filter;
+  function comments_number() {
+    global $post;
+    $count = get_post_meta( $post->ID, 'discourse_comments_count', true );
+    return $count ? $count : 0;
   }
-
 }

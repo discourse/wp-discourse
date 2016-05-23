@@ -105,7 +105,6 @@ class SettingsValidator {
     add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
     add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
     add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
-    add_filter( 'validate_woocommerce_support', array( $this, 'validate_woocommerce_support' ) );
     add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
   }
 
@@ -283,10 +282,6 @@ class SettingsValidator {
     } else {
       return sanitize_text_field( $input );
     }
-  }
-
-  public function validate_woocommerce_support( $input ) {
-    return $this->sanitize_checkbox( $input );
   }
 
   public function validate_login_path( $input ) {

@@ -69,12 +69,6 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
-
-    if ( self::get_plugin_options()['woocommerce-support'] ) {
-      $woocommerce = Woocommerce\WoocommerceSupport::get_instance();
-      add_filter( $woocommerce->get_comments_number_filter(), array( $this, 'comments_number' ) );
-
-    }
   }
 
   // If a value has been supplied for the 'login-path' option, use it instead of
