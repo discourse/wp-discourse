@@ -259,6 +259,7 @@ class Discourse {
 
   function sync_comments( $postid ) {
     global $wpdb;
+
     $discourse_options = self::get_plugin_options();
 
     // every 10 minutes do a json call to sync comment count and top comments
@@ -291,11 +292,10 @@ class Discourse {
           }
           $options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-          $permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
+          $permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
           $result = wp_remote_get( $permalink );
-          if ( is_wp_error( $result ) ) {
-             error_log( $result->get_error_message() );
-          } else {
+
+          if ( $this->validate_response( $result ) ) {
             $json = json_decode( $result['body'] );
 
             if ( isset( $json->posts_count ) ) {
@@ -320,6 +320,7 @@ class Discourse {
       }
     }
   }
+
 
   function comments_template( $old ) {
     global $post;
@@ -421,7 +422,6 @@ class Discourse {
       add_post_meta( $_POST['ID'], 'publish_post_category',  $_POST['publish_post_category'], true );
     }
 
-
     add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
 
     return $postid;
@@ -509,12 +509,8 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( is_wp_error( $result ) ) {
-        error_log( $result->get_error_message() );
-      } else {
+      if ( $this->validate_response( $result )) {
         $json = json_decode( $result['body'] );
-
-        // todo may have $json->errors with list of errors
 
         if( property_exists( $json, 'id' ) ) {
           $discourse_id = (int) $json->id;
@@ -539,12 +535,8 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( is_wp_error( $result ) ) {
-        error_log( $result->get_error_message() );
-      } else {
+      if ( $this->validate_response( $result ) ) {
         $json = json_decode( $result['body'] );
-
-        // todo may have $json->errors with list of errors
 
         if( property_exists( $json, 'id' ) ) {
           $discourse_id = (int) $json->id;
@@ -561,4 +553,20 @@ class Discourse {
       add_post_meta( $postid, 'discourse_permalink', $options['url'] . '/t/' . $json->topic_slug . '/' . $json->topic_id, true );
     }
   }
+  
+  protected function validate_response( $response ) {
+    if ( is_wp_error( $response ) ) {
+      error_log( $response->get_error_message() );
+      return 0;
+      
+    } elseif ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+      $error_message = wp_remote_retrieve_response_message( $response );
+      error_log( "There has been a problem accessing your Discourse forum. Error Message: " . $error_message );
+      return 0;
+      
+      }
+    // valid response
+    return 1;
+  }
+  
 }
