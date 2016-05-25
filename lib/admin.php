@@ -30,6 +30,7 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'discourse_wp_api' );
 
     add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'discourse_wp_sso' );
+    add_settings_field( 'discourse_wp_login_path', 'Path to your login page', array( $this, 'wordpress_login_path' ), 'discourse', 'discourse_wp_sso' );
     add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
 
     add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
@@ -80,6 +81,10 @@ class DiscourseAdmin {
 
   function url_input() {
     self::text_input( 'url', 'e.g. http://discourse.example.com', 'url' );
+  }
+
+  function wordpress_login_path() {
+    self::text_input( 'login-path', '(Optional) The path to your login page. It should start with \'/\'. Leave blank to use the default WordPress login page.' );
   }
 
   function api_key_input() {

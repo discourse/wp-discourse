@@ -37,7 +37,8 @@ class Discourse {
     'bypass-trust-level-score' => 50,
     'debug-mode' => 0,
     'full-post-content' => 0,
-    'only-show-moderator-liked' => 0
+    'only-show-moderator-liked' => 0,
+    'login-path' => ''
   );
 
   public function __construct() {
@@ -55,8 +56,9 @@ class Discourse {
 
     // replace comments with discourse comments
     add_filter( 'comments_number', array( $this, 'comments_number' ) );
-    add_filter( 'comments_template', array( $this, 'comments_template' ) );
+    add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
     add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
+    add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 
     add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 
@@ -65,6 +67,29 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+  }
+
+  // If a value has been supplied for the 'login-path' option, use it instead of
+  // the default WordPress login path.
+  function set_login_url( $login_url, $redirect ) {
+    $options = self::get_plugin_options();
+    if ( $options['login-path'] ) {
+      $login_url = $options['login-path'];
+
+      if ( !empty( $redirect ) ) {
+        return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+
+      } else {
+        return $login_url;
+      }
+    }
+
+    if ( !empty( $redirect ) ) {
+      return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+    } else {
+      return $login_url;
+    }
+
   }
 
   function admin_styles() {
