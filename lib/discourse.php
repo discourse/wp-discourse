@@ -31,7 +31,7 @@ class Discourse {
     'use-discourse-comments' => 0,
     'show-existing-comments' => 0,
     'min-score' => 30,
-    'min-replies' => 5,
+    'min-replies' => 1,
     'min-trust-level' => 1,
     'custom-excerpt-length' => 55,
     'bypass-trust-level-score' => 50,
