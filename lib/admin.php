@@ -131,7 +131,7 @@ class DiscourseAdmin {
   function post_types_select() {
     self::post_type_select_input( 'allowed_post_types',
       $this->post_types_to_publish( array( 'attachment' ) ),
-      __( 'Hold the <strong>control</strong> button (Windows), or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+      __( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
   }
 
   function use_discourse_comments_checkbox() {
