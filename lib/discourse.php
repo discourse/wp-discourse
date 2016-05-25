@@ -309,7 +309,7 @@ class Discourse {
       } else {
         // show the Discourse comments then show the existing WP comments (in $old)
         include WPDISCOURSE_PATH . '/templates/comments.php';
-        echo '<div class="discourse-existing-comments-heading">' . $options['existing-comments-heading'] . '</div>';
+        echo '<div class="discourse-existing-comments-heading">' . esc_html( $options['existing-comments-heading'] ) . '</div>';
         return $old;
       }
     }
