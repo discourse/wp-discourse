@@ -382,20 +382,26 @@ class DiscourseAdmin {
 
       $categories = self::get_discourse_categories('0');
       if( is_wp_error( $categories ) ) {
-        echo '<span>Unable to retrieve discourse categories at this time. Please save draft to refresh the page.</span>';
+        echo '<span>' . __( 'Unable to retrieve discourse categories at this time. Please save draft to refresh the page.', 'wp-discourse' ) . '</span>';
       }
       else {
-        echo '<div class="misc-pub-section misc-pub-section-last"><span>' .
-             '<input type="hidden" name="showed_publish_option" value="1"><label>';
+        
+        echo '<div class="misc-pub-section misc-pub-section-discourse">';
+        echo '<label>'. __( 'Publish to Discourse: ', 'wp-discourse' ) .'</label>';
+        echo  '<input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" />';
+        echo  '</div>';
+        
+        echo '<div class="misc-pub-section misc-pub-section-category">' .
+             '<input type="hidden" name="showed_publish_option" value="1">';
+        echo '<label>' . __( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
 
-         $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
-         $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-         $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
-         self::option_input('publish_post_category', $categories, $selected);
-         echo ' Discourse Category</label>';
+        $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
+        $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+        $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
+        
+        self::option_input('publish_post_category', $categories, $selected);
+        echo '</div>';
 
-         echo '<label><input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
-         .'</span></div>';
       }
     }
   }
