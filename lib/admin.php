@@ -406,15 +406,6 @@ class DiscourseAdmin {
         
         self::option_input('publish_post_category', $categories, $selected);
         echo '</div>';
-
-         $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
-         $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-         $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
-         self::option_input('publish_post_category', $categories, $selected);
-         echo __( ' Discourse Category', 'wp-discourse' ) . '</label>';
-
-         echo '<label><input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" /> Publish to Discourse</label>'
-         .'</span></div>';
       }
     }
   }
