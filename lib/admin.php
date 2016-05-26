@@ -19,41 +19,41 @@ class DiscourseAdmin {
    */
   public function admin_init() {
     register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
-    add_settings_section( 'discourse_wp_api', 'Common Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    add_settings_section( 'discourse_wp_api', __( 'Common Settings', 'wp-discourse' ), array( $this, 'init_default_settings' ), 'discourse' );
 
-    add_settings_section( 'discourse_wp_publish', 'Publishing Settings', array( $this, 'init_default_settings' ), 'discourse' );
-    add_settings_section( 'discourse_comments', 'Comments Settings', array( $this, 'init_comment_settings' ), 'discourse' );
-    add_settings_section( 'discourse_wp_sso', 'SSO Settings', array( $this, 'init_default_settings' ), 'discourse' );
+    add_settings_section( 'discourse_wp_publish', __( 'Publishing Settings', 'wp-discourse' ), array( $this, 'init_default_settings' ), 'discourse' );
+    add_settings_section( 'discourse_comments', __( 'Comments Settings', 'wp-discourse' ), array( $this, 'init_comment_settings' ), 'discourse' );
+    add_settings_section( 'discourse_wp_sso', __( 'SSO Settings', 'wp-discourse' ), array( $this, 'init_default_settings' ), 'discourse' );
 
-    add_settings_field( 'discourse_url', 'Discourse URL', array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
-    add_settings_field( 'discourse_api_key', 'API Key', array( $this, 'api_key_input' ), 'discourse', 'discourse_wp_api' );
-    add_settings_field( 'discourse_publish_username', 'Publishing username', array( $this, 'publish_username_input' ), 'discourse', 'discourse_wp_api' );
+    add_settings_field( 'discourse_url', __( 'Discourse URL', 'wp-discourse' ), array( $this, 'url_input' ), 'discourse', 'discourse_wp_api' );
+    add_settings_field( 'discourse_api_key', __( 'API Key', 'wp-discourse' ), array( $this, 'api_key_input' ), 'discourse', 'discourse_wp_api' );
+    add_settings_field( 'discourse_publish_username', __( 'Publishing username', 'wp-discourse' ), array( $this, 'publish_username_input' ), 'discourse', 'discourse_wp_api' );
 
-    add_settings_field( 'discourse_enable_sso', 'Enable SSO', array( $this, 'enable_sso_checkbox' ), 'discourse', 'discourse_wp_sso' );
-    add_settings_field( 'discourse_wp_login_path', 'Path to your login page', array( $this, 'wordpress_login_path' ), 'discourse', 'discourse_wp_sso' );
-    add_settings_field( 'discourse_sso_secret', 'SSO Secret Key', array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
+    add_settings_field( 'discourse_enable_sso', __( 'Enable SSO', 'wp-discourse' ), array( $this, 'enable_sso_checkbox' ), 'discourse', 'discourse_wp_sso' );
+    add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array( $this, 'wordpress_login_path' ), 'discourse', 'discourse_wp_sso' );
+    add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
 
-    add_settings_field( 'discourse_publish_category', 'Published category', array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
-    add_settings_field( 'discourse_publish_category_update', 'Force category update', array( $this, 'publish_category_input_update' ), 'discourse', 'discourse_wp_publish' );
-    add_settings_field( 'discourse_full_post_content', 'Use full post content', array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_publish_category', __( 'Published category', 'wp-discourse' ), array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_publish_category_update', __( 'Force category update', 'wp-discourse' ), array( $this, 'publish_category_input_update' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_full_post_content', __( 'Use full post content', 'wp-discourse' ), array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
 
-    add_settings_field( 'discourse_auto_publish', 'Auto Publish', array( $this, 'auto_publish_checkbox' ), 'discourse', 'discourse_wp_publish' );
-    add_settings_field( 'discourse_auto_track', 'Auto Track Published Topics', array( $this, 'auto_track_checkbox' ), 'discourse', 'discourse_wp_publish' );
-    add_settings_field( 'discourse_allowed_post_types', 'Post Types to publish to Discourse', array( $this, 'post_types_select' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array( $this, 'auto_publish_checkbox' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_auto_track', __( 'Auto Track Published Topics', 'wp-discourse' ), array( $this, 'auto_track_checkbox' ), 'discourse', 'discourse_wp_publish' );
+    add_settings_field( 'discourse_allowed_post_types', __( 'Post Types to publish to Discourse', 'wp-discourse' ), array( $this, 'post_types_select' ), 'discourse', 'discourse_wp_publish' );
 
-    add_settings_field( 'discourse_use_discourse_comments', 'Use Discourse Comments', array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_show_existing_comments', 'Show Existing WP Comments', array( $this, 'show_existing_comments_checkbox' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_existing_comments_heading', 'Existing Comments Heading', array( $this, 'existing_comments_heading_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_max_comments', 'Max visible comments', array( $this, 'max_comments_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_min_replies', 'Min number of replies', array( $this, 'min_replies_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_min_score', 'Min score of posts', array( $this, 'min_score_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_min_trust_level', 'Min trust level', array( $this, 'min_trust_level_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_bypass_trust_level_score', 'Bypass trust level score', array( $this, 'bypass_trust_level_input' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_custom_excerpt_length', 'Custom excerpt length', array( $this, 'custom_excerpt_length' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_custom_datetime_format', 'Custom Datetime Format', array( $this, 'custom_datetime_format' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array( $this, 'use_discourse_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array( $this, 'show_existing_comments_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_existing_comments_heading', __( 'Existing Comments Heading', 'wp-discourse' ), array( $this, 'existing_comments_heading_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_max_comments', __( 'Max visible comments', 'wp-discourse' ), array( $this, 'max_comments_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_replies', __( 'Min number of replies', 'wp-discourse' ), array( $this, 'min_replies_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_score', __( 'Min score of posts', 'wp-discourse' ), array( $this, 'min_score_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_min_trust_level', __( 'Min trust level', 'wp-discourse' ), array( $this, 'min_trust_level_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass trust level score', 'wp-discourse' ), array( $this, 'bypass_trust_level_input' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_custom_excerpt_length', __( 'Custom excerpt length', 'wp-discourse' ), array( $this, 'custom_excerpt_length' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array( $this, 'custom_datetime_format' ), 'discourse', 'discourse_comments' );
 
-    add_settings_field( 'discourse_only_show_moderator_liked', 'Only import comments liked by a moderator', array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'discourse_comments' );
-    add_settings_field( 'discourse_debug_mode', 'Debug mode', array( $this, 'debug_mode_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_only_show_moderator_liked', __( 'Only import comments liked by a moderator', 'wp-discourse' ), array( $this, 'only_show_moderator_liked_checkbox' ), 'discourse', 'discourse_comments' );
+    add_settings_field( 'discourse_debug_mode', __( 'Debug mode', 'wp-discourse' ), array( $this, 'debug_mode_checkbox' ), 'discourse', 'discourse_comments' );
 
     add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
