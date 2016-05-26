@@ -15,3 +15,6 @@
     border-width: 2px;
 }
 
+.settings_page_discourse .discourse-allowed-types {
+    min-width: 160px;
+}

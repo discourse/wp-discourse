@@ -129,7 +129,9 @@ class DiscourseAdmin {
   }
 
   function post_types_select() {
-    self::post_type_select_input( 'allowed_post_types', get_post_types() );
+    self::post_type_select_input( 'allowed_post_types',
+      $this->post_types_to_publish( array( 'attachment' ) ),
+      __( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
   }
 
   function use_discourse_comments_checkbox() {
@@ -197,10 +199,13 @@ class DiscourseAdmin {
     <?php
   }
 
-  function post_type_select_input( $option, $post_types) {
+  function post_type_select_input( $option, $post_types, $description = '' ) {
     $options = $this->options;
+    $allowed = array(
+      'strong' => array()
+    );
 
-    echo "<select multiple id='discourse_allowed_post_types' name='discourse[allowed_post_types][]'>";
+    echo "<select multiple id='discourse_allowed_post_types' class='discourse-allowed-types' name='discourse[allowed_post_types][]'>";
 
     foreach ( $post_types as $post_type ) {
 
@@ -214,6 +219,7 @@ class DiscourseAdmin {
     }
 
     echo '</select>';
+    echo '<p class="description">'. wp_kses( $description, $allowed ) . '</p>';
   }
 
   // Todo: this method takes a $force_update argument, but it is never used. It uses the value from the options instead.
@@ -438,4 +444,13 @@ class DiscourseAdmin {
     }
     return true;
   }
+
+  protected function post_types_to_publish( $excluded_types = array() ) {
+    $post_types = get_post_types( array( 'public' => true ) );
+    foreach ( $excluded_types as $excluded ) {
+      unset( $post_types[$excluded] );
+    }
+    return apply_filters( 'discourse_post_types_to_publish', $post_types );
+  }
+
 }
