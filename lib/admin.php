@@ -113,7 +113,7 @@ class DiscourseAdmin {
   }
 
   function publish_category_input_update() {
-    self::checkbox_input( 'publish-category-update', __( 'Update the discourse publish category list, normaly set for an hour (normaly set to refresh every hour)', 'wp-discourse' ) );
+    self::checkbox_input( 'publish-category-update', __( 'Update the discourse publish category list, (normally set to refresh every hour)', 'wp-discourse' ) );
   }
 
   function max_comments_input() {
