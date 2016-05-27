@@ -456,10 +456,6 @@ class Discourse {
       }
     }
 
-//    if ( function_exists( 'discourse_custom_excerpt' ) ) {
-//      $excerpt = apply_filters( 'wp_discourse_excerpt', discourse_custom_excerpt( $postid ) );
-//    }
-
     // trim to keep the Discourse markdown parser from treating this as code.
     $baked = trim( Templates\HTMLTemplates::publish_format_html() );
     $baked = str_replace( "{excerpt}", $excerpt, $baked );
