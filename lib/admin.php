@@ -185,14 +185,14 @@ class DiscourseAdmin {
   function checkbox_input( $option, $label, $description = '' ) {
     $options = $this->options;
     if (array_key_exists( $option, $options) and $options[$option] == 1) {
-      $value = 'checked="checked"';
+      $checked = 'checked="checked"';
     } else {
-      $value = '0';
+      $checked = '';
     }
 
     ?>
     <label>
-      <input id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]' type='checkbox' value='1' <?php echo $value; ?> />
+      <input id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]' type='checkbox' value='1' <?php echo $checked; ?> />
       <?php echo esc_html( $label ); ?>
     </label>
     <p class="description"><?php echo esc_html( $description ); ?></p>

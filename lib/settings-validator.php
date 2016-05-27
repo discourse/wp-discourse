@@ -184,7 +184,7 @@ class SettingsValidator {
   }
 
   public function validate_use_discourse_comments( $input ) {
-    $this->use_discourse_comments = ( $input == 1 ) ? 1 : 0;
+    $this->use_discourse_comments = 1;
 
     return $this->sanitize_checkbox( $input );
   }
@@ -264,7 +264,7 @@ class SettingsValidator {
   }
 
   public function validate_enable_sso( $input ) {
-    $this->sso_enabled = ( $input == 1 ) ? 1 : 0;
+    $this->sso_enabled = 1;
 
     return $this->sanitize_checkbox( $input );
   }
