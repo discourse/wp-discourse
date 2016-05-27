@@ -448,17 +448,17 @@ class Discourse {
       $excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
     } else {
       if ( has_excerpt( $postid ) ) {
-        // This works since WordPress 4.5.0
-        $excerpt = apply_filters( 'wp_discourse_excerpt', get_the_excerpt( $postid ) );
+        $wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+        $excerpt = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
       } else {
         $excerpt = apply_filters( 'the_content', $raw );
         $excerpt = apply_filters( 'wp_discourse_excerpt',  wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
       }
     }
 
-    if ( function_exists( 'discourse_custom_excerpt' ) ) {
-      $excerpt = apply_filters( 'wp_discourse_excerpt', discourse_custom_excerpt( $postid ) );
-    }
+//    if ( function_exists( 'discourse_custom_excerpt' ) ) {
+//      $excerpt = apply_filters( 'wp_discourse_excerpt', discourse_custom_excerpt( $postid ) );
+//    }
 
     // trim to keep the Discourse markdown parser from treating this as code.
     $baked = trim( Templates\HTMLTemplates::publish_format_html() );
