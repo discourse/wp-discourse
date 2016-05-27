@@ -10,8 +10,8 @@ namespace WPDiscourse\Validator;
 
 class SettingsValidator {
 
-  protected $sso_enabled = 0;
-  protected $use_discourse_comments = 0;
+  protected $sso_enabled = false;
+  protected $use_discourse_comments = false;
 
   public function __construct() {
     add_filter( 'validate_url', array( $this, 'validate_url' ) );
@@ -183,8 +183,9 @@ class SettingsValidator {
     return $output;
   }
 
+  // This is only called if the checkbox is 'checked'.
   public function validate_use_discourse_comments( $input ) {
-    $this->use_discourse_comments = 1;
+    $this->use_discourse_comments = true;
 
     return $this->sanitize_checkbox( $input );
   }
@@ -263,8 +264,9 @@ class SettingsValidator {
     return $this->sanitize_html( $input );
   }
 
+  // This is only called if the checkbox is 'checked'.
   public function validate_enable_sso( $input ) {
-    $this->sso_enabled = 1;
+    $this->sso_enabled = true;
 
     return $this->sanitize_checkbox( $input );
   }
