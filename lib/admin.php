@@ -108,6 +108,10 @@ class DiscourseAdmin {
     self::text_input( 'publish-username', __( 'Discourse username of publisher (will be overriden if Discourse Username is specified on user)', 'wp-discourse' ) );
   }
 
+  function display_subcategories() {
+    self::checkbox_input( 'display-subcategories', __( 'Include subcategories in the list of available categories.', 'wp-discourse' ) );
+  }
+
   function publish_category_input() {
     self::category_select( 'publish-category', __( 'Default category used to published in Discourse (optional)', 'wp-discourse' ) );
   }
@@ -225,53 +229,55 @@ class DiscourseAdmin {
     echo '<p class="description">'. wp_kses( $description, $allowed ) . '</p>';
   }
 
-  // Todo: this method takes a $force_update argument, but it is never used. It uses the value from the options instead.
-  function get_discourse_categories( $force_update='0' ) {
+  function get_discourse_categories() {
     $options = get_option( 'discourse' );
-    $url = $options['url'] . '/categories.json';
 
     $url = add_query_arg( array(
-      "api_key" => $options['api-key'] ,
-      "api_username" => $options['publish-username']
-    ), $url );
-    $force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
+      'api_key' => $options['api-key'],
+      'api_username' => $options['publish-username']
+    ), $options['url'] . '/site.json' );
 
-    $remote = get_transient( "discourse_settings_categories_cache" );
+    $force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
+    $remote = get_transient( 'discourse_settings_categories_cache' );
     $cache = $remote;
 
-    if( empty($remote) || $force_update == '1' ) {
+    if ( empty( $remote ) || $force_update ) {
       $remote = wp_remote_get( $url );
-      $invalid_response = wp_remote_retrieve_response_code( $remote ) != 200;
 
-      if ( is_wp_error( $remote ) || $invalid_response ) {
+      if ( ! $this->validate_response( $remote ) ) {
         if ( ! empty( $cache ) ) {
-          $categories = $cache['category_list']['categories'];
-          return $categories;
-        } else {
-          return new WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
+          return $cache;
+
         }
+        return new WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
       }
 
-      $remote = wp_remote_retrieve_body( $remote );
+      $remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 
-      if( is_wp_error( $remote ) ) {
-        return $remote;
+      if ( array_key_exists( 'categories', $remote ) ) {
+        $remote = $remote['categories'];
+
+        if ( ! isset( $options['display-subcategories'] ) ) {
+          foreach ( $remote as $category => $values ) {
+            if ( array_key_exists( 'parent_category_id', $values ) ) {
+              unset( $remote[$category] );
+            }
+          }
+        }
+        
+        set_transient( 'discourse_settings_categories_cache', $remote, HOUR_IN_SECONDS );
+      } else {
+        return new WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
       }
-
-      $remote = json_decode( $remote, true );
-
-      set_transient( "discourse_settings_categories_cache", $remote, HOUR_IN_SECONDS );
     }
 
-    $categories = $remote['category_list']['categories'];
-    return $categories;
+    return $remote;
   }
 
   function category_select( $option, $description ) {
     $options = get_option( 'discourse' );
 
-    $force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
-    $categories = self::get_discourse_categories($force_update);
+    $categories = self::get_discourse_categories();
 
     // todo: this is being set with the numerical value of the option ('1'). The categories become available
     // when a connection with Discourse is established.
@@ -385,17 +391,17 @@ class DiscourseAdmin {
         $value = get_post_meta( $post->ID, 'publish_to_discourse', true );
       }
 
-      $categories = self::get_discourse_categories('0');
+      $categories = self::get_discourse_categories();
       if( is_wp_error( $categories ) ) {
         echo '<span>' . __ ( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
       }
       else {
-        
+
         echo '<div class="misc-pub-section misc-pub-section-discourse">';
         echo '<label>'. __( 'Publish to Discourse: ', 'wp-discourse' ) .'</label>';
         echo  '<input type="checkbox"' . (( $value == "1") ? ' checked="checked" ' : null) . 'value="1" name="publish_to_discourse" />';
         echo  '</div>';
-        
+
         echo '<div class="misc-pub-section misc-pub-section-category">' .
              '<input type="hidden" name="showed_publish_option" value="1">';
         echo '<label>' . __( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
@@ -403,7 +409,7 @@ class DiscourseAdmin {
         $publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true);
         $default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
         $selected = (! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
-        
+
         self::option_input('publish_post_category', $categories, $selected);
         echo '</div>';
       }
@@ -449,9 +455,8 @@ class DiscourseAdmin {
       "api_username" => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
     ), $url );
     $response = wp_remote_get( $url );
-    $invalid_response = wp_remote_retrieve_response_code( $response ) != 200;
 
-    if ( is_wp_error( $response ) || $invalid_response ) {
+    if ( ! $this->validate_response( $response ) ) {
       return false;
     }
     return true;
@@ -463,6 +468,21 @@ class DiscourseAdmin {
       unset( $post_types[$excluded] );
     }
     return apply_filters( 'discourse_post_types_to_publish', $post_types );
+  }
+
+  protected function validate_response( $response ) {
+    if ( is_wp_error( $response ) ) {
+      error_log( $response->get_error_message() );
+      return 0;
+
+    } elseif ( wp_remote_retrieve_response_code( $response ) != 200 ) {
+      $error_message = wp_remote_retrieve_response_message( $response );
+      error_log( "There has been a problem accessing your Discourse forum. Error Message: " . $error_message );
+      return 0;
+
+    }
+    // valid response
+    return 1;
   }
 
 }
