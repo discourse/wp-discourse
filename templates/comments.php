@@ -30,6 +30,9 @@ $datetime_format = $options['custom-datetime-format'] == '' ? get_option( 'date_
 // Add some protection in the event our metadata doesn't look how we expect it to
 $discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
 
+$total_comments = get_post_meta( $post->ID, 'discourse_comments_count', true );
+$displayed_comments = count( $discourse_info->posts );
+
 $more_replies = ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 );
 $more         = count( $discourse_info->posts ) == 0 ? "" : "more ";
 
@@ -76,6 +79,7 @@ if ( count( $discourse_info->posts ) > 0 ) {
     $participants_html .= $participant_html;
   }
   $discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html() );
+  $discourse_html = str_replace( '{comments_count}', wp_kses_post( Templates\HTMLTemplates::comment_count( $total_comments, $displayed_comments ) ), $discourse_html );
   $discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 } else {
   $discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html() );

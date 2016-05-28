@@ -1,6 +1,5 @@
 <?php
 namespace WPDiscourse\Templates;
-
 /**
  * Class HTMLTemplates
  *
@@ -10,6 +9,36 @@ namespace WPDiscourse\Templates;
  * https://github.com/10up/wp-discourse/commit/5c9d43c4333e136204d5a3b07192f4b368c3f518
  */
 class HTMLTemplates {
+
+  /**
+   * HTML template for comment numbers
+   *
+   * Can be customized from within the a theme using the filter provided.
+   *
+   * @param $total_comments
+   * @param $displayed_comments
+   *
+   * @return mixed|void
+   */
+  public static function comment_count( $total_comments, $displayed_comments ) {
+    ob_start();
+
+    if ( $total_comments == 0 ) {
+      echo '';
+
+    } elseif ( $displayed_comments == 1 && $total_comments == 1 ) {
+      echo '1 ' . __( 'comment', 'wp-discourse' );
+
+    } elseif ( $displayed_comments == $total_comments ) {
+      echo $displayed_comments . ' ' . __( 'comments', 'wp-discourse' );
+    } else {
+      echo __( 'displaying ', 'wp-discourse' ) . $displayed_comments . __( ' of ', 'wp-discourse' ) . $total_comments . __( ' comments', 'wp-discourse' );
+    }
+
+    $output = ob_get_clean();
+
+    return apply_filters( 'discourse_comment_count', $output, 10, 2 );
+  }
 
   /**
    * HTML template for replies
@@ -28,6 +57,7 @@ class HTMLTemplates {
     ?>
     <div id="comments" class="comments-area">
       <h2 class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
+      <div class="discourse-comments-count">{comments_count}</div>
       <ol class="comment-list">{comments}</ol>
       <div class="respond comment-respond">
         <h3 id="reply-title" class="comment-reply-title">
@@ -40,6 +70,7 @@ class HTMLTemplates {
     </div>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_replies_html', $output );
   }
 
@@ -66,6 +97,7 @@ class HTMLTemplates {
     </div>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_no_replies_html', $output );
   }
 
@@ -89,13 +121,17 @@ class HTMLTemplates {
       <article class="comment-body">
         <footer class="comment-meta">
           <div class="comment-author vcard">
-            <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64" width="64">
+            <img alt="" src="{avatar_url}"
+                 class="avatar avatar-64 photo avatar-default" height="64"
+                 width="64">
             <b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
             <span class="says">says:</span>
           </div>
           <!-- .comment-author -->
           <div class="comment-metadata">
-            <time pubdate="" datetime="{comment_created_at}">{comment_created_at}</time>
+            <time pubdate="" datetime="{comment_created_at}">
+              {comment_created_at}
+            </time>
           </div>
           <!-- .comment-metadata -->
         </footer>
@@ -107,6 +143,7 @@ class HTMLTemplates {
     </li>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_comment_html', $output );
   }
 
@@ -125,9 +162,11 @@ class HTMLTemplates {
   public static function participant_html() {
     ob_start();
     ?>
-    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25">
+    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default"
+         height="25" width="25">
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_participant_html', $output );
   }
 
@@ -148,6 +187,7 @@ class HTMLTemplates {
     <small>Originally published at: {blogurl}</small><br>{excerpt}
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_publish_format_html', $output );
   }
 }
