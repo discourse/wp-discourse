@@ -27,11 +27,12 @@ class HTMLTemplates {
     ob_start();
     ?>
     <div id="comments" class="comments-area">
-      <h2 class="comments-title">Notable Replies</h2>
+      <h2 class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
       <ol class="comment-list">{comments}</ol>
       <div class="respond comment-respond">
         <h3 id="reply-title" class="comment-reply-title">
-          <a href="{topic_url}">Continue the discussion at</a> at {discourse_url_name}
+          <a href="{topic_url}"><?php _e( 'Continue the discussion', 'wp-discourse' ); ?>
+          </a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
         </h3>
         <p class="more-replies">{more_replies}</p>
         <p class="comment-reply-title">{participants}</p>
@@ -58,7 +59,9 @@ class HTMLTemplates {
     ?>
     <div id="comments" class="comments-area">
       <div class="respond comment-respond">
-        <h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">Start the discussion</a> at {discourse_url_name}</h3>
+        <h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
+            <?php _e( 'Start the discussion', 'wp-discourse' ); ?>
+          </a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
       </div><!-- #respond -->
     </div>
     <?php
