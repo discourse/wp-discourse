@@ -55,9 +55,9 @@ class HTMLTemplates {
   public static function replies_html() {
     ob_start();
     ?>
-    <div id="comments" class="comments-area">
+    <div id="comments" class="comments-area discourse-comments">
       <h2 class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
-      <div class="discourse-comments-count">{comments_count}</div>
+      <div class="comment-meta">{comments_count}</div>
       <ol class="comment-list">{comments}</ol>
       <div class="respond comment-respond">
         <h3 id="reply-title" class="comment-reply-title">
