@@ -1,15 +1,14 @@
 <?php
 use WPDiscourse\Templates as Templates;
-use WPDiscourse\ConnectionStatus as Status;
+use WPDiscourse\ResponseValidator as Validator;
 
 $custom = get_post_custom();
-$connection_status = Status\ConnectionStatus::get_instance();
+$response_validator = Validator\ResponseValidator::get_instance();
 
 // If, when a new post is published to Discourse, there is not a valid response from the forum,
 // the 'discourse_permalink' key will not be set. Return no_connection_html. todo: rename template.
 
 if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
-  
   echo wp_kses_post( Templates\HTMLTemplates::no_connection_html() );
 
 } else {
@@ -86,10 +85,10 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
       $participant_html = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
       $participants_html .= $participant_html;
     }
-    $discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html( $connection_status->get_status() ) );
+    $discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html( $response_validator->get_status() ) );
     $discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
   } else {
-    $discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html( $connection_status->get_status() ) );
+    $discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html( $response_validator->get_status() ) );
   }
   $discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
   $discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
