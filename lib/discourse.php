@@ -277,7 +277,7 @@ class Discourse {
     $time = date_create()->format( 'U' );
     $debug = isset( $discourse_options['debug-mode'] ) && intval( $discourse_options['debug-mode'] ) == 1;
 
-    if( $debug || $last_sync + 60 * 10 < $time ) {
+    if( $debug || $last_sync + 60 * 2 < $time ) {
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
       if( $got_lock->got_it == '1' ) {
         if( get_post_status( $postid ) == 'publish' ) {
