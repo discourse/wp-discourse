@@ -5,6 +5,8 @@
 use WPDiscourse\Templates as Templates;
 
 class Discourse {
+  protected $connection_status;
+
   public static function homepage( $url, $post ) {
     return $url . "/users/" . strtolower( $post->username );
   }
@@ -41,8 +43,17 @@ class Discourse {
     'login-path' => ''
   );
 
-  public function __construct() {
+  /**
+   * Discourse constructor.
+   *
+   * Takes a connection_status object that responds to get_status and set_status.
+   *
+   * @param $connection_status
+   */
+  public function __construct( $connection_status ) {
     add_action( 'init', array( $this, 'init' ) );
+
+    $this->connection_status = $connection_status;
   }
 
   static function install() {
@@ -295,7 +306,10 @@ class Discourse {
           $permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
           $result = wp_remote_get( $permalink );
 
-          if ( $this->validate_response( $result ) ) {
+          $this->connection_status->set_status( $this->validate_response( $result ) );
+
+          if ( $this->connection_status->get_status() ) {
+
             $json = json_decode( $result['body'] );
 
             if ( isset( $json->posts_count ) ) {
@@ -308,7 +322,6 @@ class Discourse {
               add_post_meta( $postid, 'discourse_comments_count', $posts_count, true );
 
               delete_post_meta( $postid, 'discourse_comments_raw' );
-
               add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) , true );
 
               delete_post_meta( $postid, 'discourse_last_sync' );
@@ -509,7 +522,9 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( $this->validate_response( $result )) {
+      $this->connection_status->set_status( $this->validate_response( $result ) );
+
+      if ( $this->connection_status->get_status() ) {
         $json = json_decode( $result['body'] );
 
         if( property_exists( $json, 'id' ) ) {
@@ -520,6 +535,7 @@ class Discourse {
           add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
         }
       }
+
     } else {
       $data = array(
           'api_key' => $options['api-key'],
@@ -535,7 +551,9 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( $this->validate_response( $result ) ) {
+      $this->connection_status->set_status( $this->validate_response( $result ) );
+
+      if ( $this->connection_status->get_status() ) {
         $json = json_decode( $result['body'] );
 
         if( property_exists( $json, 'id' ) ) {
@@ -553,20 +571,21 @@ class Discourse {
       add_post_meta( $postid, 'discourse_permalink', $options['url'] . '/t/' . $json->topic_slug . '/' . $json->topic_id, true );
     }
   }
-  
+
   protected function validate_response( $response ) {
     if ( is_wp_error( $response ) ) {
       error_log( $response->get_error_message() );
       return 0;
-      
+
     } elseif ( wp_remote_retrieve_response_code( $response ) != 200 ) {
       $error_message = wp_remote_retrieve_response_message( $response );
       error_log( "There has been a problem accessing your Discourse forum. Error Message: " . $error_message );
       return 0;
-      
-      }
+
+    }
     // valid response
     return 1;
   }
-  
+
+
 }
