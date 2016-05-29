@@ -6,7 +6,7 @@ use WPDiscourse\Templates as Templates;
 
 class Discourse {
   protected $response_validator;
-  
+
   public static function homepage( $url, $post ) {
     return $url . "/users/" . strtolower( $post->username );
   }
@@ -56,7 +56,7 @@ class Discourse {
    */
   public function __construct( $response_validator ) {
     $this->response_validator = $response_validator;
-    
+
     add_action( 'init', array( $this, 'init' ) );
   }
 
@@ -306,11 +306,11 @@ class Discourse {
           }
           $options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-          $permalink = (string) get_post_meta( $postid, 'discourse_permalink', true ) . '/wordpress.json?' . $options;
+          $permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
           $result = wp_remote_get( $permalink );
-          if ( is_wp_error( $result ) ) {
-             error_log( $result->get_error_message() );
-          } else {
+
+          if ( $this->response_validator->validate( $result ) ) {
+
             $json = json_decode( $result['body'] );
 
             if ( isset( $json->posts_count ) ) {
@@ -323,7 +323,6 @@ class Discourse {
               add_post_meta( $postid, 'discourse_comments_count', $posts_count, true );
 
               delete_post_meta( $postid, 'discourse_comments_raw' );
-
               add_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) , true );
 
               delete_post_meta( $postid, 'discourse_last_sync' );
@@ -333,6 +332,8 @@ class Discourse {
         }
         $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" );
       }
+    } else {
+      $this->response_validator->check_connection_status( 60 );
     }
   }
 
@@ -436,7 +437,6 @@ class Discourse {
       add_post_meta( $_POST['ID'], 'publish_post_category',  $_POST['publish_post_category'], true );
     }
 
-
     add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
 
     return $postid;
@@ -524,12 +524,8 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( is_wp_error( $result ) ) {
-        error_log( $result->get_error_message() );
-      } else {
+      if ( $this->response_validator->validate( $result ) ) {
         $json = json_decode( $result['body'] );
-
-        // todo may have $json->errors with list of errors
 
         if( property_exists( $json, 'id' ) ) {
           $discourse_id = (int) $json->id;
@@ -554,12 +550,8 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( is_wp_error( $result ) ) {
-        error_log( $result->get_error_message() );
-      } else {
+      if ( $this->response_validator->validate( $result ) ) {
         $json = json_decode( $result['body'] );
-
-        // todo may have $json->errors with list of errors
 
         if( property_exists( $json, 'id' ) ) {
           $discourse_id = (int) $json->id;
