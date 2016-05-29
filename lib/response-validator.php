@@ -3,7 +3,6 @@ namespace WPDiscourse\ResponseValidator;
 
 class ResponseValidator {
   static protected $instance;
-  
 
   public static function get_instance() {
     if ( null == self::$instance ) {

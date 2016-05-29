@@ -5,9 +5,11 @@
 
 class DiscourseAdmin {
   protected $options;
+  protected $response_validator;
 
-  public function __construct() {
+  public function __construct( $response_validator ) {
     $this->options = get_option( 'discourse' );
+    $this->response_validator = $response_validator;
 
     add_action( 'admin_init', array( $this, 'admin_init' ) );
     add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
@@ -411,7 +413,7 @@ class DiscourseAdmin {
   }
 
   function connection_status_notice() {
-    if ( ! $this->test_api_credentials() ) {
+    if ( ! $this->response_validator->update_connection_status() ) {
       add_action( 'admin_notices' , array( $this, 'disconnected' ) );
     } else {
       add_action( 'admin_notices', array($this, 'connected' ) );
@@ -440,23 +442,6 @@ class DiscourseAdmin {
     <?php
   }
 
-  protected function test_api_credentials() {
-    $options = $this->options;
-    $url = array_key_exists( 'url', $options ) ? $options['url'] . '/categories.json' : '';
-
-    $url = add_query_arg( array(
-      "api_key" => array_key_exists( 'api-key', $options  ) ? $options['api-key'] : '' ,
-      "api_username" => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
-    ), $url );
-    $response = wp_remote_get( $url );
-    $invalid_response = wp_remote_retrieve_response_code( $response ) != 200;
-
-    if ( is_wp_error( $response ) || $invalid_response ) {
-      return false;
-    }
-    return true;
-  }
-
   protected function post_types_to_publish( $excluded_types = array() ) {
     $post_types = get_post_types( array( 'public' => true ) );
     foreach ( $excluded_types as $excluded ) {
@@ -464,5 +449,4 @@ class DiscourseAdmin {
     }
     return apply_filters( 'discourse_post_types_to_publish', $post_types );
   }
-
 }

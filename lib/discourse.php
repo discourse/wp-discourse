@@ -548,7 +548,7 @@ class Discourse {
       );
       $result = wp_remote_post( $url, $post_options);
 
-      if ( $this->response_validator->validate_response( $result ) ) {
+      if ( $this->response_validator->validate( $result ) ) {
         $json = json_decode( $result['body'] );
 
         if( property_exists( $json, 'id' ) ) {
