@@ -413,7 +413,7 @@ class DiscourseAdmin {
   }
 
   function connection_status_notice() {
-    if ( ! $this->response_validator->update_connection_status() ) {
+    if ( ! $this->response_validator->check_connection_status() ) {
       add_action( 'admin_notices' , array( $this, 'disconnected' ) );
     } else {
       add_action( 'admin_notices', array($this, 'connected' ) );

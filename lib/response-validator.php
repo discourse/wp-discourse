@@ -23,14 +23,16 @@ class ResponseValidator {
     return get_transient( 'discourse_connection_status' );
   }
 
-  public function update_connection_status( $period = null ) {
+  // Checks the connection status. If a period is given, only checks once per period.
+  public function check_connection_status( $period = null ) {
     $options = get_option( 'discourse' );
     $url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
     $url     = add_query_arg( array(
       'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
       'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
-    ), $url );
-
+    ), $url . '/users/' . $options['publish-username'] .'.json' );
+    
+    $url = esc_url_raw( $url );
     $time = date_create()->format( 'U' );
 
     if ( $period ) {
@@ -40,14 +42,17 @@ class ResponseValidator {
         set_transient( 'discourse_last_status_update', $time );
 
         return $this->validate( $response );
+      } else {
+        // It's not time to update yet, return the saved status.
+        return $this->get_status();
       }
 
     } else {
       $response = wp_remote_get( $url );
+      set_transient( 'discourse_last_status_update', $time );
 
       return $this->validate( $response );
     }
-
   }
 
   public function validate( $response, $update_status = true ) {
@@ -68,7 +73,7 @@ class ResponseValidator {
 
       return 0;
     }
-    // valid response 
+    // valid response
     if ( $update_status ) {
       $this->set_status( 1 );
     }

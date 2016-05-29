@@ -329,7 +329,7 @@ class Discourse {
         $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" );
       }
     } else {
-      $this->response_validator->update_connection_status( 60 );
+      $this->response_validator->check_connection_status( 60 );
     }
   }
 
