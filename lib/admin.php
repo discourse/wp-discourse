@@ -33,6 +33,7 @@ class DiscourseAdmin {
     add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array( $this, 'wordpress_login_path' ), 'discourse', 'discourse_wp_sso' );
     add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array( $this, 'sso_secret_input' ), 'discourse', 'discourse_wp_sso' );
 
+    add_settings_field( 'discourse_display_subcategories', __( 'Display subcategories', 'wp-discourse' ), array( $this, 'display_subcategories' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_publish_category', __( 'Published category', 'wp-discourse' ), array( $this, 'publish_category_input' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_publish_category_update', __( 'Force category update', 'wp-discourse' ), array( $this, 'publish_category_input_update' ), 'discourse', 'discourse_wp_publish' );
     add_settings_field( 'discourse_full_post_content', __( 'Use full post content', 'wp-discourse' ), array( $this, 'full_post_checkbox' ), 'discourse', 'discourse_wp_publish' );
@@ -264,7 +265,7 @@ class DiscourseAdmin {
             }
           }
         }
-        
+
         set_transient( 'discourse_settings_categories_cache', $remote, HOUR_IN_SECONDS );
       } else {
         return new WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
