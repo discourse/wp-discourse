@@ -70,6 +70,34 @@ class HTMLTemplates {
   }
 
   /**
+   * The template that is displayed in the comments section after a post is created
+   * with bad credentials.
+   * This template is displayed in the comments section when there is no `discourse_permalink`
+   * index in the response returned from `Discourse::sync_to_discourse_work`
+   * 
+   * Can be customized in the theme using the filter provided.
+   *
+   * @return mixed|void
+   */
+  public static function bad_response_html() {
+    ob_start();
+    ?>
+    <div class="respond comment-respond">
+      <h3 id="reply-title" class="comment-reply-title">
+        <?php _e( 'Start the discussion...', 'wp-discourse' ); ?>
+      </h3>
+      <div class="comment-reply-title no-connection-notice">
+        <p><?php _e( 'We are currently unable to connect with the Discourse forum. ' .
+                     'The site administrator has been notified. Please try again later.', 'wp-discourse' ); ?></p>
+      </div>
+    </div>
+    <?php
+    $output = ob_get_clean();
+
+    return apply_filters( 'discourse_no_connection_html', $output );
+  }
+
+  /**
    * HTML template for each comment
    *
    * Can be customized from within a theme using the filter provided.
