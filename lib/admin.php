@@ -11,10 +11,8 @@ class DiscourseAdmin {
    * Discourse constructor.
    *
    * Takes a `response_validator` object as a parameter.
-   * The `response_validator` has a `validate()` method that validates the response
-   * from `wp_remote_get` and `wp_remote_post`.
-   * It also has a `check_connection_status` method that may be run to periodically check
-   * the connection status to Discourse.
+   * It has a `check_connection_status` method that may be run to check
+   * the site's connection status to Discourse.
    *
    * @param $response_validator
    */
