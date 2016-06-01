@@ -3,10 +3,10 @@ namespace WPDiscourse\ResponseValidator;
 
 /**
  * Class ResponseValidator
- * 
+ *
  * Validates the response from `wp_remote_get` and `wp_remote_post`.
  * Sets and gets the status of the connection to Discourse.
- * 
+ *
  */
 class ResponseValidator {
   static protected $instance;
@@ -22,74 +22,38 @@ class ResponseValidator {
   private function __construct() {
   }
 
-  public function set_status( $status ) {
-    set_transient( 'discourse_connection_status', $status );
-  }
-
-  public function get_status() {
-    return get_transient( 'discourse_connection_status' );
-  }
-
-  // Checks the connection status. If a period is given, only checks once per period.
-  public function check_connection_status( $period = null ) {
+  public function check_connection_status() {
     $options = get_option( 'discourse' );
     $url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
     $url     = add_query_arg( array(
       'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
       'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
-    ), $url . '/users/' . $options['publish-username'] .'.json' );
-    
-    $url = esc_url_raw( $url );
-    $time = date_create()->format( 'U' );
+    ), $url . '/users/' . $options['publish-username'] . '.json' );
 
-    if ( $period ) {
-      // Check if it's time to update. 
-      if ( get_transient( 'discourse_last_status_update' ) === false ||
-           ( ( get_transient( 'discourse_last_status_update' ) + $period ) < $time ) ) {
-        $response = wp_remote_get( $url );
-        set_transient( 'discourse_last_status_update', $time );
+    $url      = esc_url_raw( $url );
+    $response = wp_remote_get( $url );
 
-        return $this->validate( $response );
-      } else {
-        // It's not time to update yet, return the saved status.
-        return $this->get_status();
-      }
-
-    } else {
-      // No period has been set, so check the status now.
-      $response = wp_remote_get( $url );
-      set_transient( 'discourse_last_status_update', $time );
-
-      return $this->validate( $response );
-    }
+    return $this->validate( $response );
   }
-  
-  public function validate( $response, $update_status = false ) {
-    
+
+  public function validate( $response ) {
+
     // There will be a WP_Error if the server can't be accessed
     if ( is_wp_error( $response ) ) {
       error_log( $response->get_error_message() );
-      if ( $update_status ) {
-        $this->set_status( 0 );
-      }
 
       return 0;
-      
+
       // There is a response from the server, but it's not what we're looking for.
     } elseif ( wp_remote_retrieve_response_code( $response ) != 200 ) {
       $error_message = wp_remote_retrieve_response_code( $response );
       error_log( 'There has been a problem accessing your Discourse forum. Error Message: ' . $error_message );
-      if ( $update_status ) {
-        $this->set_status( 0 );
-      }
 
       return 0;
-    }
-    // valid response
-    if ( $update_status ) {
-      $this->set_status( 1 );
+    } else {
+      // valid response
+      return 1;
     }
 
-    return 1;
   }
 }
