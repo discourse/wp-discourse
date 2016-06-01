@@ -9,16 +9,17 @@ class WooCommerceSupport {
     $this->discourse = $discourse;
 
     add_filter( 'woocommerce_login_redirect', array( $this, 'set_redirect' ) );
-    add_action( 'init', array( $this, 'set_product_review_count_filter' ) );
+    add_filter( 'woocommerce_product_review_count', array( $this, 'comments_number' ) );
   }
-
-  // Only use the Discourse comments number if 'product' is in allowed post types.
-  function set_product_review_count_filter() {
-    $options = get_option('discourse');
-    if ( array_key_exists( 'allowed_post_types', $options ) 
-         && in_array( 'product', $options['allowed_post_types'] ) ) {
-      add_filter( 'woocommerce_product_review_count', array( $this->discourse, 'comments_number' ) );
+  
+  function comments_number( $count ) {
+    global $post;
+    $options = get_option( 'discourse' );
+    if ( array_key_exists( 'allowed_post_types', $options ) && in_array( 'product', $options['allowed_post_types'] ) ) {
+      $count = get_post_meta( $post->ID, 'discourse_comments_count', true );
+      return $count;
     }
+    return $count;
   }
 
   function set_redirect( $redirect ) {
