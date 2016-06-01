@@ -86,9 +86,8 @@ class HTMLTemplates {
     ob_start();
     ?>
     <div class="respond comment-respond">
-      <div class="comment-reply-title discourse-connection-notice">
-        <p><?php _e( 'We are unable to connect this post with the Discourse forum. ' .
-                     'The site administrator has been notified. Please try again later.', 'wp-discourse' ); ?>
+      <div class="comment-reply-title discourse-no-connection-notice">
+        <p><?php _e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?>
         </p>
       </div>
     </div>
