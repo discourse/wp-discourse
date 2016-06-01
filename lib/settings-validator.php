@@ -16,7 +16,7 @@ class SettingsValidator {
   public function __construct() {
     add_filter( 'validate_url', array( $this, 'validate_url' ) );
     add_filter( 'validate_api_key', array( $this, 'validate_api_key' ) );
-    add_filter( 'validate_publish_username', array(
+    add_filter( 'validate_publish_username', array( 
       $this,
       'validate_publish_username'
     ) );
@@ -272,7 +272,7 @@ class SettingsValidator {
   }
 
   public function validate_sso_secret( $input ) {
-    if ( strlen( sanitize_text_field( $input) ) >= 10 ) {
+    if ( strlen( sanitize_text_field( $input ) ) >= 10 ) {
       return sanitize_text_field( $input );
 
       // Only add a settings error if sso is enabled, otherwise just sanitize the input.
@@ -288,16 +288,19 @@ class SettingsValidator {
 
   public function validate_login_path( $input ) {
     if ( $this->sso_enabled && $input ) {
-      
+
       $regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
       if ( ! preg_match( $regex, $input ) ) {
         add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
+
         return $this->sanitize_text( $input );
-        
+
       }
+
       // It's valid
       return $this->sanitize_text( $input );
     }
+
     // Sanitize, but don't validate. SSO is not enabled.
     return $this->sanitize_text( $input );
   }

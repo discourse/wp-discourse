@@ -6,9 +6,7 @@ namespace WPDiscourse\ResponseValidator;
  * 
  * Validates the response from `wp_remote_get` and `wp_remote_post`.
  * Sets and gets the status of the connection to Discourse.
- * Runs a periodic check on the connection status.
  * 
- * @package WPDiscourse\ResponseValidator
  */
 class ResponseValidator {
   static protected $instance;
@@ -65,8 +63,8 @@ class ResponseValidator {
       return $this->validate( $response );
     }
   }
-
-  public function validate( $response, $update_status = true ) {
+  
+  public function validate( $response, $update_status = false ) {
     
     // There will be a WP_Error if the server can't be accessed
     if ( is_wp_error( $response ) ) {

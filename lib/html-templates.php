@@ -14,8 +14,6 @@ class HTMLTemplates {
   /**
    * HTML template for replies.
    *
-   * Checks the connection before displaying the 'Continue the discussion' link.
-   *
    * Can be customized from within a theme using the filter provided.
    *
    * Available tags:
@@ -24,50 +22,31 @@ class HTMLTemplates {
    *
    * @static
    *
-   * @param $connection_status
-   *
    * @return mixed|void
    */
-  public static function replies_html( $connection ) {
+  public static function replies_html() {
     ob_start();
     ?>
     <div id="comments" class="comments-area">
-      <h2
-        class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
+      <h2 class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
       <ol class="comment-list">{comments}</ol>
       <div class="respond comment-respond">
-
-        <?php if ( $connection ) : ?>
-          <h3 id="reply-title" class="comment-reply-title">
-            <a href="{topic_url}">
-              <?php _e( 'Continue the discussion', 'wp-discourse' ); ?>
-            </a> <?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
-          </h3>
-          <p class="more-replies">{more_replies}</p>
-        <?php else : ?>
-          <h3 id="reply-title" class="comment-reply-title">
-            <?php _e( 'Continue the discussion...', 'wp-discourse' ); ?>
-          </h3>
-          <p id="reply-title" class="comment-reply-title no-connection-notice">
-            <?php _e( 'We are currently not able to connect to our forum. ' .
-                      'The site administrator has been notified, Please try again soon.', 'wp-discourse' ); ?>
-          </p>
-
-        <?php endif; ?>
-
+        <h3 id="reply-title" class="comment-reply-title">
+          <a href="{topic_url}"><?php _e( 'Continue the discussion', 'wp-discourse' ); ?>
+          </a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
+        </h3>
+        <p class="more-replies">{more_replies}</p>
         <p class="comment-reply-title">{participants}</p>
       </div><!-- #respond -->
     </div>
     <?php
     $output = ob_get_clean();
 
-    return apply_filters( 'discourse_replies_html', $output, $connection );
+    return apply_filters( 'discourse_replies_html', $output );
   }
 
   /**
    * HTML template for no replies.
-   *
-   * Checks the connection status before displaying the 'Start the discussion' link.
    *
    * Can be customized from within a theme using the filter provided.
    *
@@ -77,34 +56,20 @@ class HTMLTemplates {
    * @static
    * @return mixed|void
    */
-  public static function no_replies_html( $connection ) {
+  public static function no_replies_html() {
     ob_start();
     ?>
     <div id="comments" class="comments-area">
       <div class="respond comment-respond">
-
-        <?php if ( $connection ) : ?>
-          <h3 id="reply-title" class="comment-reply-title"><a
-              href="{topic_url}">
-              <?php _e( 'Start the discussion', 'wp-discourse' ); ?>
-            </a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
-          </h3>
-        <?php else : ?>
-          <h3 id="reply-title" class="comment-reply-title">
-            <?php _e( 'Start the discussion...', 'wp-discourse' ); ?>
-          </h3>
-          <p id="reply-title" class="comment-reply-title no-connection-notice">
-            <?php _e( 'We are currently unable to connect with our forum. ' .
-                      'The site administrator has been notified. Please try again soon.', 'wp-discourse' ); ?>
-          </p>
-        <?php endif; ?>
-
+        <h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
+            <?php _e( 'Start the discussion', 'wp-discourse' ); ?>
+          </a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
       </div><!-- #respond -->
     </div>
     <?php
     $output = ob_get_clean();
 
-    return apply_filters( 'discourse_no_replies_html', $output, $connection );
+    return apply_filters( 'discourse_no_replies_html', $output );
   }
 
   /**
@@ -121,12 +86,10 @@ class HTMLTemplates {
     ob_start();
     ?>
     <div class="respond comment-respond">
-      <h3 id="reply-title" class="comment-reply-title">
-        <?php _e( 'Start the discussion...', 'wp-discourse' ); ?>
-      </h3>
-      <div class="comment-reply-title no-connection-notice">
-        <p><?php _e( 'We are currently unable to connect with the Discourse forum. ' .
-                     'The site administrator has been notified. Please try again later.', 'wp-discourse' ); ?></p>
+      <div class="comment-reply-title discourse-connection-notice">
+        <p><?php _e( 'We are unable to connect this post with the Discourse forum. ' .
+                     'The site administrator has been notified. Please try again later.', 'wp-discourse' ); ?>
+        </p>
       </div>
     </div>
     <?php
@@ -155,7 +118,8 @@ class HTMLTemplates {
       <article class="comment-body">
         <footer class="comment-meta">
           <div class="comment-author vcard">
-            <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64" width="64">
+            <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64"
+                 width="64">
             <b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
             <span class="says">says:</span>
           </div>
@@ -192,7 +156,8 @@ class HTMLTemplates {
   public static function participant_html() {
     ob_start();
     ?>
-    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25">
+    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
+         width="25">
     <?php
     $output = ob_get_clean();
 
