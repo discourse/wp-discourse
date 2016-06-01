@@ -67,7 +67,6 @@ class Discourse {
     add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
     add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
-    add_action( 'wp_enqueue_scripts', array( $this, 'plugin_styles' ) );
   }
 
   // If a value has been supplied for the 'login-path' option, use it instead of
@@ -96,11 +95,6 @@ class Discourse {
   function admin_styles() {
     wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
     wp_enqueue_style( 'wp_discourse_admin' );
-  }
-
-  function plugin_styles() {
-    wp_register_style( 'wp_discourse_styles', WPDISCOURSE_URL . '/css/wp-discourse-styles.css' );
-    wp_enqueue_style( 'wp_discourse_styles' );
   }
 
   function discourse_comments_js() {
