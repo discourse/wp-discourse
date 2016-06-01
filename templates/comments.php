@@ -79,7 +79,7 @@ if ( count( $discourse_info->posts ) > 0 ) {
     $participants_html .= $participant_html;
   }
   $discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html() );
-  $discourse_html = str_replace( '{comments_count}', wp_kses_post( Templates\HTMLTemplates::comment_count( $total_comments, $displayed_comments ) ), $discourse_html );
+  $discourse_html = str_replace( '{comments_count}', wp_kses_post( Templates\HTMLTemplates::comment_count_html( $total_comments, $displayed_comments ) ), $discourse_html );
   $discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 } else {
   $discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html() );
