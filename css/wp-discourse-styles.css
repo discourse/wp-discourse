@@ -1,9 +1,0 @@
-/* The notice for when there is a bad connection with Discourse. */
-.no-connection-notice {
-    font-size: 14px;
-    border: 1px solid #ebccd1;
-    color: #a94442;
-    background: #f2dede;
-    border-radius: 4px;
-    padding: 15px;
-}
