@@ -20,7 +20,7 @@ class HTMLTemplates {
    *
    * @return mixed|void
    */
-  public static function comment_count( $total_comments, $displayed_comments ) {
+  public static function comment_count_html( $total_comments, $displayed_comments ) {
     ob_start();
 
     if ( $total_comments == 0 ) {
@@ -37,7 +37,7 @@ class HTMLTemplates {
 
     $output = ob_get_clean();
 
-    return apply_filters( 'discourse_comment_count', $output, 10, 2 );
+    return apply_filters( 'discourse_comment_count_html', $output, $total_comments, $displayed_comments );
   }
 
   /**
