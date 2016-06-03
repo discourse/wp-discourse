@@ -456,14 +456,15 @@ class Discourse {
     $use_full_post = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
 
     if ($use_full_post) {
-      $excerpt = $raw;
+      $excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
     } else {
-      $excerpt = apply_filters( 'the_content', $raw );
-      $excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
-    }
-
-    if ( function_exists( 'discourse_custom_excerpt' ) ) {
-      $excerpt = discourse_custom_excerpt( $postid );
+      if ( has_excerpt( $postid ) ) {
+        $wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+        $excerpt = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
+      } else {
+        $excerpt = apply_filters( 'the_content', $raw );
+        $excerpt = apply_filters( 'wp_discourse_excerpt',  wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
+      }
     }
 
     // trim to keep the Discourse markdown parser from treating this as code.
