@@ -12,7 +12,7 @@ namespace WPDiscourse\Templates;
 class HTMLTemplates {
 
   /**
-   * HTML template for replies
+   * HTML template for replies.
    *
    * Can be customized from within a theme using the filter provided.
    *
@@ -21,6 +21,7 @@ class HTMLTemplates {
    * {topic_url}, {more_replies}, {participants}
    *
    * @static
+   *
    * @return mixed|void
    */
   public static function replies_html() {
@@ -40,11 +41,12 @@ class HTMLTemplates {
     </div>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_replies_html', $output );
   }
 
   /**
-   * HTML template for no replies
+   * HTML template for no replies.
    *
    * Can be customized from within a theme using the filter provided.
    *
@@ -66,7 +68,33 @@ class HTMLTemplates {
     </div>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_no_replies_html', $output );
+  }
+
+  /**
+   * The template that is displayed in the comments section after a post is created
+   * with bad credentials.
+   * This template is displayed in the comments section when there is no `discourse_permalink`
+   * index in the response returned from `Discourse::sync_to_discourse_work`
+   *
+   * Can be customized in the theme using the filter provided.
+   *
+   * @return mixed|void
+   */
+  public static function bad_response_html() {
+    ob_start();
+    ?>
+    <div class="respond comment-respond">
+      <div class="comment-reply-title discourse-no-connection-notice">
+        <p><?php _e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?>
+        </p>
+      </div>
+    </div>
+    <?php
+    $output = ob_get_clean();
+
+    return apply_filters( 'discourse_no_connection_html', $output );
   }
 
   /**
@@ -89,7 +117,8 @@ class HTMLTemplates {
       <article class="comment-body">
         <footer class="comment-meta">
           <div class="comment-author vcard">
-            <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64" width="64">
+            <img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64"
+                 width="64">
             <b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
             <span class="says">says:</span>
           </div>
@@ -107,6 +136,7 @@ class HTMLTemplates {
     </li>
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_comment_html', $output );
   }
 
@@ -125,9 +155,11 @@ class HTMLTemplates {
   public static function participant_html() {
     ob_start();
     ?>
-    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25">
+    <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
+         width="25">
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_participant_html', $output );
   }
 
@@ -148,6 +180,7 @@ class HTMLTemplates {
     <small>Originally published at: {blogurl}</small><br>{excerpt}
     <?php
     $output = ob_get_clean();
+
     return apply_filters( 'discourse_publish_format_html', $output );
   }
 }

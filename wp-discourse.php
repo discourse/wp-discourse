@@ -35,13 +35,15 @@ define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 require_once( __DIR__ . '/lib/html-templates.php' );
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
+require_once( __DIR__ . '/lib/response-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/plugin-support/woocommerce_support.php' );
 
-$discourse = new Discourse();
+$discourse_response_validator = WPDiscourse\ResponseValidator\ResponseValidator::get_instance();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
-$discourse_admin = new DiscourseAdmin();
+$discourse = new Discourse( $discourse_response_validator );
+$discourse_admin = new DiscourseAdmin( $discourse_response_validator );
 $woocommerce_support = new WPDiscourse\PluginSupport\WooCommerceSupport( $discourse );
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
