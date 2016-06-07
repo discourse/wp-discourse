@@ -1,0 +1,4 @@
+{
+    "preset": "wordpress",
+    "fileExtensions": [ ".js" ]
+}
