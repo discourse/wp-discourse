@@ -10,7 +10,8 @@ Author URI: https://github.com/discourse/wp-discourse
 Plugin URI: https://github.com/discourse/wp-discourse
 GitHub Plugin URI: https://github.com/discourse/wp-discourse
 */
-/*  Copyright 2014 Civilized Discourse Construction Kit, Inc (team@discourse.org)
+/*
+   Copyright 2014 Civilized Discourse Construction Kit, Inc (team@discourse.org)
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by

@@ -6,7 +6,6 @@ namespace WPDiscourse\ResponseValidator;
  *
  * Validates the response from `wp_remote_get` and `wp_remote_post`.
  * Sets and gets the status of the connection to Discourse.
- *
  */
 class ResponseValidator {
 	static protected $instance;
@@ -27,7 +26,7 @@ class ResponseValidator {
 		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
 		$url     = add_query_arg( array(
 			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
-			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : ''
+			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : '',
 		), $url . '/users/' . $options['publish-username'] . '.json' );
 
 		$url      = esc_url_raw( $url );

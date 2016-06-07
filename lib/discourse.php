@@ -8,11 +8,11 @@ class Discourse {
 	protected $response_validator;
 
 	public static function homepage( $url, $post ) {
-		return $url . "/users/" . strtolower( $post->username );
+		return $url . '/users/' . strtolower( $post->username );
 	}
 
 	public static function avatar( $template, $size ) {
-		return str_replace( "{size}", $size, $template );
+		return str_replace( '{size}', $size, $template );
 	}
 
 	// Version
@@ -40,7 +40,7 @@ class Discourse {
 		'debug-mode'                => 0,
 		'full-post-content'         => 0,
 		'only-show-moderator-liked' => 0,
-		'login-path'                => ''
+		'login-path'                => '',
 	);
 
 	/**
@@ -134,8 +134,8 @@ class Discourse {
 	}
 
 	function sso_add_query_vars( $vars ) {
-		$vars[] = "sso";
-		$vars[] = "sig";
+		$vars[] = 'sso';
+		$vars[] = 'sig';
 
 		return $vars;
 	}
@@ -157,7 +157,6 @@ class Discourse {
 			exit;
 		}
 		// end logout processing
-
 		// only process requests with "my-plugin=ajax-handler"
 		if ( isset( $discourse_options['enable-sso'] ) &&
 		     intval( $discourse_options['enable-sso'] ) == 1 &&
@@ -219,7 +218,7 @@ class Discourse {
 					'email'       => $current_user->user_email,
 					'about_me'    => $current_user->description,
 					'external_id' => $current_user->ID,
-					'avatar_url'  => get_avatar_url( get_current_user_id() )
+					'avatar_url'  => get_avatar_url( get_current_user_id() ),
 				);
 
 				// Build login string
@@ -367,9 +366,8 @@ class Discourse {
 		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
 			// This seems a little redundant after `save_postdata` but when using the Press This
 			// widget it updates the field as it should.
-
 			if ( isset( $_POST['publish_post_category'] ) ) {
-				#delete_post_meta( $post->ID, 'publish_post_category');
+				// delete_post_meta( $post->ID, 'publish_post_category');
 				add_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
 			}
 
@@ -474,15 +472,15 @@ class Discourse {
 
 		// trim to keep the Discourse markdown parser from treating this as code.
 		$baked     = trim( Templates\HTMLTemplates::publish_format_html() );
-		$baked     = str_replace( "{excerpt}", $excerpt, $baked );
-		$baked     = str_replace( "{blogurl}", get_permalink( $postid ), $baked );
+		$baked     = str_replace( '{excerpt}', $excerpt, $baked );
+		$baked     = str_replace( '{blogurl}', get_permalink( $postid ), $baked );
 		$author_id = $post->post_author;
 		$author    = get_the_author_meta( 'display_name', $author_id );
-		$baked     = str_replace( "{author}", $author, $baked );
+		$baked     = str_replace( '{author}', $author, $baked );
 		$thumb     = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'thumbnail' );
-		$baked     = str_replace( "{thumbnail}", "![image](" . $thumb['0'] . ")", $baked );
+		$baked     = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
 		$featured  = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'full' );
-		$baked     = str_replace( "{featuredimage}", "![image](" . $featured['0'] . ")", $baked );
+		$baked     = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 
 		$username = get_the_author_meta( 'discourse_username', $post->post_author );
 		if ( ! $username || strlen( $username ) < 2 ) {
@@ -515,7 +513,7 @@ class Discourse {
 				'raw'              => $baked,
 				'category'         => $category,
 				'skip_validations' => 'true',
-				'auto_track'       => ( $options['auto-track'] == "1" ? 'true' : 'false' )
+				'auto_track'       => ( $options['auto-track'] == '1' ? 'true' : 'false' ),
 			);
 			$url  = $options['url'] . '/posts';
 			// use key 'http' even if you send the request to https://...

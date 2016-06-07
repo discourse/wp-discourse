@@ -18,89 +18,89 @@ class SettingsValidator {
 		add_filter( 'validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'validate_publish_username', array(
 			$this,
-			'validate_publish_username'
+			'validate_publish_username',
 		) );
 		add_filter( 'validate_publish_category', array(
 			$this,
-			'validate_publish_category'
+			'validate_publish_category',
 		) );
 		add_filter( 'validate_publish_category_update', array(
 			$this,
-			'validate_publish_category_update'
+			'validate_publish_category_update',
 		) );
 		add_filter( 'validate_publish_format', array(
 			$this,
-			'validate_publish_format'
+			'validate_publish_format',
 		) );
 		add_filter( 'validate_full_post_content', array(
 			$this,
-			'validate_full_post_content'
+			'validate_full_post_content',
 		) );
 		add_filter( 'validate_auto_publish', array(
 			$this,
-			'validate_auto_publish'
+			'validate_auto_publish',
 		) );
 		add_filter( 'validate_auto_track', array( $this, 'validate_auto_track' ) );
 		add_filter( 'validate_allowed_post_types', array(
 			$this,
-			'validate_allowed_post_types'
+			'validate_allowed_post_types',
 		) );
 		add_filter( 'validate_use_discourse_comments', array(
 			$this,
-			'validate_use_discourse_comments'
+			'validate_use_discourse_comments',
 		) );
 		add_filter( 'validate_show_existing_comments', array(
 			$this,
-			'validate_show_existing_comments'
+			'validate_show_existing_comments',
 		) );
 		add_filter( 'validate_existing_comments_heading', array(
 			$this,
-			'validate_existing_comments_heading'
+			'validate_existing_comments_heading',
 		) );
 		add_filter( 'validate_max_comments', array(
 			$this,
-			'validate_max_comments'
+			'validate_max_comments',
 		) );
 		add_filter( 'validate_min_replies', array(
 			$this,
-			'validate_min_replies'
+			'validate_min_replies',
 		) );
 		add_filter( 'validate_min_score', array( $this, 'validate_min_score' ) );
 		add_filter( 'validate_min_trust_level', array(
 			$this,
-			'validate_min_trust_level'
+			'validate_min_trust_level',
 		) );
 		add_filter( 'validate_bypass_trust_level_score', array(
 			$this,
-			'validate_bypass_trust_level_score'
+			'validate_bypass_trust_level_score',
 		) );
 		add_filter( 'validate_custom_excerpt_length', array(
 			$this,
-			'validate_custom_excerpt_length'
+			'validate_custom_excerpt_length',
 		) );
 		add_filter( 'validate_custom_datetime_format', array(
 			$this,
-			'validate_custom_datetime_format'
+			'validate_custom_datetime_format',
 		) );
 		add_filter( 'validate_only_show_moderator_liked', array(
 			$this,
-			'validate_only_show_moderator_liked'
+			'validate_only_show_moderator_liked',
 		) );
 		add_filter( 'validate_replies_html', array(
 			$this,
-			'validate_replies_html'
+			'validate_replies_html',
 		) );
 		add_filter( 'validate_no_replies_html', array(
 			$this,
-			'validate_no_replies_html'
+			'validate_no_replies_html',
 		) );
 		add_filter( 'validate_comment_html', array(
 			$this,
-			'validate_comment_html'
+			'validate_comment_html',
 		) );
 		add_filter( 'validate_participant_html', array(
 			$this,
-			'validate_participant_html'
+			'validate_participant_html',
 		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
@@ -201,38 +201,38 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 1, null,
 			__( 'The max visible comments setting requires a positive integer.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	public function validate_custom_excerpt_length( $input ) {
 		return $this->validate_int( $input, 'excerpt_length', 1, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	// Tricky to validate. We could show the user an example of what their format translates into.
@@ -306,7 +306,6 @@ class SettingsValidator {
 	}
 
 	// Helper methods
-
 	protected function sanitize_text( $input ) {
 		return sanitize_text_field( $input );
 	}
