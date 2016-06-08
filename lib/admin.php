@@ -394,7 +394,7 @@ class DiscourseAdmin {
 	 */
 	function checkbox_input( $option, $label, $description = '' ) {
 		$options = $this->options;
-		if ( array_key_exists( $option, $options ) && 1 == $options[ $option ] ) {
+		if ( array_key_exists( $option, $options ) && 1 === $options[ $option ] ) {
 			$checked = 'checked="checked"';
 		} else {
 			$checked = '';
@@ -428,7 +428,7 @@ class DiscourseAdmin {
 
 		foreach ( $post_types as $post_type ) {
 
-			if ( array_key_exists( $option, $options ) and in_array( $post_type, $options[ $option ] ) ) {
+			if ( array_key_exists( $option, $options ) and in_array( $post_type, $options[ $option ], true ) ) {
 				$value = 'selected';
 			} else {
 				$value = '';
@@ -465,9 +465,9 @@ class DiscourseAdmin {
 		$remote = get_transient( 'discourse_settings_categories_cache' );
 		$cache  = $remote;
 
-		if ( empty( $remote ) || 1 == $force_update ) {
+		if ( empty( $remote ) || 1 === $force_update ) {
 			$remote           = wp_remote_get( $url );
-			$invalid_response = wp_remote_retrieve_response_code( $remote ) != 200;
+			$invalid_response = wp_remote_retrieve_response_code( $remote ) !== 200;
 
 			if ( is_wp_error( $remote ) || $invalid_response ) {
 				if ( ! empty( $cache ) ) {
@@ -659,8 +659,8 @@ class DiscourseAdmin {
 
 		$options = Discourse::get_plugin_options();
 
-		if ( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
-			if ( 'auto-draft' == $post->post_status ) {
+		if ( in_array( $post->post_type, $options['allowed_post_types'], true ) ) {
+			if ( 'auto-draft' === $post->post_status ) {
 				$value = $options['auto-publish'];
 			} else {
 				$value = get_post_meta( $post->ID, 'publish_to_discourse', true );
@@ -673,7 +673,7 @@ class DiscourseAdmin {
 
 				echo '<div class="misc-pub-section misc-pub-section-discourse">';
 				echo '<label>' . esc_html__( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
-				echo '<input type="checkbox"' . ( ( '1' == $value ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
+				echo '<input type="checkbox"' . ( ( '1' === $value ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
 				echo '</div>';
 
 				echo '<div class="misc-pub-section misc-pub-section-category"><input type="hidden" name="showed_publish_option" value="1">';
