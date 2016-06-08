@@ -261,7 +261,7 @@ class SettingsValidator {
 	}
 
 	public function validate_debug_mode( $input ) {
-		return $this->sanitize_html( $input );
+		return $this->sanitize_checkbox( $input );
 	}
 
 	// This is only called if the checkbox is 'checked'.
