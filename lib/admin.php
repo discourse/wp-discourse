@@ -673,7 +673,7 @@ class DiscourseAdmin {
 
 				echo '<div class="misc-pub-section misc-pub-section-discourse">';
 				echo '<label>' . esc_html__( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
-				echo '<input type="checkbox"' . ( ( '1' === $value ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
+				echo '<input type="checkbox"' . ( ( 1 === $value ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
 				echo '</div>';
 
 				echo '<div class="misc-pub-section misc-pub-section-category"><input type="hidden" name="showed_publish_option" value="1">';
