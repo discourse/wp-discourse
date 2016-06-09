@@ -74,6 +74,7 @@ class Discourse {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+		add_action( 'save_post', array( $this, 'publish_on_save' ), 10, 2 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
@@ -356,6 +357,13 @@ class Discourse {
 
 		// show the existing WP comments
 		return $old;
+	}
+
+	public function publish_on_save( $post_id, $post ) {
+		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		if ( $publish_to_discourse && self::is_valid_sync_post_type( $post_id ) ) {
+			self::sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+		}
 	}
 
 	function publish_post_to_discourse( $new_status, $old_status, $post ) {
