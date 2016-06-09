@@ -40,7 +40,7 @@ class MetaBox {
 
 		<label for="publish_to_discourse"><?php _e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
-				<?php checked( $publish_to_discourse, 1 ); ?> >
+				<?php checked( $publish_to_discourse ); ?> >
 		</label>
 		<br>
 		<label for="publish_post_category"><?php _e( 'Category to publish to:', 'wp-discourse' ); ?>
@@ -71,15 +71,18 @@ class MetaBox {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return 0;
 		}
+		
+		// Indicate that the post has been saved so that the meta-box gets its values from the meta-data instead of the defaults.
+		update_post_meta( $post_id, 'has_been_saved', 1 );
 
 		if ( isset( $_POST['publish_post_category'] ) ) {
-			update_post_meta( $post_id, 'has_been_saved', 1 );
 			update_post_meta( $post_id, 'publish_post_category', $_POST['publish_post_category'] );
 		}
 
 		if ( isset( $_POST['publish_to_discourse'] ) ) {
-			update_post_meta( $post_id, 'has_been_saved', 1);
 			update_post_meta( $post_id, 'publish_to_discourse', $_POST['publish_to_discourse'] );
+		} else {
+			update_post_meta( $post_id, 'publish_to_discourse', 0 );
 		}
 
 		return $post_id;
