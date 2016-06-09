@@ -150,7 +150,7 @@ class DiscourseAdmin {
 			'debug_mode_checkbox'
 		), 'discourse', 'discourse_comments' );
 
-		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
+//		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}

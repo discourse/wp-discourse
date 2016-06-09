@@ -151,7 +151,7 @@ class SettingsValidator {
 	}
 
 	public function validate_publish_category( $input ) {
-		return sanitize_text_field( $input );
+		return intval( sanitize_text_field( $input ) );
 	}
 
 	public function validate_publish_category_update( $input ) {
