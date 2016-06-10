@@ -45,6 +45,14 @@ class Discourse_SSO {
 		}
 	}
 
+	/**
+	 * Gets the nonce from the payload.
+	 * 
+	 * @param string $payload A Base64 encoded string.
+	 *
+	 * @return mixed
+	 * @throws Exception
+	 */
 	public function get_nonce( $payload ) {
 		$payload = urldecode( $payload );
 		$query   = array();
@@ -56,7 +64,7 @@ class Discourse_SSO {
 		}
 	}
 
-	public function buildLoginString( $params ) {
+	public function build_login_string( $params ) {
 		if ( ! isset( $params['external_id'] ) ) {
 			throw new Exception( "Missing required parameter 'external_id'" );
 		}
