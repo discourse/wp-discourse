@@ -363,8 +363,10 @@ class Discourse {
 		if ( wp_is_post_revision($post_id ) ) {
 			return;
 		}
+
+		$post_is_published = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-		if ( $publish_to_discourse && self::is_valid_sync_post_type( $post_id ) ) {
+		if ( $publish_to_discourse && $post_is_published && self::is_valid_sync_post_type( $post_id ) ) {
 			self::sync_to_discourse( $post_id, $post->post_title, $post->post_content );
 		}
 	}
