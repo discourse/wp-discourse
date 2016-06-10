@@ -314,7 +314,7 @@ class SettingsValidator {
 
 	/**
 	 * Validates the 'min_score' number input.
-	 * 
+	 *
 	 * @param int $input The input to be validated.
 	 *
 	 * @return mixed
@@ -327,7 +327,7 @@ class SettingsValidator {
 
 	/**
 	 * Validates the 'min_trust_level' number input.
-	 * 
+	 *
 	 * @param int $input The input to be validated.
 	 *
 	 * @return mixed
@@ -340,7 +340,7 @@ class SettingsValidator {
 
 	/**
 	 * Validates the 'bypass_trust_level_score' number input.
-	 * 
+	 *
 	 * @param int $input The input to be validated.
 	 *
 	 * @return mixed
@@ -366,7 +366,7 @@ class SettingsValidator {
 
 	/**
 	 * Validates the 'custom_date_time' text input.
-	 * 
+	 *
 	 * @param string $input The input to be validated.
 	 *
 	 * @return string
@@ -377,7 +377,7 @@ class SettingsValidator {
 
 	/**
 	 * Validates the 'only_show_moderator_liked' checkbox.
-	 * 
+	 *
 	 * @param string $input The input to be validated.
 	 *
 	 * @return int
@@ -386,17 +386,40 @@ class SettingsValidator {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'debug_mode' checkbox.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_debug_mode( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
-	// This is only called if the checkbox is 'checked'.
+	/**
+	 * Validated the 'enable_sso'checkbox.
+	 *
+	 * This function is only called if the checkbox is checked. It sets the `sso_enabled` property to true.
+	 * This allows sso validation notices to only be displayed if sso is enabled.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_enable_sso( $input ) {
 		$this->sso_enabled = true;
 
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'sso_secret' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_sso_secret( $input ) {
 		if ( strlen( sanitize_text_field( $input ) ) >= 10 ) {
 			return sanitize_text_field( $input );
@@ -412,6 +435,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'login_path' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_login_path( $input ) {
 		if ( $this->sso_enabled && $input ) {
 
@@ -423,7 +453,7 @@ class SettingsValidator {
 
 			}
 
-			// It's valid
+			// It's valid.
 			return $this->sanitize_text( $input );
 		}
 
@@ -431,20 +461,56 @@ class SettingsValidator {
 		return $this->sanitize_text( $input );
 	}
 
-	// Helper methods
+	/**
+	 * Helper methods
+	 ******************************/
+
+	/**
+	 * A helper method to sanitize text inputs.
+	 *
+	 * @param string $input The input to be sanitized.
+	 *
+	 * @return string
+	 */
 	protected function sanitize_text( $input ) {
 		return sanitize_text_field( $input );
 	}
 
+	/**
+	 * A helper method to sanitize the value returned from checkbox inputs.
+	 *
+	 * @param string $input The value returned from the checkbox.
+	 *
+	 * @return int
+	 */
 	protected function sanitize_checkbox( $input ) {
-		return $input == 1 ? 1 : 0;
+		return 1 === intval( $input ) ? 1 : 0;
 	}
 
+	/**
+	 * A helper function to sanitize HTML.
+	 *
+	 * @param string $input HTML input to be sanitized.
+	 *
+	 * @return string
+	 */
 	protected function sanitize_html( $input ) {
 		return wp_kses_post( $input );
 	}
 
-	protected function validate_int( $input, $option_id, $min = null, $max = null, $error_message = '', $add_error = 1 ) {
+	/**
+	 * A helper function to validate and sanitize integers.
+	 *
+	 * @param int    $input The input to be validated.
+	 * @param string $option_id The option being validated.
+	 * @param null   $min The minimum allowed value.
+	 * @param null   $max The maximum allowed value.
+	 * @param string $error_message The error message to return.
+	 * @param bool   $add_error Whether or not to add a setting error.
+	 *
+	 * @return mixed
+	 */
+	protected function validate_int( $input, $option_id, $min = null, $max = null, $error_message = '', $add_error = false ) {
 		$options = array();
 
 		if ( isset( $min ) ) {
@@ -464,7 +530,7 @@ class SettingsValidator {
 			// The input is not valid, but the setting's section is not being used, sanitize the input and return it.
 			return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
 		} else {
-			// Valid input
+			// Valid input.
 			return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
 		}
 	}
