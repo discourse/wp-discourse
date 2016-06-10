@@ -150,7 +150,6 @@ class DiscourseAdmin {
 			'debug_mode_checkbox'
 		), 'discourse', 'discourse_comments' );
 
-		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}
@@ -479,43 +478,7 @@ class DiscourseAdmin {
 		</div>
 		<?php
 	}
-
-	function publish_to_discourse() {
-		global $post;
-
-		$options = Discourse::get_plugin_options();
-
-		if ( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
-			if ( $post->post_status == 'auto-draft' ) {
-				$value = $options['auto-publish'];
-			} else {
-				$value = get_post_meta( $post->ID, 'publish_to_discourse', true );
-			}
-
-			$categories = self::get_discourse_categories( '0' );
-			if ( is_wp_error( $categories ) ) {
-				echo '<span>' . __( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
-			} else {
-
-				echo '<div class="misc-pub-section misc-pub-section-discourse">';
-				echo '<label>' . __( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
-				echo '<input type="checkbox"' . ( ( $value == "1" ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
-				echo '</div>';
-
-				echo '<div class="misc-pub-section misc-pub-section-category">' .
-				     '<input type="hidden" name="showed_publish_option" value="1">';
-				echo '<label>' . __( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
-
-				$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
-				$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-				$selected              = ( ! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
-
-				self::option_input( 'publish_post_category', $categories, $selected );
-				echo '</div>';
-			}
-		}
-	}
-
+	
 	function connection_status_notice() {
 		if ( ! $this->response_validator->check_connection_status() ) {
 			add_action( 'admin_notices', array( $this, 'disconnected' ) );

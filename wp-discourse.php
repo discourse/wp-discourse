@@ -36,12 +36,14 @@ require_once( __DIR__ . '/lib/settings-validator.php' );
 require_once( __DIR__ . '/lib/response-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
+require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/plugin-support/woocommerce_support.php' );
 
 $discourse_response_validator = WPDiscourse\ResponseValidator\ResponseValidator::get_instance();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new Discourse( $discourse_response_validator );
 $discourse_admin              = new DiscourseAdmin( $discourse_response_validator );
+$discourse_admin_meta_box     = new WPDiscourse\MetaBox\MetaBox( $discourse_admin );
 $woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport( $discourse );
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );

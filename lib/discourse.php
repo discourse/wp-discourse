@@ -74,8 +74,7 @@ class Discourse {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
-
-		add_action( 'save_post', array( $this, 'save_postdata' ) );
+		add_action( 'save_post', array( $this, 'publish_on_save' ), 10, 2 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
@@ -360,21 +359,22 @@ class Discourse {
 		return $old;
 	}
 
+	public function publish_on_save( $post_id, $post ) {
+		if ( wp_is_post_revision($post_id ) ) {
+			return;
+		}
+
+		$post_is_published = 'publish' === get_post_status( $post_id );
+		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		if ( $publish_to_discourse && $post_is_published && self::is_valid_sync_post_type( $post_id ) ) {
+			self::sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+		}
+	}
+
 	function publish_post_to_discourse( $new_status, $old_status, $post ) {
 		$publish_to_discourse  = get_post_meta( $post->ID, 'publish_to_discourse', true );
-		$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
 
-		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
-			// This seems a little redundant after `save_postdata` but when using the Press This
-			// widget it updates the field as it should.
-
-			if ( isset( $_POST['publish_post_category'] ) ) {
-				#delete_post_meta( $post->ID, 'publish_post_category');
-				add_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
-			}
-
-			add_post_meta( $post->ID, 'publish_to_discourse', '1', true );
-
+		if ( $publish_to_discourse && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
 			self::sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
 		}
 	}
@@ -406,42 +406,6 @@ class Discourse {
 		}
 
 		return $selected_post_types;
-	}
-
-	function publish_active() {
-		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) ) {
-			return $_POST['publish_to_discourse'] == '1';
-		}
-
-		return false;
-	}
-
-	function save_postdata( $postid ) {
-		if ( ! current_user_can( 'edit_page', $postid ) ) {
-			return $postid;
-		}
-
-		if ( empty( $postid ) ) {
-			return $postid;
-		}
-
-		// trust me ... WordPress is crazy like this, try changing a title.
-		if ( ! isset( $_POST['ID'] ) ) {
-			return $postid;
-		}
-
-		if ( $_POST['action'] == 'editpost' ) {
-			delete_post_meta( $_POST['ID'], 'publish_to_discourse' );
-		}
-
-		if ( isset( $_POST['publish_post_category'] ) ) {
-			delete_post_meta( $_POST['ID'], 'publish_post_category' );
-			add_post_meta( $_POST['ID'], 'publish_post_category', $_POST['publish_post_category'], true );
-		}
-
-		add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
-
-		return $postid;
 	}
 
 	function sync_to_discourse( $postid, $title, $raw ) {
