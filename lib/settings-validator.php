@@ -106,22 +106,6 @@ class SettingsValidator {
 			$this,
 			'validate_only_show_moderator_liked',
 		) );
-		add_filter( 'validate_replies_html', array(
-			$this,
-			'validate_replies_html',
-		) );
-		add_filter( 'validate_no_replies_html', array(
-			$this,
-			'validate_no_replies_html',
-		) );
-		add_filter( 'validate_comment_html', array(
-			$this,
-			'validate_comment_html',
-		) );
-		add_filter( 'validate_participant_html', array(
-			$this,
-			'validate_participant_html',
-		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
@@ -215,18 +199,46 @@ class SettingsValidator {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'full_post_content' checkbox.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_full_post_content( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'auto_publish' checkbox.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_auto_publish( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'auto_track' checkbox.
+	 *
+	 * @param string $input The input to be validates.
+	 *
+	 * @return int
+	 */
 	public function validate_auto_track( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'allowed_post_types' multi-select.
+	 *
+	 * @param array $input The array of allowed post-types.
+	 *
+	 * @return array
+	 */
 	public function validate_allowed_post_types( $input ) {
 		$output = array();
 		foreach ( $input as $post_type ) {
@@ -236,81 +248,142 @@ class SettingsValidator {
 		return $output;
 	}
 
-	// This is only called if the checkbox is 'checked'.
+	/**
+	 * Validates the 'use_discourse_comments' checkbox.
+	 *
+	 * If this function is called, it sets the 'use_discourse_comments' property to true. This makes it possible
+	 * to only show warnings for the comment settings if Discourse is being used for comments.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_use_discourse_comments( $input ) {
 		$this->use_discourse_comments = true;
 
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'show_existing_comments' checkbox.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_show_existing_comments( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'existing_comments_heading' input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_existing_comments_heading( $input ) {
 		return $this->sanitize_html( $input );
 	}
 
+	/**
+	 * Validates the 'max_comments' number input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 1, null,
 			__( 'The max visible comments setting requires a positive integer.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
+	/**
+	 * Validates the 'min_replies' number input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
+	/**
+	 * Validates the 'min_score' number input.
+	 * 
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
-
+	/**
+	 * Validates the 'min_trust_level' number input.
+	 * 
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
+	/**
+	 * Validates the 'bypass_trust_level_score' number input.
+	 * 
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
+	/**
+	 * Validates the 'custom_excerpt_length' number input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_custom_excerpt_length( $input ) {
 		return $this->validate_int( $input, 'excerpt_length', 1, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
-	// Tricky to validate. We could show the user an example of what their format translates into.
+	/**
+	 * Validates the 'custom_date_time' text input.
+	 * 
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_custom_datetime_format( $input ) {
 		return sanitize_text_field( $input );
 	}
 
+	/**
+	 * Validates the 'only_show_moderator_liked' checkbox.
+	 * 
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_only_show_moderator_liked( $input ) {
 		return $this->sanitize_checkbox( $input );
-	}
-
-	public function validate_replies_html( $input ) {
-		return $this->sanitize_html( $input );
-	}
-
-	public function validate_no_replies_html( $input ) {
-		return $this->sanitize_html( $input );
-	}
-
-	public function validate_comment_html( $input ) {
-		return $this->sanitize_html( $input );
-	}
-
-	public function validate_participant_html( $input ) {
-		return $this->sanitize_html( $input );
 	}
 
 	public function validate_debug_mode( $input ) {
