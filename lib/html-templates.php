@@ -1,13 +1,18 @@
 <?php
+/**
+ * Returns HTML templates used for publishing to Discourse and for displaying comments on the WordPress site.
+ *
+ * Templates and implementation copied from @aliso's commit:
+ * https://github.com/10up/wp-discourse/commit/5c9d43c4333e136204d5a3b07192f4b368c3f518.
+ *
+ * @link https://github.com/discourse/wp-discourse/blob/master/lib/html-templates.php
+ * @package WPDiscourse
+ */
+
 namespace WPDiscourse\Templates;
 
 /**
  * Class HTMLTemplates
- *
- * Static methods to return HTML templates. Used in `templates/comments.php`
- *
- * Templates and implementation copied from @aliso's commit:
- * https://github.com/10up/wp-discourse/commit/5c9d43c4333e136204d5a3b07192f4b368c3f518
  */
 class HTMLTemplates {
 
@@ -28,12 +33,12 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
-			<h2 class="comments-title"><?php _e( 'Notable Replies', 'wp-discourse' ); ?></h2>
+			<h2 class="comments-title"><?php esc_html_e( 'Notable Replies', 'wp-discourse' ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php _e( 'Continue the discussion', 'wp-discourse' ); ?>
-					</a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
+					<a href="{topic_url}"><?php esc_html_e( 'Continue the discussion', 'wp-discourse' ); ?>
+					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
 				</h3>
 				<p class="more-replies">{more_replies}</p>
 				<p class="comment-reply-title">{participants}</p>
@@ -62,8 +67,8 @@ class HTMLTemplates {
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
-						<?php _e( 'Start the discussion', 'wp-discourse' ); ?>
-					</a><?php _e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
+						<?php esc_html_e( 'Start the discussion', 'wp-discourse' ); ?>
+					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
 			</div><!-- #respond -->
 		</div>
 		<?php
@@ -87,8 +92,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php _e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?>
-				</p>
+				<p><?php esc_html_e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?></p>
 			</div>
 		</div>
 		<?php

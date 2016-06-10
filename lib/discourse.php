@@ -223,7 +223,7 @@ class Discourse {
 				);
 
 				// Build login string
-				$q = $sso->buildLoginString( $params );
+				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse
 				wp_redirect( $discourse_options['url'] . '/session/sso_login?' . $q );

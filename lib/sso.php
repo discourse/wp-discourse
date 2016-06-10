@@ -30,7 +30,7 @@ class Discourse_SSO {
 
 	/**
 	 * Validates the payload against the sig.
-	 * 
+	 *
 	 * @param string $payload A Base64 encoded string.
 	 * @param string $sig HMAC-SHA256 of $sso_secret, $payload should be equal to $sig.
 	 *
@@ -45,6 +45,14 @@ class Discourse_SSO {
 		}
 	}
 
+	/**
+	 * Gets the nonce from the payload.
+	 *
+	 * @param string $payload A Base64 encoded string.
+	 *
+	 * @return mixed
+	 * @throws Exception Thrown when the nonce in not found in the payload.
+	 */
 	public function get_nonce( $payload ) {
 		$payload = urldecode( $payload );
 		$query   = array();
@@ -56,7 +64,15 @@ class Discourse_SSO {
 		}
 	}
 
-	public function buildLoginString( $params ) {
+	/**
+	 * Creates the sso-login query params that are sent to Discourse.
+	 *
+	 * @param array $params The array of parameters to send.
+	 *
+	 * @return string
+	 * @throws Exception Thrown when the required params aren't present.
+	 */
+	public function build_login_string( $params ) {
 		if ( ! isset( $params['external_id'] ) ) {
 			throw new Exception( "Missing required parameter 'external_id'" );
 		}
