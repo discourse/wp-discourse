@@ -206,7 +206,7 @@ class Discourse {
 				}
 
 				// Nonce
-				$nonce = $sso->getNonce( $payload );
+				$nonce = $sso->get_nonce( $payload );
 
 				// Current user info
 				$current_user = wp_get_current_user();
