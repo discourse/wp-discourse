@@ -6,6 +6,8 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\SSO;
+
 /**
  * Class Discourse_SSO
  */

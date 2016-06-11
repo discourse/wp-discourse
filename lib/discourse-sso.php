@@ -2,8 +2,11 @@
 namespace WPDiscourse\DiscourseSSO;
 
 class DiscourseSSO {
-	
+	protected $options;
+
 	public function __construct() {
+		$this->options = get_option( 'discourse' );
+
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 	}
@@ -16,25 +19,24 @@ class DiscourseSSO {
 	}
 
 	function sso_parse_request( $wp ) {
-		$discourse_options = self::get_plugin_options();
 
 		// sync logout from Discourse to WordPress from Adam Capirola : https://meta.discourse.org/t/wordpress-integration-guide/27531
 		// to make this work, enter a URL of the form "http://my-wp-blog.com/?request=logout" in the "logout redirect"
 		// field in your Discourse admin
-		if ( isset( $discourse_options['enable-sso'] ) &&
-		     intval( $discourse_options['enable-sso'] ) == 1 &&
+		if ( isset( $this->options['enable-sso'] ) &&
+		     intval( $this->options['enable-sso'] ) == 1 &&
 		     isset( $_GET['request'] ) && $_GET['request'] == 'logout'
 		) {
 
 			wp_logout();
-			wp_redirect( $discourse_options['url'] );
+			wp_redirect( $this->options['url'] );
 			exit;
 		}
 		// end logout processing
 
 		// only process requests with "my-plugin=ajax-handler"
-		if ( isset( $discourse_options['enable-sso'] ) &&
-		     intval( $discourse_options['enable-sso'] ) == 1 &&
+		if ( isset( $this->options['enable-sso'] ) &&
+		     intval( $this->options['enable-sso'] ) == 1 &&
 		     array_key_exists( 'sso', $wp->query_vars ) &&
 		     array_key_exists( 'sig', $wp->query_vars )
 		) {
@@ -57,7 +59,7 @@ class DiscourseSSO {
 			} else {
 
 				// Check for helper class
-				if ( ! class_exists( 'Discourse_SSO' ) ) {
+				if ( ! class_exists( '\\WPDiscourse\\SSO\\Discourse_SSO' ) ) {
 					// Error message
 					echo( 'Helper class is not properly included.' );
 					exit;
@@ -71,8 +73,9 @@ class DiscourseSSO {
 				$payload = urldecode( str_replace( '%0B', '%0A', urlencode( $payload ) ) );
 
 				// Validate signature
-				$sso_secret = $discourse_options['sso-secret'];
-				$sso        = new Discourse_SSO( $sso_secret );
+				$sso_secret = $this->options['sso-secret'];
+				$sso = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
+
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					// Error message
 					echo( 'Invalid request.' );
@@ -100,10 +103,10 @@ class DiscourseSSO {
 				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse
-				wp_redirect( $discourse_options['url'] . '/session/sso_login?' . $q );
+				wp_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 				exit;
 			}
 		}
 	}
-	
+
 }
