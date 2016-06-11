@@ -133,15 +133,15 @@ class Discourse {
 		}
 	}
 
-	function sso_add_query_vars( $vars ) {
-		$vars[] = "sso";
-		$vars[] = "sig";
-
-		return $vars;
-	}
+//	function sso_add_query_vars( $vars ) {
+//		$vars[] = "sso";
+//		$vars[] = "sig";
+//
+//		return $vars;
+//	}
 
 	// SSO Request Processing from Adam Capirola : https://gist.github.com/adamcapriola/11300529
-	function sso_parse_request( $wp ) {
+/*	function sso_parse_request( $wp ) {
 		$discourse_options = self::get_plugin_options();
 
 		// sync logout from Discourse to WordPress from Adam Capirola : https://meta.discourse.org/t/wordpress-integration-guide/27531
@@ -231,6 +231,7 @@ class Discourse {
 			}
 		}
 	}
+*/
 
 	static function convert_relative_img_src_to_absolute( $url, $content ) {
 		if ( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content ) ) {
