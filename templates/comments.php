@@ -1,4 +1,11 @@
 <?php
+/**
+ * The template used for Discourse comments.
+ *
+ * @link https://github.com/discourse/wp-discourse/blob/master/templates/comments.php
+ * @package WPDiscourse
+ */
+
 use WPDiscourse\Templates as Templates;
 
 $custom = get_post_custom();
@@ -10,12 +17,12 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 
 } else {
 	$options       = get_option( 'discourse' );
-	$is_enable_sso = ( isset( $options['enable-sso'] ) && intval( $options['enable-sso'] ) == 1 );
+	$is_enable_sso = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$permalink     = (string) $custom['discourse_permalink'][0];
 	if ( $is_enable_sso ) {
 		$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
 	}
-	$discourse_url_name = preg_replace( "(https?://)", "", esc_url( $options['url'] ) );
+	$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
 	if ( isset( $custom['discourse_comments_raw'] ) ) {
 		$discourse_info = json_decode( $custom['discourse_comments_raw'][0] );
 	} else {
@@ -24,28 +31,28 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$defaults = array(
 		'posts_count'  => 0,
 		'posts'        => array(),
-		'participants' => array()
+		'participants' => array(),
 	);
 
-// add <time> tag to WP allowed html tags
+	// Add <time> tag to WP allowed html tags.
 	global $allowedposttags;
 	$allowedposttags['time'] = array( 'datetime' => array() );
 
-// use custom datetime format string if provided, else global date format
-	$datetime_format = $options['custom-datetime-format'] == '' ? get_option( 'date_format' ) : $options['custom-datetime-format'];
+	// Use custom datetime format string if provided, else global date format.
+	$datetime_format = '' === $options['custom-datetime-format'] ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
-// Add some protection in the event our metadata doesn't look how we expect it to
+	// Add some protection in the event our metadata doesn't look how we expect it to.
 	$discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
 
 	$more_replies = ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 );
-	$more         = count( $discourse_info->posts ) == 0 ? "" : "more ";
+	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : 'more ';
 
-	if ( $more_replies == 0 ) {
-		$more_replies = "";
-	} elseif ( $more_replies == 1 ) {
-		$more_replies = "1 " . $more . "reply";
+	if ( 0 === $more_replies ) {
+		$more_replies = '';
+	} elseif ( 1 === $more_replies ) {
+		$more_replies = '1 ' . $more . 'reply';
 	} else {
-		$more_replies = $more_replies . " " . $more . "replies";
+		$more_replies = $more_replies . ' ' . $more . 'replies';
 	}
 
 	$discourse_url     = esc_url( $options['url'] );
@@ -92,5 +99,5 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
 	$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 	$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
-	echo $discourse_html;
+	echo wp_kses_post( $discourse_html );
 }
