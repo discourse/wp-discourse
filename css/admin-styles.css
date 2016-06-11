@@ -11,15 +11,15 @@
 #setting-error-excerpt_length ~ form #discourse_custom-excerpt-length,
 #setting-error-sso_secret ~ form #discourse_sso-secret,
 #setting-error-login_path ~ form #discourse_login-path {
-    border-color: #dc3232;
-    border-width: 2px;
+	border-color: #dc3232;
+	border-width: 2px;
 }
 
 .settings_page_discourse .discourse-allowed-types {
-    min-width: 160px;
+	min-width: 160px;
 }
 
 /* Adds top border to discourse section of post submit box */
 .misc-pub-section-discourse {
-    border-top: 1px solid rgb(238, 238, 238);
+	border-top: 1px solid rgb(238, 238, 238);
 }
