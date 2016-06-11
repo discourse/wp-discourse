@@ -206,7 +206,7 @@ class Discourse {
 				}
 
 				// Nonce
-				$nonce = $sso->getNonce( $payload );
+				$nonce = $sso->get_nonce( $payload );
 
 				// Current user info
 				$current_user = wp_get_current_user();
@@ -223,7 +223,7 @@ class Discourse {
 				);
 
 				// Build login string
-				$q = $sso->buildLoginString( $params );
+				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse
 				wp_redirect( $discourse_options['url'] . '/session/sso_login?' . $q );
