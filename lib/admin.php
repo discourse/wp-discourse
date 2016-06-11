@@ -200,7 +200,7 @@ class DiscourseAdmin {
 		?>
 
 		<p class="documentation-link">
-			<em><?php _e( 'For documentation on customizing the plugin\'s html, visit ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'For documentation on customizing the plugin\'s html, visit ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">https://github.com/discourse/wp-discourse/wiki/Template-Customization</a>
 		</p>
 
@@ -394,7 +394,7 @@ class DiscourseAdmin {
 	 */
 	function checkbox_input( $option, $label, $description = '' ) {
 		$options = $this->options;
-		if ( array_key_exists( $option, $options ) and $options[ $option ] == 1 ) {
+		if ( array_key_exists( $option, $options ) and 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';
 		} else {
 			$checked = '';
@@ -404,7 +404,7 @@ class DiscourseAdmin {
 		<label>
 			<input id='discourse_<?php echo esc_attr( $option ); ?>'
 			       name='discourse[<?php echo esc_attr( $option ); ?>]' type='checkbox'
-			       value='1' <?php echo $checked; ?> />
+			       value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo esc_html( $label ); ?>
 		</label>
 		<p class="description"><?php echo esc_html( $description ); ?></p>
@@ -428,13 +428,13 @@ class DiscourseAdmin {
 
 		foreach ( $post_types as $post_type ) {
 
-			if ( array_key_exists( $option, $options ) and in_array( $post_type, $options[ $option ] ) ) {
+			if ( array_key_exists( $option, $options ) and in_array( $post_type, $options[ $option ], true ) ) {
 				$value = 'selected';
 			} else {
 				$value = '';
 			}
 
-			echo '<option ' . $value . " value='" . esc_attr( $post_type ) . "'>" . esc_html( $post_type ) . '</option>';
+			echo '<option ' . esc_attr( $value ) . " value='" . esc_attr( $post_type ) . "'>" . esc_html( $post_type ) . '</option>';
 		}
 
 		echo '</select>';
@@ -465,9 +465,9 @@ class DiscourseAdmin {
 		$remote = get_transient( 'discourse_settings_categories_cache' );
 		$cache  = $remote;
 
-		if ( empty( $remote ) || $force_update == '1' ) {
+		if ( empty( $remote ) || 1 === intval( $force_update ) ) {
 			$remote           = wp_remote_get( $url );
-			$invalid_response = wp_remote_retrieve_response_code( $remote ) != 200;
+			$invalid_response = intval( wp_remote_retrieve_response_code( $remote ) ) !== 200;
 
 			if ( is_wp_error( $remote ) || $invalid_response ) {
 				if ( ! empty( $cache ) ) {
@@ -564,10 +564,10 @@ class DiscourseAdmin {
 		}
 
 		?>
-		<input id='discourse_<?php echo $option ?>' name='discourse[<?php echo $option ?>]'
-		       type="<?php echo isset( $type ) ? $type : 'text'; ?>"
+		<input id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]'
+		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
-				echo 'min="' . $min . '"';
+				echo 'min="' . esc_attr( $min ) . '"';
 } ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
@@ -631,13 +631,13 @@ class DiscourseAdmin {
 	 */
 	function discourse_options_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( __( 'You do not have sufficient permissions to access this page.', 'wp-discourse' ) );
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wp-discourse' ) );
 		}
 		?>
 		<div class="wrap">
 			<h2>Discourse Options</h2>
 			<p class="documentation-link">
-				<em><?php _e( 'The WP Discourse plugin documentation can be found at ', 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( 'The WP Discourse plugin documentation can be found at ', 'wp-discourse' ); ?></em>
 				<a href="https://github.com/discourse/wp-discourse/wiki">https://github.com/discourse/wp-discourse/wiki</a>
 			</p>
 			<form action="options.php" method="POST">
@@ -659,8 +659,8 @@ class DiscourseAdmin {
 
 		$options = Discourse::get_plugin_options();
 
-		if ( in_array( $post->post_type, $options['allowed_post_types'] ) ) {
-			if ( $post->post_status == 'auto-draft' ) {
+		if ( in_array( $post->post_type, $options['allowed_post_types'], true ) ) {
+			if ( 'auto-draft' === $post->post_status ) {
 				$value = $options['auto-publish'];
 			} else {
 				$value = get_post_meta( $post->ID, 'publish_to_discourse', true );
@@ -668,17 +668,16 @@ class DiscourseAdmin {
 
 			$categories = self::get_discourse_categories( '0' );
 			if ( is_wp_error( $categories ) ) {
-				echo '<span>' . __( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
+				echo '<span>' . esc_html__( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
 			} else {
 
 				echo '<div class="misc-pub-section misc-pub-section-discourse">';
-				echo '<label>' . __( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
-				echo '<input type="checkbox"' . ( ( $value == '1' ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
+				echo '<label>' . esc_html__( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
+				echo '<input type="checkbox"' . ( ( 1 === intval( $value ) ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
 				echo '</div>';
 
-				echo '<div class="misc-pub-section misc-pub-section-category">' .
-				     '<input type="hidden" name="showed_publish_option" value="1">';
-				echo '<label>' . __( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
+				echo '<div class="misc-pub-section misc-pub-section-category"><input type="hidden" name="showed_publish_option" value="1">';
+				echo '<label>' . esc_html__( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
 
 				$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
 				$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
@@ -710,7 +709,7 @@ class DiscourseAdmin {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php _e( 'You are not currently connected to a Discourse forum. ' .
+				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
 				                  "To establish a connection, check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
 				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
@@ -725,7 +724,7 @@ class DiscourseAdmin {
 		?>
 		<div class="notice notice-success is-dismissible">
 			<p>
-				<strong><?php _e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
