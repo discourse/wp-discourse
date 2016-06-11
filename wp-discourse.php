@@ -42,6 +42,6 @@ $discourse_response_validator = WPDiscourse\ResponseValidator\ResponseValidator:
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new Discourse( $discourse_response_validator );
 $discourse_admin              = new DiscourseAdmin( $discourse_response_validator );
-$woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport( $discourse );
+$woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
