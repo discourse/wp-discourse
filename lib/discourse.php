@@ -70,7 +70,7 @@ class Discourse {
 		// replace comments with discourse comments
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
-		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
+//		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
@@ -78,7 +78,7 @@ class Discourse {
 		add_action( 'save_post', array( $this, 'save_postdata' ) );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
-		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+//		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 	}
 
