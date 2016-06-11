@@ -1,5 +1,10 @@
 <?php
-// If uninstall not called from WordPress, then exit
+/**
+ * Uninstall the plugin.
+ *
+ * @package WPDiscourse
+ */
+
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
