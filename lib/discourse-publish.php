@@ -1,12 +1,39 @@
 <?php
+/**
+ * Publishes a post to Discourse.
+ *
+ * @package WPDicourse
+ */
 
 namespace WPDiscourse\DiscoursePublish;
 use WPDiscourse\Templates as Templates;
 
+/**
+ * Class DiscoursePublish
+ */
 class DiscoursePublish {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
+
+	/**
+	 * Validates the response from the Discourse forum.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\ResponseValidator\ResponseValidator
+	 */
 	protected $response_validator;
 
+	/**
+	 * DiscoursePublish constructor.
+	 *
+	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
+	 */
 	public function __construct( $response_validator ) {
 		$this->response_validator = $response_validator;
 		$this->options = get_option('discourse' );
@@ -16,6 +43,15 @@ class DiscoursePublish {
 		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
 	}
 
+	/**
+	 * Publishes a post to Discourse.
+	 *
+	 * This function is called when post status changes. Hooks into 'transition_post_status'.
+	 *
+	 * @param string $new_status New post status after an update.
+	 * @param string $old_status The old post status.
+	 * @param object $post The post object.
+	 */
 	public function publish_post_to_discourse( $new_status, $old_status, $post ) {
 		$publish_to_discourse  = get_post_meta( $post->ID, 'publish_to_discourse', true );
 		$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
@@ -35,6 +71,13 @@ class DiscoursePublish {
 		}
 	}
 
+	/**
+	 * For publishing by xmlrpc.
+	 *
+	 * Hooks into 'xmlrpc_publish_post'.
+	 *
+	 * @param int $postid The post id.
+	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
 		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
@@ -43,8 +86,11 @@ class DiscoursePublish {
 		}
 	}
 
-
-
+	/**
+	 * @param int $postid The ID of the post that has been saved.
+	 *
+	 * @return mixed
+	 */
 	public function save_postdata( $postid ) {
 		if ( ! current_user_can( 'edit_page', $postid ) ) {
 			return $postid;
@@ -73,6 +119,13 @@ class DiscoursePublish {
 		return $postid;
 	}
 
+	/**
+	 * Calls `sync_do_discourse_work` after getting the lock.
+	 *
+	 * @param int    $postid The post id.
+	 * @param string $title The title.
+	 * @param string $raw The raw content of the post.
+	 */
 	public function sync_to_discourse( $postid, $title, $raw ) {
 		global $wpdb;
 
@@ -86,6 +139,13 @@ class DiscoursePublish {
 
 	// Protected
 
+	/**
+	 * Syncs a post to Discourse.
+	 *
+	 * @param int    $postid The post id.
+	 * @param string $title The post title.
+	 * @param string $raw The content of the post.
+	 */
 	protected function sync_to_discourse_work( $postid, $title, $raw ) {
 		$discourse_id  = get_post_meta( $postid, 'discourse_post_id', true );
 		$options       = $this->options;
@@ -203,6 +263,11 @@ class DiscoursePublish {
 		}
 	}
 
+	/**
+	 * Hmmm.
+	 * 
+	 * @return bool
+	 */
 	protected function publish_active() {
 		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) ) {
 			return $_POST['publish_to_discourse'] == '1';
@@ -211,6 +276,11 @@ class DiscoursePublish {
 		return false;
 	}
 
+	/**
+	 * @param null $postid The ID of the post in question.
+	 *
+	 * @return bool
+	 */
 	protected function is_valid_sync_post_type( $postid = null ) {
 		// is_single() etc. is not reliable
 		$allowed_post_types = $this->get_allowed_post_types();
@@ -219,14 +289,13 @@ class DiscoursePublish {
 		return in_array( $current_post_type, $allowed_post_types );
 	}
 
+	/**
+	 * Returns the array of allowed post types.
+	 * 
+	 * @return mixed
+	 */
 	protected function get_allowed_post_types() {
 		$selected_post_types = $this->options['allowed_post_types'];
-
-		/** If no post type is explicitly set then use the defaults */
-//		if ( empty( $selected_post_types ) ) {
-//			$selected_post_types = self::$options['allowed_post_types'];
-//		}
-
 		return $selected_post_types;
 	}
 
