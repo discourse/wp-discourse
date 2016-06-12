@@ -1,23 +1,31 @@
 <?php
 /**
- * WP-Discourse
+ * Sets up the plugin.
+ * 
+ * @package WPDiscourse
  */
-use WPDiscourse\Templates as Templates;
 
+namespace WPDiscourse\Discourse;
+
+/**
+ * Class Discourse
+ */
 class Discourse {
 
-	public static function homepage( $url, $post ) {
-		return $url . "/users/" . strtolower( $post->username );
-	}
+	/**
+	 * Sets the plugin version.
+	 * 
+	 * @var string
+	 */
+	public static $version = '0.7.0';
 
-	public static function avatar( $template, $size ) {
-		return str_replace( "{size}", $size, $template );
-	}
-
-	// Version
-	static $version = '0.7.0';
-
-	// Options and defaults
+	/**
+	 * The default options.
+	 * 
+	 * The options can be accessed in any file with `get_option( 'discourse' )`.
+	 * 
+	 * @var array
+	 */
 	static $options = array(
 		'url'                       => '',
 		'api-key'                   => '',
@@ -46,25 +54,25 @@ class Discourse {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ) );
-	}
-
-	static function install() {
-		update_option( 'discourse_version', self::$version );
-		add_option( 'discourse', self::$options );
-	}
-
-	public function init() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 	}
+	
+	public static function install() {
+		update_option( 'discourse_version', self::$version );
+		add_option( 'discourse', self::$options );
+	}
 
-	// If a value has been supplied for the 'login-path' option, use it instead of
-	// the default WordPress login path.
-	function set_login_url( $login_url, $redirect ) {
-		$options = self::get_plugin_options();
+	/**
+	 * @param $login_url
+	 * @param $redirect
+	 *
+	 * @return string
+	 */
+	public function set_login_url( $login_url, $redirect ) {
+		$options = get_option( 'discourse' );
 		if ( $options['login-path'] ) {
 			$login_url = $options['login-path'];
 
@@ -84,12 +92,20 @@ class Discourse {
 
 	}
 
-	function admin_styles() {
+	public function admin_styles() {
 		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
 		wp_enqueue_style( 'wp_discourse_admin' );
 	}
 
-	static function convert_relative_img_src_to_absolute( $url, $content ) {
+	public static function homepage( $url, $post ) {
+		return $url . "/users/" . strtolower( $post->username );
+	}
+
+	public static function avatar( $template, $size ) {
+		return str_replace( "{size}", $size, $template );
+	}
+	
+	public static function convert_relative_img_src_to_absolute( $url, $content ) {
 		if ( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content ) ) {
 			return $content;
 		}
@@ -100,7 +116,4 @@ class Discourse {
 		return preg_replace( $search, $replace, $content );
 	}
 
-	static function get_plugin_options() {
-		return wp_parse_args( get_option( 'discourse' ), Discourse::$options );
-	}
 }
