@@ -41,7 +41,7 @@ class MetaBox {
 			add_meta_box( 'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
 				$this,
 				'render_meta_box',
-			), 'post', 'side', 'high', null );
+			), null, 'side', 'high', null );
 		}
 	}
 
