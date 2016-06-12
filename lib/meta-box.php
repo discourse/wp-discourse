@@ -1,24 +1,55 @@
 <?php
+/**
+ * Adds a Discourse Publish meta box to posts that may be published to Discourse.
+ *
+ * @package WPDiscourse
+ */
+
 namespace WPDiscourse\MetaBox;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class MetaBox
+ */
 class MetaBox {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
-	
+
+	/**
+	 * MetaBox constructor.
+	 */
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ) );
 	}
+
+	/**
+	 * Registers a meta box for the allowed post types.
+	 *
+	 * @param string $post_type The post_type of the current post.
+	 */
 	public function add_meta_box( $post_type ) {
-		if ( in_array( $post_type, $this->options['allowed_post_types'] ) ) {
+		if ( in_array( $post_type, $this->options['allowed_post_types'], true ) ) {
 			add_meta_box( 'discourse-publish-meta-box', __( 'Publish to Discourse' ), array(
 				$this,
-				'render_meta_box'
+				'render_meta_box',
 			), 'post', 'side', 'high', null );
 		}
 	}
+
+	/**
+	 * The callback function for creating the meta box.
+	 *
+	 * @param object $post The current Post object.
+	 */
 	public function render_meta_box( $post ) {
 		$categories = DiscourseUtilities::get_discourse_categories();
 
@@ -52,10 +83,19 @@ class MetaBox {
 		</label>
 
 		<?php
-		echo ob_get_clean();
+		echo wp_kses_post( ob_get_clean() );
 	}
+
+	/**
+	 * Verifies the nonce and saves the meta data.
+	 *
+	 * @param int $post_id The id of the current post.
+	 *
+	 * @return int
+	 */
 	function save_meta_box( $post_id ) {
-		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || ! wp_verify_nonce( $_POST['publish_to_discourse_nonce'], 'publish_to_discourse' ) ) {
+		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) ) { // Input var okay.
 			return 0;
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -67,14 +107,17 @@ class MetaBox {
 
 		// Indicate that the post has been saved so that the meta-box gets its values from the meta-data instead of the defaults.
 		update_post_meta( $post_id, 'has_been_saved', 1 );
-		if ( isset( $_POST['publish_post_category'] ) ) {
-			update_post_meta( $post_id, 'publish_post_category', $_POST['publish_post_category'] );
+
+		if ( isset( $_POST['publish_post_category'] ) ) { // Input var okay.
+			update_post_meta( $post_id, 'publish_post_category', wp_unslash( $_POST['publish_post_category'] ) ); // Input var okay.
 		}
-		if ( isset( $_POST['publish_to_discourse'] ) ) {
-			update_post_meta( $post_id, 'publish_to_discourse', $_POST['publish_to_discourse'] );
+
+		if ( isset( $_POST['publish_to_discourse'] ) ) { // Input var okay.
+			update_post_meta( $post_id, 'publish_to_discourse', wp_unslash( $_POST['publish_to_discourse'] ) ); // Input var okay.
 		} else {
 			update_post_meta( $post_id, 'publish_to_discourse', 0 );
 		}
+
 		return $post_id;
 	}
 }

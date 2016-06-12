@@ -23,8 +23,6 @@ class DiscourseComment {
 
 	/**
 	 * DiscourseComment constructor.
-	 *
-	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
@@ -80,17 +78,17 @@ class DiscourseComment {
 	 * @param int $postid The WordPress post id.
 	 */
 	function sync_comments( $postid ) {
-		global $wpdb;
 		$discourse_options = $this->options;
-
 		// Every 10 minutes do a json call to sync comment count and top comments.
 		$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
 		$time      = date_create()->format( 'U' );
 		$debug     = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 
 		if ( $debug || $last_sync + 60 * 10 < $time ) {
-			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
-			if ( 1 === intval( $got_lock->got_it ) ) {
+			$lock = 'comments_locked_for_' . $postid;
+			if ( ! 'locked' === get_transient( $lock ) ) {
+				set_transient( $lock, 'locked' );
+
 				if ( 'publish' === get_post_status( $postid ) ) {
 
 					$comment_count            = intval( $discourse_options['max-comments'] );
@@ -126,7 +124,7 @@ class DiscourseComment {
 						}
 					}
 				}
-				$wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" );
+				delete_transient( $lock );
 			}
 		}
 	}

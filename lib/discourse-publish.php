@@ -7,7 +7,7 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
-use WPDiscourse\Templates as Templates;
+use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
@@ -25,11 +25,9 @@ class DiscoursePublish {
 
 	/**
 	 * DiscoursePublish constructor.
-	 *
-	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
 	public function __construct() {
-		$this->options            = get_option( 'discourse' );
+		$this->options = get_option( 'discourse' );
 
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 10, 2 );
 		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
@@ -46,27 +44,27 @@ class DiscoursePublish {
 	 * @param object $post The post object.
 	 */
 	function publish_post_after_transition( $new_status, $old_status, $post ) {
-		$publish_to_discourse  = get_post_meta( $post->ID, 'publish_to_discourse', true );
+		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 
-		if ( $publish_to_discourse && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
-			self::sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
+		if ( $publish_to_discourse && 'publish' === $new_status && $this->is_valid_sync_post_type( $post->ID ) ) {
+			$this->sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
 		}
 	}
 
 	/**
 	 * Published a post to Discourse after it has been saved.
-	 * 
-	 * @param int $post_id The id of the post that has been saved.
+	 *
+	 * @param int    $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
-		if ( wp_is_post_revision($post_id ) ) {
+		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
-		$post_is_published = 'publish' === get_post_status( $post_id );
+		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-		if ( $publish_to_discourse && $post_is_published && self::is_valid_sync_post_type( $post_id ) ) {
-			self::sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
+			$this->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
 		}
 	}
 
@@ -79,12 +77,12 @@ class DiscoursePublish {
 	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
-		if ( 'publish' === get_post_status( $postid ) && self::is_valid_sync_post_type( $postid ) ) {
+		if ( 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
 			update_post_meta( $postid, 'publish_to_discourse', 1, true );
-			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
+			$this->sync_to_discourse( $postid, $post->post_title, $post->post_content );
 		}
 	}
-	
+
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
@@ -93,13 +91,13 @@ class DiscoursePublish {
 	 * @param string $raw The raw content of the post.
 	 */
 	public function sync_to_discourse( $postid, $title, $raw ) {
-		global $wpdb;
+		$lock = 'publishing_locked_for_post_' . $postid;
 
 		// This avoids a double sync, just 1 is allowed to go through at a time.
-		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
-		if ( $got_lock ) {
-			self::sync_to_discourse_work( $postid, $title, $raw );
-			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
+		if ( ! 'locked' === get_transient( $lock ) ) {
+			set_transient( $lock, 'locked' );
+			$this->sync_to_discourse_work( $postid, $title, $raw );
+			delete_transient( $lock );
 		}
 	}
 
@@ -114,7 +112,7 @@ class DiscoursePublish {
 		$discourse_id   = get_post_meta( $postid, 'discourse_post_id', true );
 		$options        = $this->options;
 		$discourse_post = get_post( $postid );
-		$use_full_post  = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
+		$use_full_post  = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
 
 		if ( $use_full_post ) {
 			$excerpt = $raw;
@@ -127,8 +125,8 @@ class DiscoursePublish {
 			$excerpt = discourse_custom_excerpt( $postid );
 		}
 
-		// trim to keep the Discourse markdown parser from treating this as code.
-		$baked     = trim( Templates\HTMLTemplates::publish_format_html() );
+		// Trim to keep the Discourse markdown parser from treating this as code.
+		$baked     = trim( Templates::publish_format_html() );
 		$baked     = str_replace( '{excerpt}', $excerpt, $baked );
 		$baked     = str_replace( '{blogurl}', get_permalink( $postid ), $baked );
 		$author_id = $discourse_post->post_author;
@@ -144,21 +142,10 @@ class DiscoursePublish {
 			$username = $options['publish-username'];
 		}
 
-		// Get publish category of a post
+		// Get publish category of a post.
 		$publish_post_category = get_post_meta( $discourse_post->ID, 'publish_post_category', true );
-		// $publish_post_category = $discourse_post->publish_post_category;
-		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
-
-		if ( $category === '' ) {
-			$categories = get_the_category();
-			foreach ( $categories as $category ) {
-				if ( in_category( $category->name, $postid ) ) {
-					$category = $category->name;
-					break;
-				}
-			}
-		}
+		$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+		$category              = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
@@ -227,29 +214,17 @@ class DiscoursePublish {
 	}
 
 	/**
-	 * Hmmm.
+	 * Checks if a post_type can be synced.
 	 *
-	 * @return bool
-	 */
-	protected function publish_active() {
-		if ( isset( $_POST['showed_publish_option'] ) && isset( $_POST['publish_to_discourse'] ) ) {
-			return $_POST['publish_to_discourse'] == '1';
-		}
-
-		return false;
-	}
-
-	/**
 	 * @param null $postid The ID of the post in question.
 	 *
 	 * @return bool
 	 */
 	protected function is_valid_sync_post_type( $postid = null ) {
-		// is_single() etc. is not reliable
 		$allowed_post_types = $this->get_allowed_post_types();
 		$current_post_type  = get_post_type( $postid );
 
-		return in_array( $current_post_type, $allowed_post_types );
+		return in_array( $current_post_type, $allowed_post_types, true );
 	}
 
 	/**
