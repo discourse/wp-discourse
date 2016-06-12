@@ -43,9 +43,7 @@ require_once( __DIR__ . '/lib/discourse-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
-require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
 
-$woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
 $discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
