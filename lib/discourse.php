@@ -32,6 +32,7 @@ class Discourse {
 		'enable-sso'                => 0,
 		'sso-secret'                => '',
 		'publish-username'          => 'system',
+		'display-subcategories'     => 0,
 		'publish-category'          => '',
 		'auto-publish'              => 0,
 		'allowed_post_types'        => array( 'post' ),
