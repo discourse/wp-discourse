@@ -1,11 +1,38 @@
 <?php
+/**
+ * Syncs Discourse comments with WordPress posts.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\DiscourseComment;
 
+/**
+ * Class DiscourseComment
+ */
 class DiscourseComment {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
+
+	/**
+	 * Validates the response from the Discourse forum.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\ResponseValidator\ResponseValidator
+	 */
 	protected $response_validator;
 
+	/**
+	 * DiscourseComment constructor.
+	 *
+	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
+	 */
 	public function __construct( $response_validator ) {
 		$this->options = get_option( 'discourse' );
 		$this->response_validator = $response_validator;
@@ -14,23 +41,22 @@ class DiscourseComment {
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 	}
 
+	/**
+	 * Enqueues the `comments.js` script.
+	 *
+	 * Hooks into 'wp_enqueue_scripts'.
+	 */
 	function discourse_comments_js() {
-		// Allowed post type
-//		if ( is_singular( self::get_allowed_post_types() ) ) {
 		if ( is_singular( $this->options['allowed_post_types'] ) ) {
-			// Publish to Discourse enabled
 			if ( $this->use_discourse_comments( get_the_ID() ) ) {
-				// Enqueue script
 				wp_enqueue_script(
 					'discourse-comments-js',
 					WPDISCOURSE_URL . '/js/comments.js',
 					array( 'jquery' ),
 					get_option( 'discourse_version' ),
-//					self::$version,
 					true
 				);
 				// Localize script
-//				$discourse_options = self::get_plugin_options();
 				$data              = array(
 					'url' => $this->options['url'],
 				);
@@ -39,9 +65,14 @@ class DiscourseComment {
 		}
 	}
 
-	function use_discourse_comments( $postid ) {
-		// If "use comments" is disabled, bail out
-//		$options = self::get_plugin_options();
+	/**
+	 * Checks if a post is using Discourse comments.
+	 *
+	 * @param int $postid The ID of the post.
+	 *
+	 * @return bool|int
+	 */
+	protected function use_discourse_comments( $postid ) {
 		if ( ! $this->options['use-discourse-comments'] ) {
 			return 0;
 		}
@@ -51,6 +82,11 @@ class DiscourseComment {
 		return $setting == '1';
 	}
 
+	/**
+	 * Syncs Discourse comments to WordPress.
+	 *
+	 * @param int $postid The WordPress post id.
+	 */
 	function sync_comments( $postid ) {
 		global $wpdb;
 		$discourse_options = $this->options;
@@ -108,6 +144,15 @@ class DiscourseComment {
 		}
 	}
 
+	/**
+	 * Loads the comments template.
+	 *
+	 * Hooks into 'comments_template'.
+	 *
+	 * @param string $old The comments template returned by WordPress.
+	 *
+	 * @return string
+	 */
 	function comments_template( $old ) {
 		global $post;
 
@@ -132,6 +177,16 @@ class DiscourseComment {
 		return $old;
 	}
 
+	/**
+	 * Returns the comments number.
+	 *
+	 * If Discourse comments are enabled, returns the 'discourse_comments_count', otherwise
+	 * returns the $count value. Hooks into 'comments_number'.
+	 *
+	 * @param int $count The comment count supplied by WordPress.
+	 *
+	 * @return mixed|string
+	 */
 	function comments_number( $count ) {
 		global $post;
 		if ( $this->use_discourse_comments( $post->ID ) ) {
