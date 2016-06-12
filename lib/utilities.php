@@ -1,11 +1,21 @@
 <?php
+/**
+ * Static utility functions used throughout the plugin.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\Utilities;
 
+/**
+ * Class Utilities
+ *
+ * @package WPDiscourse
+ */
 class Utilities {
 
 	/**
-	 * A function to check the connection status to Discourse.
+	 * Checks the connection status to Discourse.
 	 *
 	 * @return int
 	 */
@@ -49,14 +59,38 @@ class Utilities {
 		}
 	}
 
+	/**
+	 * Returns the user's Discourse homepage.
+	 *
+	 * @param string $url The base URL of the Discourse forum.
+	 * @param object $post The Post object.
+	 *
+	 * @return string
+	 */
 	public static function homepage( $url, $post ) {
-		return $url . "/users/" . strtolower( $post->username );
+		return $url . '/users/' . strtolower( $post->username );
 	}
 
+	/**
+	 * Substitutes the value for `$size` into the template.
+	 *
+	 * @param string $template The avatar template.
+	 * @param int    $size The size of the avarar.
+	 *
+	 * @return mixed
+	 */
 	public static function avatar( $template, $size ) {
-		return str_replace( "{size}", $size, $template );
+		return str_replace( '{size}', $size, $template );
 	}
 
+	/**
+	 * Replaces relative image src with absolute.
+	 *
+	 * @param string $url The base url of the forum.
+	 * @param string $content The content to be checked.
+	 *
+	 * @return mixed
+	 */
 	public static function convert_relative_img_src_to_absolute( $url, $content ) {
 		if ( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content ) ) {
 			return $content;
@@ -68,18 +102,23 @@ class Utilities {
 		return preg_replace( $search, $replace, $content );
 	}
 
+	/**
+	 * Gets the Discourse categories.
+	 *
+	 * @return array|mixed|object|\WP_Error|WP_Error
+	 */
 	public static function get_discourse_categories() {
 		$options = get_option( 'discourse' );
 		$url = add_query_arg( array(
 			'api_key' => $options['api-key'],
-			'api_username' => $options['publish-username']
+			'api_username' => $options['publish-username'],
 		), $options['url'] . '/site.json' );
-		$force_update = isset($options['publish-category-update']) ? $options['publish-category-update'] : '0';
+		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
 		$remote = get_transient( 'discourse_settings_categories_cache' );
 		$cache = $remote;
 		if ( empty( $remote ) || $force_update ) {
 			$remote = wp_remote_get( $url );
-			if ( ! self::validate_response( $remote ) ) {
+			if ( ! self::validate( $remote ) ) {
 				if ( ! empty( $cache ) ) {
 					return $cache;
 				}
@@ -91,7 +130,7 @@ class Utilities {
 				if ( ! isset( $options['display-subcategories'] ) ) {
 					foreach ( $remote as $category => $values ) {
 						if ( array_key_exists( 'parent_category_id', $values ) ) {
-							unset( $remote[$category] );
+							unset( $remote[ $category ] );
 						}
 					}
 				}
@@ -102,5 +141,4 @@ class Utilities {
 		}
 		return $remote;
 	}
-
 }
