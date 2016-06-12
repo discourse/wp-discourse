@@ -162,8 +162,6 @@ class DiscourseAdmin {
 			$this,
 			'debug_mode_checkbox',
 		), 'discourse', 'discourse_comments' );
-
-		add_action( 'post_submitbox_misc_actions', array( $this, 'publish_to_discourse' ) );
 	}
 
 	/**
@@ -586,51 +584,6 @@ class DiscourseAdmin {
 		<?php
 	}
 
-	/**
-	 * Adds the 'publish to Discourse' section to the post-submit-box.
-	 *
-	 * Hooks into the 'post_submitbox_misc_actions' filter
-	 */
-	function publish_to_discourse() {
-		global $post;
-
-		$options = $this->options;
-
-		if ( in_array( $post->post_type, $options['allowed_post_types'], true ) ) {
-			if ( 'auto-draft' === $post->post_status ) {
-				$value = $options['auto-publish'];
-			} else {
-				$value = get_post_meta( $post->ID, 'publish_to_discourse', true );
-			}
-
-			$categories = DiscourseUtilities::get_discourse_categories();
-			if ( is_wp_error( $categories ) ) {
-				echo '<span>' . esc_html__( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
-			} else {
-
-				echo '<div class="misc-pub-section misc-pub-section-discourse">';
-				echo '<label>' . esc_html__( 'Publish to Discourse: ', 'wp-discourse' ) . '</label>';
-				echo '<input type="checkbox"' . ( ( 1 === intval( $value ) ) ? ' checked="checked" ' : null ) . 'value="1" name="publish_to_discourse" />';
-				echo '</div>';
-
-				echo '<div class="misc-pub-section misc-pub-section-category"><input type="hidden" name="showed_publish_option" value="1">';
-				echo '<label>' . esc_html__( 'Discourse Category: ', 'wp-discourse' ) . '</label>';
-
-				$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
-				$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-				$selected              = ( ! empty( $publish_post_category ) ) ? $publish_post_category : $default_category;
-
-				self::option_input( 'publish_post_category', $categories, $selected );
-				echo '</div>';
-			}
-		}
-	}
-
-	/**
-	 * Adds a connection status notice to the Discourse options page.
-	 *
-	 * Hooks into the 'load-settings_page_discourse' action.
-	 */
 	function connection_status_notice() {
 		if ( ! DiscourseUtilities::check_connection_status() ) {
 			add_action( 'admin_notices', array( $this, 'disconnected' ) );
