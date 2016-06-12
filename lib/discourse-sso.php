@@ -36,7 +36,7 @@ class DiscourseSSO {
 	 *
 	 * Hooks into the 'login_url' filter. If the 'login-path' option has been set the supplied path
 	 * is used instead of the default WordPress login path.
-	 * 
+	 *
 	 * @param string $login_url The WordPress login url.
 	 * @param string $redirect The after-login redirect, supplied by WordPress.
 	 *
