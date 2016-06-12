@@ -1,7 +1,7 @@
 <?php
 /**
  * Sets up the plugin.
- * 
+ *
  * @package WPDiscourse
  */
 
@@ -14,16 +14,16 @@ class Discourse {
 
 	/**
 	 * Sets the plugin version.
-	 * 
+	 *
 	 * @var string
 	 */
 	public static $version = '0.7.0';
 
 	/**
 	 * The default options.
-	 * 
+	 *
 	 * The options can be accessed in any file with `get_option( 'discourse' )`.
-	 * 
+	 *
 	 * @var array
 	 */
 	static $options = array(
@@ -47,7 +47,7 @@ class Discourse {
 		'debug-mode'                => 0,
 		'full-post-content'         => 0,
 		'only-show-moderator-liked' => 0,
-		'login-path'                => ''
+		'login-path'                => '',
 	);
 
 	/**
@@ -58,40 +58,35 @@ class Discourse {
 
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
+		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}
-	
+
+	/**
+	 * Adds the options 'discourse' and 'discourse_version'.
+	 *
+	 * Called with `register_activation_hook` from `wp-discourse.php`.
+	 */
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
 		add_option( 'discourse', self::$options );
 	}
 
 	/**
-	 * @param $login_url
-	 * @param $redirect
+	 * Adds 'discourse_username' to the user_contactmethods array.
 	 *
-	 * @return string
+	 * @param array $fields The array of contact methods.
+	 *
+	 * @return mixed
 	 */
-	public function set_login_url( $login_url, $redirect ) {
-		$options = get_option( 'discourse' );
-		if ( $options['login-path'] ) {
-			$login_url = $options['login-path'];
+	function extend_user_profile( $fields ) {
+		$fields['discourse_username'] = 'Discourse Username';
 
-			if ( ! empty( $redirect ) ) {
-				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
-
-			} else {
-				return $login_url;
-			}
-		}
-
-		if ( ! empty( $redirect ) ) {
-			return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
-		} else {
-			return $login_url;
-		}
-
+		return $fields;
 	}
 
+	/**
+	 * Enqueues the admin stylesheet.
+	 */
 	public function admin_styles() {
 		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
 		wp_enqueue_style( 'wp_discourse_admin' );
