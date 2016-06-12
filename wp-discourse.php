@@ -33,10 +33,10 @@ GitHub Plugin URI: https://github.com/discourse/wp-discourse
 define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 
+require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/html-templates.php' );
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
-require_once( __DIR__ . '/lib/response-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
@@ -44,13 +44,12 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
 
-$discourse_response_validator = WPDiscourse\ResponseValidator\ResponseValidator::get_instance();
 $woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
-$discourse_admin              = new DiscourseAdmin( $discourse_response_validator );
-$discourse_publisher = new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_response_validator );
-$discourse_comment = new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_response_validator );
+$discourse_admin              = new DiscourseAdmin();
+$discourse_publisher = new WPDiscourse\DiscoursePublish\DiscoursePublish();
+$discourse_comment = new WPDiscourse\DiscourseComment\DiscourseComment();
 $discourse_sso = new WPDiscourse\DiscourseSSO\DiscourseSSO();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
