@@ -1,6 +1,6 @@
 <?php
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * WP-Discourse admin settings
