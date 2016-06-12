@@ -48,7 +48,7 @@ require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
 $woocommerce_support          = new WPDiscourse\PluginSupport\WooCommerceSupport();
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
-$discourse_admin              = new DiscourseAdmin();
+$discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
 $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublish();
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO();

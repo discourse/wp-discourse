@@ -1,13 +1,13 @@
 <?php
-
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
-
 /**
  * WP-Discourse admin settings
  *
  * @link https://github.com/discourse/wp-discourse/blob/master/lib/admin.php
  * @package WPDiscourse
  */
+
+namespace WPDiscourse\DiscourseAdmin;
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class DiscourseAdmin
@@ -23,12 +23,6 @@ class DiscourseAdmin {
 
 	/**
 	 * Discourse constructor.
-	 *
-	 * Takes a `response_validator` object as a parameter.
-	 * It has a `check_connection_status` method that may be run to check
-	 * the site's connection status to Discourse.
-	 *
-	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
 	public function __construct() {
 		$this->options            = get_option( 'discourse' );
@@ -584,6 +578,9 @@ class DiscourseAdmin {
 		<?php
 	}
 
+	/**
+	 * Outputs the markup for the 'connected' notice.
+	 */
 	function connection_status_notice() {
 		if ( ! DiscourseUtilities::check_connection_status() ) {
 			add_action( 'admin_notices', array( $this, 'disconnected' ) );
