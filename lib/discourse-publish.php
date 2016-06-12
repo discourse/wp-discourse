@@ -6,6 +6,7 @@
  */
 
 namespace WPDiscourse\DiscoursePublish;
+
 use WPDiscourse\Templates as Templates;
 
 /**
@@ -36,7 +37,7 @@ class DiscoursePublish {
 	 */
 	public function __construct( $response_validator ) {
 		$this->response_validator = $response_validator;
-		$this->options = get_option('discourse' );
+		$this->options            = get_option( 'discourse' );
 
 		add_action( 'save_post', array( $this, 'save_postdata' ) );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
@@ -56,13 +57,12 @@ class DiscoursePublish {
 		$publish_to_discourse  = get_post_meta( $post->ID, 'publish_to_discourse', true );
 		$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
 
-		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
-			// This seems a little redundant after `save_postdata` but when using the Press This
-			// widget it updates the field as it should.
-
+		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) &&
+		     'publish' === $new_status &&
+		     self::is_valid_sync_post_type( $post->ID )
+		) {
 			if ( isset( $_POST['publish_post_category'] ) ) {
-				#delete_post_meta( $post->ID, 'publish_post_category');
-				add_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
+				update_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
 			}
 
 			add_post_meta( $post->ID, 'publish_to_discourse', '1', true );
@@ -80,13 +80,15 @@ class DiscoursePublish {
 	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
-		if ( get_post_status( $postid ) == 'publish' && self::is_valid_sync_post_type( $postid ) ) {
-			add_post_meta( $postid, 'publish_to_discourse', '1', true );
+		if ( 'publish' === get_post_status( $postid ) && self::is_valid_sync_post_type( $postid ) ) {
+			update_post_meta( $postid, 'publish_to_discourse', 1, true );
 			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
 		}
 	}
 
 	/**
+	 * Saves the 'publish_to_discourse' and 'publish_post_category' metadata.
+	 *
 	 * @param int $postid The ID of the post that has been saved.
 	 *
 	 * @return mixed
@@ -105,16 +107,15 @@ class DiscoursePublish {
 			return $postid;
 		}
 
-		if ( $_POST['action'] == 'editpost' ) {
+		if ( 'editpost' === $_POST['action'] ) {
 			delete_post_meta( $_POST['ID'], 'publish_to_discourse' );
 		}
 
 		if ( isset( $_POST['publish_post_category'] ) ) {
-			delete_post_meta( $_POST['ID'], 'publish_post_category' );
-			add_post_meta( $_POST['ID'], 'publish_post_category', $_POST['publish_post_category'], true );
+			update_post_meta( $_POST['ID'], 'publish_post_category', $_POST['publish_post_category'], true );
 		}
 
-		add_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? '1' : '0', true );
+		update_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? 1 : 0, true );
 
 		return $postid;
 	}
@@ -129,15 +130,13 @@ class DiscoursePublish {
 	public function sync_to_discourse( $postid, $title, $raw ) {
 		global $wpdb;
 
-		// this avoids a double sync, just 1 is allowed to go through at a time
+		// This avoids a double sync, just 1 is allowed to go through at a time.
 		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
 		if ( $got_lock ) {
 			self::sync_to_discourse_work( $postid, $title, $raw );
 			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
 	}
-
-	// Protected
 
 	/**
 	 * Syncs a post to Discourse.
@@ -147,10 +146,10 @@ class DiscoursePublish {
 	 * @param string $raw The content of the post.
 	 */
 	protected function sync_to_discourse_work( $postid, $title, $raw ) {
-		$discourse_id  = get_post_meta( $postid, 'discourse_post_id', true );
-		$options       = $this->options;
-		$post          = get_post( $postid );
-		$use_full_post = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
+		$discourse_id   = get_post_meta( $postid, 'discourse_post_id', true );
+		$options        = $this->options;
+		$discourse_post = get_post( $postid );
+		$use_full_post  = isset( $options['full-post-content'] ) && intval( $options['full-post-content'] ) == 1;
 
 		if ( $use_full_post ) {
 			$excerpt = $raw;
@@ -165,26 +164,26 @@ class DiscoursePublish {
 
 		// trim to keep the Discourse markdown parser from treating this as code.
 		$baked     = trim( Templates\HTMLTemplates::publish_format_html() );
-		$baked     = str_replace( "{excerpt}", $excerpt, $baked );
-		$baked     = str_replace( "{blogurl}", get_permalink( $postid ), $baked );
-		$author_id = $post->post_author;
+		$baked     = str_replace( '{excerpt}', $excerpt, $baked );
+		$baked     = str_replace( '{blogurl}', get_permalink( $postid ), $baked );
+		$author_id = $discourse_post->post_author;
 		$author    = get_the_author_meta( 'display_name', $author_id );
-		$baked     = str_replace( "{author}", $author, $baked );
+		$baked     = str_replace( '{author}', $author, $baked );
 		$thumb     = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'thumbnail' );
-		$baked     = str_replace( "{thumbnail}", "![image](" . $thumb['0'] . ")", $baked );
+		$baked     = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
 		$featured  = wp_get_attachment_image_src( get_post_thumbnail_id( $postid ), 'full' );
-		$baked     = str_replace( "{featuredimage}", "![image](" . $featured['0'] . ")", $baked );
+		$baked     = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 
-		$username = get_the_author_meta( 'discourse_username', $post->post_author );
+		$username = get_the_author_meta( 'discourse_username', $discourse_post->post_author );
 		if ( ! $username || strlen( $username ) < 2 ) {
 			$username = $options['publish-username'];
 		}
 
 		// Get publish category of a post
-		$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
-		$publish_post_category = $post->publish_post_category;
-		$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-		$category              = isset( $publish_post_category ) ? $publish_post_category : $default_category;
+		$publish_post_category = get_post_meta( $discourse_post->ID, 'publish_post_category', true );
+		// $publish_post_category = $discourse_post->publish_post_category;
+		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
 		if ( $category === '' ) {
 			$categories = get_the_category();
@@ -206,11 +205,10 @@ class DiscoursePublish {
 				'raw'              => $baked,
 				'category'         => $category,
 				'skip_validations' => 'true',
-//				'auto_track'       => ( $options['auto-track'] == "1" ? 'true' : 'false' )
-				'auto_track'       => ( isset($options['auto-track']) && 1 === intval( $options['auto-track'] ) ? 'true' : 'false' )
+				'auto_track'       => ( isset( $options['auto-track'] ) && 1 === intval( $options['auto-track'] ) ? 'true' : 'false' ),
 			);
 			$url  = $options['url'] . '/posts';
-			// use key 'http' even if you send the request to https://...
+			// Use key 'http' even if you send the request to https://.
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
@@ -265,7 +263,7 @@ class DiscoursePublish {
 
 	/**
 	 * Hmmm.
-	 * 
+	 *
 	 * @return bool
 	 */
 	protected function publish_active() {
@@ -291,12 +289,12 @@ class DiscoursePublish {
 
 	/**
 	 * Returns the array of allowed post types.
-	 * 
+	 *
 	 * @return mixed
 	 */
 	protected function get_allowed_post_types() {
 		$selected_post_types = $this->options['allowed_post_types'];
+
 		return $selected_post_types;
 	}
-
 }
