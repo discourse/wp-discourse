@@ -96,24 +96,4 @@ class Discourse {
 		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
 		wp_enqueue_style( 'wp_discourse_admin' );
 	}
-
-	public static function homepage( $url, $post ) {
-		return $url . "/users/" . strtolower( $post->username );
-	}
-
-	public static function avatar( $template, $size ) {
-		return str_replace( "{size}", $size, $template );
-	}
-	
-	public static function convert_relative_img_src_to_absolute( $url, $content ) {
-		if ( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content ) ) {
-			return $content;
-		}
-
-		$search  = '#<img src="((?!\s*[\'"]?(?:https?:)?\/\/)\s*([\'"]))?#';
-		$replace = "<img src=\"{$url}$1";
-
-		return preg_replace( $search, $replace, $content );
-	}
-
 }
