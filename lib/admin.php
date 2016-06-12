@@ -1,4 +1,7 @@
 <?php
+
+use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * WP-Discourse admin settings
  *
@@ -19,14 +22,6 @@ class DiscourseAdmin {
 	protected $options;
 
 	/**
-	 * Validates the response from the Discourse forum.
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\ResponseValidator\ResponseValidator
-	 */
-	protected $response_validator;
-
-	/**
 	 * Discourse constructor.
 	 *
 	 * Takes a `response_validator` object as a parameter.
@@ -36,7 +31,6 @@ class DiscourseAdmin {
 	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
 	public function __construct( $response_validator ) {
-		$this->response_validator = $response_validator;
 		$this->options            = get_option( 'discourse' );
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
@@ -225,7 +219,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the api-key input.
 	 */
 	function api_key_input() {
-		$discourse_options = Discourse::get_plugin_options();
+		$discourse_options = $this->options;
 		if ( isset( $discourse_options['url'] ) && ! empty( $discourse_options['url'] ) ) {
 			self::text_input( 'api-key', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) . '/admin/api" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api</a>' );
 		} else {
@@ -442,60 +436,6 @@ class DiscourseAdmin {
 	}
 
 	/**
-	 * Tries to get the available categories from the Discourse forum.
-	 *
-	 * If the transient 'discourse_settings_categories_cache' is empty, this function makes a request
-	 * to the Discourse site to retrieve the available categories. If successful, it sets the
-	 * 'discourse_settings_categories_cache' and returns an array of categories.
-	 *
-	 * @param boolean $force_update If true forces a request to Discourse.
-	 *
-	 * @return array|mixed|object|string|WP_Error
-	 */
-	function get_discourse_categories( $force_update = '0' ) {
-		$options = get_option( 'discourse' );
-		$url     = $options['url'] . '/categories.json';
-
-		$url          = add_query_arg( array(
-			'api_key'      => $options['api-key'],
-			'api_username' => $options['publish-username'],
-		), $url );
-		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
-
-		$remote = get_transient( 'discourse_settings_categories_cache' );
-		$cache  = $remote;
-
-		if ( empty( $remote ) || 1 === intval( $force_update ) ) {
-			$remote           = wp_remote_get( $url );
-			$invalid_response = intval( wp_remote_retrieve_response_code( $remote ) ) !== 200;
-
-			if ( is_wp_error( $remote ) || $invalid_response ) {
-				if ( ! empty( $cache ) ) {
-					$categories = $cache['category_list']['categories'];
-
-					return $categories;
-				} else {
-					return new WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
-				}
-			}
-
-			$remote = wp_remote_retrieve_body( $remote );
-
-			if ( is_wp_error( $remote ) ) {
-				return $remote;
-			}
-
-			$remote = json_decode( $remote, true );
-
-			set_transient( 'discourse_settings_categories_cache', $remote, HOUR_IN_SECONDS );
-		}
-
-		$categories = $remote['category_list']['categories'];
-
-		return $categories;
-	}
-
-	/**
 	 * Outputs the markup for the categories select input.
 	 *
 	 * @param string $option The name of the option.
@@ -504,8 +444,7 @@ class DiscourseAdmin {
 	function category_select( $option, $description ) {
 		$options = get_option( 'discourse' );
 
-		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
-		$categories   = self::get_discourse_categories( $force_update );
+		$categories = DiscourseUtilities::get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
 			self::text_input( $option, $description );
@@ -657,7 +596,7 @@ class DiscourseAdmin {
 	function publish_to_discourse() {
 		global $post;
 
-		$options = Discourse::get_plugin_options();
+		$options = $this->options;
 
 		if ( in_array( $post->post_type, $options['allowed_post_types'], true ) ) {
 			if ( 'auto-draft' === $post->post_status ) {
@@ -666,7 +605,7 @@ class DiscourseAdmin {
 				$value = get_post_meta( $post->ID, 'publish_to_discourse', true );
 			}
 
-			$categories = self::get_discourse_categories( '0' );
+			$categories = DiscourseUtilities::get_discourse_categories();
 			if ( is_wp_error( $categories ) ) {
 				echo '<span>' . esc_html__( 'Unable to retrieve Discourse categories. Please check the wp-discourse plugin settings page to establish a connection.', 'wp-discourse' ) . '</span>';
 			} else {
@@ -695,7 +634,7 @@ class DiscourseAdmin {
 	 * Hooks into the 'load-settings_page_discourse' action.
 	 */
 	function connection_status_notice() {
-		if ( ! $this->response_validator->check_connection_status() ) {
+		if ( ! DiscourseUtilities::check_connection_status() ) {
 			add_action( 'admin_notices', array( $this, 'disconnected' ) );
 		} else {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
