@@ -27,7 +27,40 @@ class DiscourseSSO {
 		$this->options = get_option( 'discourse' );
 
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
+		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+	}
+
+	/**
+	 * Allows the login_url to be configured.
+	 *
+	 * Hooks into the 'login_url' filter. If the 'login-path' option has been set the supplied path
+	 * is used instead of the default WordPress login path.
+	 * 
+	 * @param string $login_url The WordPress login url.
+	 * @param string $redirect The after-login redirect, supplied by WordPress.
+	 *
+	 * @return string
+	 */
+	public function set_login_url( $login_url, $redirect ) {
+		$options = get_option( 'discourse' );
+		if ( $options['login-path'] ) {
+			$login_url = $options['login-path'];
+
+			if ( ! empty( $redirect ) ) {
+				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+
+			} else {
+				return $login_url;
+			}
+		}
+
+		if ( ! empty( $redirect ) ) {
+			return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+		} else {
+			return $login_url;
+		}
+
 	}
 
 	/**
