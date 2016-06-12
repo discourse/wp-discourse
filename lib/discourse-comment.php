@@ -6,6 +6,7 @@
  */
 
 namespace WPDiscourse\DiscourseComment;
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class DiscourseComment
@@ -21,21 +22,12 @@ class DiscourseComment {
 	protected $options;
 
 	/**
-	 * Validates the response from the Discourse forum.
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\ResponseValidator\ResponseValidator
-	 */
-	protected $response_validator;
-
-	/**
 	 * DiscourseComment constructor.
 	 *
 	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
-	public function __construct( $response_validator ) {
+	public function __construct() {
 		$this->options = get_option( 'discourse' );
-		$this->response_validator = $response_validator;
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
@@ -118,7 +110,7 @@ class DiscourseComment {
 					$permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
 					$result    = wp_remote_get( $permalink );
 
-					if ( $this->response_validator->validate( $result ) ) {
+					if ( DiscourseUtilities::validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
 

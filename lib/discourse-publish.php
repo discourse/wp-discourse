@@ -8,6 +8,7 @@
 namespace WPDiscourse\DiscoursePublish;
 
 use WPDiscourse\Templates as Templates;
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class DiscoursePublish
@@ -23,20 +24,11 @@ class DiscoursePublish {
 	protected $options;
 
 	/**
-	 * Validates the response from the Discourse forum.
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\ResponseValidator\ResponseValidator
-	 */
-	protected $response_validator;
-
-	/**
 	 * DiscoursePublish constructor.
 	 *
 	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
-	public function __construct( $response_validator ) {
-		$this->response_validator = $response_validator;
+	public function __construct() {
 		$this->options            = get_option( 'discourse' );
 
 		add_action( 'save_post', array( $this, 'save_postdata' ) );
@@ -216,7 +208,7 @@ class DiscoursePublish {
 			);
 			$result       = wp_remote_post( $url, $post_options );
 
-			if ( $this->response_validator->validate( $result ) ) {
+			if ( DiscourseUtilities::validate( $result ) ) {
 				$json = json_decode( $result['body'] );
 
 				if ( property_exists( $json, 'id' ) ) {
@@ -242,7 +234,7 @@ class DiscoursePublish {
 			);
 			$result       = wp_remote_post( $url, $post_options );
 
-			if ( $this->response_validator->validate( $result ) ) {
+			if ( DiscourseUtilities::validate( $result ) ) {
 				$json = json_decode( $result['body'] );
 
 				if ( property_exists( $json, 'id' ) ) {

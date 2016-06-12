@@ -30,7 +30,7 @@ class DiscourseAdmin {
 	 *
 	 * @param \WPDiscourse\ResponseValidator\ResponseValidator $response_validator Validate the response from Discourse.
 	 */
-	public function __construct( $response_validator ) {
+	public function __construct() {
 		$this->options            = get_option( 'discourse' );
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
