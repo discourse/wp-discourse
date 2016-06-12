@@ -38,7 +38,7 @@ class MetaBox {
 	 */
 	public function add_meta_box( $post_type ) {
 		if ( in_array( $post_type, $this->options['allowed_post_types'], true ) ) {
-			add_meta_box( 'discourse-publish-meta-box', __( 'Publish to Discourse' ), array(
+			add_meta_box( 'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
 				$this,
 				'render_meta_box',
 			), 'post', 'side', 'high', null );
@@ -55,22 +55,22 @@ class MetaBox {
 
 		// If the post has not yet been saved, use the default setting. If it has been saved use the meta value.
 		if ( ! get_post_meta( $post->ID, 'has_been_saved', true ) ) {
-			$selected_category = intval( $this->options['publish-category'] );
+			$selected_category    = intval( $this->options['publish-category'] );
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 		} else {
-			$selected_category = get_post_meta( $post->ID, 'publish_post_category', true );
+			$selected_category    = get_post_meta( $post->ID, 'publish_post_category', true );
 			$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 		}
-		ob_start();
+
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 		?>
 
-		<label for="publish_to_discourse"><?php _e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+		<label for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
 		</label>
 		<br>
-		<label for="publish_post_category"><?php _e( 'Category to publish to:', 'wp-discourse' ); ?>
+		<label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
 			<select name="publish_post_category" id="publish_post_category">
 				<?php foreach ( $categories as $category ) : ?>
 					<option
@@ -83,7 +83,6 @@ class MetaBox {
 		</label>
 
 		<?php
-		echo wp_kses_post( ob_get_clean() );
 	}
 
 	/**
@@ -95,7 +94,8 @@ class MetaBox {
 	 */
 	function save_meta_box( $post_id ) {
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) ) { // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
+		) {
 			return 0;
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -109,11 +109,11 @@ class MetaBox {
 		update_post_meta( $post_id, 'has_been_saved', 1 );
 
 		if ( isset( $_POST['publish_post_category'] ) ) { // Input var okay.
-			update_post_meta( $post_id, 'publish_post_category', wp_unslash( $_POST['publish_post_category'] ) ); // Input var okay.
+			update_post_meta( $post_id, 'publish_post_category', intval( wp_unslash( $_POST['publish_post_category'] ) ) ); // Input var okay.
 		}
 
 		if ( isset( $_POST['publish_to_discourse'] ) ) { // Input var okay.
-			update_post_meta( $post_id, 'publish_to_discourse', wp_unslash( $_POST['publish_to_discourse'] ) ); // Input var okay.
+			update_post_meta( $post_id, 'publish_to_discourse', intval( wp_unslash( $_POST['publish_to_discourse'] ) ) ); // Input var okay.
 		} else {
 			update_post_meta( $post_id, 'publish_to_discourse', 0 );
 		}
