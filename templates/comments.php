@@ -6,14 +6,14 @@
  * @package WPDiscourse
  */
 
-use WPDiscourse\Templates as Templates;
+use WPDiscourse\Templates\HTMLTemplates as Templates;
 
 $custom = get_post_custom();
 
 // If, when a new post is published to Discourse, there is not a valid response from
 // the forum, the `discourse_permalink` key will not be set. Display the `bad_response_html` template.
 if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
-	echo wp_kses_post( Templates\HTMLTemplates::bad_response_html() );
+	echo wp_kses_post( Templates::bad_response_html() );
 
 } else {
 	$options       = get_option( 'discourse' );
@@ -44,7 +44,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	// Add some protection in the event our metadata doesn't look how we expect it to.
 	$discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
 
-	$more_replies = ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 );
+	$more_replies = intval( ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 ) );
 	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : 'more ';
 
 	if ( 0 === $more_replies ) {
@@ -62,7 +62,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {
-			$comment_html = wp_kses_post( Templates\HTMLTemplates::comment_html() );
+			$comment_html = wp_kses_post( Templates::comment_html() );
 			$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 			$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 			$comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
@@ -78,7 +78,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comments_html .= $comment_html;
 		}
 		foreach ( $discourse_info->participants as &$participant ) {
-			$participant_html = wp_kses_post( Templates\HTMLTemplates::participant_html() );
+			$participant_html = wp_kses_post( Templates::participant_html() );
 			$participant_html = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 			$participant_html = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 			$participant_html = str_replace( '{topic_url}', $permalink, $participant_html );
@@ -89,10 +89,10 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$participant_html = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 			$participants_html .= $participant_html;
 		}
-		$discourse_html = wp_kses_post( Templates\HTMLTemplates::replies_html() );
+		$discourse_html = wp_kses_post( Templates::replies_html() );
 		$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 	} else {
-		$discourse_html = wp_kses_post( Templates\HTMLTemplates::no_replies_html() );
+		$discourse_html = wp_kses_post( Templates::no_replies_html() );
 	}
 	$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 	$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
