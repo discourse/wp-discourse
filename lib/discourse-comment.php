@@ -120,9 +120,9 @@ class DiscourseComment {
 								$posts_count = 0;
 							}
 
-							update_post_meta( $postid, 'discourse_comments_count', $posts_count, true );
-							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ), true );
-							update_post_meta( $postid, 'discourse_last_sync', $time, true );
+							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
+							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							update_post_meta( $postid, 'discourse_last_sync', $time );
 						}
 					}
 				}

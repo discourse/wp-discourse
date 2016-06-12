@@ -1,5 +1,4 @@
 <?php
-
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 

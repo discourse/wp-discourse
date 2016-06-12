@@ -56,7 +56,6 @@ class Discourse {
 	public function __construct() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}

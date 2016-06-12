@@ -31,13 +31,13 @@ class DiscoursePublish {
 	public function __construct() {
 		$this->options            = get_option( 'discourse' );
 
-		add_action( 'save_post', array( $this, 'save_postdata' ) );
+		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 10, 2 );
+		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
-		add_action( 'transition_post_status', array( $this, 'publish_post_to_discourse' ), 10, 3 );
 	}
 
 	/**
-	 * Publishes a post to Discourse.
+	 * Publishes a post to Discourse after its status has transitioned.
 	 *
 	 * This function is called when post status changes. Hooks into 'transition_post_status'.
 	 *
@@ -45,21 +45,28 @@ class DiscoursePublish {
 	 * @param string $old_status The old post status.
 	 * @param object $post The post object.
 	 */
-	public function publish_post_to_discourse( $new_status, $old_status, $post ) {
+	function publish_post_after_transition( $new_status, $old_status, $post ) {
 		$publish_to_discourse  = get_post_meta( $post->ID, 'publish_to_discourse', true );
-		$publish_post_category = get_post_meta( $post->ID, 'publish_post_category', true );
 
-		if ( ( self::publish_active() || ! empty( $publish_to_discourse ) ) &&
-		     'publish' === $new_status &&
-		     self::is_valid_sync_post_type( $post->ID )
-		) {
-			if ( isset( $_POST['publish_post_category'] ) ) {
-				update_post_meta( $post->ID, 'publish_post_category', $_POST['publish_post_category'], true );
-			}
-
-			add_post_meta( $post->ID, 'publish_to_discourse', '1', true );
-
+		if ( $publish_to_discourse && $new_status == 'publish' && self::is_valid_sync_post_type( $post->ID ) ) {
 			self::sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
+		}
+	}
+
+	/**
+	 * Published a post to Discourse after it has been saved.
+	 * 
+	 * @param int $post_id The id of the post that has been saved.
+	 * @param object $post The Post object.
+	 */
+	public function publish_post_after_save( $post_id, $post ) {
+		if ( wp_is_post_revision($post_id ) ) {
+			return;
+		}
+		$post_is_published = 'publish' === get_post_status( $post_id );
+		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		if ( $publish_to_discourse && $post_is_published && self::is_valid_sync_post_type( $post_id ) ) {
+			self::sync_to_discourse( $post_id, $post->post_title, $post->post_content );
 		}
 	}
 
@@ -77,41 +84,7 @@ class DiscoursePublish {
 			self::sync_to_discourse( $postid, $post->post_title, $post->post_content );
 		}
 	}
-
-	/**
-	 * Saves the 'publish_to_discourse' and 'publish_post_category' metadata.
-	 *
-	 * @param int $postid The ID of the post that has been saved.
-	 *
-	 * @return mixed
-	 */
-	public function save_postdata( $postid ) {
-		if ( ! current_user_can( 'edit_page', $postid ) ) {
-			return $postid;
-		}
-
-		if ( empty( $postid ) ) {
-			return $postid;
-		}
-
-		// trust me ... WordPress is crazy like this, try changing a title.
-		if ( ! isset( $_POST['ID'] ) ) {
-			return $postid;
-		}
-
-		if ( 'editpost' === $_POST['action'] ) {
-			delete_post_meta( $_POST['ID'], 'publish_to_discourse' );
-		}
-
-		if ( isset( $_POST['publish_post_category'] ) ) {
-			update_post_meta( $_POST['ID'], 'publish_post_category', $_POST['publish_post_category'], true );
-		}
-
-		update_post_meta( $_POST['ID'], 'publish_to_discourse', self::publish_active() ? 1 : 0, true );
-
-		return $postid;
-	}
-
+	
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *

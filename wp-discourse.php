@@ -52,5 +52,6 @@ $discourse_admin              = new DiscourseAdmin();
 $discourse_publisher = new WPDiscourse\DiscoursePublish\DiscoursePublish();
 $discourse_comment = new WPDiscourse\DiscourseComment\DiscourseComment();
 $discourse_sso = new WPDiscourse\DiscourseSSO\DiscourseSSO();
+$discourse_publish_metabox = new WPDiscourse\MetaBox\MetaBox();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
