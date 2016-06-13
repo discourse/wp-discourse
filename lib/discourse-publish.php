@@ -48,7 +48,6 @@ class DiscoursePublish {
 		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 
 		if ( $publish_to_discourse && 'publish' === $new_status && $this->is_valid_sync_post_type( $post->ID ) ) {
-			var_dump('why are we not here');
 			$this->sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
 		}
 	}
