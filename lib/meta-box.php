@@ -28,7 +28,7 @@ class MetaBox {
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-		add_action( 'save_post', array( $this, 'save_meta_box' ) );
+		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
 	}
 
 	/**

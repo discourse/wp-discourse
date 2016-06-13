@@ -29,7 +29,8 @@ class DiscoursePublish {
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
 
-		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 10, 2 );
+		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
+		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
 		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 	}
@@ -47,6 +48,7 @@ class DiscoursePublish {
 		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 
 		if ( $publish_to_discourse && 'publish' === $new_status && $this->is_valid_sync_post_type( $post->ID ) ) {
+			var_dump('why are we not here');
 			$this->sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
 		}
 	}
@@ -115,14 +117,15 @@ class DiscoursePublish {
 		$use_full_post  = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
 
 		if ( $use_full_post ) {
-			$excerpt = $raw;
+			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
 		} else {
-			$excerpt = apply_filters( 'the_content', $raw );
-			$excerpt = wp_trim_words( $excerpt, $options['custom-excerpt-length'] );
-		}
-
-		if ( function_exists( 'discourse_custom_excerpt' ) ) {
-			$excerpt = discourse_custom_excerpt( $postid );
+			if ( has_excerpt( $postid ) ) {
+				$wp_excerpt = apply_filters( 'get_the_excerpt', $discourse_post->post_excerpt );
+				$excerpt = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
+			} else {
+				$excerpt = apply_filters( 'the_content', $raw );
+				$excerpt = apply_filters( 'wp_discourse_excerpt',  wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
+			}
 		}
 
 		// Trim to keep the Discourse markdown parser from treating this as code.
