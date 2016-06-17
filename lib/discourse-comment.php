@@ -145,9 +145,10 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$options         = $this->options;
 			$num_wp_comments = get_comments_number();
-			if ( ( isset( $options['show_existing_comments'] ) && ! $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+			if ( ( isset( $options['show-existing-comments'] ) && ( 0 === intval( $options['show-existing-comments'] ) ) ) ||
+			     0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
-				return WPDISCOURSE_PATH . '/templates/comments.php';
+				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
 				// Show the Discourse comments then show the existing WP comments (in $old).
 				include WPDISCOURSE_PATH . '/templates/comments.php';
