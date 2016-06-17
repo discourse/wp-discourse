@@ -2,3 +2,5 @@
 
 # JetBrains IDEs
 .idea/*
+
+vendor/*
