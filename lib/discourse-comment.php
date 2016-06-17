@@ -151,7 +151,7 @@ class DiscourseComment {
 				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
 				// Show the Discourse comments then show the existing WP comments (in $old).
-				include WPDISCOURSE_PATH . '/templates/comments.php';
+				include WPDISCOURSE_PATH . 'templates/comments.php';
 				echo '<div class="discourse-existing-comments-heading">' . wp_kses_post( $options['existing-comments-heading'] ) . '</div>';
 
 				return $old;
