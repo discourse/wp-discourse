@@ -124,16 +124,20 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_url( $input ) {
-		$escaped_url = esc_url_raw( $input );
+		$regex = '/^(http:|https:)/';
 
-		// FIlTER_VALIDATE_URL doesn't check the protocol / esc_url_raw returns an empty string
-		// unless the protocol is in the default protocol array.
-		if ( filter_var( $input, FILTER_VALIDATE_URL ) && $escaped_url ) {
-			return untrailingslashit( $escaped_url );
+		// Make sure the url starts with a valid protocol.
+		if ( ! preg_match( $regex, $input ) ) {
+			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to begin with either \'http:\' or \'https:\'.') );
+			return '';
+		}
+
+		if ( filter_var( $input, FILTER_VALIDATE_URL ) ) {
+			return untrailingslashit( esc_url_raw( $input ) );
 		} else {
 			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
 
-			return esc_url_raw( $escaped_url );
+			return untrailingslashit( esc_url_raw( $input ) );
 		}
 	}
 
@@ -200,7 +204,7 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_publish_category( $input ) {
-		return intval( sanitize_text_field( $input ) );
+		return $this->sanitize_int( $input );
 	}
 
 	/**
@@ -511,6 +515,17 @@ class SettingsValidator {
 	 */
 	protected function sanitize_html( $input ) {
 		return wp_kses_post( $input );
+	}
+
+	/**
+	 * A helper function to sanitize an int.
+	 * 
+	 * @param mixed|int $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	protected function sanitize_int( $input ) {
+		return intval( $input );
 	}
 
 	/**
