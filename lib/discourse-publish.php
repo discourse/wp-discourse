@@ -79,7 +79,7 @@ class DiscoursePublish {
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
 		if ( 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
-			update_post_meta( $postid, 'publish_to_discourse', 1, true );
+			update_post_meta( $postid, 'publish_to_discourse', 1 );
 			$this->sync_to_discourse( $postid, $post->post_title, $post->post_content );
 		}
 	}
