@@ -37,4 +37,31 @@ class TestMetaBox extends \PHPUnit_Framework_TestCase {
 
 		$this->metabox->add_meta_box( 'page' );
 	}
+
+	public function test_save_meta_box_updates_post_has_been_saved_meta_data() {
+		$postarr = array(
+			'ID' => 0,
+			'post_author' => 1,
+			'post_status' => 'publish',
+			'post_title' => 'This is a test',
+		);
+
+		$post_id = wp_insert_post( $postarr, true );
+		
+		$_POST['publish_to_discourse_nonce'] = 'nonce';
+
+		$wp_verify_nonce = $this->getFunctionMock( 'WPDiscourse\MetaBox', 'wp_verify_nonce' );
+		$wp_verify_nonce->expects( $this->once() )
+			->with( $this->anything() )
+			->willReturn( true );
+
+		$current_user_can = $this->getFunctionMock( 'WPDiscourse\MetaBox', 'current_user_can' );
+		$current_user_can->expects( $this->once() )
+			->with( $this->anything() )
+			->willReturn( true );
+
+		$this->metabox->save_meta_box( $post_id );
+		
+		$this->assertEquals( 1, get_post_meta( $post_id, 'has_been_saved', true ) );
+	}
 }
