@@ -64,7 +64,7 @@ class TestDiscoursePublish extends WP_UnitTestCase {
 		$publish_mock->publish_post_after_transition( 'private', 'publish', $post );
 	}
 
-	public function test_publish_post_after_transition_does_not_call_sync_to_discourse_publish_to_discourse_not_set() {
+	public function test_publish_post_after_transition_does_not_call_sync_to_discourse_when_publish_to_discourse_not_set() {
 		$post_id = $this->factory->post->create( array(
 			'post_title' => 'This is a test',
 		) );
