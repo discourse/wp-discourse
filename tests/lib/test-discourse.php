@@ -10,7 +10,6 @@ class TestDiscourse extends WP_UnitTestCase {
 	}
 	
 	public function test_constructor_hooks_into_correct_filters_and_actions() {
-		$this->assertEquals( 10, has_action( 'admin_enqueue_scripts', array( $this->discourse, 'admin_styles' ) ) );
 		$this->assertEquals( 10, has_filter( 'user_contactmethods', array( $this->discourse, 'extend_user_profile' ) ) );
 	}
 }

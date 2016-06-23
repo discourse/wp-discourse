@@ -57,7 +57,6 @@ class Discourse {
 	public function __construct() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}
 
@@ -82,13 +81,5 @@ class Discourse {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
-	}
-
-	/**
-	 * Enqueues the admin stylesheet.
-	 */
-	public function admin_styles() {
-		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
-		wp_enqueue_style( 'wp_discourse_admin' );
 	}
 }

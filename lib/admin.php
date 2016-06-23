@@ -29,8 +29,17 @@ class DiscourseAdmin {
 		$this->options = get_option( 'discourse' );
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
 		add_action( 'load-settings_page_discourse', array( $this, 'connection_status_notice' ) );
+	}
+
+	/**
+	 * Enqueues the admin stylesheet.
+	 */
+	public function admin_styles() {
+		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
+		wp_enqueue_style( 'wp_discourse_admin' );
 	}
 
 	/**
