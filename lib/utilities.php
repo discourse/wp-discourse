@@ -122,7 +122,7 @@ class Utilities {
 				if ( ! empty( $cache ) ) {
 					return $cache;
 				}
-				return new WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
+				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
 			}
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
@@ -136,7 +136,7 @@ class Utilities {
 				}
 				set_transient( 'discourse_settings_categories_cache', $remote, HOUR_IN_SECONDS );
 			} else {
-				return new WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
+				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
 			}
 		}
 		return $remote;
