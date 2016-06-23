@@ -37,7 +37,8 @@ class MetaBox {
 	 * @param string $post_type The post_type of the current post.
 	 */
 	public function add_meta_box( $post_type ) {
-		if ( in_array( $post_type, $this->options['allowed_post_types'], true ) ) {
+		if ( isset($this->options['allowed_post_types']) &&
+		     in_array( $post_type, $this->options['allowed_post_types'], true ) ) {
 			add_meta_box( 'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
 				$this,
 				'render_meta_box',
