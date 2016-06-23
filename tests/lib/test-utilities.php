@@ -35,11 +35,11 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 	}
 
 	function test_get_discourse_categories_returns_cached_categories_when_force_update_false_and_there_are_cached_categories() {
-		
+
 		$options = array(
-			'api-key' => 'thisisatest',
-			'publish-username' => 'system',
-			'url' => 'http://forum.example.com',
+			'api-key'                 => 'thisisatest',
+			'publish-username'        => 'system',
+			'url'                     => 'http://forum.example.com',
 			'publish-category-update' => 0,
 		);
 		update_option( 'discourse', $options );
@@ -52,17 +52,17 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 
 		$get_transient = $this->getFunctionMock( 'WPDiscourse\Utilities', 'get_transient' );
 		$get_transient->expects( $this->once() )
-			->with( 'discourse_settings_categories_cache' )
-			->willReturn( $categories );
+		              ->with( 'discourse_settings_categories_cache' )
+		              ->willReturn( $categories );
 
 		$this->assertEquals( $categories, DiscourseUtilities::get_discourse_categories() );
 	}
 
 	function test_discourse_categories_returns_cached_categories_when_remote_returns_an_error() {
 		$options = array(
-			'api-key' => 'thisisatest',
-			'publish-username' => 'system',
-			'url' => 'http://forum.example.com',
+			'api-key'                 => 'thisisatest',
+			'publish-username'        => 'system',
+			'url'                     => 'http://forum.example.com',
 			'publish-category-update' => 1,
 		);
 		update_option( 'discourse', $options );
@@ -73,17 +73,131 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 			'category three',
 		);
 
-//		$get_transient = $this->getFunctionMock( 'WPDiscourse\Utilities', 'get_transient' );
-//		$get_transient->expects( $this->once() )
-//		              ->with( 'discourse_settings_categories_cache' )
-//		              ->willReturn( $categories );
-		
+		$get_transient = $this->getFunctionMock( 'WPDiscourse\Utilities', 'get_transient' );
+		$get_transient->expects( $this->once() )
+		              ->with( 'discourse_settings_categories_cache' )
+		              ->willReturn( $categories );
+
 		$wp_remote_get = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_get' );
 		$wp_remote_get->expects( $this->once() )
-			->with( $this->anything() )
-			->willReturn( new \WP_Error );
+		              ->with( $this->anything() )
+		              ->willReturn( new \WP_Error );
 
 		$this->assertEquals( $categories, DiscourseUtilities::get_discourse_categories() );
-		
+	}
+
+	public function test_get_discourse_categories_sets_transient() {
+		$options = array(
+			'api-key'                 => 'thisisatest',
+			'publish-username'        => 'system',
+			'url'                     => 'http://forum.example.com',
+			'publish-category-update' => 1,
+		);
+		update_option( 'discourse', $options );
+
+		$response = array(
+			'categories' => array(
+				array(
+					'id'   => 1,
+					'name' => 'category one',
+				),
+				array(
+					'id'   => 2,
+					'name' => 'category two',
+				),
+				array(
+					'id'   => 3,
+					'name' => 'category three',
+				),
+			),
+		);
+
+		// Mocks getting the site.json from Discourse.
+		$wp_remote_get = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_get' );
+		$wp_remote_get->expects( $this->once() )
+		              ->with( $this->anything() );
+
+		// Mocks passing validation.
+		$wp_remote_retrieve_response_code = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_retrieve_response_code' );
+		$wp_remote_retrieve_response_code->expects( $this->any() )
+		                                 ->with( $this->anything() )
+		                                 ->willReturn( 200 );
+
+		// Mocks retrieving the body.
+		$wp_remote_retrieve_body = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_retrieve_body' );
+		$wp_remote_retrieve_body->expects( $this->any() )
+		                        ->with( $this->anything() );
+
+		// Mocks json_decode. Returns the $response array created above. What is being
+		// tested runs starts here.
+		$json_decode = $this->getFunctionMock( 'WPDiscourse\Utilities', 'json_decode' );
+		$json_decode->expects( $this->once() )
+		            ->with( $this->anything(), true )
+		            ->willReturn( $response );
+
+		$set_transient = $this->getFunctionMock( 'WPDiscourse\Utilities', 'set_transient' );
+		$set_transient->expects( $this->once() )
+		              ->with(
+			              'discourse_settings_categories_cache',
+			              $response['categories'],
+			              HOUR_IN_SECONDS
+		              );
+
+		DiscourseUtilities::get_discourse_categories();
+	}
+
+	public function test_get_discourse_categories_removes_subcategories_when_display_subcategories_is_not_set() {
+		$options = array(
+			'api-key'                 => 'thisisatest',
+			'publish-username'        => 'system',
+			'url'                     => 'http://forum.example.com',
+			'publish-category-update' => 1,
+			'display-subcategories' => 0
+		);
+		update_option( 'discourse', $options );
+
+		$response = array(
+			'categories' => array(
+				array(
+					'id'   => 1,
+					'name' => 'category one',
+				),
+				array(
+					'id'   => 2,
+					'name' => 'category two',
+					'parent_category_id' => 1,
+				),
+				array(
+					'id'   => 3,
+					'name' => 'category three',
+				),
+			),
+		);
+
+		// Mocks getting the site.json from Discourse.
+		$wp_remote_get = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_get' );
+		$wp_remote_get->expects( $this->once() )
+		              ->with( $this->anything() );
+
+		// Mocks passing validation.
+		$wp_remote_retrieve_response_code = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_retrieve_response_code' );
+		$wp_remote_retrieve_response_code->expects( $this->any() )
+		                                 ->with( $this->anything() )
+		                                 ->willReturn( 200 );
+
+		// Mocks retrieving the body.
+		$wp_remote_retrieve_body = $this->getFunctionMock( 'WPDiscourse\Utilities', 'wp_remote_retrieve_body' );
+		$wp_remote_retrieve_body->expects( $this->any() )
+		                        ->with( $this->anything() );
+
+		// Mocks json_decode. Returns the $response array created above. What is being
+		// tested runs starts here.
+		$json_decode = $this->getFunctionMock( 'WPDiscourse\Utilities', 'json_decode' );
+		$json_decode->expects( $this->once() )
+		            ->with( $this->anything(), true )
+		            ->willReturn( $response );
+
+		// The subcategory is removed.
+		$this->assertEquals( 2, count( DiscourseUtilities::get_discourse_categories() ) );
 	}
 }
