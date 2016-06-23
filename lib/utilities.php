@@ -127,7 +127,7 @@ class Utilities {
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
 				$remote = $remote['categories'];
-				if ( ! isset( $options['display-subcategories'] ) ) {
+				if ( ! isset( $options['display-subcategories'] ) || 0 === intval( $options['display-subcategories']) ) {
 					foreach ( $remote as $category => $values ) {
 						if ( array_key_exists( 'parent_category_id', $values ) ) {
 							unset( $remote[ $category ] );
