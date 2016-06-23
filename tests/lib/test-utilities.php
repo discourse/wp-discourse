@@ -152,7 +152,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 			'publish-username'        => 'system',
 			'url'                     => 'http://forum.example.com',
 			'publish-category-update' => 1,
-			'display-subcategories' => 0
+			'display-subcategories'   => 0
 		);
 		update_option( 'discourse', $options );
 
@@ -163,8 +163,8 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 					'name' => 'category one',
 				),
 				array(
-					'id'   => 2,
-					'name' => 'category two',
+					'id'                 => 2,
+					'name'               => 'category two',
 					'parent_category_id' => 1,
 				),
 				array(
@@ -199,5 +199,33 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 
 		// The subcategory is removed.
 		$this->assertEquals( 2, count( DiscourseUtilities::get_discourse_categories() ) );
+	}
+
+	public function test_validate_returns_zero_for_a_wp_error() {
+		$response = new \WP_Error();
+		$this->assertEquals( 0, DiscourseUtilities::validate( $response ) );
+	}
+
+	public function test_validate_returns_zero_if_response_code_is_not_200() {
+		$response_codes = array( 300, 400, 500 );
+		foreach ( $response_codes as $code ) {
+			$response = array(
+				'response' => array(
+					'code'    => $code,
+					'message' => 'not found',
+				),
+			);
+			$this->assertEquals( 0, DiscourseUtilities::validate( $response ) );
+		}
+	}
+	
+	public function test_validate_returns_one_if_response_code_is_200() {
+		$response = array(
+			'response' => array(
+				'code'    => 200,
+				'message' => 'not found',
+			),
+		);
+		$this->assertEquals( 1, DiscourseUtilities::validate( $response ) );
 	}
 }
