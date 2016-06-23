@@ -34,6 +34,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( '<img src="http://example.com/uploads/example.png" />', DiscourseUtilities::convert_relative_img_src_to_absolute( 'http://example.com', $content ) );
 	}
 
+	// Brittle test.
 	function test_get_discourse_categories_returns_cached_categories_when_force_update_false_and_there_are_cached_categories() {
 
 		$options = array(
@@ -58,6 +59,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $categories, DiscourseUtilities::get_discourse_categories() );
 	}
 
+	// Brittle test.
 	function test_discourse_categories_returns_cached_categories_when_remote_returns_an_error() {
 		$options = array(
 			'api-key'                 => 'thisisatest',
@@ -146,6 +148,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 		DiscourseUtilities::get_discourse_categories();
 	}
 
+	// Brittle test.
 	public function test_get_discourse_categories_removes_subcategories_when_display_subcategories_is_not_set() {
 		$options = array(
 			'api-key'                 => 'thisisatest',
@@ -218,7 +221,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 			$this->assertEquals( 0, DiscourseUtilities::validate( $response ) );
 		}
 	}
-	
+
 	public function test_validate_returns_one_if_response_code_is_200() {
 		$response = array(
 			'response' => array(
