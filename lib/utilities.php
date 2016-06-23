@@ -49,7 +49,7 @@ class Utilities {
 
 			// There is a response from the server, but it's not what we're looking for.
 		} elseif ( intval( wp_remote_retrieve_response_code( $response ) ) !== 200 ) {
-			$error_message = wp_remote_retrieve_response_code( $response );
+			$error_message = wp_remote_retrieve_response_message( $response );
 			error_log( 'There has been a problem accessing your Discourse forum. Error Message: ' . $error_message );
 
 			return 0;
