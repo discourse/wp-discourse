@@ -457,7 +457,7 @@ class DiscourseAdmin {
 		$categories = DiscourseUtilities::get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
-			self::text_input( $option, $description );
+			esc_html_e( 'The category list will be synced with Discourse when you establish a connection.' , 'wp-discourse' );
 
 			return;
 		}
