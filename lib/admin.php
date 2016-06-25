@@ -357,7 +357,7 @@ class DiscourseAdmin {
 	function custom_datetime_format() {
 		self::text_input( 'custom-datetime-format', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                            get_option( 'date_format' ) . '").' .
-		                                            __( 'See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+		                                            __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
 		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
