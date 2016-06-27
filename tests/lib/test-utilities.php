@@ -28,6 +28,15 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals( $content, DiscourseUtilities::convert_relative_img_src_to_absolute( 'http://example.com', $content ) );
 	}
 
+	function test_convert_relative_img_src_to_absolute_when_first_image_is_absolute_and_second_is_relative() {
+		$this->markTestIncomplete( 'This will fail, fix!' );
+		
+		$content = '<img src="//testbucket.s3-us-west-2.amazonaws.com/example.jpg"><img src="/uploads/example.png" />';
+		$expected_result = '<img src="//testbucket.s3-us-west-2.amazonaws.com/example.jpg"><img src="http://example.com/uploads/example.png" />';
+		
+		$this->assertEquals( $expected_result, DiscourseUtilities::convert_relative_img_src_to_absolute( 'http://example.com', $content ) );
+	}
+
 	function test_convert_relative_img_src_to_absolute_when_supplied_with_relative_src() {
 		$content = '<img src="/uploads/example.png" />';
 
@@ -63,7 +72,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 	// Brittle test.
 	function test_discourse_categories_returns_cached_categories_when_remote_returns_an_error() {
 		$this->markTestIncomplete();
-		
+
 		$options = array(
 			'api-key'                 => 'thisisatest',
 			'publish-username'        => 'system',
@@ -94,7 +103,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 	// Brittle test.
 	public function test_get_discourse_categories_sets_transient() {
 		$this->markTestIncomplete();
-		
+
 		$options = array(
 			'api-key'                 => 'thisisatest',
 			'publish-username'        => 'system',
@@ -157,7 +166,7 @@ class TestUtilities extends \PHPUnit_Framework_TestCase {
 	// Brittle test.
 	public function test_get_discourse_categories_removes_subcategories_when_display_subcategories_is_not_set() {
 		$this->markTestIncomplete();
-		
+
 		$options = array(
 			'api-key'                 => 'thisisatest',
 			'publish-username'        => 'system',
