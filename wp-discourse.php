@@ -43,6 +43,7 @@ require_once( __DIR__ . '/lib/discourse-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
+require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
@@ -51,5 +52,6 @@ $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublis
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO();
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
+$discourse_woocommerce = new WPDiscourse\PluginSupport\WooCommerceSupport();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
