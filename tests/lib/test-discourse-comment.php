@@ -161,7 +161,7 @@ class TestDiscourseComment extends WP_UnitTestCase {
 
 	public function test_sync_comments_updates_post_metadata() {
 		$this->markTestIncomplete(
-			'This is not testable with the way the function is '
+			'It would be nice to be able to test this.'
 		);
 	}
 
