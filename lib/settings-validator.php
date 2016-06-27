@@ -128,7 +128,7 @@ class SettingsValidator {
 
 		// Make sure the url starts with a valid protocol.
 		if ( ! preg_match( $regex, $input ) ) {
-			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to begin with either \'http:\' or \'https:\'.') );
+			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to begin with either \'http:\' or \'https:\'.' ) );
 			return '';
 		}
 
@@ -519,7 +519,7 @@ class SettingsValidator {
 
 	/**
 	 * A helper function to sanitize an int.
-	 * 
+	 *
 	 * @param mixed|int $input The input to be validated.
 	 *
 	 * @return int

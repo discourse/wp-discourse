@@ -1,4 +1,5 @@
 /* globals discourse */
+
 /**
  * Fixes Discourse oneboxes and mention links for display on WordPress.
  *
