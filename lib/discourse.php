@@ -40,7 +40,7 @@ class Discourse {
 		'max-comments'              => 5,
 		'use-discourse-comments'    => 0,
 		'show-existing-comments'    => 0,
-		'min-score'                 => 30,
+		'min-score'                 => 0,
 		'min-replies'               => 1,
 		'min-trust-level'           => 1,
 		'custom-excerpt-length'     => 55,
