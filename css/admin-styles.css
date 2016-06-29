@@ -19,7 +19,6 @@
 	min-width: 160px;
 }
 
-/* Adds top border to discourse section of post submit box */
-.misc-pub-section-discourse {
-	border-top: 1px solid rgb(238, 238, 238);
+#discourse-publish-meta-box .warning {
+	padding: 0 8px;
 }
