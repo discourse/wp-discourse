@@ -83,9 +83,7 @@ class MetaBox {
 				<div class="warning">
 					<p>
 						<?php
-						esc_html_e( "The Discourse categories list is not currently available. To publish this post " .
-						            "to Discourse, please check the wp-discourse settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-						            "Also, make sure that your Discourse forum is online.", "wp-discourse" );
+						esc_html_e( "The Discourse categories list is not currently available. To publish this post to Discourse, please check the wp-discourse settings for 'Discourse URL', 'API Key', and 'Publishing username'. Also, make sure that your Discourse forum is online.", 'wp-discourse' );
 						?>
 					</p>
 				</div>
