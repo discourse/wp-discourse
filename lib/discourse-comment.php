@@ -63,7 +63,7 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function use_discourse_comments( $postid ) {
-		if ( ! $this->options['use-discourse-comments'] ) {
+		if ( ( ! isset( $this->options['use-discourse-comments'] ) ) || ! $this->options['use-discourse-comments'] ) {
 			return 0;
 		}
 
