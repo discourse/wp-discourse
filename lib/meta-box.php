@@ -61,7 +61,7 @@ class MetaBox {
 		} elseif ( ! get_post_meta( $post->ID, 'has_been_saved', true ) ) {
 
 			// If the post has not yet been saved, use the default setting. If it has been saved use the meta value.
-			$selected_category    = intval( $this->options['publish-category'] );
+			$selected_category    = isset( $this->options['publish-category' ] ) ? intval( $this->options['publish-category'] ) : 1;
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 		} else {
 
