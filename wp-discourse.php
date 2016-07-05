@@ -37,7 +37,10 @@ class Discourse {
     'publish-category'=>'',
     'auto-publish'=>0,
     'auto-update'=>0,
-    'use-discourse-comments'=>0
+    'max-comment'=>5,
+    'use-discourse-comments'=>0,
+    'use-fullname-in-comments'=>1,
+    'publish-format'=>'<small>Originally published at: {blogurl}</small><br>{excerpt}'
 	);
 
 	public function __construct() {
@@ -103,7 +106,8 @@ class Discourse {
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
 
-        $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=5';
+        $comment_count = intval(get_option('discourse')['max-comments']);
+        $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=' . $comment_count;
         $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
         $context  = stream_context_create($soptions);
         $result = file_get_contents($permalink, false, $context);
@@ -125,6 +129,7 @@ class Discourse {
 
   function comments_template($old) {
     global $post;
+
     if(self::use_discourse_comments($post->ID)) {
       self::sync_comments($post->ID);
       return dirname(__FILE__) . '/comments.php';
@@ -143,9 +148,12 @@ class Discourse {
     add_settings_field('discourse_api_key', 'API Key', array($this, 'api_key_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_publish_username', 'Publishing username', array($this, 'publish_username_input'), 'discourse', 'default_discourse');
     add_settings_field('discourse_publish_category', 'Published category', array($this, 'publish_category_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_publish_format', 'Publish format', array($this, 'publish_format_textarea'), 'discourse', 'default_discourse');
     add_settings_field('discourse_auto_publish', 'Auto Publish', array($this, 'auto_publish_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_auto_update', 'Auto Update Posts', array($this, 'auto_update_checkbox'), 'discourse', 'default_discourse');
     add_settings_field('discourse_use_discourse_comments', 'Use Discourse Comments', array($this, 'use_discourse_comments_checkbox'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_max_comments', 'Max visible comments', array($this, 'max_comments_input'), 'discourse', 'default_discourse');
+    add_settings_field('discourse_use_fullname_in_comments', 'Full name in comments', array($this, 'use_fullname_in_comments_checkbox'), 'discourse', 'default_discourse');
 
 
     add_action( 'post_submitbox_misc_actions', array($this,'publish_to_discourse'));
@@ -184,9 +192,12 @@ class Discourse {
     $post = get_post($post_id);
 
 
-    $baked = apply_filters('the_content', $raw);
-    $baked = wp_trim_words($baked);
-    $baked = "<small>Originally published at: " . get_permalink($postid) . "</small><br>" . $baked;
+    $excerpt = apply_filters('the_content', $raw);
+    $excerpt = wp_trim_words($excerpt);
+
+    $baked = $options['publish-format'];
+    $baked = str_replace("{excerpt}", $excerpt, $baked);
+    $baked = str_replace("{blogurl}", get_permalink($postid), $baked);
 
     $data = array(
       'wp-id' => $postid,
@@ -273,6 +284,18 @@ class Discourse {
     self::text_input('publish-category', 'Category post will be published in Discourse (optional)');
   }
 
+  function publish_format_textarea(){
+    self::text_area('publish-format', 'Markdown format for published articles, use {excerpt} for excerpt and {blogurl} for the url of the blog post');
+  }
+
+  function max_comments_input(){
+    self::text_input('max-comments', 'Maximum number of comments to display');
+  }
+
+  function use_fullname_in_comments_checkbox(){
+    self::checkbox_input('use-fullname-in-comments', 'Use the users full name in blog comment section');
+  }
+
   function auto_publish_checkbox(){
     self::checkbox_input('auto-publish', 'Publish all new posts to Discourse');
   }
@@ -316,6 +339,20 @@ class Discourse {
 
   }
 
+  function text_area($option, $description) {
+
+    $options = get_option( 'discourse' );
+    if (array_key_exists($option, $options)) {
+      $value = $options[$option];
+    } else {
+      $value = '';
+    }
+
+    ?>
+<textarea cols=100 rows=6 id='discourse_<?php echo $option?>' name='discourse[<?php echo $option?>]'><?php echo esc_attr( $value ); ?></textarea><br><?php echo $description ?>
+    <?php
+
+  }
   function discourse_validate_options($input) {
     return $input;
   }
