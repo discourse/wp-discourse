@@ -1,0 +1,13 @@
+{
+	"maxReviewers": 2,
+	"userBlacklist": [
+		"tnorthcutt",
+		"retlehs"
+	],
+	"userBlacklistForPR": [
+		"scossar",
+		"retlehs",
+		"techAPJ",
+		"SamSaffron"
+	]
+}
