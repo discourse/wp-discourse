@@ -27,8 +27,9 @@
 <?php # var_dump($discourse_info->posts) ?>
 
 <div id="comments">
+<?php if(count($discourse_info->posts) > 0) { ?>
 <h2 id="comments-title"> Notable replies to “<span><?php echo $post->post_title ?></span>”</h2>
-		
+<?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
         <li class="comment">
@@ -52,12 +53,14 @@
 	
     <div id="respond">
         <h3 id="reply-title"><a href="<?php echo $permalink ?>">Continue the discussion</a> at <?php echo $discourse_url_name ?></h3>
+        <?php if(count($discourse_info->posts) > 0) { ?>
         <p class='more-replies'><?php echo $more_replies ?></p>
         <p>
           <?php foreach($discourse_info->participants as &$participant) { ?>
             <img alt="" src="<?php avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
           <?php } ?>
         </p>
+        <?php } ?>
     </div><!-- #respond -->
 						
 </div>
