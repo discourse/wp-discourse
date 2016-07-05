@@ -28,16 +28,16 @@
 
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-<h2 id="comments-title"> Notable replies to “<span><?php echo $post->post_title ?></span>”</h2>
+<h2 id="comments-title"> Notable replies to “<?php echo $post->post_title ?>”</h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
         <li class="comment">             
 				<div class="comment-author vcard">
         <img alt="" src="<?php avatar($post->avatar_template,68) ?>" class="avatar avatar-68 photo avatar-default" height="68" width="68">
-          <span class="fn"><a href="<?php homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo $post->name ?></a></span>
+          <a href="<?php homepage($options['url'],$post) ?>" rel="external" class="url"><?php echo $post->name ?></a>
           on <time pubdate="" datetime="<?php echo $post->created_at ?>"><?php echo mysql2date(get_option('date_format'), $post->created_at)?></time>
-            <span class="says">said:</span></div>
+</div>
             <div class="comment-content"><?php echo $post->cooked ?></div>
         </li>
       <?php } ?>
