@@ -51,9 +51,8 @@
 		
 	
     <div id="respond">
-        <h3 id="reply-title">Discussion</h3>
-        <p></p>
-        <h2><a href="<?php echo $permalink ?>">Continue the discussion</a> at <a href="<?php echo $permalink ?>"><?php echo $discourse_url_name ?></a> <?php echo $more_replies ?></h2>
+        <h3 id="reply-title"><a href="<?php echo $permalink ?>">Continue the discussion</a> at <?php echo $discourse_url_name ?></h3>
+        <p class='more-replies'><?php echo $more_replies ?></p>
         <p>
           <?php foreach($discourse_info->participants as &$participant) { ?>
             <img alt="" src="<?php avatar($participant->avatar_template,25) ?>" class="avatar avatar-25 photo avatar-default" height="25" width="25">
