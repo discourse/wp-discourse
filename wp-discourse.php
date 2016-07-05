@@ -218,6 +218,8 @@ class Discourse {
 
     } 
     else {
+      # for now the updates are just causing grief, leave'em out
+      return;
       $url =  $options['url'] .'/posts/' . $discourse_id ;
       $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'PUT','content' => http_build_query($data)));
       $context  = stream_context_create($soptions);
