@@ -28,7 +28,7 @@
 
 <div id="comments">
 <?php if(count($discourse_info->posts) > 0) { ?>
-<h2 id="comments-title"> Notable replies to “<?php echo $post->post_title ?>”</h2>
+<h2 id="comments-title">Notable replies</h2>
 <?php } ?>
 		<ol class="commentlist">
       <?php foreach($discourse_info->posts as &$post) { ?>
