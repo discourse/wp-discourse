@@ -106,7 +106,8 @@ class Discourse {
       $got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_lock', 0) got_it");
       if($got_lock->got_it == "1") {
 
-        $comment_count = intval(get_option('discourse')['max-comments']);
+        $discourse_options =  get_option('discourse');
+        $comment_count = intval($discourse_options['max-comments']);
         $permalink = (string)get_post_meta($postid, 'discourse_permalink', true) . '.json?best=' . $comment_count;
         $soptions = array('http' => array('ignore_errors' => true, 'method'  => 'GET'));
         $context  = stream_context_create($soptions);
