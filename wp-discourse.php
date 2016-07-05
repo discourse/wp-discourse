@@ -71,12 +71,16 @@ class Discourse {
 	}
 
   function comments_number($count) {
+
+
     global $post;
     if(self::use_discourse_comments($post->ID)){
       self::sync_comments($post->ID);
       $count = get_post_meta($post->ID, 'discourse_comments_count', true);
       if(!$count){
-        $count = "";
+        $count = "Leave a reply";
+      } else {
+        $count = $count == 1 ? "1 Reply" : $count . " Replies"; 
       }
     } 
     
