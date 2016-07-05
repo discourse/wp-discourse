@@ -45,7 +45,7 @@ Discourse forum. You can install Discourse for yourself following either of thes
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
 
-= Is it possible to customize the comment templates?
+= Is it possible to customize the comment templates? =
 
 Yes, the html templates used for publishing posts on Discourse and for displaying comments on WordPress can be customized in your theme.
 This is done by hooking into the filters that are applied to each template.
