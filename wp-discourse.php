@@ -113,7 +113,8 @@ class Discourse {
         add_post_meta($postid, 'discourse_comments_count', $json->posts_count - 1 , true);
 
         delete_post_meta($postid, 'discourse_comments_raw');
-        add_post_meta($postid, 'discourse_comments_raw', $result , true);
+
+        add_post_meta($postid, 'discourse_comments_raw', $wpdb->escape($result) , true);
 
         delete_post_meta($postid, 'discourse_last_sync');
         add_post_meta($postid, 'discourse_last_sync', $time, true);
