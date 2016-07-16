@@ -45,6 +45,7 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
+require_once( __DIR__ . '/lib/flash-notice.php' );
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
@@ -55,5 +56,6 @@ $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordP
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 $discourse_woocommerce        = new WPDiscourse\PluginSupport\WooCommerceSupport();
+$discourse_flash_notice       = new WPDiscourse\FlashNotice\FlashNotice();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
