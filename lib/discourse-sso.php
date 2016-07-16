@@ -20,11 +20,14 @@ class DiscourseSSO {
 	 */
 	protected $options;
 
+	protected $wordpress_email_verifier;
+
 	/**
 	 * DiscourseSSO constructor.
 	 */
-	public function __construct() {
-		$this->options = get_option( 'discourse' );
+	public function __construct( $wordpress_email_verifier ) {
+		$this->options                  = get_option( 'discourse' );
+		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
@@ -135,6 +138,36 @@ class DiscourseSSO {
 					exit;
 				}
 
+				$current_user = wp_get_current_user();
+
+				// This keeps users that don't have a verified email address from logging into Discourse.
+				if ( ! $this->wordpress_email_verifier->is_verified( $current_user->ID ) ) {
+					$this->wordpress_email_verifier->send_verification_email( $current_user->ID );
+
+					$referer = wp_get_referer();
+					if ( $referer ) {
+						$referer_without_query = explode( '?', $referer )[0];
+						$referer_parts         = explode( '/', $referer_without_query );
+						if ( untrailingslashit( $referer_without_query ) === untrailingslashit( $this->options['url'] ) ||
+						     'wp-login.php' === end( $referer_parts )
+						) {
+							$target_url = home_url( '/' );
+						} else {
+							$target_url = $referer;
+						}
+					} else {
+						$target_url = home_url( '/' );
+					}
+
+					FlashNotice::set_flash_notice(
+						'email_not_verified',
+						__( 'Your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and try logging in again.', 'wp-discourse' )
+					);
+
+					wp_redirect( $target_url );
+					exit;
+				}
+
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
 				$sig     = $wp->query_vars['sig'];
@@ -144,15 +177,14 @@ class DiscourseSSO {
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];
-				$sso = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
+				$sso        = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
 					exit;
 				}
 
-				$nonce = $sso->get_nonce( $payload );
-				$current_user = wp_get_current_user();
+				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
 					'nonce'       => $nonce,
 					'name'        => $current_user->display_name,
