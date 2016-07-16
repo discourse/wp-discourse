@@ -54,6 +54,6 @@ $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseCommen
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse', 'wp-discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
-$discourse_woocommerce = new WPDiscourse\PluginSupport\WooCommerceSupport();
+$discourse_woocommerce        = new WPDiscourse\PluginSupport\WooCommerceSupport();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
