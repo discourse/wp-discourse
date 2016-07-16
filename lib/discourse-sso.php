@@ -159,10 +159,10 @@ class DiscourseSSO {
 						$target_url = home_url( '/' );
 					}
 
-					FlashNotice::set_flash_notice(
-						'email_not_verified',
-						__( 'Your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and try logging in again.', 'wp-discourse' )
-					);
+//					FlashNotice::set_flash_notice(
+//						'email_not_verified',
+//						__( 'Your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and try logging in again.', 'wp-discourse' )
+//					);
 
 					wp_redirect( $target_url );
 					exit;
