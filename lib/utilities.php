@@ -86,6 +86,9 @@ class Utilities {
 	/**
 	 * Replaces relative image src with absolute.
 	 *
+	 * This function may not be required anymore.
+	 * See: https://meta.discourse.org/t/can-emoji-be-rendered-with-absolute-urls/47250
+	 *
 	 * @param string $url The base url of the forum.
 	 * @param string $content The content to be checked.
 	 *
@@ -140,5 +143,25 @@ class Utilities {
 			}
 		}
 		return $remote;
+	}
+
+	/**
+	 * This function allows string to pass through unsanitized when in the development environment.
+	 *
+	 * This is a temporary work around for handling protocol relative image src urls.
+	 * see http://wordpress.stackexchange.com/questions/232420/getting-wp-kses-post-to-handle-protocol-relative-image-src-urls-that-include-a-p.
+	 *
+	 * TODO: Find a better way to do this.
+	 *
+	 * @param string $string The string to be sanitized.
+	 *
+	 * @return mixed
+	 */
+	public static function sanitize_for_environment( $string ) {
+		if ( defined( 'WP_ENV' ) && 'development' === WP_ENV ) {
+			return $string;
+		} else {
+			return wp_kses_post( $string );
+		}
 	}
 }

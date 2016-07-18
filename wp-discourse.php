@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 0.7.0
+ * Version: 0.9.0
  * Author: Sam Saffron, Robin Ward
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -39,6 +39,7 @@ require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
+require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
@@ -50,8 +51,9 @@ $discourse                    = new WPDiscourse\Discourse\Discourse();
 $discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
 $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublish();
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
-$discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO();
+$wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse', 'wp-discourse' );
+$discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
-$discourse_woocommerce = new WPDiscourse\PluginSupport\WooCommerceSupport();
+$discourse_woocommerce        = new WPDiscourse\PluginSupport\WooCommerceSupport();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );

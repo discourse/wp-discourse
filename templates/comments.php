@@ -72,8 +72,8 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 			$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 			$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-			$comment_body = DiscourseUtilities::convert_relative_img_src_to_absolute( $discourse_url, $post->cooked );
-			$comment_html = str_replace( '{comment_body}', wp_kses_post( $comment_body ), $comment_html );
+			$comment_body = DiscourseUtilities::sanitize_for_environment( $post->cooked );
+			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
 			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, get_date_from_gmt( $post->created_at ) ), $comment_html );
 			$comments_html .= $comment_html;
 		}
@@ -99,5 +99,6 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
 	$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 	$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
-	echo wp_kses_post( $discourse_html );
+	$discourse_html = DiscourseUtilities::sanitize_for_environment( $discourse_html );
+	echo $discourse_html;
 }

@@ -21,6 +21,13 @@ It allows you to:
 - Select which comments are to be displayed on the WordPress site based on post score and commenter trust level
 - Use your WordPress site as the Single Sign On provider for your Discourse forum
 
+#### See it live
+
+- [blog.discourse.org](http://blog.discourse.org/)
+- [boingboing.net](http://boingboing.net/)
+- [howtogeek.com](http://www.howtogeek.com/)
+- [talkingpointsmemo.com](http://talkingpointsmemo.com/)
+
 == Installation ==
 
 #### From your WordPress dashboard
@@ -34,6 +41,9 @@ It allows you to:
 1. Download WP Discourse
 2. Upload the 'wp-discourse' directory to your '/wp-content/plugins/' directory
 3. Activate WP Discourse from your Plugins page
+
+For more detailed instructions please see the [setup](https://github.com/discourse/wp-discourse/wiki/Setup) page of the
+[wp-discourse wiki](https://github.com/discourse/wp-discourse/wiki)
 
 == Frequently Asked Questions ==
 
@@ -64,3 +74,34 @@ For more details on template customization, take a look at this section of our w
 
 
 == Changelog ==
+
+#### 0.7.0 16/05/16
+
+**note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
+admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
+section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+- Restructure code
+- Move templates out of options
+- Validate settings
+- Add notices to indicate connection status
+- Sanitize admin options page
+- Sanitize comment template output
+- Add type argument to text input method
+- Use cached categories when there is a configuration error
+- Fix name property not available in participants array
+- Use `wp_get_current_user`
+- Fix `add_query_arg` undefined offset notice
+- Update Discourse post on WP post update
+- Better method for including comments script
+- Allow choosing Discourse category per post
+- Replace avatar URL function
+- Fix timezone for custom timestamp
+
+#### 0.9.0 16/07/18
+
+- Verify email before logging into Discourse
+
+== Developers ==
+
+Check out the [code](https://github.com/discourse/wp-discourse) on GitHub
