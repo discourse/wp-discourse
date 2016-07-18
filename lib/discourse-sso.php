@@ -20,10 +20,17 @@ class DiscourseSSO {
 	 */
 	protected $options;
 
+	/**
+	 * An email_verifier object that has the `is_verified` and `send_verification_email` methods.
+	 *
+	 * @var object
+	 */
 	protected $wordpress_email_verifier;
 
 	/**
 	 * DiscourseSSO constructor.
+	 *
+	 * @param object $wordpress_email_verifier An object for verifying email addresses.
 	 */
 	public function __construct( $wordpress_email_verifier ) {
 		$this->options                  = get_option( 'discourse' );
@@ -183,12 +190,18 @@ class DiscourseSSO {
 		}
 	}
 
+	/**
+	 * Creates the 'email not verified' notice.
+	 */
 	protected function email_not_verified_notice() {
 		$forum_url   = $this->options['url'];
 		$website_url = home_url( '/' );
+		$allowed = array(
+			'strong' => array(),
+		);
 
 		$notice = __( '<strong>Attention: </strong>your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and log in again.', 'wp-discourse' );
-		echo '<p>' . $notice . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . __( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
-		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . __( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
+		echo '<p>' . wp_kses( $notice, $allowed ) . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . esc_html__( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
+		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . esc_html__( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
 	}
 }
