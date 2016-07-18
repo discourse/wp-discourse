@@ -21,10 +21,20 @@ class DiscourseSSO {
 	protected $options;
 
 	/**
-	 * DiscourseSSO constructor.
+	 * An email_verifier object that has the `is_verified` and `send_verification_email` methods.
+	 *
+	 * @var object
 	 */
-	public function __construct() {
-		$this->options = get_option( 'discourse' );
+	protected $wordpress_email_verifier;
+
+	/**
+	 * DiscourseSSO constructor.
+	 *
+	 * @param object $wordpress_email_verifier An object for verifying email addresses.
+	 */
+	public function __construct( $wordpress_email_verifier ) {
+		$this->options                  = get_option( 'discourse' );
+		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
@@ -135,6 +145,15 @@ class DiscourseSSO {
 					exit;
 				}
 
+				$current_user = wp_get_current_user();
+
+				// This keeps users that don't have a verified email address from logging into Discourse.
+				if ( ! $this->wordpress_email_verifier->is_verified( $current_user->ID ) ) {
+					$this->wordpress_email_verifier->send_verification_email( $current_user->ID );
+					$this->email_not_verified_notice();
+					exit;
+				}
+
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
 				$sig     = $wp->query_vars['sig'];
@@ -144,15 +163,14 @@ class DiscourseSSO {
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];
-				$sso = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
+				$sso        = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
 					exit;
 				}
 
-				$nonce = $sso->get_nonce( $payload );
-				$current_user = wp_get_current_user();
+				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
 					'nonce'       => $nonce,
 					'name'        => $current_user->display_name,
@@ -170,5 +188,20 @@ class DiscourseSSO {
 				exit;
 			}
 		}
+	}
+
+	/**
+	 * Creates the 'email not verified' notice.
+	 */
+	protected function email_not_verified_notice() {
+		$forum_url   = $this->options['url'];
+		$website_url = home_url( '/' );
+		$allowed = array(
+			'strong' => array(),
+		);
+
+		$notice = __( '<strong>Attention: </strong>your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and log in again.', 'wp-discourse' );
+		echo '<p>' . wp_kses( $notice, $allowed ) . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . esc_html__( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
+		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . esc_html__( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
 	}
 }
