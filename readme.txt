@@ -64,3 +64,27 @@ For more details on template customization, take a look at this section of our w
 
 
 == Changelog ==
+
+#### 0.7.0 16/05/16
+
+- Restructure code
+- Move templates out of options
+- Validate settings
+- Add notices to indicate connection status
+- Sanitize admin options page
+- Sanitize comment template output
+- Add type argument to text input method
+- Use cached categories when there is a configuration error
+- Fix name property not available in participants array
+- Use `wp_get_current_user`
+- Fix `add_query_arg` undefined offset notice
+- Update Discourse post on WP post update
+- Better method for including comments script
+- Allow choosing Discourse category per post
+- Replace avatar URL function
+- Fix timezone for custom timestamp
+
+#### 0.9.0 16/07/18
+
+- Verify email before logging into Discourse
+
