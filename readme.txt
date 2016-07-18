@@ -21,6 +21,13 @@ It allows you to:
 - Select which comments are to be displayed on the WordPress site based on post score and commenter trust level
 - Use your WordPress site as the Single Sign On provider for your Discourse forum
 
+#### See it live
+
+- [blog.discourse.org](http://blog.discourse.org/)
+- [boingboing.net](http://boingboing.net/)
+- [howtogeek.com](http://www.howtogeek.com/)
+- [talkingpointsmemo.com](http://talkingpointsmemo.com/)
+
 == Installation ==
 
 #### From your WordPress dashboard
@@ -35,6 +42,9 @@ It allows you to:
 2. Upload the 'wp-discourse' directory to your '/wp-content/plugins/' directory
 3. Activate WP Discourse from your Plugins page
 
+For more detailed instructions please see the [setup](https://github.com/discourse/wp-discourse/wiki/Setup) page of the
+[wp-discourse wiki](https://github.com/discourse/wp-discourse/wiki)
+
 == Frequently Asked Questions ==
 
 = Does this plugin install Discourse for me? =
@@ -45,7 +55,7 @@ Discourse forum. You can install Discourse for yourself following either of thes
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
 
-= Is it possible to customize the comment templates?
+= Is it possible to customize the comment templates? =
 
 Yes, the html templates used for publishing posts on Discourse and for displaying comments on WordPress can be customized in your theme.
 This is done by hooking into the filters that are applied to each template.
@@ -66,6 +76,10 @@ For more details on template customization, take a look at this section of our w
 == Changelog ==
 
 #### 0.7.0 16/05/16
+
+**note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
+admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
+section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
 - Restructure code
 - Move templates out of options
@@ -88,3 +102,6 @@ For more details on template customization, take a look at this section of our w
 
 - Verify email before logging into Discourse
 
+== Developers ==
+
+Check out the [code](https://github.com/discourse/wp-discourse) on GitHub
