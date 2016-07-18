@@ -7,8 +7,6 @@
 
 namespace WPDiscourse\DiscourseSSO;
 
-use WPDiscourse\FlashNotice\FlashNotice as FlashNotice;
-
 /**
  * Class DiscourseSSO
  */
@@ -145,24 +143,7 @@ class DiscourseSSO {
 				// This keeps users that don't have a verified email address from logging into Discourse.
 				if ( ! $this->wordpress_email_verifier->is_verified( $current_user->ID ) ) {
 					$this->wordpress_email_verifier->send_verification_email( $current_user->ID );
-
-					$referer = wp_get_referer();
-					if ( $referer ) {
-						$referer_without_query = explode( '?', $referer )[0];
-						$referer_parts         = explode( '/', $referer_without_query );
-						if ( untrailingslashit( $referer_without_query ) === untrailingslashit( $this->options['url'] ) ||
-						     'wp-login.php' === end( $referer_parts )
-						) {
-							$target_url = home_url( '/' );
-						} else {
-							$target_url = $referer;
-						}
-					} else {
-						$target_url = home_url( '/' );
-					}
-
-					$notice = __( 'Your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and try logging in again.', 'wp-discourse' );
-					echo $notice . '<br><a href="' . esc_url_raw( $target_url ) . '">Back to site</a>';
+					$this->email_not_verified_notice();
 					exit;
 				}
 
@@ -200,5 +181,14 @@ class DiscourseSSO {
 				exit;
 			}
 		}
+	}
+
+	protected function email_not_verified_notice() {
+		$forum_url   = $this->options['url'];
+		$website_url = home_url( '/' );
+
+		$notice = __( '<strong>Attention: </strong>your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and log in again.', 'wp-discourse' );
+		echo '<p>' . $notice . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . __( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
+		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . __( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
 	}
 }
