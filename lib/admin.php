@@ -169,6 +169,11 @@ class DiscourseAdmin {
 			$this,
 			'debug_mode_checkbox',
 		), 'discourse', 'discourse_comments' );
+		
+		add_settings_field( 'discourse_redirect_without_login', __( 'Redirect Without Login', 'wp-discourse' ), array(
+			$this,
+			'redirect_without_login_checkbox',
+		), 'discourse', 'discourse_wp_sso' );
 	}
 
 	/**
@@ -387,6 +392,13 @@ class DiscourseAdmin {
 	 */
 	function only_show_moderator_liked_checkbox() {
 		self::checkbox_input( 'only-show-moderator-liked', __( 'Yes', 'wp-discourse' ) );
+	}
+	
+	/**
+	 * Outputs markup for the redirect-without-login checkbox.
+	 */
+	function redirect_without_login_checkbox() {
+		self::checkbox_input( 'redirect-without-login', __( 'Do not force login for link to Discourse comments thread (No effect if not using SSO)' ) );
 	}
 
 	/**
