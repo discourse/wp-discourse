@@ -19,7 +19,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$options       = get_option( 'discourse' );
 	$is_enable_sso = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$permalink     = (string) $custom['discourse_permalink'][0];
-	if ( $is_enable_sso ) {
+	if ( $is_enable_sso && ! $options['redirect-without-login'] ) {
 		$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
 	}
 	$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
