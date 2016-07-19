@@ -114,6 +114,7 @@ class SettingsValidator {
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
+		add_filter( 'validate_redirect_without_login', array( $this, 'validate_redirect_without_login' ) );
 	}
 
 	/**
@@ -478,6 +479,17 @@ class SettingsValidator {
 
 		// Sanitize, but don't validate. SSO is not enabled.
 		return $this->sanitize_text( $input );
+	}
+
+	/**
+	 * Validates the 'redirect_without_login' checkbox.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_redirect_without_login( $input ) {
+		return $this->sanitize_checkbox( $input );
 	}
 
 	/**

@@ -169,7 +169,7 @@ class DiscourseAdmin {
 			$this,
 			'debug_mode_checkbox',
 		), 'discourse', 'discourse_comments' );
-		
+
 		add_settings_field( 'discourse_redirect_without_login', __( 'Redirect Without Login', 'wp-discourse' ), array(
 			$this,
 			'redirect_without_login_checkbox',
@@ -393,7 +393,7 @@ class DiscourseAdmin {
 	function only_show_moderator_liked_checkbox() {
 		self::checkbox_input( 'only-show-moderator-liked', __( 'Yes', 'wp-discourse' ) );
 	}
-	
+
 	/**
 	 * Outputs markup for the redirect-without-login checkbox.
 	 */
@@ -569,6 +569,10 @@ class DiscourseAdmin {
 		$output = array();
 		foreach ( $inputs as $key => $input ) {
 			$filter         = 'validate_' . str_replace( '-', '_', $key );
+
+			if ( ! has_filter( $filter ) ) {
+				error_log( 'Missing validation filter: ' . $filter );
+			}
 			$output[ $key ] = apply_filters( $filter, $input );
 		}
 
