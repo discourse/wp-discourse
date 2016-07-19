@@ -55,7 +55,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
+	 * @param int $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -87,7 +87,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int    $postid The post id.
+	 * @param int $postid The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -105,7 +105,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int    $postid The post id.
+	 * @param int $postid The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 */
@@ -120,10 +120,10 @@ class DiscoursePublish {
 		} else {
 			if ( has_excerpt( $postid ) ) {
 				$wp_excerpt = apply_filters( 'get_the_excerpt', $discourse_post->post_excerpt );
-				$excerpt = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
+				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
 			} else {
 				$excerpt = apply_filters( 'the_content', $raw );
-				$excerpt = apply_filters( 'wp_discourse_excerpt',  wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
+				$excerpt = apply_filters( 'wp_discourse_excerpt', wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
 			}
 		}
 
@@ -235,8 +235,14 @@ class DiscoursePublish {
 	 * @return mixed
 	 */
 	protected function get_allowed_post_types() {
-		$selected_post_types = $this->options['allowed_post_types'];
+		if ( isset( $this->options['allowed_post_types'] ) && is_array( $this->options['allowed_post_types'] ) ) {
+			$selected_post_types = $this->options['allowed_post_types'];
 
-		return $selected_post_types;
+			return $selected_post_types;
+		} else {
+			// Return an empty array, otherwise if all post types have been deselectd on the options page
+			// functions using this function will be trying to access the key of `null`.
+			return array();
+		}
 	}
 }

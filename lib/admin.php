@@ -169,6 +169,11 @@ class DiscourseAdmin {
 			$this,
 			'debug_mode_checkbox',
 		), 'discourse', 'discourse_comments' );
+
+		add_settings_field( 'discourse_redirect_without_login', __( 'Redirect Without Login', 'wp-discourse' ), array(
+			$this,
+			'redirect_without_login_checkbox',
+		), 'discourse', 'discourse_wp_sso' );
 	}
 
 	/**
@@ -390,6 +395,13 @@ class DiscourseAdmin {
 	}
 
 	/**
+	 * Outputs markup for the redirect-without-login checkbox.
+	 */
+	function redirect_without_login_checkbox() {
+		self::checkbox_input( 'redirect-without-login', __( 'Do not force login for link to Discourse comments thread (No effect if not using SSO)' ) );
+	}
+
+	/**
 	 * Outputs the markup for a checkbox input.
 	 *
 	 * @param string $option The option name.
@@ -557,6 +569,10 @@ class DiscourseAdmin {
 		$output = array();
 		foreach ( $inputs as $key => $input ) {
 			$filter         = 'validate_' . str_replace( '-', '_', $key );
+
+			if ( ! has_filter( $filter ) ) {
+				error_log( 'Missing validation filter: ' . $filter );
+			}
 			$output[ $key ] = apply_filters( $filter, $input );
 		}
 

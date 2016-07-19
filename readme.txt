@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.5.2
-Stable tag: 0.9.0
+Stable tag: 0.9.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -101,6 +101,12 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 #### 0.9.0 16/07/18
 
 - Verify email before logging into Discourse
+
+#### 0.9.1 16/07/19
+
+- Add option to redirect to Discourse without login
+- Log error if validation filter is missing
+- Check for post_types array before trying to access it
 
 == Developers ==
 
