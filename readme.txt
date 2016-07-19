@@ -102,6 +102,12 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
 - Verify email before logging into Discourse
 
+#### 0.9.1 16/07/19
+
+- Add option to redirect to Discourse without login
+- Log error if validation filter is missing
+- Check for post_types array before trying to access it
+
 == Developers ==
 
 Check out the [code](https://github.com/discourse/wp-discourse) on GitHub
