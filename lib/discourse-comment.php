@@ -37,7 +37,7 @@ class DiscourseComment {
 	 * Hooks into 'wp_enqueue_scripts'.
 	 */
 	function discourse_comments_js() {
-		if ( is_singular( $this->options['allowed_post_types'] ) ) {
+		if ( isset( $this->options['allowed_post_types']) && is_singular( $this->options['allowed_post_types'] ) ) {
 			if ( $this->use_discourse_comments( get_the_ID() ) ) {
 				wp_enqueue_script(
 					'discourse-comments-js',
