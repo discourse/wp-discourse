@@ -1,5 +1,5 @@
 === WP Discourse ===
-Contributors: cdck, retiehs, samsaffron, scossar, techapj
+Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.5.2
