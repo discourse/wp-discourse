@@ -39,7 +39,18 @@ class DiscourseSSO {
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 	}
+
+	public function logout_from_discourse() {
+		$user = wp_get_current_user();
+		$api_key = $this->options['api-key'];
+		$api_username = $this->options['publish-username'];
+		$url =
+
+
+	}
+
 
 	/**
 	 * Allows the login_url to be configured.
