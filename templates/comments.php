@@ -74,6 +74,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 			$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
 			$comment_body = DiscourseUtilities::sanitize_for_environment( $post->cooked );
+			$comment_body = DiscourseUtilities::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
 			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
 			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, get_date_from_gmt( $post->created_at ) ), $comment_html );
 			$comments_html .= $comment_html;
