@@ -3,7 +3,7 @@
  * Override functions from 'pluggable.php'
  */
 
-if ( !function_exists('wp_new_user_notification') ) :
+if ( ! function_exists( 'wp_new_user_notification' ) ) :
 	/**
 	 * Overrides the 'wp_new_user_notification' function to add an 'email_verification_key' to the email
 	 * sent to newly registered users.
@@ -32,13 +32,13 @@ if ( !function_exists('wp_new_user_notification') ) :
 
 		// The blogname option is escaped with esc_html on the way into the database in sanitize_option
 		// we want to reverse this for the plain text arena of emails.
-		$blogname = wp_specialchars_decode(get_option('blogname'), ENT_QUOTES);
+		$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 
-		$message  = sprintf(__('New user registration on your site %s:'), $blogname) . "\r\n\r\n";
-		$message .= sprintf(__('Username: %s'), $user->user_login) . "\r\n\r\n";
-		$message .= sprintf(__('Email: %s'), $user->user_email) . "\r\n";
+		$message  = sprintf( __( 'New user registration on your site %s:' ), $blogname ) . "\r\n\r\n";
+		$message .= sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
+		$message .= sprintf( __( 'Email: %s' ), $user->user_email ) . "\r\n";
 
-		@wp_mail(get_option('admin_email'), sprintf(__('[%s] New User Registration'), $blogname), $message);
+		@wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] New User Registration' ), $blogname ), $message );
 
 		// `$deprecated was pre-4.3 `$plaintext_pass`. An empty `$plaintext_pass` didn't sent a user notifcation.
 		if ( 'admin' === $notify || ( empty( $deprecated ) && empty( $notify ) ) ) {
@@ -63,12 +63,12 @@ if ( !function_exists('wp_new_user_notification') ) :
 		$email_verification_sig = time() . '_' . wp_generate_password( 20, false );
 		update_user_meta( $user_id, 'discourse_email_verification_key', $email_verification_sig );
 
-		$message = sprintf(__('Username: %s'), $user->user_login) . "\r\n\r\n";
-		$message .= __('To set your password, visit the following address:') . "\r\n\r\n";
-		$message .= '<' . network_site_url("wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode($user->user_login), 'login') . ">\r\n\r\n";
+		$message = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
+		$message .= __( 'To set your password, visit the following address:' ) . "\r\n\r\n";
+		$message .= '<' . network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ), 'login' ) . ">\r\n\r\n";
 
 		$message .= wp_login_url() . "\r\n";
 
-		wp_mail($user->user_email, sprintf(__('[%s] Your username and password info'), $blogname), $message);
+		wp_mail( $user->user_email, sprintf( __( '[%s] Your username and password info' ), $blogname ), $message );
 	}
 endif;

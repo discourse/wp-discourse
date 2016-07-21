@@ -28,7 +28,34 @@ class DiscourseComment {
 		$this->options = get_option( 'discourse' );
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
+		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+	}
+
+	/**
+	 * Adds data-youtube-id to the allowable div attributes.
+	 *
+	 * Discourse returns the youtube video id as the value of the 'data-youtube-attribute',
+	 * this function makes it possible to filter the comments with `wp_kses_post` without
+	 * stripping out that attribute.
+	 *
+	 * @param array  $allowedposttags  The array of allowed post tags.
+	 * @param string $context   The current context ('post', 'data', etc.).
+	 *
+	 * @return mixed
+	 */
+	public function extend_allowed_html( $allowedposttags, $context ) {
+		if ( 'post' === $context ) {
+			$allowedposttags['div'] = array(
+				'class' => true,
+				'id' => true,
+				'style' => true,
+				'title' => true,
+				'role' => true,
+				'data-youtube-id' => array(),
+			);
+		}
+		return $allowedposttags;
 	}
 
 	/**
@@ -37,7 +64,7 @@ class DiscourseComment {
 	 * Hooks into 'wp_enqueue_scripts'.
 	 */
 	function discourse_comments_js() {
-		if ( isset( $this->options['allowed_post_types']) && is_singular( $this->options['allowed_post_types'] ) ) {
+		if ( isset( $this->options['allowed_post_types'] ) && is_singular( $this->options['allowed_post_types'] ) ) {
 			if ( $this->use_discourse_comments( get_the_ID() ) ) {
 				wp_enqueue_script(
 					'discourse-comments-js',
@@ -145,8 +172,7 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$options         = $this->options;
 			$num_wp_comments = get_comments_number();
-			if ( ( isset( $options['show-existing-comments'] ) && ( 0 === intval( $options['show-existing-comments'] ) ) ) ||
-			     0 === intval( $num_wp_comments ) ) {
+			if ( ! isset( $options['show-existing-comments'] ) ||  0 === intval( $options['show-existing-comments'] ) ) {
 				// Only show the Discourse comments.
 				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
@@ -178,9 +204,9 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			if ( ! $count ) {
-				$count = 'Leave a reply';
+				$count = __( 'Leave a reply', 'wp-discourse' );
 			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 Reply' : $count . ' Replies';
+				$count = ( 1 === intval( $count ) ) ? '1 ' . __( 'Reply', 'wp-discourse' ) : $count . ' ' . __( 'Replies', 'wp-discourse' );
 			}
 		}
 

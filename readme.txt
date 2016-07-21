@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.5.2
-Stable tag: 0.9.2
+Stable tag: 0.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,17 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 - Add option to redirect to Discourse without login
 - Log error if validation filter is missing
 - Check for post_types array before trying to access it
+
+#### 0.9.2 16/07/20
+
+- Partial fix for emoji relative paths
+
+#### 0.9.3 16/07/21
+
+- Fix: existing WordPress comments always showing
+- Fix: don't escape youtube data attribute
+- Substitute comment url for comment_url tag
+- Internationalize comments_number function
 
 == Developers ==
 
