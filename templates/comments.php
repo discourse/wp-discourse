@@ -68,6 +68,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 			$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 			$comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
+			$comment_html = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
 			$avatar_url   = DiscourseUtilities::avatar( $post->avatar_template, 64 );
 			$comment_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
 			$user_url     = DiscourseUtilities::homepage( $options['url'], $post );
