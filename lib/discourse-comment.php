@@ -204,9 +204,9 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			if ( ! $count ) {
-				$count = 'Leave a reply';
+				$count = __( 'Leave a reply', 'wp-discourse' );
 			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 Reply' : $count . ' Replies';
+				$count = ( 1 === intval( $count ) ) ? '1 ' . __( 'Reply', 'wp-discourse' ) : $count . ' ' . __( 'Replies', 'wp-discourse' );
 			}
 		}
 
