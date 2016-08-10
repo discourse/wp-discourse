@@ -7,6 +7,8 @@
 
 namespace WPDiscourse\DiscourseSSO;
 
+use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class DiscourseSSO
  */
@@ -39,6 +41,7 @@ class DiscourseSSO {
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 	}
 
 	/**
@@ -196,12 +199,66 @@ class DiscourseSSO {
 	protected function email_not_verified_notice() {
 		$forum_url   = $this->options['url'];
 		$website_url = home_url( '/' );
-		$allowed = array(
+		$allowed     = array(
 			'strong' => array(),
 		);
 
 		$notice = __( '<strong>Attention: </strong>your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and log in again.', 'wp-discourse' );
 		echo '<p>' . wp_kses( $notice, $allowed ) . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . esc_html__( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
 		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . esc_html__( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
+	}
+
+	/**
+	 * Log the current user out of Discourse before logging them out of WordPress.
+	 *
+	 * This function hooks into the 'clear_auth_cookie' action. It is the last action hook before logout
+	 * where it is possible to access the user_id.
+	 *
+	 * @return \WP_Error
+	 */
+	public function logout_from_discourse() {
+		$user    = wp_get_current_user();
+		$user_id = $user->ID;
+
+		$base_url     = $this->options['url'];
+		$api_key      = $this->options['api-key'];
+		$api_username = $this->options['publish-username'];
+
+		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
+		// user info on login to WordPress and store it in the user_metadata table.
+		$user_url = $base_url . "/users/by-external/$user_id.json";
+		$user_url = add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		), $user_url );
+		$user_url = esc_url_raw( $user_url );
+
+		$user_data = wp_remote_get( $user_url );
+
+		if ( ! DiscourseUtilities::validate( $user_data ) ) {
+			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
+		}
+
+		$user_data = json_decode( wp_remote_retrieve_body( $user_data ), true );
+		if ( array_key_exists( 'user', $user_data ) ) {
+			$discourse_user_id = $user_data['user']['id'];
+
+			if ( isset( $discourse_user_id ) ) {
+				$logout_url = $base_url . "/admin/users/$discourse_user_id/log_out";
+				$logout_url = esc_url_raw( $logout_url );
+
+				$logout_response = wp_remote_post( $logout_url, array(
+					'method' => 'POST',
+					'body'   => array(
+						'api_key'      => $api_key,
+						'api_username' => $api_username,
+					),
+				) );
+
+				if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+					return new \WP_Error( 'unable_to_log_out_user', 'There was an error in logging out the current user from Discourse.' );
+				}
+			}
+		}
 	}
 }
