@@ -75,11 +75,37 @@ For more details on template customization, take a look at this section of our w
 
 == Changelog ==
 
-#### 0.7.0 16/05/16
 
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 0.9.4 16/08/10
+
+- Fix: WordPress comment box showing when there are no WordPress comments
+
+#### 0.9.3 16/07/21
+
+- Fix: existing WordPress comments always showing
+- Fix: youtube data attribute being escaped by wp_kses_post
+- Substitute comment url for comment_url tag
+- Internationalize comments_number function
+
+#### 0.9.2 16/07/20
+
+- Partial fix for emoji relative paths
+
+#### 0.9.1 16/07/19
+
+- Add option to redirect to Discourse without login
+- Log error if validation filter is missing
+- Check for post_types array before trying to access it
+
+#### 0.9.0 16/07/18
+
+- Verify email before logging into Discourse
+
+#### 0.7.0 16/05/16
 
 - Restructure code
 - Move templates out of options
@@ -97,28 +123,3 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 - Allow choosing Discourse category per post
 - Replace avatar URL function
 - Fix timezone for custom timestamp
-
-#### 0.9.0 16/07/18
-
-- Verify email before logging into Discourse
-
-#### 0.9.1 16/07/19
-
-- Add option to redirect to Discourse without login
-- Log error if validation filter is missing
-- Check for post_types array before trying to access it
-
-#### 0.9.2 16/07/20
-
-- Partial fix for emoji relative paths
-
-#### 0.9.3 16/07/21
-
-- Fix: existing WordPress comments always showing
-- Fix: don't escape youtube data attribute
-- Substitute comment url for comment_url tag
-- Internationalize comments_number function
-
-== Developers ==
-
-Check out the [code](https://github.com/discourse/wp-discourse) on GitHub
