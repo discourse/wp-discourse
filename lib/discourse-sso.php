@@ -146,12 +146,10 @@ class DiscourseSSO {
 				}
 
 				$current_user = wp_get_current_user();
+				$require_activation = false;
 
-				// This keeps users that don't have a verified email address from logging into Discourse.
 				if ( ! $this->wordpress_email_verifier->is_verified( $current_user->ID ) ) {
-					$this->wordpress_email_verifier->send_verification_email( $current_user->ID );
-					$this->email_not_verified_notice();
-					exit;
+					$require_activation = true;
 				}
 
 				// Payload and signature.
@@ -176,6 +174,7 @@ class DiscourseSSO {
 					'name'        => $current_user->display_name,
 					'username'    => $current_user->user_login,
 					'email'       => $current_user->user_email,
+					'require_activation' => $require_activation ? 'true' : 'false',
 					'about_me'    => $current_user->description,
 					'external_id' => $current_user->ID,
 					'avatar_url'  => get_avatar_url( get_current_user_id() ),
@@ -188,20 +187,5 @@ class DiscourseSSO {
 				exit;
 			}
 		}
-	}
-
-	/**
-	 * Creates the 'email not verified' notice.
-	 */
-	protected function email_not_verified_notice() {
-		$forum_url   = $this->options['url'];
-		$website_url = home_url( '/' );
-		$allowed = array(
-			'strong' => array(),
-		);
-
-		$notice = __( '<strong>Attention: </strong>your email address needs to be verified before it can be used to access the forum. A verification email has been sent to you. Please follow it\'s instructions and log in again.', 'wp-discourse' );
-		echo '<p>' . wp_kses( $notice, $allowed ) . '</p><p><a href="' . esc_url_raw( $website_url ) . '">' . esc_html__( 'Go to the website -->', 'wp-discourse' ) . '</a><br><br>';
-		echo '<a href="' . esc_url_raw( $forum_url ) . '">' . esc_html__( 'Go to the forum -->', 'wp-discourse' ) . '</a></p>';
 	}
 }
