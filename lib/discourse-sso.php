@@ -174,6 +174,7 @@ class DiscourseSSO {
 					'name'        => $current_user->display_name,
 					'username'    => $current_user->user_login,
 					'email'       => $current_user->user_email,
+					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
 					'require_activation' => $require_activation ? 'true' : 'false',
 					'about_me'    => $current_user->description,
 					'external_id' => $current_user->ID,
