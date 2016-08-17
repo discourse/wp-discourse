@@ -2,8 +2,8 @@
 Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
-Tested up to: 4.5.2
-Stable tag: 0.9.4
+Tested up to: 4.6
+Stable tag: 0.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,11 @@ For more details on template customization, take a look at this section of our w
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 0.9.5 16/08/16
+
+- Require activation on Discourse when email address can't be verified by WordPress
+- Tested up to WordPress 4.6
 
 #### 0.9.4 16/08/10
 
