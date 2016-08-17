@@ -1,0 +1,6 @@
+*.swp
+
+# JetBrains IDEs
+.idea/*
+
+vendor/*

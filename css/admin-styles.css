@@ -1,0 +1,24 @@
+/* Highlights errors in settings form inputs */
+
+#setting-error-discourse_url ~ form #discourse_url,
+#setting-error-api_key ~ form #discourse_api-key,
+#setting-error-publish_username ~ form #discourse_publish-username,
+#setting-error-max_comments ~ form #discourse_max-comments,
+#setting-error-min_replies ~ form #discourse_min-replies,
+#setting-error-min_score ~ form #discourse_min-score,
+#setting-error-min_trust_level ~ form #discourse_min-trust-level,
+#setting-error-bypass_trust_level ~ form #discourse_bypass-trust-level-score,
+#setting-error-excerpt_length ~ form #discourse_custom-excerpt-length,
+#setting-error-sso_secret ~ form #discourse_sso-secret,
+#setting-error-login_path ~ form #discourse_login-path {
+	border-color: #dc3232;
+	border-width: 2px;
+}
+
+.settings_page_discourse .discourse-allowed-types {
+	min-width: 160px;
+}
+
+#discourse-publish-meta-box .warning {
+	padding: 0 8px;
+}

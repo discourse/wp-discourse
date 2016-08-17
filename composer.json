@@ -1,0 +1,28 @@
+{
+  "name": "discourse/wp-discourse",
+  "type": "wordpress-plugin",
+  "license": "GPLv3",
+  "description": "WordPress plugin that allows you to use Discourse as a community engine for your WordPress blog.",
+  "homepage": "https://github.com/discourse/wp-discourse",
+  "authors": [
+    {
+      "name": "Sam Saffron",
+      "homepage": "https://github.com/SamSaffron"
+    },
+    {
+      "name": "Robin Ward",
+      "homepage": "https://github.com/eviltrout"
+    }
+  ],
+  "keywords": ["wordpress", "discourse"],
+  "support": {
+    "issues": "https://github.com/discourse/wp-discourse/issues"
+  },
+  "require": {
+    "php": ">=5.3",
+    "composer/installers": "1.0.*"
+  },
+  "require-dev": {
+    "php-mock/php-mock-phpunit": "^0.3"
+  }
+}
