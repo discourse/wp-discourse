@@ -2,10 +2,10 @@
 /**
  * PHPUnit bootstrap file
  *
- * @package wp-discourse
+ * @package Wp_Discourse
  */
 
-require_once( dirname( __DIR__) . '/vendor/autoload.php' );
+require_once( dirname( __DIR__ ) . '/vendor/autoload.php' );
 
 $_tests_dir = getenv( 'WP_TESTS_DIR' );
 if ( ! $_tests_dir ) {
