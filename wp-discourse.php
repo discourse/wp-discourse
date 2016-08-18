@@ -43,6 +43,7 @@ require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
+require_once( __DIR__ . '/lib/discourse-user.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/plugin-support/woocommerce-support.php' );
 
@@ -53,6 +54,7 @@ $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublis
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse', 'wp-discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+$discourse_user               = new WPDiscourse\DiscourseUser\DiscourseUser();
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 $discourse_woocommerce        = new WPDiscourse\PluginSupport\WooCommerceSupport();
 
