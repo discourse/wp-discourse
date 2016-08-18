@@ -2,13 +2,15 @@
 
 require_once( __DIR__ . '/../../lib/discourse-sso.php' );
 
+require_once( __DIR__ . '/../../lib/wordpress-email-verification.php' );
+
 
 class TestDiscourseSSO extends WP_UnitTestCase {
-	
+
 	protected $discourse_sso;
 
 	public function setUp() {
-		$this->discourse_sso = new \WPDiscourse\DiscourseSSO\DiscourseSSO();
+		$this->discourse_sso = new \WPDiscourse\DiscourseSSO\DiscourseSSO( new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse', 'wp-discourse' ));
 		$options = array(
 			'enable-sso' => 1,
 			'url' => 'http://forum.example.com',
