@@ -146,9 +146,10 @@ class DiscourseSSO {
 				}
 
 				$current_user = wp_get_current_user();
+				$user_id = $current_user->ID;
 				$require_activation = false;
 
-				if ( ! $this->wordpress_email_verifier->is_verified( $current_user->ID ) ) {
+				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ) {
 					$require_activation = true;
 				}
 

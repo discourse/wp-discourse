@@ -106,4 +106,30 @@ class TestWordPressEmailVerification extends WP_UnitTestCase {
 		$this->email_verifier->verify_email_after_login( $user->user_login, $user );
 		$this->assertTrue( $this->email_verifier->is_verified( $user_id ) );
 	}
+
+	public function test_user_email_changed_when_email_changed_it_is_marked_as_not_verified() {
+		$user_id                = $this->factory->user->create();
+		$user_data = get_userdata( $user_id );
+		wp_update_user( array(
+			'ID' => $user_id,
+			'user_email' => 'newemail@example.com',
+		) );
+
+		delete_user_meta( $user_id, 'discourse_email_not_verified' );
+
+		$this->email_verifier->user_email_changed( $user_id, $user_data );
+
+		$this->assertFalse( $this->email_verifier->is_verified( $user_id ) );
+	}
+
+	public function test_user_email_changed_when_email_not_changed() {
+		$user_id                = $this->factory->user->create();
+		$user_data = get_userdata( $user_id );
+
+		delete_user_meta( $user_id, 'discourse_email_not_verified' );
+
+		$this->email_verifier->user_email_changed( $user_id, $user_data );
+
+		$this->assertTrue( $this->email_verifier->is_verified( $user_id ) );
+	}
 }
