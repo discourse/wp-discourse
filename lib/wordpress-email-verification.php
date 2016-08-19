@@ -90,6 +90,7 @@ class WordPressEmailVerification {
 		add_action( 'after_password_reset', array( $this, 'verify_email_after_password_reset' ) );
 		add_action( 'wp_login', array( $this, 'verify_email_after_login' ), 10, 2 );
 		add_action( 'login_message', array( $this, 'email_not_verified_messages' ) );
+		add_action( 'profile_update', array( $this, 'user_email_changed' ), 10, 2 );
 	}
 
 	/**
@@ -212,6 +213,24 @@ class WordPressEmailVerification {
 	}
 
 	/**
+	 * Checks if the email address has been changed after a profile update.
+	 *
+	 * If the email address has changed the 'discourse_email_changed' value will be used to force Discourse
+	 * to validate the user.
+	 *
+	 * @param int  $user_id The user's id.
+	 * @param User $old_user_data The old userdata.
+	 */
+	public function user_email_changed( $user_id, $old_user_data ) {
+		$old_data_email = $old_user_data->user_email;
+		$new_data_email = get_userdata( $user_id )->user_email;
+
+		if ( $old_data_email !== $new_data_email ) {
+			update_user_meta( $user_id, $this->email_changed_key_name(), 1 );
+		}
+	}
+
+	/**
 	 * Sends an email verification message.
 	 *
 	 * The message includes a login link that has an email verification signature. Unless `$force` is set to true, the
@@ -265,9 +284,14 @@ class WordPressEmailVerification {
 	 */
 	public function is_verified( $user_id ) {
 
-		$status = $this->get_verification_status( $user_id );
+		if ( 1 === intval( $this->get_email_flag_status( $user_id ) ) ||
+		     1 === intval( $this->get_email_changed_status( $user_id ) ) ) {
 
-		return '' === $status ? true : false;
+			return false;
+		} else {
+
+			return true;
+		}
 	}
 
 	/**
@@ -292,18 +316,6 @@ class WordPressEmailVerification {
 	}
 
 	/**
-	 * Gets the database entry for the user's verification status.
-	 *
-	 * @param int $user_id The ID of the user.
-	 *
-	 * @return mixed
-	 */
-	protected function get_verification_status( $user_id ) {
-
-		return get_user_meta( $user_id, $this->verification_status_key_name(), true );
-	}
-
-	/**
 	 * Sets the verification status for a user.
 	 *
 	 * @param int   $user_id The user's ID.
@@ -312,6 +324,16 @@ class WordPressEmailVerification {
 	protected function set_verification_status( $user_id, $status ) {
 
 		update_user_meta( $user_id, $this->verification_status_key_name(), $status );
+	}
+
+	/**
+	 * Returns `1` if a user's email address is flagged as unverified.
+	 *
+	 * @param int $user_id The user's ID.
+	 */
+	protected function get_email_flag_status( $user_id ) {
+
+		return get_user_meta( $user_id, $this->verification_status_key_name(), true );
 	}
 
 	/**
@@ -332,6 +354,25 @@ class WordPressEmailVerification {
 	protected function verification_time_key_name() {
 
 		return $this->prefix_value( 'email_key_created_at' );
+	}
+
+	/**
+	 * Returns the prefixed key name for the email-changed database entry.
+	 *
+	 * @return string
+	 */
+	protected function email_changed_key_name() {
+		return $this->prefix_value( 'email_changed' );
+	}
+
+	/**
+	 * Returns `1` if the user's email address has been changed.
+	 * @param int $user_id The user's ID.
+	 *
+	 * @return mixed
+	 */
+	protected function get_email_changed_status( $user_id ) {
+		return get_user_meta( $user_id, $this->email_changed_key_name(), true );
 	}
 
 	/**
