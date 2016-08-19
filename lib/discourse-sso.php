@@ -39,24 +39,6 @@ class DiscourseSSO {
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
-		add_action( 'profile_update', array( $this, 'user_email_changed' ), 10, 2 );
-	}
-
-	/**
-	 * Checks if the email address has been changed after a profile update, if
-	 * it has the 'discourse_email_changed' value will be used to force Discourse
-	 * to validate the user.
-	 *
-	 * @param int $user_id The user's id.
-	 * @param User $old_user_data The old userdata.
-	 */
-	public function user_email_changed( $user_id, $old_user_data ) {
-		$old_data_email = $old_user_data->user_email;
-		$new_data_email = get_userdata( $user_id )->user_email;
-
-		if ( $old_data_email !== $new_data_email ) {
-			update_user_meta( $user_id, 'discourse_email_changed', 1 );
-		}
 	}
 
 	/**
@@ -167,8 +149,7 @@ class DiscourseSSO {
 				$user_id = $current_user->ID;
 				$require_activation = false;
 
-				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ||
-				     1 === intval( get_user_meta( $user_id, 'discourse_email_changed', true ) ) ) {
+				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ) {
 					$require_activation = true;
 				}
 
