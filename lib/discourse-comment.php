@@ -114,7 +114,7 @@ class DiscourseComment {
 		if ( $debug || $last_sync + 60 * 10 < $time ) {
 			$lock = 'comments_locked_for_' . $postid;
 			if ( ! 'locked' === get_transient( $lock ) ) {
-				set_transient( $lock, 'locked', 600 );
+				set_transient( $lock, 'locked', 60 );
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
