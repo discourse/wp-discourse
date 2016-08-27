@@ -1,6 +1,8 @@
 <?php
 /**
  * PHPUnit bootstrap file
+ *
+ * @package Wp_Discourse
  */
 
 require_once( dirname( __DIR__ ) . '/vendor/autoload.php' );
