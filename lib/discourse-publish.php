@@ -96,7 +96,7 @@ class DiscoursePublish {
 
 		// This avoids a double sync, just 1 is allowed to go through at a time.
 		if ( ! 'locked' === get_transient( $lock ) ) {
-			set_transient( $lock, 'locked' );
+			set_transient( $lock, 'locked', 60 );
 			$this->sync_to_discourse_work( $postid, $title, $raw );
 			delete_transient( $lock );
 		}
