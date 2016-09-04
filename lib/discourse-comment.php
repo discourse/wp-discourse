@@ -130,7 +130,6 @@ class DiscourseComment {
 					if ( isset( $discourse_options['only-show-moderator-liked'] ) && 1 === intval( $discourse_options['only-show-moderator-liked'] ) ) {
 						$options = $options . '&only_moderator_liked=true';
 					}
-					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
 					$permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
 					$result    = wp_remote_get( $permalink );
