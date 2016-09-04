@@ -107,14 +107,12 @@ class Utilities {
 	 */
 	public static function get_discourse_categories() {
 		$options = get_option( 'discourse' );
-		$url = add_query_arg( array(
-			'api_key' => $options['api-key'],
-			'api_username' => $options['publish-username'],
-		), $options['url'] . '/site.json' );
+		$base_url = $options['url'];
+		$url = esc_url_raw( $base_url . '/site.json' );
 		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
 		$remote = get_transient( 'discourse_settings_categories_cache' );
 		$cache = $remote;
-		if ( empty( $remote ) || $force_update ) {
+		if ( empty( $remote ) || 1 === intval( $force_update ) ) {
 			$remote = wp_remote_get( $url );
 			if ( ! self::validate( $remote ) ) {
 				if ( ! empty( $cache ) ) {
