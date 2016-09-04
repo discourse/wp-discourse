@@ -210,12 +210,7 @@ class DiscourseSSO {
 		$api_username = $this->options['publish-username'];
 		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
 		// user info on login to WordPress and store it in the user_metadata table.
-		$user_url = $base_url . "/users/by-external/$user_id.json";
-		$user_url = add_query_arg( array(
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-		), $user_url );
-		$user_url = esc_url_raw( $user_url );
+		$user_url = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
 		$user_data = wp_remote_get( $user_url );
 		if ( ! DiscourseUtilities::validate( $user_data ) ) {
 			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
