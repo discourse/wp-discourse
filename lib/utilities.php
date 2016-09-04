@@ -21,13 +21,8 @@ class Utilities {
 	 */
 	public static function check_connection_status() {
 		$options = get_option( 'discourse' );
-		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
-		$url     = add_query_arg( array(
-			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
-			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : '',
-		), $url . '/users/' . $options['publish-username'] . '.json' );
-
-		$url      = esc_url_raw( $url );
+		$base_url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
+		$url      = esc_url_raw( $base_url . '/site.json' );
 		$response = wp_remote_get( $url );
 
 		return self::validate( $response );
