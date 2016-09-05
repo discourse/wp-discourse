@@ -469,7 +469,7 @@ class DiscourseAdmin {
 		$categories = DiscourseUtilities::get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
-			esc_html_e( 'The category list will be synced with Discourse when you establish a connection.' , 'wp-discourse' );
+			esc_html_e( 'The category list will be synced with Discourse when you establish a connection.', 'wp-discourse' );
 
 			return;
 		}
@@ -525,7 +525,8 @@ class DiscourseAdmin {
 		}
 
 		?>
-		<input id='discourse_<?php echo esc_attr( $option ); ?>' name='discourse[<?php echo esc_attr( $option ); ?>]'
+		<input id='discourse_<?php echo esc_attr( $option ); ?>'
+		       name='discourse[<?php echo esc_attr( $option ); ?>]'
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
@@ -568,7 +569,7 @@ class DiscourseAdmin {
 	function discourse_validate_options( $inputs ) {
 		$output = array();
 		foreach ( $inputs as $key => $input ) {
-			$filter         = 'validate_' . str_replace( '-', '_', $key );
+			$filter = 'validate_' . str_replace( '-', '_', $key );
 
 			if ( ! has_filter( $filter ) ) {
 				error_log( 'Missing validation filter: ' . $filter );
@@ -633,7 +634,7 @@ class DiscourseAdmin {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
-				                          "To establish a connection, check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
+				                          "To establish a connection, check your settings for 'Discourse URL'. " .
 				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>

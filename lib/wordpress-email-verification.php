@@ -367,6 +367,7 @@ class WordPressEmailVerification {
 
 	/**
 	 * Returns `1` if the user's email address has been changed.
+	 *
 	 * @param int $user_id The user's ID.
 	 *
 	 * @return mixed
