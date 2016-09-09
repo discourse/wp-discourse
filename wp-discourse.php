@@ -2,8 +2,8 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 0.9.7.5
- * Author: Sam Saffron, Robin Ward
+ * Version: 0.9.8
+ * Author: Sam Saffron, Robin Ward, scossar
  * Text Domain: wp-discourse
  * Domain Path: /languages
  * Author URI: https://github.com/discourse/wp-discourse
