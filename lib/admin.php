@@ -22,11 +22,24 @@ class DiscourseAdmin {
 	 */
 	protected $options;
 
+	protected $discourse_connection;
+
+	protected $discourse_publish;
+
+	protected $discourse_comment;
+
+	protected $discourse_sso;
+
 	/**
 	 * Discourse constructor.
 	 */
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
+
+		$this->discourse_connection = get_option( 'discourse_connection' );
+		$this->discourse_publish = get_option( 'discourse_publish' );
+		$this->discourse_comment = get_option( 'discourse_comment' );
+		$this->discourse_sso = get_option( 'discourse_sso' );
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
