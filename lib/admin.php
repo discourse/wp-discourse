@@ -634,7 +634,7 @@ class DiscourseAdmin {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
-				                          "To establish a connection, check your settings for 'Discourse URL'. " .
+				                          "To establish a connection, check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
 				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>

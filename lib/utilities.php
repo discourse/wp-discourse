@@ -21,8 +21,13 @@ class Utilities {
 	 */
 	public static function check_connection_status() {
 		$options = get_option( 'discourse' );
-		$base_url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
-		$url      = esc_url_raw( $base_url . '/site.json' );
+		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
+		$url     = add_query_arg( array(
+			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
+			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : '',
+		), $url . '/users/' . $options['publish-username'] . '.json' );
+
+		$url      = esc_url_raw( $url );
 		$response = wp_remote_get( $url );
 
 		return self::validate( $response );
@@ -107,12 +112,14 @@ class Utilities {
 	 */
 	public static function get_discourse_categories() {
 		$options = get_option( 'discourse' );
-		$base_url = $options['url'];
-		$url = esc_url_raw( $base_url . '/site.json' );
+		$url = add_query_arg( array(
+			'api_key' => $options['api-key'],
+			'api_username' => $options['publish-username'],
+		), $options['url'] . '/site.json' );
 		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
 		$remote = get_transient( 'discourse_settings_categories_cache' );
 		$cache = $remote;
-		if ( empty( $remote ) || 1 === intval( $force_update ) ) {
+		if ( empty( $remote ) || $force_update ) {
 			$remote = wp_remote_get( $url );
 			if ( ! self::validate( $remote ) ) {
 				if ( ! empty( $cache ) ) {
