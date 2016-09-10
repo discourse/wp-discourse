@@ -48,7 +48,8 @@ class DiscoursePublish {
 		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 
 		if ( $publish_to_discourse && 'publish' === $new_status && $this->is_valid_sync_post_type( $post->ID ) ) {
-			$this->sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $post->ID, $title, $post->post_content );
 		}
 	}
 
@@ -65,7 +66,8 @@ class DiscoursePublish {
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
-			$this->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		}
 	}
 
@@ -80,8 +82,13 @@ class DiscoursePublish {
 		$post = get_post( $postid );
 		if ( 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
 			update_post_meta( $postid, 'publish_to_discourse', 1 );
-			$this->sync_to_discourse( $postid, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $postid, $title, $post->post_content );
 		}
+	}
+
+	protected function sanitize_title( $title ) {
+		return wp_strip_all_tags( $title );
 	}
 
 	/**
