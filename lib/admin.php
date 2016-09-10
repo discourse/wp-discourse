@@ -37,13 +37,14 @@ class DiscourseAdmin {
 		$this->options = get_option( 'discourse' );
 
 		$this->discourse_connection = get_option( 'discourse_connection' );
-		$this->discourse_publish = get_option( 'discourse_publish' );
-		$this->discourse_comment = get_option( 'discourse_comment' );
-		$this->discourse_sso = get_option( 'discourse_sso' );
+		$this->discourse_publish    = get_option( 'discourse_publish' );
+		$this->discourse_comment    = get_option( 'discourse_comment' );
+		$this->discourse_sso        = get_option( 'discourse_sso' );
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'discourse_admin_menu' ) );
+		add_action( 'admin_menu', array( $this, 'discourse_settings_menu' ) );
 		add_action( 'load-settings_page_discourse', array( $this, 'connection_status_notice' ) );
 	}
 
@@ -317,7 +318,7 @@ class DiscourseAdmin {
 	function post_types_select() {
 		self::post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -376,7 +377,7 @@ class DiscourseAdmin {
 		self::text_input( 'custom-datetime-format', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                            get_option( 'date_format' ) . '").' .
 		                                            __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                            __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -444,7 +445,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $post_types An array of available post types.
+	 * @param array $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -496,8 +497,8 @@ class DiscourseAdmin {
 	 * Outputs the markup for an option input.
 	 *
 	 * @param string $name Suppies the 'name' value for the select input.
-	 * @param array  $group The array of items to be selected.
-	 * @param int    $selected The value of the selected option.
+	 * @param array $group The array of items to be selected.
+	 * @param int $selected The value of the selected option.
 	 */
 	function option_input( $name, $group, $selected ) {
 		echo '<select id="' . esc_attr( $name ) . '" name="' . esc_attr( $name ) . '">';
@@ -519,8 +520,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option.
 	 * @param string $description The description of the settings field.
-	 * @param null   $type The type of input ('number', 'url', etc).
-	 * @param null   $min The min value (applied to number inputs).
+	 * @param null $type The type of input ('number', 'url', etc).
+	 * @param null $min The min value (applied to number inputs).
 	 */
 	function text_input( $option, $description, $type = null, $min = null ) {
 		$options = $this->options;
@@ -543,7 +544,7 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -605,6 +606,104 @@ class DiscourseAdmin {
 		) );
 	}
 
+	function discourse_settings_menu() {
+		add_menu_page(
+			__( 'Discourse', 'wp-discourse' ),
+			__( 'Discourse', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_options',
+			array( $this, 'wp_discourse_options_display' )
+		);
+
+		add_submenu_page(
+			'wp_discourse_options',
+			__( 'Connection Options', 'wp-discourse' ),
+			__( 'Connection Options', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_connection_options',
+			array( $this, 'wp_discourse_connection_options_display' )
+		);
+
+		add_submenu_page(
+			'wp_discourse_options',
+			__( 'Publishing Options', 'wp-discourse' ),
+			__( 'Publishing Options', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_publishing_options',
+			array( $this, 'wp_discourse_publishing_options_display' )
+		);
+
+		add_submenu_page(
+			'wp_discourse_options',
+			__( 'Commenting Options', 'wp-discourse' ),
+			__( 'Commenting Options', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_commenting_options',
+			array( $this, 'wp_discourse_commenting_options_display' )
+		);
+
+		add_submenu_page(
+			'wp_discourse_options',
+			__( 'SSO Options', 'wp-discourse' ),
+			__( 'SSO Options', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_sso_options',
+			array( $this, 'wp_discourse_sso_options_display' )
+		);
+	}
+
+	function wp_discourse_connection_options_display() {
+		$this->wp_discourse_options_display( 'connection_options' );
+	}
+
+	function wp_discourse_publishing_options_display() {
+		$this->wp_discourse_options_display( 'publishing_options' );
+	}
+
+	function wp_discourse_commenting_options_display() {
+		$this->wp_discourse_options_display( 'commenting_options' );
+	}
+
+	function wp_discourse_sso_options_display() {
+		$this->wp_discourse_options_display( 'sso_options' );
+	}
+
+	// Menu page callbacks
+	function wp_discourse_options_display( $active_tab = '' ) {
+		?>
+
+		<div class="wrap">
+			<h2><?php _e( 'WP Discourse Options', 'wp-discourse' ); ?></h2>
+			<?php settings_errors(); ?>
+
+			<?php
+			if ( isset( $_GET['tab'] ) ) {
+				$tab = $_GET['tab'];
+			} else {
+				$tab = $active_tab;
+			}
+			?>
+
+			<div class="nav-tab-wrapper">
+				<a href="?page=wp_discourse_options&tab=connection_options"
+				   class="nav-tab <?php echo 'connection_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php _e( 'Connection', 'wp-discourse' ); ?>
+				</a>
+				<a href="?page=wp_discourse_options&tab=publishing_options"
+				   class="nav-tab <?php echo 'publishing_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php _e( 'Publishing', 'wp-discourse' ); ?>
+				</a>
+				<a href="?page=wp_discourse_options&tab=commenting_options"
+				   class="nav-tab <?php echo 'commenting_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php _e( 'Commenting', 'wp-discourse' ); ?>
+				</a>
+				<a href="?page=wp_discourse_options&tab=sso_options"
+				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php _e( 'SSO', 'wp-discourse' ); ?>
+				</a>
+			</div>
+
+		</div>
+
+		<?php
+	}
+
 	/**
 	 * The callback for creating the Discourse options page.
 	 */
@@ -648,7 +747,7 @@ class DiscourseAdmin {
 			<p>
 				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
 				                          "To establish a connection, check your settings for 'Discourse URL'. " .
-				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
