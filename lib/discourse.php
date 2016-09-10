@@ -51,6 +51,40 @@ class Discourse {
 		'login-path'                => '',
 	);
 
+	static $discourse_connection = array(
+		'url' => '',
+		'api-key' => '',
+		'publish-username' => 'system',
+	);
+
+	static $discourse_publish = array(
+		'display-subcategories' => 0,
+		'publish-category' => '',
+		'auto-publish' => 0,
+		'allowed_post_types' => array( 'post' ),
+		'auto-track' => 1,
+	);
+
+	static $discourse_comment = array(
+		'max-comments' => 5,
+		'use-discourse-comments'    => 0,
+		'show-existing-comments'    => 0,
+		'min-score'                 => 0,
+		'min-replies'               => 1,
+		'min-trust-level'           => 1,
+		'custom-excerpt-length'     => 55,
+		'bypass-trust-level-score'  => 50,
+		'debug-mode'                => 0,
+		'full-post-content'         => 0,
+		'only-show-moderator-liked' => 0,
+	);
+
+	static $discourse_sso = array(
+		'enable-sso' => 0,
+		'sso-secret' => '',
+		'login-path' => '',
+	);
+
 	/**
 	 * Discourse constructor.
 	 */
@@ -68,6 +102,10 @@ class Discourse {
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
 		add_option( 'discourse', self::$options );
+		add_option( 'discourse_connection', self::$discourse_connection );
+		add_option( 'discourse_publish', self::$discourse_publish );
+		add_option( 'discourse_comment', self::$discourse_comment );
+		add_option( 'discourse_sso', self::$discourse_sso );
 	}
 
 	/**
