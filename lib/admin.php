@@ -60,7 +60,20 @@ class DiscourseAdmin {
 	 * Settings
 	 */
 	public function admin_init() {
+		// old
 		register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
+
+		// new
+		register_setting( 'discourse_connection', 'discourse_connection', array( $this, 'discourse_validate_options' ) );
+		register_setting( 'discourse_publish', 'discourse_publish', array( $this, 'discourse_validate_options' ) );
+		register_setting( 'discourse_comment', 'discourse_comment', array( $this, 'discourse_validate_options' ) );
+		register_setting( 'discourse_sso', 'discourse_sso', array( $this, 'discourse_validate_options' ) );
+
+
+
+
+
+
 		add_settings_section( 'discourse_wp_api', __( 'Common Settings', 'wp-discourse' ), array(
 			$this,
 			'init_default_settings',
