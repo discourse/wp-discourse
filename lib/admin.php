@@ -64,16 +64,44 @@ class DiscourseAdmin {
 		register_setting( 'discourse', 'discourse', array( $this, 'discourse_validate_options' ) );
 
 		// new
-		register_setting( 'discourse_connection', 'discourse_connection', array( $this, 'discourse_validate_options' ) );
-		register_setting( 'discourse_publish', 'discourse_publish', array( $this, 'discourse_validate_options' ) );
-		register_setting( 'discourse_comment', 'discourse_comment', array( $this, 'discourse_validate_options' ) );
-		register_setting( 'discourse_sso', 'discourse_sso', array( $this, 'discourse_validate_options' ) );
+		register_setting( 'discourse_connection', 'discourse_connection', array(
+			$this,
+			'discourse_validate_options'
+		) );
+		register_setting( 'discourse_publish', 'discourse_publish', array(
+			$this,
+			'discourse_validate_options'
+		) );
+		register_setting( 'discourse_comment', 'discourse_comment', array(
+			$this,
+			'discourse_validate_options'
+		) );
+		register_setting( 'discourse_sso', 'discourse_sso', array(
+			$this,
+			'discourse_validate_options'
+		) );
 
+		add_settings_section( 'discourse_connection_settings_section', __( 'Connection Settings', 'wp-discourse' ), array(
+			$this,
+			'connection_settings_display'
+		), 'wp_discourse_connection_options' );
 
+		add_settings_section( 'discourse_publishing_settings_section', __( 'Publishing Settings', 'wp-discourse' ), array(
+			$this,
+			'publishing_settings_display'
+		), 'wp_discourse_publishing_options' );
 
+		add_settings_section( 'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
+			$this,
+			'commenting_settings_display'
+		), 'wp_discourse_commenting_options' );
 
+		add_settings_section( 'discourse_sso_settings_section', __( 'SSO Settings', 'wp-discourse' ), array(
+			$this,
+			'sso_settings_display'
+		), 'wp_discourse_sso_options' );
 
-
+		// old
 		add_settings_section( 'discourse_wp_api', __( 'Common Settings', 'wp-discourse' ), array(
 			$this,
 			'init_default_settings',
@@ -540,7 +568,7 @@ class DiscourseAdmin {
 		$options = $this->options;
 		$allowed = array(
 			'a' => array(
-				'href'   => array(),
+				'href' => array(),
 				'target' => array(),
 			),
 		);
@@ -760,7 +788,7 @@ class DiscourseAdmin {
 			<p>
 				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
 				                          "To establish a connection, check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
