@@ -121,6 +121,8 @@ class DiscourseAdmin {
 		), 'discourse' );
 
 		// Old -- these are being updated to work with the new settings sections
+
+		// connection
 		add_settings_field( 'discourse_url', __( 'Discourse URL', 'wp-discourse' ), array(
 			$this,
 			'url_input',
@@ -136,102 +138,123 @@ class DiscourseAdmin {
 			'publish_username_input',
 		), 'wp_discourse_connection_options', 'discourse_connection_settings_section' );
 
-		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO', 'wp-discourse' ), array(
-			$this,
-			'enable_sso_checkbox',
-		), 'wp_discourse_options', 'discourse_sso_settings_section' );
-		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
-			$this,
-			'wordpress_login_path',
-		), 'wp_discourse_options', 'discourse_sso_settings_section' );
-		add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
-			$this,
-			'sso_secret_input',
-		), 'wp_discourse_options', 'discourse_sso_settings_section' );
+		// publish
 		add_settings_field( 'discourse_display_subcategories', __( 'Display subcategories', 'wp-discourse' ), array(
 			$this,
 			'display_subcategories',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_publish_category', __( 'Published category', 'wp-discourse' ), array(
 			$this,
 			'publish_category_input',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_publish_category_update', __( 'Force category update', 'wp-discourse' ), array(
 			$this,
 			'publish_category_input_update',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_full_post_content', __( 'Use full post content', 'wp-discourse' ), array(
 			$this,
 			'full_post_checkbox',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
 
 		add_settings_field( 'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
 			$this,
 			'auto_publish_checkbox',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_auto_track', __( 'Auto Track Published Topics', 'wp-discourse' ), array(
 			$this,
 			'auto_track_checkbox',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_allowed_post_types', __( 'Post Types to publish to Discourse', 'wp-discourse' ), array(
 			$this,
 			'post_types_select',
-		), 'wp_discourse_options', 'discourse_publishing_settings_section' );
+		), 'wp_discourse_publishing_options', 'discourse_publishing_settings_section' );
 
+		// commenting
 		add_settings_field( 'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array(
 			$this,
 			'use_discourse_comments_checkbox',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
 			$this,
 			'show_existing_comments_checkbox',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_existing_comments_heading', __( 'Existing Comments Heading', 'wp-discourse' ), array(
 			$this,
 			'existing_comments_heading_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_max_comments', __( 'Max visible comments', 'wp-discourse' ), array(
 			$this,
 			'max_comments_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_min_replies', __( 'Min number of replies', 'wp-discourse' ), array(
 			$this,
 			'min_replies_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_min_score', __( 'Min score of posts', 'wp-discourse' ), array(
 			$this,
 			'min_score_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_min_trust_level', __( 'Min trust level', 'wp-discourse' ), array(
 			$this,
 			'min_trust_level_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass trust level score', 'wp-discourse' ), array(
 			$this,
 			'bypass_trust_level_input',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_custom_excerpt_length', __( 'Custom excerpt length', 'wp-discourse' ), array(
 			$this,
 			'custom_excerpt_length',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
 			$this,
 			'custom_datetime_format',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
 
 		add_settings_field( 'discourse_only_show_moderator_liked', __( 'Only import comments liked by a moderator', 'wp-discourse' ), array(
 			$this,
 			'only_show_moderator_liked_checkbox',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_debug_mode', __( 'Debug mode', 'wp-discourse' ), array(
 			$this,
 			'debug_mode_checkbox',
-		), 'wp_discourse_options', 'discourse_commenting_settings_section' );
+		), 'wp_discourse_commenting_options', 'discourse_commenting_settings_section' );
+
+		// sso
+		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO', 'wp-discourse' ), array(
+			$this,
+			'enable_sso_checkbox',
+		), 'wp_discourse_sso_options', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
+			$this,
+			'wordpress_login_path',
+		), 'wp_discourse_sso_options', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
+			$this,
+			'sso_secret_input',
+		), 'wp_discourse_sso_options', 'discourse_sso_settings_section' );
 
 		add_settings_field( 'discourse_redirect_without_login', __( 'Redirect Without Login', 'wp-discourse' ), array(
 			$this,
 			'redirect_without_login_checkbox',
-		), 'wp_discourse_options', 'discourse_sso_settings_section' );
+		), 'wp_discourse_sso_options', 'discourse_sso_settings_section' );
 	}
 
 	/**
