@@ -74,13 +74,20 @@ class DiscoursePublish {
 	/**
 	 * For publishing by xmlrpc.
 	 *
-	 * Hooks into 'xmlrpc_publish_post'.
+	 * Hooks into 'xmlrpc_publish_post'. Publishing through this hook is disabled. This is to prevent
+	 * posts being inadvertently published to Discourse when they are edited using blogging software.
+	 * This can be overridden by hooking into the `wp_discourse_before_xmlrpc_publish` filter and setting
+	 * `$publish_to_discourse` to true based on some condition - testing for the presence of a tag can
+	 * work for this.
 	 *
 	 * @param int $postid The post id.
 	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
-		if ( 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
+		$publish_to_discourse = false;
+		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
+
+		if ( $publish_to_discourse && 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
 			update_post_meta( $postid, 'publish_to_discourse', 1 );
 			$title = $this->sanitize_title( $post->post_title );
 			$this->sync_to_discourse( $postid, $title, $post->post_content );
