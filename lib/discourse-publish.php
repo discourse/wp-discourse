@@ -87,10 +87,6 @@ class DiscoursePublish {
 		}
 	}
 
-	protected function sanitize_title( $title ) {
-		return wp_strip_all_tags( $title );
-	}
-
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
@@ -251,5 +247,16 @@ class DiscoursePublish {
 			// functions using this function will be trying to access the key of `null`.
 			return array();
 		}
+	}
+
+	/**
+	 * Strip html tags from titles before passing them to Discourse.
+	 *
+	 * @param $title The title of the post.
+	 *
+	 * @return string
+	 */
+	protected function sanitize_title( $title ) {
+		return wp_strip_all_tags( $title );
 	}
 }
