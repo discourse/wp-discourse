@@ -25,7 +25,7 @@ Download the [latest release](https://github.com/discourse/wp-discourse/releases
 If you're using Composer to manage WordPress, add WP-Discourse to your project's dependencies. Run:
 
 ```sh
-composer require discourse/wp-discourse 0.7.0
+composer require discourse/wp-discourse 0.9.9
 ```
 
 Or manually add it to your `composer.json`:
@@ -34,7 +34,7 @@ Or manually add it to your `composer.json`:
 "require": {
   "php": ">=5.3.0",
   "wordpress": "4.1.1",
-  "discourse/wp-discourse": "0.7.0"
+  "discourse/wp-discourse": "0.9.9"
 }
 ```
 

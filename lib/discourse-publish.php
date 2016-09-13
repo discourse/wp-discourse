@@ -48,7 +48,8 @@ class DiscoursePublish {
 		$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
 
 		if ( $publish_to_discourse && 'publish' === $new_status && $this->is_valid_sync_post_type( $post->ID ) ) {
-			$this->sync_to_discourse( $post->ID, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $post->ID, $title, $post->post_content );
 		}
 	}
 
@@ -65,22 +66,31 @@ class DiscoursePublish {
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
-			$this->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		}
 	}
 
 	/**
 	 * For publishing by xmlrpc.
 	 *
-	 * Hooks into 'xmlrpc_publish_post'.
+	 * Hooks into 'xmlrpc_publish_post'. Publishing through this hook is disabled. This is to prevent
+	 * posts being inadvertently published to Discourse when they are edited using blogging software.
+	 * This can be overridden by hooking into the `wp_discourse_before_xmlrpc_publish` filter and setting
+	 * `$publish_to_discourse` to true based on some condition - testing for the presence of a tag can
+	 * work for this.
 	 *
 	 * @param int $postid The post id.
 	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
 		$post = get_post( $postid );
-		if ( 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
+		$publish_to_discourse = false;
+		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
+
+		if ( $publish_to_discourse && 'publish' === get_post_status( $postid ) && $this->is_valid_sync_post_type( $postid ) ) {
 			update_post_meta( $postid, 'publish_to_discourse', 1 );
-			$this->sync_to_discourse( $postid, $post->post_title, $post->post_content );
+			$title = $this->sanitize_title( $post->post_title );
+			$this->sync_to_discourse( $postid, $title, $post->post_content );
 		}
 	}
 
@@ -244,5 +254,16 @@ class DiscoursePublish {
 			// functions using this function will be trying to access the key of `null`.
 			return array();
 		}
+	}
+
+	/**
+	 * Strip html tags from titles before passing them to Discourse.
+	 *
+	 * @param $title The title of the post.
+	 *
+	 * @return string
+	 */
+	protected function sanitize_title( $title ) {
+		return wp_strip_all_tags( $title );
 	}
 }
