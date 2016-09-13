@@ -27,6 +27,7 @@ class DiscourseComment {
 	public function __construct() {
 		$this->options = get_option( 'discourse' );
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
+		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
@@ -207,6 +208,28 @@ class DiscourseComment {
 			} else {
 				$count = ( 1 === intval( $count ) ) ? '1 ' . __( 'Reply', 'wp-discourse' ) : $count . ' ' . __( 'Replies', 'wp-discourse' );
 			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Return the 'discourse_comment_count'.
+	 *
+	 * When the 'show-existing-comments' option is not enabled, return the 'discourse_comment_count'
+	 * so that it is available for themes using `get_comments_number`.
+	 *
+	 * @param int $count The comment count supplied by WordPress.
+	 * @param int $post_id The ID of the post.
+	 *
+	 * @return mixed
+	 */
+	function get_comments_number( $count, $post_id ) {
+		$use_wordpress_comments = isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] );
+
+		if ( $this->use_discourse_comments( $post_id ) && ( ! $use_wordpress_comments ) ) {
+			$this->sync_comments( $post_id );
+			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 		}
 
 		return $count;
