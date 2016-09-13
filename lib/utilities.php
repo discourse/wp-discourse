@@ -14,6 +14,16 @@ namespace WPDiscourse\Utilities;
  */
 class Utilities {
 
+	public static function get_options( $option_names ) {
+		$options = [];
+		foreach ( $option_names as $option_name ) {
+			$option = get_option( $option_name );
+			$options = array_merge( $options, $option );
+		}
+
+		return $options;
+	}
+
 	/**
 	 * Checks the connection status to Discourse.
 	 *

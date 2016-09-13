@@ -91,7 +91,26 @@ class Discourse {
 	public function __construct() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
+		add_action( 'admin_init', array( $this, 'initialize_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
+	}
+
+	public function initialize_plugin_options() {
+		if ( false === get_option( 'discourse_connect' ) ) {
+			add_option( 'discourse_connect', self::$discourse_connection );
+		}
+
+		if ( false === get_option( 'discourse_publish' ) ) {
+			add_option( 'discourse_publish', self::$discourse_publish );
+		}
+
+		if ( false === get_option( 'discourse_comment' ) ) {
+			add_option( 'discourse_comment', self::$discourse_comment );
+		}
+
+		if ( false === get_option( 'discourse_sso' ) ) {
+			add_option( 'discourse_sso', self::$discourse_sso );
+		}
 	}
 
 	/**
@@ -101,11 +120,11 @@ class Discourse {
 	 */
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
-		add_option( 'discourse', self::$options );
-		add_option( 'discourse_connection', self::$discourse_connection );
-		add_option( 'discourse_publish', self::$discourse_publish );
-		add_option( 'discourse_comment', self::$discourse_comment );
-		add_option( 'discourse_sso', self::$discourse_sso );
+//		add_option( 'discourse', self::$options );
+//		add_option( 'discourse_connection', self::$discourse_connection );
+//		add_option( 'discourse_publish', self::$discourse_publish );
+//		add_option( 'discourse_comment', self::$discourse_comment );
+//		add_option( 'discourse_sso', self::$discourse_sso );
 	}
 
 	/**
