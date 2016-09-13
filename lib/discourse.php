@@ -17,7 +17,7 @@ class Discourse {
 	 *
 	 * @var string
 	 */
-	public static $version = '0.9.8';
+	public static $version = '0.9.9';
 
 	/**
 	 * The default options.
