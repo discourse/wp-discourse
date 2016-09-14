@@ -417,6 +417,7 @@ class DiscourseAdmin {
 
 	/**
 	 * Outputs markup for the sso-secret input.
+	 * TODO: add a 'found at' link, similar to what is used for the api_key setting.
 	 */
 	function sso_secret_input() {
 		$this->text_input( 'sso-secret', 'discourse_sso', '' );
