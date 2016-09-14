@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.6.1
-Stable tag: 0.9.8
+Stable tag: 0.9.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -79,6 +79,12 @@ For more details on template customization, take a look at this section of our w
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 0.9.9 13/09/16
+
+- Return 'discourse_comments_count' from WordPress `get_comments_number` function when WordPress comments are not being used
+- Disable publishing to Discourse when a WordPress post is published through `XML-RPC`
+- Strip html tags from WordPress titles before sending them to Discourse
 
 #### 0.9.8 09/09/16
 
