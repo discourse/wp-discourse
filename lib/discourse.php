@@ -19,39 +19,7 @@ class Discourse {
 	 */
 	public static $version = '0.9.8';
 
-	/**
-	 * The default options.
-	 *
-	 * The options can be accessed in any file with `get_option( 'discourse' )`.
-	 *
-	 * @var array
-	 */
-	static $options = array(
-		'url'                       => '',
-		'api-key'                   => '',
-		'enable-sso'                => 0,
-		'sso-secret'                => '',
-		'publish-username'          => 'system',
-		'display-subcategories'     => 0,
-		'publish-category'          => '',
-		'auto-publish'              => 0,
-		'allowed_post_types'        => array( 'post' ),
-		'auto-track'                => 1,
-		'max-comments'              => 5,
-		'use-discourse-comments'    => 0,
-		'show-existing-comments'    => 0,
-		'min-score'                 => 0,
-		'min-replies'               => 1,
-		'min-trust-level'           => 1,
-		'custom-excerpt-length'     => 55,
-		'bypass-trust-level-score'  => 50,
-		'debug-mode'                => 0,
-		'full-post-content'         => 0,
-		'only-show-moderator-liked' => 0,
-		'login-path'                => '',
-	);
-
-	static $discourse_connection = array(
+	static $discourse_connect = array(
 		'url' => '',
 		'api-key' => '',
 		'publish-username' => 'system',
@@ -97,7 +65,7 @@ class Discourse {
 
 	public function initialize_plugin_options() {
 		if ( false === get_option( 'discourse_connect' ) ) {
-			add_option( 'discourse_connect', self::$discourse_connection );
+			add_option( 'discourse_connect', self::$discourse_connect );
 		}
 
 		if ( false === get_option( 'discourse_publish' ) ) {
@@ -120,11 +88,6 @@ class Discourse {
 	 */
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
-//		add_option( 'discourse', self::$options );
-//		add_option( 'discourse_connection', self::$discourse_connection );
-//		add_option( 'discourse_publish', self::$discourse_publish );
-//		add_option( 'discourse_comment', self::$discourse_comment );
-//		add_option( 'discourse_sso', self::$discourse_sso );
 	}
 
 	/**
