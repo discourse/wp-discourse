@@ -22,3 +22,9 @@
 #discourse-publish-meta-box .warning {
 	padding: 0 8px;
 }
+
+/* Menu logo */
+#adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
+	padding-top: 5px;
+}
+
