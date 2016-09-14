@@ -11,6 +11,8 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class MetaBox
+ * Todo: don't show category list when a post is being edited, show the 'published category' instead.
+ * Todo: improve the 'categories not available' error message.
  */
 class MetaBox {
 
