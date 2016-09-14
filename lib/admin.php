@@ -36,7 +36,6 @@ class DiscourseAdmin {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'discourse_settings_menu' ) );
-		add_action( 'load-settings_page_discourse', array( $this, 'connection_status_notice' ) );
 	}
 
 	/**
@@ -596,13 +595,16 @@ class DiscourseAdmin {
 	// Create the options pages
 
 	function discourse_settings_menu() {
-		add_menu_page(
+		$suffix = add_menu_page(
 			__( 'Discourse', 'wp-discourse' ),
 			__( 'Discourse', 'wp-discourse' ),
 			'manage_options',
 			'wp_discourse_options',
 			array( $this, 'wp_discourse_options_display' )
 		);
+		add_action( 'load-' . $suffix, array( $this, 'connection_status_notice' ) );
+
+
 
 		add_submenu_page(
 			'wp_discourse_options',
@@ -659,7 +661,13 @@ class DiscourseAdmin {
 
 	// Menu page callbacks
 
-	function connection_settings_display() {}
+	function connection_settings_display() {
+		?>
+		<p class="documentation-link">
+			<?php esc_html_e( 'This section is for configuring your connection to discourse.', 'wp-discourse' ); ?>
+		</p>
+		<?php
+	}
 
 	function publishing_settings_display() {}
 
