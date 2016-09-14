@@ -15,6 +15,19 @@
 	border-width: 1px;
 }
 
+.toplevel_page_wp_discourse_options .documentation-link {
+	max-width: 900px;
+}
+
+.toplevel_page_wp_discourse_options h2 img {
+    vertical-align: bottom;
+}
+
+.wrap>h2:first-child {
+	line-height: 23px;
+	margin-bottom: 6px;
+}
+
 #discourse-allowed-post-types {
 	min-width: 160px;
 }
@@ -27,4 +40,3 @@
 #adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
 	padding-top: 6px;
 }
-
