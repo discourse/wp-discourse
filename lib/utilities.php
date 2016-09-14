@@ -30,7 +30,9 @@ class Utilities {
 	 * @return int
 	 */
 	public static function check_connection_status() {
-		$options = get_option( 'discourse' );
+		$options = self::get_options(
+			array( 'discourse_connect' )
+		);
 		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
 		$url     = add_query_arg( array(
 			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
@@ -121,7 +123,13 @@ class Utilities {
 	 * @return array|mixed|object|\WP_Error|WP_Error
 	 */
 	public static function get_discourse_categories() {
-		$options = get_option( 'discourse' );
+		$options = self::get_options(
+			array(
+				'discourse_connect',
+				'discourse_publish',
+			)
+		);
+
 		$url = add_query_arg( array(
 			'api_key' => $options['api-key'],
 			'api_username' => $options['publish-username'],

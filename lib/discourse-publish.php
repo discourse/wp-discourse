@@ -27,7 +27,12 @@ class DiscoursePublish {
 	 * DiscoursePublish constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'discourse' );
+		$this->options = DiscourseUtilities::get_options(
+			array(
+				'discourse_connect',
+				'discourse_publish',
+			)
+		);
 
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );

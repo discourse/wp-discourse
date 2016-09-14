@@ -22,7 +22,7 @@ class WooCommerceSupport {
 	 * WooCommerceSupport constructor.
 	 */
 	function __construct() {
-		$this->options = DiscourseUtilities::get_options( 'discourse_connection' );
+		$this->options = DiscourseUtilities::get_options( array( 'discourse_connect' ) );
 
 		add_filter( 'woocommerce_login_redirect', array( $this, 'set_redirect' ) );
 		add_filter( 'woocommerce_product_review_count', array( $this, 'comments_number' ) );

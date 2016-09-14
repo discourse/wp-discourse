@@ -25,7 +25,13 @@ class DiscourseComment {
 	 * DiscourseComment constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'discourse' );
+		$this->options = DiscourseUtilities::get_options(
+			array(
+				'discourse_connect',
+				'discourse_publish',
+				'discourse_comment',
+			)
+		);
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
