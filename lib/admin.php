@@ -380,9 +380,9 @@ class DiscourseAdmin {
 	 */
 	function custom_datetime_format() {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
-		                                            get_option( 'date_format' ) . '").' .
-		                                            __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		                                            __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                  get_option( 'date_format' ) . '").' .
+		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -486,7 +486,8 @@ class DiscourseAdmin {
 		?>
 		<label>
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
-			       name='<?php echo $this->option_name( $option, $option_group ); ?>' type='checkbox'
+			       name='<?php echo $this->option_name( $option, $option_group ); ?>'
+			       type='checkbox'
 			       value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo esc_html( $label ); ?>
 		</label>
@@ -541,8 +542,8 @@ class DiscourseAdmin {
 			return;
 		}
 
-		$selected = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-		$option_name     = $this->option_name( $option, $option_group );
+		$selected    = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+		$option_name = $this->option_name( $option, $option_group );
 		$this->option_input( $option, $option_name, $categories, $selected );
 	}
 
@@ -595,7 +596,7 @@ class DiscourseAdmin {
 	// Create the options pages
 
 	function discourse_settings_menu() {
-		$suffix = add_menu_page(
+		$settings = add_menu_page(
 			__( 'Discourse', 'wp-discourse' ),
 			__( 'Discourse', 'wp-discourse' ),
 			'manage_options',
@@ -603,45 +604,55 @@ class DiscourseAdmin {
 			array( $this, 'wp_discourse_options_display' ),
 			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzNEQzI4NEE3MjY1MTFFNjlCMTdFMUZCNjUyNTEyQTYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzNEQzI4NEI3MjY1MTFFNjlCMTdFMUZCNjUyNTEyQTYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpGMzQzOTQ2QjcyNjMxMUU2OUIxN0UxRkI2NTI1MTJBNiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpGMzQzOTQ2QzcyNjMxMUU2OUIxN0UxRkI2NTI1MTJBNiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PqiLpIEAAAPqSURBVHjahJVLSFxnFMfPjO/XOD6Lb7TxgWgQBVeilCBm1YUQgpBNN1111WXtooR0X7IQiit3tt20tEjAjSa4UKnCUJWowRJHCSoa328n53ecb7gziZkP/nrnu+f5P4/rq62tlc+ce4pexVeKJsUXCp9iV7GqeKl4oQjdZcB3h4NyxU+KR4qgz+f7SCASibjHK8XviqeK14lyKQUFBYl3jxV/ELXf78/k4uzsTM7Pz+Xy8tLASUtLc/J+RaviiWJHMf85B98qRhQBoj45OTFkZGRIIBCQ7OxsSU1NlaOjIzk+PhYNQNLT0102BPO14r1i2hlM9RjvV/yKYRQODg7MaGtrq1RVVZlh3l1dXZnxxcVFWVpaMmclJSVyfX3t7PyieKf4zVuDCsWCIp8fh4eHwn1XV5dFeHNzI8XFxeaILDgYnp+fl5GREZOvqamJ0YcJRbMi7ByMwj0p7+/vS3V1tfT19VlUWVlZ0tHRYXdk4QpMNikpKbK8vCyDg4OyuroqlZWVFkyUMgr/GAe0X0gV0igmEff395syFPX29kowGLSILy4uzIBVVoPBYVFRkTkZGBiwu8LCQqNR7dFd9ynyN/rwkJdw29LSIhUVFVZYssjPz5ednZ0Yx8i5OnEHLRgl05mZGbtHV//TXW/504MCgrReeXm5CbW1tZni7u6uZeMMxwZIn7kjK9DZ2Snt7e0WvctSzwMcfMkTDvBMEXNzc63IUJbsYIzAyKahoUHy8vKMzmgwVTgIxo22voBXakFkn5riRHkXII5KS0u9LRvAgeUDDUwrdSADjkcw6aH7kCcDzyrx+W+fIxYxDsLhcCzyZNGjRydRi7W1NSt0gs6B35sqKa6srJgTl3Iy/sl2a2vLWpX60XEe6sJ+r3BOTo5sb2/L3Nyc7SC3Zz4F6GBOoHZ0dNS4R2djYyM27Xom/N6IaLHMzExpbGw0LukifqOAITe9UEEjQM3Q0JBsbm5KXV2dTE9PG73oRG6L8Fds2SFMBKTc3d1tLUtNiNRNOIo44T4UCsnY2Ji1ZE9Pj8zOzsrCwoJlFZ2DvxX/xTmgExBubm6OpctCIzPmgqD29vZkfX3duGYom5qaZGpqSiYnJ2OZqtyJmvw+bl3jlbVAhMPDwzIxMWEr+/T01IpdX19v2xR6yKasrMwCGh8fN4dk7javnu8Ub9y6DrOuXauiRHQo0IJEhBKOCQDqODgmG3cPA1HjPyp+9n6T3zLScZ+52zTjVjPK0BbdlOacbDyGjxU/KJ57bUFRYWJ/J06wc0Ybe+cGw1HjfyqeKf5NtIWD/xWVfNuTrYPoCsbioT5D7SvFP4qZu3Q+CDAAAzkFrQnbawkAAAAASUVORK5CYII='
 		);
-		add_action( 'load-' . $suffix, array( $this, 'connection_status_notice' ) );
-
-
+		add_action( 'load-' . $settings, array( $this, 'connection_status_notice' ) );
 
 		add_submenu_page(
 			'wp_discourse_options',
-			__( 'Connection Options', 'wp-discourse' ),
-			__( 'Connection Options', 'wp-discourse' ),
+			__( 'All Options', 'wp-discourse' ),
+			__( 'All Options', 'wp-discourse' ),
+			'manage_options',
+			'wp_discourse_options'
+		);
+
+		$connect = add_submenu_page(
+			'wp_discourse_options',
+			__( 'Connection', 'wp-discourse' ),
+			__( 'Connection', 'wp-discourse' ),
 			'manage_options',
 			'discourse_connect',
 			array( $this, 'wp_discourse_connection_options_display' )
 		);
+//		add_action( 'load-' . $connect, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$publish = add_submenu_page(
 			'wp_discourse_options',
-			__( 'Publishing Options', 'wp-discourse' ),
-			__( 'Publishing Options', 'wp-discourse' ),
+			__( 'Publishing', 'wp-discourse' ),
+			__( 'Publishing', 'wp-discourse' ),
 			'manage_options',
 			'discourse_publish',
 			array( $this, 'wp_discourse_publishing_options_display' )
 		);
+//		add_action( 'load-' . $publish, array( $this, 'establish_connection_notice' ) );
 
-		add_submenu_page(
+		$comment = add_submenu_page(
 			'wp_discourse_options',
-			__( 'Commenting Options', 'wp-discourse' ),
-			__( 'Commenting Options', 'wp-discourse' ),
+			__( 'Commenting', 'wp-discourse' ),
+			__( 'Commenting', 'wp-discourse' ),
 			'manage_options',
 			'discourse_comment',
 			array( $this, 'wp_discourse_commenting_options_display' )
 		);
+//		add_action( 'load-' . $comment, array( $this, 'establish_connection_notice' ) );
 
-		add_submenu_page(
+		$sso = add_submenu_page(
 			'wp_discourse_options',
-			__( 'SSO Options', 'wp-discourse' ),
-			__( 'SSO Options', 'wp-discourse' ),
+			__( 'SSO', 'wp-discourse' ),
+			__( 'SSO', 'wp-discourse' ),
 			'manage_options',
 			'discourse_sso',
 			array( $this, 'wp_discourse_sso_options_display' )
 		);
+//		add_action( 'load-' . $sso, array( $this, 'establish_connection_notice' ) );
 	}
 
 	function wp_discourse_connection_options_display() {
@@ -670,7 +681,8 @@ class DiscourseAdmin {
 		<?php
 	}
 
-	function publishing_settings_display() {}
+	function publishing_settings_display() {
+	}
 
 	function commenting_settings_display() {
 		?>
@@ -681,7 +693,8 @@ class DiscourseAdmin {
 		<?php
 	}
 
-	function sso_settings_display() {}
+	function sso_settings_display() {
+	}
 
 	function wp_discourse_options_display( $active_tab = '' ) {
 		?>
@@ -775,9 +788,21 @@ class DiscourseAdmin {
 	 */
 	function connection_status_notice() {
 		if ( ! DiscourseUtilities::check_connection_status() ) {
-			add_action( 'admin_notices', array( $this, 'disconnected' ) );
-		} else {
+			$tab = isset( $_GET['tab'] ) ? $_GET['tab'] : '';
+
+			if ( 'publishing_options' === $tab || 'commenting_options' === $tab || 'sso_options' === $tab ) {
+				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
+			} else {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
+			}
+		} else if ( ! isset( $_GET['tab'] ) || 'connection_options' === $_GET['tab'] ) {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
+		}
+	}
+
+	function establish_connection_notice() {
+		if ( ! DiscourseUtilities::check_connection_status() ) {
+			add_action( 'admin_notices', array( $this, 'establish_connection' ) );
 		}
 	}
 
@@ -788,8 +813,8 @@ class DiscourseAdmin {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not currently connected to a Discourse forum. ' .
-				                          "To establish a connection, check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
+				                          "Please check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
 				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
@@ -804,6 +829,17 @@ class DiscourseAdmin {
 		<div class="notice notice-success is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
+			</p>
+		</div>
+		<?php
+	}
+
+	function establish_connection() {
+		?>
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
+				                          "To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
