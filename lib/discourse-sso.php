@@ -35,7 +35,12 @@ class DiscourseSSO {
 	 * @param object $wordpress_email_verifier An object for verifying email addresses.
 	 */
 	public function __construct( $wordpress_email_verifier ) {
-		$this->options                  = get_option( 'discourse' );
+		$this->options                  = DiscourseUtilities::get_options(
+			array(
+				'discourse_connect',
+				'discourse_sso',
+			)
+		);
 		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );

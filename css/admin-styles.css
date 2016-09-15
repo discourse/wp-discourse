@@ -1,24 +1,42 @@
 /* Highlights errors in settings form inputs */
 
-#setting-error-discourse_url ~ form #discourse_url,
-#setting-error-api_key ~ form #discourse_api-key,
-#setting-error-publish_username ~ form #discourse_publish-username,
-#setting-error-max_comments ~ form #discourse_max-comments,
-#setting-error-min_replies ~ form #discourse_min-replies,
-#setting-error-min_score ~ form #discourse_min-score,
-#setting-error-min_trust_level ~ form #discourse_min-trust-level,
-#setting-error-bypass_trust_level ~ form #discourse_bypass-trust-level-score,
-#setting-error-excerpt_length ~ form #discourse_custom-excerpt-length,
-#setting-error-sso_secret ~ form #discourse_sso-secret,
-#setting-error-login_path ~ form #discourse_login-path {
+#setting-error-discourse_url ~ form #discourse-url,
+#setting-error-api_key ~ form #discourse-api-key,
+#setting-error-publish_username ~ form #discourse-publish-username,
+#setting-error-max_comments ~ form #discourse-max-comments,
+#setting-error-min_replies ~ form #discourse-min-replies,
+#setting-error-min_score ~ form #discourse-min-score,
+#setting-error-min_trust_level ~ form #discourse-min-trust-level,
+#setting-error-bypass_trust_level ~ form #discourse-bypass-trust-level-score,
+#setting-error-excerpt_length ~ form #discourse-custom-excerpt-length,
+#setting-error-sso_secret ~ form #discourse-sso-secret,
+#setting-error-login_path ~ form #discourse-login-path {
 	border-color: #dc3232;
-	border-width: 2px;
+	border-width: 1px;
 }
 
-.settings_page_discourse .discourse-allowed-types {
+.toplevel_page_wp_discourse_options .documentation-link {
+	max-width: 900px;
+}
+
+.toplevel_page_wp_discourse_options h2 img {
+    vertical-align: bottom;
+}
+
+.wrap>h2:first-child {
+	line-height: 23px;
+	margin-bottom: 6px;
+}
+
+#discourse-allowed-post-types {
 	min-width: 160px;
 }
 
 #discourse-publish-meta-box .warning {
 	padding: 0 8px;
+}
+
+/* Menu logo */
+#adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
+	padding-top: 6px;
 }
