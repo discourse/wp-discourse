@@ -434,7 +434,7 @@ class DiscourseAdmin {
 	public function sso_secret_input() {
 		$options = $this->options;
 		if ( isset( $options['url'] ) && ! empty( $options['url'] ) ) {
-			$this->text_input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . 'admin/site_settings/category/login</a>' );
+			$this->text_input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . '/admin/site_settings/category/login</a>' );
 		} else {
 			$this->text_input( 'sso-secret', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
 		}
@@ -626,8 +626,9 @@ class DiscourseAdmin {
 	function connection_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring your connection to discourse. For detailed instructions see ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">https://github.com/discourse/wp-discourse/wiki/Setup</a>
+			<em><?php esc_html_e( 'This section is for configuring your connection to Discourse. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -638,8 +639,9 @@ class DiscourseAdmin {
 	function publishing_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes posts to discourse. For detailed instructions see  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">https://github.com/discourse/wp-discourse/wiki/Setup</a>
+			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes posts to Discourse. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -650,8 +652,12 @@ class DiscourseAdmin {
 	function commenting_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'For documentation on customizing the plugin\'s html see ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">https://github.com/discourse/wp-discourse/wiki/Template-Customization</a>
+			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes comments on your WordPress site. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( ' For documentation on customizing the html templates that are used for comments, see the ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">Template Customization</a>
+			<em><?php esc_html_e( ' section of the wiki.' , 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -662,8 +668,9 @@ class DiscourseAdmin {
 	function sso_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring WordPress as the Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information see  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">https://github.com/discourse/wp-discourse/wiki/Setup</a>
+			<em><?php esc_html_e( 'This section is for configuring WordPress as the Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information, see the ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
