@@ -430,10 +430,14 @@ class DiscourseAdmin {
 
 	/**
 	 * Outputs markup for the sso-secret input.
-	 * TODO: add a 'found at' link, similar to what is used for the api_key setting.
 	 */
 	public function sso_secret_input() {
-		$this->text_input( 'sso-secret', 'discourse_sso', '' );
+		$options = $this->options;
+		if ( isset( $options['url'] ) && ! empty( $options['url'] ) ) {
+			$this->text_input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . 'admin/site_settings/category/login</a>' );
+		} else {
+			$this->text_input( 'sso-secret', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
+		}
 	}
 
 	/**
