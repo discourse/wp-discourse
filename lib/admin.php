@@ -551,7 +551,7 @@ class DiscourseAdmin {
 				</a>
 			</h2>
 
-			<form action="options.php" method="post">
+			<form action="options.php" method="post" class="wp-discourse-options-form">
 				<?php
 				switch ( $tab ) {
 					case 'connection_options':
