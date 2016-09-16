@@ -312,7 +312,7 @@ class DiscourseAdmin {
 	public function post_types_select() {
 		$this->post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -391,7 +391,7 @@ class DiscourseAdmin {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -462,54 +462,59 @@ class DiscourseAdmin {
 			__( 'Discourse', 'wp-discourse' ),
 			'manage_options',
 			'wp_discourse_options',
-			array( $this, 'options_page_display' ),
+			array( $this, 'options_pages_display' ),
 			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAWCAYAAADEtGw7AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzNEQzI4NEU3MjY1MTFFNjlCMTdFMUZCNjUyNTEyQTYiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzNEQzI4NEY3MjY1MTFFNjlCMTdFMUZCNjUyNTEyQTYiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDM0RDMjg0QzcyNjUxMUU2OUIxN0UxRkI2NTI1MTJBNiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDM0RDMjg0RDcyNjUxMUU2OUIxN0UxRkI2NTI1MTJBNiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PkgZl2kAAAOzSURBVHjafJXLS9RRFMfPPHw/xkeoOIhvMxFlUChUMDM3QknLFrWQ+g+C/oegTeCmlfvCndTCNMJNjNCgC/OxCVNRUUcdx/fY+RzmDpNpF75z7+/+zv2e7zn3nN94amtr5YbBi17FA4/Hc0fnWwrv5eXlrs5Liq+KL4pFReLqYc81xKWKZ4pXXq83mEgkBJixxyO6Z3NyL6p4q3iv2Pwf8W3FiB7uV2VycnIix8fH9oJnN3JzcyU7O9v2Li4ucPRdt18q5pyNP420TvHR5/O1np+fSywWE11LTU2N5Ofnm0KcbG9vy+rqqmRmZkp5ebn4/X5R+7tK/kHPP06mJqU4RzGpRPccaUVFhYRCISkuLrbQi4qKjAyVs7OzMjExIXt7e+YYAaenp9iFlee+Iu7joI7XuvmcsCCtq6uT/v5+ycrKMgcdHR3S3t4uzc3N0tTUJJ2dneZ0eXlZFhcXpbCw0JSr06BykbtvKK7XxQ9FwcHBgZSVlcng4KApaGxslK6uLikoKJCzszMD6jMyMizPGxsbMjw8LPPz81JfX2/51pTF1CaE4qd6WU+4KPLY09NjSjEcGBiw8Mnr0dGROQOHh4c2l5aWSktLi0xNTcn+/r45U9JM8uzVnz7yhhoMA4GAqe7u7jZ1W1tb5pAycyCnXGQ0GpXq6mqL0F0uZ3Q89OqiwdUquWKgljUHXe3+VaO654Dy1tZWc0BUXL7u13Ii4OoUcsJBeTJfTsE/A3uUJ+tYqqqqLG0Q68inRRPOO3kiv5BDmt4U1w0iId87OztW6xC7LkXxJQbuktbW1lK3f9NwkXCGZtnd3bU16pMj5nVhoZR8zczMyMrKioUJ0pW7FgbUP2FHIhFTi/J4PG71rONXitjd9vr6unUUg2dqlncuRJ6pGubR0VFLQ15entUyduzTxX53yxzEY1tbm90yzlwzsOajgxoOQzY2NiZLS0vS19dndby5uWmNROep/ecUMaSQDw0NWcfR2nQi+1wmaeKZbqOVed/b2yvhcFimp6ctx4jQNPEZXUgRc2GECDCcnJw0AtfalZWVZsMz6nNycmR8fNxyzP2QZ815ROneuK8b/wYNLlwGN02xkzuccjAYDNoXDlVEQfVQDTgAGu0vxSO1n3PECzo3kTvIMebSMHYlh0rU8t5ViPsQJStnVrdeKMLpH/piV5scKikpMcKrJJSWq1/Ikk7jmtN3uh7R9e/0Wod4WUFlH6f9l13Xvh4Fng6pU93jz/STnvmp8/nVM38EGAA8rx3ghdSQ8wAAAABJRU5ErkJggg=='
 		);
 		add_action( 'load-' . $settings, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$all_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'All Options', 'wp-discourse' ),
 			__( 'All Options', 'wp-discourse' ),
 			'manage_options',
 			'wp_discourse_options'
 		);
+		add_action( 'load-' . $all_settings, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$connection_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'Connection', 'wp-discourse' ),
 			__( 'Connection', 'wp-discourse' ),
 			'manage_options',
-			'discourse_connect',
+			'connection_options',
 			array( $this, 'connection_options_tab' )
 		);
+		add_action( 'load-' . $connection_settings, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$publishing_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'Publishing', 'wp-discourse' ),
 			__( 'Publishing', 'wp-discourse' ),
 			'manage_options',
-			'discourse_publish',
+			'publishing_options',
 			array( $this, 'publishing_options_tab' )
 		);
+		add_action( 'load-' . $publishing_settings, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$commenting_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'Commenting', 'wp-discourse' ),
 			__( 'Commenting', 'wp-discourse' ),
 			'manage_options',
-			'discourse_comment',
+			'commenting_options',
 			array( $this, 'commenting_options_tab' )
 		);
+		add_action( 'load-' . $commenting_settings, array( $this, 'connection_status_notice' ) );
 
-		add_submenu_page(
+		$sso_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'SSO', 'wp-discourse' ),
 			__( 'SSO', 'wp-discourse' ),
 			'manage_options',
-			'discourse_sso',
+			'sso_options',
 			array( $this, 'sso_options_tab' )
 		);
+		add_action( 'load-' . $sso_settings, array( $this, 'connection_status_notice' ) );
 	}
 
 	/**
@@ -517,7 +522,7 @@ class DiscourseAdmin {
 	 *
 	 * @param string $active_tab The current tab, used if `$_GET['tab']` is not set.
 	 */
-	public function options_page_display( $active_tab = '' ) {
+	public function options_pages_display( $active_tab = '' ) {
 		?>
 		<div class="wrap">
 			<h2>
@@ -531,8 +536,10 @@ class DiscourseAdmin {
 			<?php
 			if ( isset( $_GET['tab'] ) ) { // Input var okay.
 				$tab = sanitize_key( wp_unslash( $_GET['tab'] ) ); // Input var okay.
-			} else {
+			} elseif ( $active_tab ) {
 				$tab = $active_tab;
+			} else {
+				$tab = 'connection_options';
 			}
 			?>
 
@@ -590,28 +597,28 @@ class DiscourseAdmin {
 	 * Called to display the 'connection_options' tab.
 	 */
 	public function connection_options_tab() {
-		$this->options_page_display( 'connection_options' );
+		$this->options_pages_display( 'connection_options' );
 	}
 
 	/**
 	 * Called to display the 'publishing_options' tab.
 	 */
 	public function publishing_options_tab() {
-		$this->options_page_display( 'publishing_options' );
+		$this->options_pages_display( 'publishing_options' );
 	}
 
 	/**
 	 * Called to display the 'commenting_options' tab.
 	 */
 	public function commenting_options_tab() {
-		$this->options_page_display( 'commenting_options' );
+		$this->options_pages_display( 'commenting_options' );
 	}
 
 	/**
 	 * Called to display the 'sso_options' tab.
 	 */
 	public function sso_options_tab() {
-		$this->options_page_display( 'sso_options' );
+		$this->options_pages_display( 'sso_options' );
 	}
 
 	/**
@@ -628,7 +635,7 @@ class DiscourseAdmin {
 		<p class="documentation-link">
 			<em><?php esc_html_e( 'This section is for configuring your connection to Discourse. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -641,7 +648,7 @@ class DiscourseAdmin {
 		<p class="documentation-link">
 			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes posts to Discourse. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -654,10 +661,11 @@ class DiscourseAdmin {
 		<p class="documentation-link">
 			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes comments on your WordPress site. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 			<em><?php esc_html_e( ' For documentation on customizing the html templates that are used for comments, see the ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">Template Customization</a>
-			<em><?php esc_html_e( ' section of the wiki.' , 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">Template
+				Customization</a>
+			<em><?php esc_html_e( ' section of the wiki.', 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -670,7 +678,7 @@ class DiscourseAdmin {
 		<p class="documentation-link">
 			<em><?php esc_html_e( 'This section is for configuring WordPress as the Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.' , 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
@@ -682,15 +690,20 @@ class DiscourseAdmin {
 	 */
 	function connection_status_notice() {
 		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : ''; // Input var okay.
+		if ( ! $tab ) {
+			$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // Input var okay.
+		}
+
+		$current_page = $tab ? $tab : $page;
 
 		if ( ! DiscourseUtilities::check_connection_status() ) {
 
-			if ( 'publishing_options' === $tab || 'commenting_options' === $tab || 'sso_options' === $tab ) {
+			if ( 'publishing_options' === $current_page || 'commenting_options' === $current_page || 'sso_options' === $current_page ) {
 				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 			}
-		} else if ( ! $tab || 'connection_options' === $tab ) {
+		} else if ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
 		}
 	}
@@ -704,7 +717,7 @@ class DiscourseAdmin {
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
 				                          "Please check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -732,7 +745,7 @@ class DiscourseAdmin {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
-				"To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
+				                          "To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -778,8 +791,8 @@ class DiscourseAdmin {
 	 * @param string $option The name of the option.
 	 * @param string $option_group The option group for the field to be saved to.
 	 * @param string $description The description of the settings field.
-	 * @param null   $type The type of input ('number', 'url', etc).
-	 * @param null   $min The min value (applied to number inputs).
+	 * @param null $type The type of input ('number', 'url', etc).
+	 * @param null $min The min value (applied to number inputs).
 	 */
 	protected function text_input( $option, $option_group, $description, $type = null, $min = null ) {
 		$options = $this->options;
@@ -802,7 +815,7 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -840,7 +853,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $post_types An array of available post types.
+	 * @param array $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	protected function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -894,8 +907,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array  $group The array of items to be selected.
-	 * @param int    $selected The value of the selected option.
+	 * @param array $group The array of items to be selected.
+	 * @param int $selected The value of the selected option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected ) {
 		echo '<select id="discourse-' . esc_attr( $option ) . '" name="' . esc_attr( $option_name ) . '">';
