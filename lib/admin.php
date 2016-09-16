@@ -909,6 +909,7 @@ class DiscourseAdmin {
 	 * @param string $option_name Supplies the 'name' value for the select input.
 	 * @param array  $group The array of items to be selected.
 	 * @param int    $selected The value of the selected option.
+	 * @param string $description The description of the option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected, $description ) {
 		echo '<select id="discourse-' . esc_attr( $option ) . '" name="' . esc_attr( $option_name ) . '">';
