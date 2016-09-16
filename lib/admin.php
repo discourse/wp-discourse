@@ -255,7 +255,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the publish-username input.
 	 */
 	public function publish_username_input() {
-		$this->text_input( 'publish-username', 'discourse_connect', __( 'Discourse username of publisher (will be overriden if Discourse Username is specified on user)', 'wp-discourse' ) );
+		$this->text_input( 'publish-username', 'discourse_connect', __( 'The default username under which posts will be published on Discourse. This will be overriden if a Discourse username has been supplied by the user (this can be set on the user\'s WordPress profile page.)', 'wp-discourse' ) );
 	}
 
 	/**
@@ -275,7 +275,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the publish-category input.
 	 */
 	public function publish_category_input() {
-		$this->category_select( 'publish-category', 'discourse_publish', __( 'Default category used to published in Discourse (optional)', 'wp-discourse' ) );
+		$this->category_select( 'publish-category', 'discourse_publish', __( 'The default category that your posts will have on Discourse (this can be changed in the \'Publish to Discourse\' meta-box when you create a post.)', 'wp-discourse' ) );
 	}
 
 	/**
@@ -325,63 +325,63 @@ class DiscourseAdmin {
 	 * Outputs markup for the use-discourse-comments checkbox.
 	 */
 	public function use_discourse_comments_checkbox() {
-		$this->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts', 'wp-discourse' ) );
+		$this->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the show-existing-comments checkbox.
 	 */
 	public function show_existing_comments_checkbox() {
-		$this->checkbox_input( 'show-existing-comments', 'discourse_comment', __( 'Display existing WordPress comments beneath Discourse comments', 'wp-discourse' ) );
+		$this->checkbox_input( 'show-existing-comments', 'discourse_comment', __( 'Display existing WordPress comments beneath Discourse comments.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the existing-comments-heading input.
 	 */
 	public function existing_comments_heading_input() {
-		$this->text_input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive")', 'wp-discourse' ) );
+		$this->text_input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive").', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->text_input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display', 'wp-discourse' ), 'number' );
+		$this->text_input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number' );
 	}
 
 	/**
 	 * Outputs markup for the min-replies input.
 	 */
 	public function min_replies_input() {
-		$this->text_input( 'min-replies', 'discourse_comment', __( 'Minimum replies required prior to pulling comments across', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'min-replies', 'discourse_comment', __( 'Minimum replies required prior to pulling comments across.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-score input.
 	 */
 	public function min_score_input() {
-		$this->text_input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read)', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read).', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-trust-level input.
 	 */
 	public function min_trust_level_input() {
-		$this->text_input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5)', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the bypass-trust-level input.
 	 */
 	public function bypass_trust_level_input() {
-		$this->text_input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the custom-excerpt-length input.
 	 */
 	public function custom_excerpt_length() {
-		$this->text_input( 'custom-excerpt-length', 'discourse_comment', __( 'Custom excerpt length in words (default: 55)', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'custom-excerpt-length', 'discourse_comment', __( 'Custom excerpt length in words (default: 55).', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
@@ -398,14 +398,14 @@ class DiscourseAdmin {
 	 * Outputs markup for the only-show-moderator-liked checkbox.
 	 */
 	public function only_show_moderator_liked_checkbox() {
-		$this->checkbox_input( 'only-show-moderator-liked', 'discourse_comment', __( 'Yes', 'wp-discourse' ) );
+		$this->checkbox_input( 'only-show-moderator-liked', 'discourse_comment' );
 	}
 
 	/**
 	 * Outputs markup for the debug-mode checkbox.
 	 */
 	public function debug_mode_checkbox() {
-		$this->checkbox_input( 'debug-mode', 'discourse_comment', __( '(always refresh comments)', 'wp-discourse' ) );
+		$this->checkbox_input( 'debug-mode', 'discourse_comment', __( 'Always refresh comments.', 'wp-discourse' ), __( 'This setting is not recommended for production, when this setting is not enabled comments will be cached for 10 minutes.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -418,7 +418,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the enable-sso checkbox.
 	 */
 	public function enable_sso_checkbox() {
-		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO to Discourse', 'wp-discourse' ) );
+		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO to Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -444,7 +444,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the redirect-without-login checkbox.
 	 */
 	public function redirect_without_login_checkbox() {
-		$this->checkbox_input( 'redirect-without-login', 'discourse_sso', __( 'Do not force login for link to Discourse comments thread (No effect if not using SSO)' ) );
+		$this->checkbox_input( 'redirect-without-login', 'discourse_sso', __( 'Do not force login for link to Discourse comments thread.' ) );
 	}
 
 	/**
@@ -633,7 +633,7 @@ class DiscourseAdmin {
 	function connection_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring your connection to Discourse. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'This section is for configuring your site\'s connection to your Discourse forum. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
@@ -659,7 +659,7 @@ class DiscourseAdmin {
 	function commenting_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring how the plugin publishes comments on your WordPress site. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'This section is for configuring how comments are published on your WordPress site. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 			<em><?php esc_html_e( ' For documentation on customizing the html templates that are used for comments, see the ', 'wp-discourse' ); ?></em>
@@ -676,7 +676,7 @@ class DiscourseAdmin {
 	function sso_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring WordPress as the Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information, see the ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'This section is for configuring WordPress as the Single Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
@@ -829,7 +829,7 @@ class DiscourseAdmin {
 	 * @param string $label The text for the label.
 	 * @param string $description The description of the settings field.
 	 */
-	protected function checkbox_input( $option, $option_group, $label, $description = '' ) {
+	protected function checkbox_input( $option, $option_group, $label = '', $description = '' ) {
 		$options = $this->options;
 		if ( array_key_exists( $option, $options ) and 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';
@@ -899,7 +899,7 @@ class DiscourseAdmin {
 
 		$selected    = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$option_name = $this->option_name( $option, $option_group );
-		$this->option_input( $option, $option_name, $categories, $selected );
+		$this->option_input( $option, $option_name, $categories, $selected, $description );
 	}
 
 	/**
@@ -910,7 +910,7 @@ class DiscourseAdmin {
 	 * @param array $group The array of items to be selected.
 	 * @param int $selected The value of the selected option.
 	 */
-	protected function option_input( $option, $option_name, $group, $selected ) {
+	protected function option_input( $option, $option_name, $group, $selected, $description ) {
 		echo '<select id="discourse-' . esc_attr( $option ) . '" name="' . esc_attr( $option_name ) . '">';
 
 		foreach ( $group as $item ) {
@@ -922,6 +922,7 @@ class DiscourseAdmin {
 		}
 
 		echo '</select>';
+		echo '<p class="description">' . esc_html( $description ) . '</p>';
 	}
 
 
