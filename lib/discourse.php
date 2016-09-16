@@ -17,7 +17,7 @@ class Discourse {
 	 *
 	 * @var string
 	 */
-	public static $version = '0.9.9';
+	public static $version = '1.0.0';
 
 	static $discourse_connect = array(
 		'url' => '',
