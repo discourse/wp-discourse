@@ -103,6 +103,11 @@ class DiscourseAdmin {
 			'full_post_checkbox',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
+		add_settings_field( 'discourse_custom_excerpt_length', __( 'Custom excerpt length', 'wp-discourse' ), array(
+			$this,
+			'custom_excerpt_length',
+		), 'discourse_publish', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
 			$this,
 			'auto_publish_checkbox',
@@ -167,11 +172,6 @@ class DiscourseAdmin {
 		add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass trust level score', 'wp-discourse' ), array(
 			$this,
 			'bypass_trust_level_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
-
-		add_settings_field( 'discourse_custom_excerpt_length', __( 'Custom excerpt length', 'wp-discourse' ), array(
-			$this,
-			'custom_excerpt_length',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
 		add_settings_field( 'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
@@ -293,6 +293,13 @@ class DiscourseAdmin {
 	}
 
 	/**
+	 * Outputs markup for the custom-excerpt-length input.
+	 */
+	public function custom_excerpt_length() {
+		$this->text_input( 'custom-excerpt-length', 'discourse_publish', __( 'Custom excerpt length in words (default: 55).', 'wp-discourse' ), 'number', 0 );
+	}
+
+	/**
 	 * Outputs markup for the auto-publish checkbox.
 	 */
 	public function auto_publish_checkbox() {
@@ -377,12 +384,6 @@ class DiscourseAdmin {
 		$this->text_input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score.', 'wp-discourse' ), 'number', 0 );
 	}
 
-	/**
-	 * Outputs markup for the custom-excerpt-length input.
-	 */
-	public function custom_excerpt_length() {
-		$this->text_input( 'custom-excerpt-length', 'discourse_comment', __( 'Custom excerpt length in words (default: 55).', 'wp-discourse' ), 'number', 0 );
-	}
 
 	/**
 	 * Outputs markup for the custom-datetime input.
