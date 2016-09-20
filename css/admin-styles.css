@@ -24,7 +24,7 @@
 }
 
 .wrap>h2:first-child {
-	line-height: 23px;
+	line-height: 24px;
 	margin-bottom: 6px;
 }
 
@@ -38,7 +38,7 @@
 
 /* Menu logo */
 #adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
-	padding-top: 6px;
+	padding-top: 5px;
 }
 
 .discourse-options-page-wrap {

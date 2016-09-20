@@ -128,4 +128,27 @@ class Discourse {
 		$array['backup'] = $array;
 		return $array;
 	}
+
+	protected function upgrade_options( $old_options ) {
+		$discourse_connect = [];
+		$discourse_publish = [];
+		$discourse_comment = [];
+		$discourse_configurable_text = [];
+		$discourse_sso = [];
+
+		// todo: make sure the options exist!!!
+		$discourse_connect['url'] = $old_options['url'];
+		$discourse_connect['api-key'] = $old_options['api-key'];
+		$discourse_connect['publish-username'] = $old_options['publish-username'];
+		add_option( 'discourse_connect', $discourse_connect );
+
+		$discourse_publish['display-subcategories'] = $old_options['display-subcategories'];
+		$discourse_publish['publish-category'] = $old_options['publish-category'];
+		$discourse_publish['auto-publish'] = $old_options['auto-publish'];
+		$discourse_publish['allowed_post_types'] = $old_options['allowed_post_types'];
+		$discourse_publish['auto-track'] = $old_options['auto-track'];
+
+
+
+	}
 }

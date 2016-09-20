@@ -15,6 +15,7 @@ namespace WPDiscourse\Templates;
  * Class HTMLTemplates
  */
 class HTMLTemplates {
+	// todo: add method to store options
 
 	/**
 	 * HTML template for replies.
@@ -33,7 +34,7 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
-			<h2 class="comments-title"><?php esc_html_e( 'Notable Replies', 'wp-discourse' ); ?></h2>
+			<h2 class="comments-title"><?php esc_html_e( get_option( 'discourse_configurable_text' )['notable-replies-text'], 'wp-discourse' ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
@@ -160,6 +161,9 @@ class HTMLTemplates {
 	public static function participant_html() {
 		ob_start();
 		?>
+		<header class="discourse-participants">
+			<h3><?php html_esc_e( 'Participants', 'wp-discourse' ); ?></h3>
+		</header>
 		<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
 		     width="25">
 		<?php

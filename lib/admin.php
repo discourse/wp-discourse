@@ -243,6 +243,8 @@ class DiscourseAdmin {
 			'discourse_validate_options',
 		) );
 
+		// todo: add 'publish' text
+
 		// SSO settings.
 		add_settings_section( 'discourse_sso_settings_section', __( 'SSO Settings', 'wp-discourse' ), array(
 			$this,
