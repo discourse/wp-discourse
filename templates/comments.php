@@ -22,6 +22,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			'discourse_connect',
 			'discourse_publish',
 			'discourse_comment',
+			'discourse_configurable_text',
 			'discourse_sso',
 		)
 	);
@@ -54,14 +55,14 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
 
 	$more_replies = intval( ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 ) );
-	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : 'more ';
+	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : esc_html( strtolower($options['more-replies-text'] ) ) . ' ';
 
 	if ( 0 === $more_replies ) {
 		$more_replies = '';
 	} elseif ( 1 === $more_replies ) {
-		$more_replies = '1 ' . $more . 'reply';
+		$more_replies = '1 ' . $more . esc_html( strtolower($options['single-reply-text'] ) );
 	} else {
-		$more_replies = $more_replies . ' ' . $more . 'replies';
+		$more_replies = $more_replies . ' ' . $more . esc_html( strtolower($options['many-replies-text'] ) );
 	}
 
 	$discourse_url     = esc_url( $options['url'] );
