@@ -47,6 +47,16 @@ class Discourse {
 		'only-show-moderator-liked' => 0,
 	);
 
+	protected $discourse_configurable_text = array(
+		'start-discussion-text' => 'Start the discussion',
+		'notable-replies-text' => 'Notable Replies',
+		'continue-discussion-text' => 'Continue the discussion',
+		'comments-not-enabled-text' => 'Comments are not enabled for this post.',
+		'leave-a-reply-text' => 'Leave a reply',
+		'single-reply-text' => 'Reply',
+		'many-replies-text' => 'Replies',
+	);
+
 	protected $discourse_sso = array(
 		'enable-sso' => 0,
 		'sso-secret' => '',
@@ -77,6 +87,10 @@ class Discourse {
 
 		if ( false === get_option( 'discourse_comment' ) ) {
 			add_option( 'discourse_comment', $this->discourse_comment );
+		}
+
+		if ( false === get_option( 'discourse_configurable_text' ) ) {
+			add_option( 'discourse_configurable_text', $this->discourse_configurable_text );
 		}
 
 		if ( false === get_option( 'discourse_sso' ) ) {
