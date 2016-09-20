@@ -50,7 +50,10 @@ class HTMLTemplates {
 					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
 				</h3>
 				<p class="more-replies">{more_replies}</p>
-				<p class="comment-reply-title">{participants}</p>
+				<div class="comment-reply-title">
+					<h4 class="discourse-participants"><?php esc_html_e( self::get_text_options( 'participants-text', 'wp-discourse' ) ); ?></h4>
+					<p>{participants}</p>
+				</div>
 			</div><!-- #respond -->
 		</div>
 		<?php
@@ -171,9 +174,6 @@ class HTMLTemplates {
 	public static function participant_html() {
 		ob_start();
 		?>
-		<header class="discourse-participants">
-			<h3><?php esc_html_e( 'Participants', 'wp-discourse' ); ?></h3>
-		</header>
 		<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
 		     width="25">
 		<?php
@@ -196,7 +196,7 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small>Originally published at: {blogurl}</small><br>{excerpt}
+		<small><?php esc_html_e( self::get_text_options( 'published-at-text', 'wp-discourse' ) ); ?> {blogurl}</small><br>{excerpt}
 		<?php
 		$output = ob_get_clean();
 
