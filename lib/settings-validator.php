@@ -111,6 +111,15 @@ class SettingsValidator {
 			'validate_display_subcategories',
 		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
+
+		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
+		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
+		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
+		add_filter( 'validate_coments_not_enabled_text', array( $this, 'validate_comments_not_enabled_text' ) );
+		add_filter( 'validate_leave_a_reply_text', array( $this, 'validate_leave_a_reply_text' ) );
+		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
+		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
+
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
@@ -415,6 +424,62 @@ class SettingsValidator {
 	 */
 	public function validate_debug_mode( $input ) {
 		return $this->sanitize_checkbox( $input );
+	}
+
+	public function validate_start_discussion_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_continue_discussion_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_notable_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_comments_not_enabled_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_leave_a_reply_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_single_reply_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_many_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
 	}
 
 	/**
