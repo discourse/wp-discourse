@@ -340,10 +340,10 @@ class DiscourseAdmin {
 	public function full_post_checkbox() {
 		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
-			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
+			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
 			                   'This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
 		} else {
-			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
+			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must uncheck the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
 			                   'This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
 		}
 
@@ -486,7 +486,7 @@ class DiscourseAdmin {
 	}
 
 	public function comments_not_enabled_text() {
-		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used for when there is a configuration error with Discourse.', 'wp-discourse' ) );
+		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
 	}
 
 	public function leave_a_reply_text() {
