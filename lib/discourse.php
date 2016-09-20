@@ -125,9 +125,4 @@ class Discourse {
 
 		return $fields;
 	}
-
-	protected function make_backup( $array ) {
-		$array['backup'] = $array;
-		return $array;
-	}
 }
