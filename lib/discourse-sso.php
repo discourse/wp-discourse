@@ -65,9 +65,8 @@ class DiscourseSSO {
 	 * @return string
 	 */
 	public function set_login_url( $login_url, $redirect ) {
-		$options = get_option( 'discourse' );
-		if ( $options['login-path'] ) {
-			$login_url = $options['login-path'];
+		if ( isset( $this->options['login-path'] ) ) {
+			$login_url = $this->options['login-path'];
 
 			if ( ! empty( $redirect ) ) {
 				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
