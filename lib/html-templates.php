@@ -19,10 +19,10 @@ class HTMLTemplates {
 	protected static function get_text_options( $option ) {
 		static $options = [];
 		if ( ! $options ) {
-			$options = get_option('discourse_configurable_text' );
+			$options = get_option( 'discourse_configurable_text' );
 		}
 
-		return isset( $options[$option] ) ? $options[$option] : null;
+		return isset( $options[ $option ] ) ? $options[ $option ] : null;
 	}
 
 	/**
@@ -42,11 +42,11 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
-			<h2 class="comments-title"><?php esc_html_e( self::get_text_options('notable-replies-text'), 'wp-discourse' ); ?></h2>
+			<h2 class="comments-title"><?php esc_html_e( self::get_text_options( 'notable-replies-text' ), 'wp-discourse' ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php esc_html_e( 'Continue the discussion', 'wp-discourse' ); ?>
+					<a href="{topic_url}"><?php esc_html_e( self::get_text_options( 'continue-discussion-text' ), 'wp-discourse' ); ?>
 					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
 				</h3>
 				<p class="more-replies">{more_replies}</p>
@@ -76,9 +76,9 @@ class HTMLTemplates {
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
-						<?php //todo: remove the word 'at' ?>
-						<?php esc_html_e( 'Start the discussion', 'wp-discourse' ); ?>
-					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
+						<?php esc_html_e( self::get_text_options( 'start-discussion-text' ) . ' ', 'wp-discourse' ); ?>
+						{discourse_url_name}
+					</a></h3>
 			</div><!-- #respond -->
 		</div>
 		<?php
@@ -102,7 +102,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php esc_html_e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?></p>
+				<p><?php esc_html_e( self::get_text_options( 'comments-not-available-text' ), 'wp-discourse' ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -131,9 +131,11 @@ class HTMLTemplates {
 			<article class="comment-body">
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
-						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64"
+						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
+						     height="64"
 						     width="64">
-						<b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
+						<b class="fn"><a href="{topic_url}" rel="external"
+						                 class="url">{fullname}</a></b>
 						<span class="says">says:</span>
 					</div>
 					<!-- .comment-author -->
