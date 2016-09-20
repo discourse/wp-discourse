@@ -57,6 +57,7 @@ class Discourse {
 		'leave-a-reply-text' => 'Leave a reply',
 		'single-reply-text' => 'Reply',
 		'many-replies-text' => 'Replies',
+		'more-replies-more-text' => 'more',
 	);
 
 	protected $discourse_sso = array(

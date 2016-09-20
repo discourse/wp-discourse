@@ -242,9 +242,14 @@ class DiscourseAdmin {
 			'single_reply_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_many_replies_text', __( 'Many Replies', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_many_replies_text', __( 'Many replies', 'wp-discourse' ), array(
 			$this,
 			'many_replies_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_more_replies_text', __( 'More replies \'more\' text', 'wp-discourse' ), array(
+			$this,
+			'more_replies_more_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
@@ -516,6 +521,10 @@ class DiscourseAdmin {
 
 	public function many_replies_text() {
 		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used when there is more than one comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
+	}
+
+	public function more_replies_more_text() {
+		$this->text_input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
 	}
 
 	/**

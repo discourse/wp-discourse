@@ -121,6 +121,7 @@ class SettingsValidator {
 		add_filter( 'validate_leave_a_reply_text', array( $this, 'validate_leave_a_reply_text' ) );
 		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
 		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
+		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
 
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
@@ -493,6 +494,14 @@ class SettingsValidator {
 	}
 
 	public function validate_many_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_more_replies_more_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
