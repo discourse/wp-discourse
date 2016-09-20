@@ -289,7 +289,16 @@ class DiscourseAdmin {
 	 * Outputs markup for the use-full-post checkbox.
 	 */
 	public function full_post_checkbox() {
-		$this->checkbox_input( 'full-post-content', 'discourse_publish', __( 'Use the full post for content rather than an excerpt.', 'wp-discourse' ) );
+		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] )  ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
+		if ( $discourse_admin_posting_url ) {
+			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
+			                   'This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) .'" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
+		} else {
+			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
+			                   'This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
+		}
+
+		$this->checkbox_input( 'full-post-content', 'discourse_publish', __( 'Use the full post for content rather than an excerpt.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -832,6 +841,13 @@ class DiscourseAdmin {
 	 */
 	protected function checkbox_input( $option, $option_group, $label = '', $description = '' ) {
 		$options = $this->options;
+		$allowed = array(
+			'a' => array(
+				'href'   => array(),
+				'target' => array(),
+			),
+			'strong' => array(),
+		);
 		if ( array_key_exists( $option, $options ) and 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';
 		} else {
@@ -844,9 +860,9 @@ class DiscourseAdmin {
 			       name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 			       type='checkbox'
 			       value='1' <?php echo esc_attr( $checked ); ?> />
-			<?php echo esc_html( $label ); ?>
+			<?php echo wp_kses( $label, $allowed ); ?>
 		</label>
-		<p class="description"><?php echo esc_html( $description ); ?></p>
+		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
 	}
 
