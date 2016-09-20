@@ -52,6 +52,8 @@ class Discourse {
 		'notable-replies-text' => 'Notable Replies',
 		'continue-discussion-text' => 'Continue the discussion',
 		'comments-not-enabled-text' => 'Comments are not enabled for this post.',
+		'participants-text' => 'Participants',
+		'published-at-text' => 'Originally published at:',
 		'leave-a-reply-text' => 'Leave a reply',
 		'single-reply-text' => 'Reply',
 		'many-replies-text' => 'Replies',
