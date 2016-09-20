@@ -135,8 +135,8 @@ class HTMLTemplates {
 						     height="64"
 						     width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
-						                 class="url">{fullname}</a></b>
-						<span class="says">says:</span>
+						                 class="url">{username}</a></b>
+						<span class="says">says:</span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
