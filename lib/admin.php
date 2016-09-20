@@ -26,14 +26,6 @@ class DiscourseAdmin {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-		$this->options = DiscourseUtilities::get_options( array(
-			'discourse_connect',
-			'discourse_publish',
-			'discourse_comment',
-			'discourse_configurable_text',
-			'discourse_sso',
-		) );
-
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'discourse_settings_menu' ) );
@@ -52,6 +44,14 @@ class DiscourseAdmin {
 	 * Settings
 	 */
 	public function admin_init() {
+		// Get the plugin's options.
+		$this->options = DiscourseUtilities::get_options( array(
+			'discourse_connect',
+			'discourse_publish',
+			'discourse_comment',
+			'discourse_configurable_text',
+			'discourse_sso',
+		) );
 
 		// Connection settings.
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connection Settings', 'wp-discourse' ), array(
@@ -217,9 +217,20 @@ class DiscourseAdmin {
 			'notable_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_comments_not_enables_text', __( 'Comments not available', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_comments_not_available_text', __( 'Comments not available', 'wp-discourse' ), array(
 			$this,
+			// todo: change function name to 'comments_not_available_text'
 			'comments_not_enabled_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_participants_text', __( 'Heading for the \'participants\' section', 'wp-discourse' ), array(
+			$this,
+			'participants_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_published_at_text', __( '\'Published at\' text', 'wp-discourse' ), array(
+			$this,
+			'published_at_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		add_settings_field( 'discourse_leave_a_reply_text', __( 'Leave a reply (WordPress hook)', 'wp-discourse' ), array(
@@ -237,13 +248,10 @@ class DiscourseAdmin {
 			'many_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
 			$this,
 			'discourse_validate_options',
 		) );
-
-		// todo: add 'publish' text
 
 		// SSO settings.
 		add_settings_section( 'discourse_sso_settings_section', __( 'SSO Settings', 'wp-discourse' ), array(
@@ -489,6 +497,14 @@ class DiscourseAdmin {
 
 	public function comments_not_enabled_text() {
 		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
+	}
+
+	public function participants_text() {
+		$this->text_input( 'participants-text', 'discourse_configurable_text', __( 'Header text for the participants section, used when there are comments.', 'wp-discourse' ) );
+	}
+
+	public function published_at_text() {
+		$this->text_input( 'published-at-text', 'discourse_configurable_text', __( 'Text used on Discourse to link back to the WordPress post.', 'wp-discourse' ) );
 	}
 
 	public function leave_a_reply_text() {
