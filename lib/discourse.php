@@ -93,6 +93,10 @@ class Discourse {
 			add_option( 'discourse_configurable_text', $this->discourse_configurable_text );
 		}
 
+		if ( false === get_option( 'discourse_configurable_text_backup' ) ) {
+			add_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
+		}
+
 		if ( false === get_option( 'discourse_sso' ) ) {
 			add_option( 'discourse_sso', $this->discourse_sso );
 		}
@@ -118,5 +122,10 @@ class Discourse {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
+	}
+
+	protected function make_backup( $array ) {
+		$array['backup'] = $array;
+		return $array;
 	}
 }
