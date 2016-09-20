@@ -39,6 +39,7 @@ class DiscourseComment {
 				'discourse_connect',
 				'discourse_publish',
 				'discourse_comment',
+				'discourse_configurable_text',
 			)
 		);
 	}
@@ -214,9 +215,9 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			if ( ! $count ) {
-				$count = __( 'Leave a reply', 'wp-discourse' );
+				$count = esc_html__( $this->options['leave-a-reply-text'] , 'wp-discourse' );
 			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 ' . __( 'Reply', 'wp-discourse' ) : $count . ' ' . __( 'Replies', 'wp-discourse' );
+				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html__( $this->options['single-reply-text'], 'wp-discourse' ) : $count . ' ' . esc_html__( $this->options['many-replies-text'], 'wp-discourse' );
 			}
 		}
 
