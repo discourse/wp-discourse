@@ -116,6 +116,8 @@ class SettingsValidator {
 		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
 		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
 		add_filter( 'validate_coments_not_enabled_text', array( $this, 'validate_comments_not_enabled_text' ) );
+		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
+		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
 		add_filter( 'validate_leave_a_reply_text', array( $this, 'validate_leave_a_reply_text' ) );
 		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
 		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
@@ -451,6 +453,22 @@ class SettingsValidator {
 	}
 
 	public function validate_comments_not_enabled_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_participants_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	public function validate_published_at_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
