@@ -46,8 +46,9 @@ class HTMLTemplates {
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php esc_html_e( self::get_text_options( 'continue-discussion-text' ), 'wp-discourse' ); ?>
-					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
+					<a href="{topic_url}"><?php esc_html_e( self::get_text_options( 'continue-discussion-text' ) . ' ', 'wp-discourse' ); ?>
+						{discourse_url_name}
+					</a>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
 				<div class="comment-reply-title">
@@ -196,7 +197,9 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small><?php esc_html_e( self::get_text_options( 'published-at-text', 'wp-discourse' ) ); ?> {blogurl}</small><br>{excerpt}
+		<small><?php esc_html_e( self::get_text_options( 'published-at-text', 'wp-discourse' ) ); ?>
+			{blogurl}
+		</small><br>{excerpt}
 		<?php
 		$output = ob_get_clean();
 
