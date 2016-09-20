@@ -19,13 +19,13 @@ class Discourse {
 	 */
 	public static $version = '1.0.0';
 
-	static $discourse_connect = array(
+	protected $discourse_connect = array(
 		'url' => '',
 		'api-key' => '',
 		'publish-username' => 'system',
 	);
 
-	static $discourse_publish = array(
+	protected $discourse_publish = array(
 		'display-subcategories' => 0,
 		'publish-category' => '',
 		'auto-publish' => 0,
@@ -33,7 +33,7 @@ class Discourse {
 		'auto-track' => 1,
 	);
 
-	static $discourse_comment = array(
+	protected $discourse_comment = array(
 		'max-comments' => 5,
 		'use-discourse-comments'    => 0,
 		'show-existing-comments'    => 0,
@@ -47,7 +47,7 @@ class Discourse {
 		'only-show-moderator-liked' => 0,
 	);
 
-	static $discourse_sso = array(
+	protected $discourse_sso = array(
 		'enable-sso' => 0,
 		'sso-secret' => '',
 		'login-path' => '',
@@ -68,19 +68,19 @@ class Discourse {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		if ( false === get_option( 'discourse_connect' ) ) {
-			add_option( 'discourse_connect', self::$discourse_connect );
+			add_option( 'discourse_connect', $this->discourse_connect );
 		}
 
 		if ( false === get_option( 'discourse_publish' ) ) {
-			add_option( 'discourse_publish', self::$discourse_publish );
+			add_option( 'discourse_publish', $this->discourse_publish );
 		}
 
 		if ( false === get_option( 'discourse_comment' ) ) {
-			add_option( 'discourse_comment', self::$discourse_comment );
+			add_option( 'discourse_comment', $this->discourse_comment );
 		}
 
 		if ( false === get_option( 'discourse_sso' ) ) {
-			add_option( 'discourse_sso', self::$discourse_sso );
+			add_option( 'discourse_sso', $this->discourse_sso );
 		}
 	}
 
@@ -91,7 +91,6 @@ class Discourse {
 	 */
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
-
 	}
 
 	/**
