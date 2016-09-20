@@ -40,3 +40,14 @@
 #adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
 	padding-top: 6px;
 }
+
+.discourse-options-page-wrap {
+	position: relative;
+}
+
+input#discourse_reset_options {
+	position: relative;
+	left: 115px;
+	bottom: 27px;
+}
+
