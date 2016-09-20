@@ -35,18 +35,22 @@ class DiscourseSSO {
 	 * @param object $wordpress_email_verifier An object for verifying email addresses.
 	 */
 	public function __construct( $wordpress_email_verifier ) {
+		$this->wordpress_email_verifier = $wordpress_email_verifier;
+
+		add_action( 'init', array( $this, 'setup_options' ) );
+		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
+		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
+		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
+		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
+	}
+
+	public function setup_options() {
 		$this->options                  = DiscourseUtilities::get_options(
 			array(
 				'discourse_connect',
 				'discourse_sso',
 			)
 		);
-		$this->wordpress_email_verifier = $wordpress_email_verifier;
-
-		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
-		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
-		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
-		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 	}
 
 	/**

@@ -27,17 +27,20 @@ class DiscoursePublish {
 	 * DiscoursePublish constructor.
 	 */
 	public function __construct() {
+		add_action( 'init', array( $this, 'setup_options' ) );
+		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
+		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
+		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
+		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
+	}
+
+	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options(
 			array(
 				'discourse_connect',
 				'discourse_publish',
 			)
 		);
-
-		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
-		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
-		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
-		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 	}
 
 	/**

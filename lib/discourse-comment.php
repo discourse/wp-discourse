@@ -25,6 +25,15 @@ class DiscourseComment {
 	 * DiscourseComment constructor.
 	 */
 	public function __construct() {
+		add_action( 'init', array( $this, 'setup_options' ) );
+		add_filter( 'comments_number', array( $this, 'comments_number' ) );
+		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
+		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
+		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
+		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+	}
+
+	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options(
 			array(
 				'discourse_connect',
@@ -32,11 +41,6 @@ class DiscourseComment {
 				'discourse_comment',
 			)
 		);
-		add_filter( 'comments_number', array( $this, 'comments_number' ) );
-		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
-		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
-		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
-		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 	}
 
 	/**
