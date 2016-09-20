@@ -30,6 +30,7 @@ class DiscourseAdmin {
 			'discourse_connect',
 			'discourse_publish',
 			'discourse_comment',
+			'discourse_configurable_text',
 			'discourse_sso',
 		) );
 
@@ -194,6 +195,53 @@ class DiscourseAdmin {
 			'discourse_validate_options',
 		) );
 
+		// Configurable text content settings
+		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Configurable Text Content Settings', 'wp-discourse' ), array(
+			$this,
+			'configurable_text_tab_details',
+		), 'discourse_configurable_text' );
+
+		add_settings_field( 'discourse_start_discussion_text', __( 'The \'Start discussion\' link text', 'wp-discourse' ), array(
+			$this,
+			'start_discussion_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_continue_discussion_text', __( 'The \'Continue discussion\' link text', 'wp-discourse' ), array(
+			$this,
+			'continue_discussion_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_notable_replies_text', __( 'The comments heading', 'wp-discourse' ), array(
+			$this,
+			'notable_replies_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_comments_not_enables_text', __( 'Comments not enabled text', 'wp-discourse' ), array(
+			$this,
+			'comments_not_enabled_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_leave_a_reply_text', __( 'The text used for the WordPress comments number', 'wp-discourse' ), array(
+			$this,
+			'leave_a_reply_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_single_reply_text', __( 'For when there is a single reply', 'wp-discourse' ), array(
+			$this,
+			'single_reply_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_many_replies_text', __( 'For when there are many replies', 'wp-discourse' ), array(
+			$this,
+			'many_replies_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+
+		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
+			$this,
+			'discourse_validate_options',
+		) );
+
 		// SSO settings.
 		add_settings_section( 'discourse_sso_settings_section', __( 'SSO Settings', 'wp-discourse' ), array(
 			$this,
@@ -289,10 +337,10 @@ class DiscourseAdmin {
 	 * Outputs markup for the use-full-post checkbox.
 	 */
 	public function full_post_checkbox() {
-		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] )  ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
+		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
 			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
-			                   'This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) .'" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
+			                   'This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
 		} else {
 			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
 			                   'This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
@@ -328,7 +376,7 @@ class DiscourseAdmin {
 	public function post_types_select() {
 		$this->post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -401,7 +449,7 @@ class DiscourseAdmin {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -416,6 +464,40 @@ class DiscourseAdmin {
 	 */
 	public function debug_mode_checkbox() {
 		$this->checkbox_input( 'debug-mode', 'discourse_comment', __( 'Always refresh comments.', 'wp-discourse' ), __( 'This setting is not recommended for production, when this setting is not enabled comments will be cached for 10 minutes.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * ----------------------------------
+	 * Configurable text settings fields.
+	 * ----------------------------------
+	 */
+
+	public function start_discussion_text() {
+		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used for starting a discussion', 'wp-discourse', 'wp-discourse' ) );
+	}
+
+	public function continue_discussion_text() {
+		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used for the \'continue discussion\' link', 'wp-discourse' ) );
+	}
+
+	public function notable_replies_text() {
+		$this->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used for the comments heading', 'wp-discourse' ) );
+	}
+
+	public function comments_not_enabled_text() {
+		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used for when there is a configuration error with Discourse', 'wp-discourse' ) );
+	}
+
+	public function leave_a_reply_text() {
+		$this->text_input( 'leave-a-reply-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there are no comments. Hooks into the comments_number function.', 'wp-discourse' ) );
+	}
+
+	public function single_reply_text() {
+		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there is a single comment. Hooks into the comments_number function.', 'wp-discourse' ) );
+	}
+
+	public function many_replies_text() {
+		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there is more than one comment. Hooks into the comments_number function.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -516,6 +598,19 @@ class DiscourseAdmin {
 		);
 		add_action( 'load-' . $commenting_settings, array( $this, 'connection_status_notice' ) );
 
+		$configurable_text_settings = add_submenu_page(
+			'wp_discourse_options',
+			__( 'Text Content', 'wp-discourse' ),
+			__( 'Text Content', 'wp-discourse' ),
+			'manage_options',
+			'text_content_options',
+			array( $this, 'text_content_options_tab' )
+		);
+		add_action( 'load-' . $configurable_text_settings, array(
+			$this,
+			'connection_status_notice'
+		) );
+
 		$sso_settings = add_submenu_page(
 			'wp_discourse_options',
 			__( 'SSO', 'wp-discourse' ),
@@ -563,6 +658,9 @@ class DiscourseAdmin {
 				<a href="?page=wp_discourse_options&tab=commenting_options"
 				   class="nav-tab <?php echo 'commenting_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Commenting', 'wp-discourse' ); ?>
 				</a>
+				<a href="?page=wp_discourse_options&tab=text_content_options"
+				   class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
+				</a>
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
@@ -584,6 +682,11 @@ class DiscourseAdmin {
 					case 'commenting_options':
 						settings_fields( 'discourse_comment' );
 						do_settings_sections( 'discourse_comment' );
+						break;
+
+					case 'text_content_options':
+						settings_fields( 'discourse_configurable_text' );
+						do_settings_sections( 'discourse_configurable_text' );
 						break;
 
 					case 'sso_options':
@@ -622,6 +725,10 @@ class DiscourseAdmin {
 	 */
 	public function commenting_options_tab() {
 		$this->options_pages_display( 'commenting_options' );
+	}
+
+	public function text_content_options_tab() {
+		$this->options_pages_display( 'text_content_options' );
 	}
 
 	/**
@@ -680,6 +787,16 @@ class DiscourseAdmin {
 		<?php
 	}
 
+	public function configurable_text_tab_details() {
+		?>
+		<p class="documentation-link">
+			<em><?php esc_html_e( 'This section is for configuring how the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+		</p>
+		<?php
+	}
+
 	/**
 	 * Details for the 'sso_options' tab.
 	 */
@@ -708,7 +825,7 @@ class DiscourseAdmin {
 
 		if ( ! DiscourseUtilities::check_connection_status() ) {
 
-			if ( 'publishing_options' === $current_page || 'commenting_options' === $current_page || 'sso_options' === $current_page ) {
+			if ( 'publishing_options' === $current_page || 'commenting_options' === $current_page || 'text_content_options' === $current_page || 'sso_options' === $current_page ) {
 				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'disconnected' ) );
@@ -727,7 +844,7 @@ class DiscourseAdmin {
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
 				                          "Please check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -755,7 +872,7 @@ class DiscourseAdmin {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
-				"To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
+				                          "To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -801,8 +918,8 @@ class DiscourseAdmin {
 	 * @param string $option The name of the option.
 	 * @param string $option_group The option group for the field to be saved to.
 	 * @param string $description The description of the settings field.
-	 * @param null   $type The type of input ('number', 'url', etc).
-	 * @param null   $min The min value (applied to number inputs).
+	 * @param null $type The type of input ('number', 'url', etc).
+	 * @param null $min The min value (applied to number inputs).
 	 */
 	protected function text_input( $option, $option_group, $description, $type = null, $min = null ) {
 		$options = $this->options;
@@ -825,7 +942,7 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -842,7 +959,7 @@ class DiscourseAdmin {
 	protected function checkbox_input( $option, $option_group, $label = '', $description = '' ) {
 		$options = $this->options;
 		$allowed = array(
-			'a' => array(
+			'a'      => array(
 				'href'   => array(),
 				'target' => array(),
 			),
@@ -870,7 +987,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $post_types An array of available post types.
+	 * @param array $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	protected function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -924,8 +1041,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array  $group The array of items to be selected.
-	 * @param int    $selected The value of the selected option.
+	 * @param array $group The array of items to be selected.
+	 * @param int $selected The value of the selected option.
 	 * @param string $description The description of the option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected, $description ) {
