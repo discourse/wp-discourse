@@ -48,10 +48,10 @@ class Discourse {
 	);
 
 	protected $discourse_configurable_text = array(
-		'start-discussion-text' => 'Start the discussion',
+		'start-discussion-text' => 'Start the discussion at',
 		'notable-replies-text' => 'Notable Replies',
 		'continue-discussion-text' => 'Continue the discussion',
-		'comments-not-enabled-text' => 'Comments are not enabled for this post.',
+		'comments-not-available-text' => 'Comments are not currently available for this post.',
 		'participants-text' => 'Participants',
 		'published-at-text' => 'Originally published at:',
 		'leave-a-reply-text' => 'Leave a reply',

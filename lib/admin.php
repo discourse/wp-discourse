@@ -219,8 +219,7 @@ class DiscourseAdmin {
 
 		add_settings_field( 'discourse_comments_not_available_text', __( 'Comments not available', 'wp-discourse' ), array(
 			$this,
-			// todo: change function name to 'comments_not_available_text'
-			'comments_not_enabled_text',
+			'comments_not_available_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		add_settings_field( 'discourse_participants_text', __( 'Heading for the \'participants\' section', 'wp-discourse' ), array(
@@ -495,8 +494,8 @@ class DiscourseAdmin {
 		$this->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used at the top of the comments section, when there are comments.', 'wp-discourse' ) );
 	}
 
-	public function comments_not_enabled_text() {
-		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
+	public function comments_not_available_text() {
+		$this->text_input( 'comments-not-available-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
 	}
 
 	public function participants_text() {

@@ -115,7 +115,7 @@ class SettingsValidator {
 		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
 		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
 		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
-		add_filter( 'validate_coments_not_enabled_text', array( $this, 'validate_comments_not_enabled_text' ) );
+		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_comments_not_available_text' ) );
 		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
 		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
 		add_filter( 'validate_leave_a_reply_text', array( $this, 'validate_leave_a_reply_text' ) );
@@ -452,7 +452,7 @@ class SettingsValidator {
 		}
 	}
 
-	public function validate_comments_not_enabled_text( $input ) {
+	public function validate_comments_not_available_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
