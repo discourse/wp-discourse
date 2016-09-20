@@ -57,13 +57,16 @@ class Discourse {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
-
-		add_action( 'admin_init', array( $this, 'initialize_plugin_options' ) );
+		add_action( 'init', array( $this, 'initialize_plugin_configuration' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 	}
 
-	public function initialize_plugin_options() {
+	/**
+	 * Initializes the plugin configuration, loads the text domain etc.
+	 */
+	public function initialize_plugin_configuration() {
+		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
+
 		if ( false === get_option( 'discourse_connect' ) ) {
 			add_option( 'discourse_connect', self::$discourse_connect );
 		}
@@ -88,6 +91,7 @@ class Discourse {
 	 */
 	public static function install() {
 		update_option( 'discourse_version', self::$version );
+
 	}
 
 	/**
