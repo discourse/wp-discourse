@@ -197,42 +197,42 @@ class DiscourseAdmin {
 		) );
 
 		// Configurable text content settings
-		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Configurable Text Content Settings', 'wp-discourse' ), array(
+		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
 			$this,
 			'configurable_text_tab_details',
 		), 'discourse_configurable_text' );
 
-		add_settings_field( 'discourse_start_discussion_text', __( 'The \'Start discussion\' link text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_start_discussion_text', __( '\'Start discussion\' link', 'wp-discourse' ), array(
 			$this,
 			'start_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_continue_discussion_text', __( 'The \'Continue discussion\' link text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_continue_discussion_text', __( '\'Continue discussion\' link', 'wp-discourse' ), array(
 			$this,
 			'continue_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_notable_replies_text', __( 'The comments heading', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_notable_replies_text', __( 'Top level comments heading', 'wp-discourse' ), array(
 			$this,
 			'notable_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_comments_not_enables_text', __( 'Comments not enabled text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_comments_not_enables_text', __( 'Comments not available', 'wp-discourse' ), array(
 			$this,
 			'comments_not_enabled_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_leave_a_reply_text', __( 'The text used for the WordPress comments number', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_leave_a_reply_text', __( 'Leave a reply (WordPress hook)', 'wp-discourse' ), array(
 			$this,
 			'leave_a_reply_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_single_reply_text', __( 'For when there is a single reply', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_single_reply_text', __( 'Single reply', 'wp-discourse' ), array(
 			$this,
 			'single_reply_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_many_replies_text', __( 'For when there are many replies', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_many_replies_text', __( 'Many Replies', 'wp-discourse' ), array(
 			$this,
 			'many_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
@@ -474,31 +474,31 @@ class DiscourseAdmin {
 	 */
 
 	public function start_discussion_text() {
-		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used for starting a discussion', 'wp-discourse', 'wp-discourse' ) );
+		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of a post with no comments, for starting a discussion on Discourse.', 'wp-discourse', 'wp-discourse' ) );
 	}
 
 	public function continue_discussion_text() {
-		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used for the \'continue discussion\' link', 'wp-discourse' ) );
+		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of the comments template, for continuing the discussion on Discourse.', 'wp-discourse' ) );
 	}
 
 	public function notable_replies_text() {
-		$this->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used for the comments heading', 'wp-discourse' ) );
+		$this->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used at the top of the comments section, when there are comments.', 'wp-discourse' ) );
 	}
 
 	public function comments_not_enabled_text() {
-		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used for when there is a configuration error with Discourse', 'wp-discourse' ) );
+		$this->text_input( 'comments-not-enabled-text', 'discourse_configurable_text', __( 'Text used for when there is a configuration error with Discourse.', 'wp-discourse' ) );
 	}
 
 	public function leave_a_reply_text() {
-		$this->text_input( 'leave-a-reply-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there are no comments. Hooks into the comments_number function.', 'wp-discourse' ) );
+		$this->text_input( 'leave-a-reply-text', 'discourse_configurable_text', __( 'Text that may be used in WordPress themes for when there are no comments on a post. This text is used for the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
 	public function single_reply_text() {
-		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there is a single comment. Hooks into the comments_number function.', 'wp-discourse' ) );
+		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
 	public function many_replies_text() {
-		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used in WordPress themes for when there is more than one comment. Hooks into the comments_number function.', 'wp-discourse' ) );
+		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used when there is more than one comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -820,7 +820,7 @@ class DiscourseAdmin {
 	public function configurable_text_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring how the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>

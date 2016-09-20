@@ -67,6 +67,7 @@ class HTMLTemplates {
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
+						<?php //todo: remove the word 'at' ?>
 						<?php esc_html_e( 'Start the discussion', 'wp-discourse' ); ?>
 					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
 			</div><!-- #respond -->
