@@ -31,6 +31,7 @@ class Discourse {
 		'auto-publish' => 0,
 		'allowed_post_types' => array( 'post' ),
 		'auto-track' => 1,
+		'custom-excerpt-length'     => 55,
 	);
 
 	protected $discourse_comment = array(
@@ -40,7 +41,6 @@ class Discourse {
 		'min-score'                 => 0,
 		'min-replies'               => 1,
 		'min-trust-level'           => 1,
-		'custom-excerpt-length'     => 55,
 		'bypass-trust-level-score'  => 50,
 		'debug-mode'                => 0,
 		'full-post-content'         => 0,
