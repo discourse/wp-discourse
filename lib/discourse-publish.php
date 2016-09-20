@@ -30,7 +30,6 @@ class DiscoursePublish {
 		$this->options = DiscourseUtilities::get_options(
 			array(
 				'discourse_connect',
-				'discourse_comment',
 				'discourse_publish',
 			)
 		);
