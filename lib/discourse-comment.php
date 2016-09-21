@@ -26,7 +26,7 @@ class DiscourseComment {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-		add_filter( 'comments_number', array( $this, 'comments_number' ), 10, 2 );
+		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
@@ -196,25 +196,26 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Returns the comments number.
+	 * Returns the comments number string.
 	 *
-	 * If Discourse comments are enabled, returns the 'discourse_comments_count', otherwise
-	 * returns the $count value. Hooks into 'comments_number'.
+	 * If both Discourse and WordPress comments are being used for a post a comments number string
+	 * is created that references both. Otherwise the output from WordPress is returned unchanged.
 	 *
 	 * @param int $count The comment count supplied by WordPress.
 	 *
 	 * @return mixed|string
 	 */
-	function comments_number( $output, $number ) {
+	function comments_number( $output ) {
 		global $post;
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
 			$discourse_comment_count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			$wp_comment_count = $post->comment_count;
 
-			if ( $discourse_comment_count && $wp_comment_count ) {
+			if ( $discourse_comment_count && $wp_comment_count &&
+			     ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) ) ) {
 				if ( 1 === intval( $discourse_comment_count ) && 1 === intval( $wp_comment_count ) ) {
-					$output = esc_html__( 'there is one Discourse comment and 1 Wordpress comment', 'wp-discourse' );
+					$output = esc_html__( '1 Discourse comment and 1 Wordpress comment', 'wp-discourse' );
 				} elseif ( 1 === intval( $discourse_comment_count ) ) {
 					$output = sprintf( esc_html__( '1 Discourse comment and %d WordPress comments', 'wp-discourse' ), $wp_comment_count );
 
@@ -230,10 +231,7 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Return the 'discourse_comment_count'.
-	 *
-	 * When the 'show-existing-comments' option is not enabled, return the 'discourse_comment_count'
-	 * so that it is available for themes using `get_comments_number`.
+	 * Returns the 'discourse_comments_count' for posts that use Discourse comments.
 	 *
 	 * @param int $count The comment count supplied by WordPress.
 	 * @param int $post_id The ID of the post.
