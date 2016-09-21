@@ -91,6 +91,14 @@ class Discourse {
 		'login-path' => '',
 	);
 
+	protected $discourse_option_groups = array(
+		'discourse_connect',
+		'discourse_publish',
+		'discourse_comment',
+		'discourse_configurable_text',
+		'discourse_sso',
+	);
+
 	/**
 	 * Discourse constructor.
 	 */
@@ -128,6 +136,8 @@ class Discourse {
 		if ( false === get_option( 'discourse_sso' ) ) {
 			add_option( 'discourse_sso', $this->discourse_sso );
 		}
+
+		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 	}
 
 	/**
