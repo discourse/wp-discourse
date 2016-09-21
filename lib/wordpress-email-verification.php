@@ -64,7 +64,6 @@ class WordPressEmailVerification {
 	 *
 	 * @param string $verification_signature_key_name The name of the key that the verification signature is stored under.
 	 * @param string $site_prefix A site prefix to avoid naming collisions in the database, for example 'testeleven'.
-	 * @param string $text_domain The key for your text domain.
 	 */
 	public function __construct( $verification_signature_key_name, $site_prefix ) {
 		$this->verification_signature_key_name = $verification_signature_key_name;

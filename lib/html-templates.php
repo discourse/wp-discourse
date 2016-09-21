@@ -53,7 +53,7 @@ class HTMLTemplates {
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' '); ?>
+					<a href="{topic_url}"><?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
 						{discourse_url_name}
 					</a>
 				</h3>
@@ -87,7 +87,7 @@ class HTMLTemplates {
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
-						<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' '); ?>
+						<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' ' ); ?>
 						{discourse_url_name}
 					</a></h3>
 			</div><!-- #respond -->
@@ -204,7 +204,7 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small><?php esc_html( self::get_text_options( 'published-at-text') ); ?>
+		<small><?php esc_html( self::get_text_options( 'published-at-text' ) ); ?>
 			{blogurl}
 		</small><br>{excerpt}
 		<?php

@@ -55,7 +55,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_info = ( object ) wp_parse_args( ( array ) $discourse_info, $defaults );
 
 	$more_replies = intval( ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 ) );
-	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : esc_html( strtolower($options['more-replies-more-text'] ) ) . ' ';
+	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : esc_html( strtolower( $options['more-replies-more-text'] ) ) . ' ';
 
 	if ( 0 === $more_replies ) {
 		$more_replies = '';

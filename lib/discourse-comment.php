@@ -220,7 +220,7 @@ class DiscourseComment {
 			if ( ! $count ) {
 				$count = esc_html( $this->options['leave-a-reply-text'] );
 			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html($this->options['single-reply-text'] ) : $count . ' ' . esc_html( $this->options['many-replies-text'] );
+				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html( $this->options['single-reply-text'] ) : $count . ' ' . esc_html( $this->options['many-replies-text'] );
 			}
 		}
 
