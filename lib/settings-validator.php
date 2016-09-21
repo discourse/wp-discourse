@@ -140,7 +140,7 @@ class SettingsValidator {
 
 		// Make sure the url starts with a valid protocol.
 		if ( ! preg_match( $regex, $input ) ) {
-			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to begin with either \'http:\' or \'https:\'.' ) );
+			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to be set to a valid URL that begins with either \'http:\' or \'https:\'.', 'wp-discourse' ) );
 			return '';
 		}
 
