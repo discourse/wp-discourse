@@ -226,11 +226,6 @@ class DiscourseAdmin {
 			'published_at_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_leave_a_reply_text', __( 'Leave a reply (WordPress hook)', 'wp-discourse' ), array(
-			$this,
-			'leave_a_reply_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
-
 		add_settings_field( 'discourse_single_reply_text', __( 'Single reply', 'wp-discourse' ), array(
 			$this,
 			'single_reply_text',
@@ -526,18 +521,11 @@ class DiscourseAdmin {
 	}
 
 	/**
-	 * Outputs the markup for the leave-a-reply-text input.
-	 */
-	public function leave_a_reply_text() {
-		$this->text_input( 'leave-a-reply-text', 'discourse_configurable_text', __( 'Text that may be used in WordPress themes for when there are no comments on a post. This text is used for the WordPress `comments_number` function.', 'wp-discourse' ) );
-	}
-
-	/**
 	 * Outputs the markup for the single-reply-text input.
 	 */
-//	public function single_reply_text() {
-//		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
-//	}
+	public function single_reply_text() {
+		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
+	}
 
 	/**
 	 * Outputs the markup for the 'many-replies-text' input.
