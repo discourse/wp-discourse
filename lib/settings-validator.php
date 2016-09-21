@@ -118,7 +118,6 @@ class SettingsValidator {
 		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_comments_not_available_text' ) );
 		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
 		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
-		add_filter( 'validate_leave_a_reply_text', array( $this, 'validate_leave_a_reply_text' ) );
 		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
 		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
 		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
@@ -512,21 +511,6 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_published_at_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'validate_leave_a_reply_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_leave_a_reply_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
