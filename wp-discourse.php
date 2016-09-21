@@ -50,7 +50,7 @@ $discourse                    = new WPDiscourse\Discourse\Discourse();
 $discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
 $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublish();
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
-$wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse', 'wp-discourse' );
+$wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 
