@@ -33,6 +33,9 @@ class DiscourseComment {
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 	}
 
+	/**
+	 * Setup options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options(
 			array(

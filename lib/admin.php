@@ -196,7 +196,7 @@ class DiscourseAdmin {
 			'discourse_validate_options',
 		) );
 
-		// Configurable text content settings
+		// Configurable text content settings.
 		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
 			$this,
 			'configurable_text_tab_details',
@@ -354,11 +354,11 @@ class DiscourseAdmin {
 	public function full_post_checkbox() {
 		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
-			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
-			                   'This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
+			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse.
+			This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
 		} else {
-			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must uncheck the <strong>\'embed truncate\'</strong> setting on Discourse. ' .
-			                   'This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
+			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must uncheck the <strong>\'embed truncate\'</strong> setting on Discourse.
+			This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
 		}
 
 		$this->checkbox_input( 'full-post-content', 'discourse_publish', __( 'Use the full post for content rather than an excerpt.', 'wp-discourse' ), $description );
@@ -391,7 +391,7 @@ class DiscourseAdmin {
 	public function post_types_select() {
 		$this->post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -464,7 +464,7 @@ class DiscourseAdmin {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -487,42 +487,72 @@ class DiscourseAdmin {
 	 * ----------------------------------
 	 */
 
+	/**
+	 * Outputs the markup for the start-discussion-text input.
+	 */
 	public function start_discussion_text() {
 		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of a post with no comments, for starting a discussion on Discourse.', 'wp-discourse', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the continue-discussion-text input.
+	 */
 	public function continue_discussion_text() {
 		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of the comments template, for continuing the discussion on Discourse.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the notable-replies-text input.
+	 */
 	public function notable_replies_text() {
 		$this->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used at the top of the comments section, when there are comments.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the comments-not-available input.
+	 */
 	public function comments_not_available_text() {
 		$this->text_input( 'comments-not-available-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the participants-text input.
+	 */
 	public function participants_text() {
 		$this->text_input( 'participants-text', 'discourse_configurable_text', __( 'Header text for the participants section, used when there are comments.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the published-at-text input.
+	 */
 	public function published_at_text() {
 		$this->text_input( 'published-at-text', 'discourse_configurable_text', __( 'Text used on Discourse to link back to the WordPress post.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the leave-a-reply-text input.
+	 */
 	public function leave_a_reply_text() {
 		$this->text_input( 'leave-a-reply-text', 'discourse_configurable_text', __( 'Text that may be used in WordPress themes for when there are no comments on a post. This text is used for the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the single-reply-text input.
+	 */
 	public function single_reply_text() {
 		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the 'many-replies-text' input.
+	 */
 	public function many_replies_text() {
 		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used when there is more than one comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs the markup for the more-replies-more-text input.
+	 */
 	public function more_replies_more_text() {
 		$this->text_input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
 	}
@@ -635,7 +665,7 @@ class DiscourseAdmin {
 		);
 		add_action( 'load-' . $configurable_text_settings, array(
 			$this,
-			'connection_status_notice'
+			'connection_status_notice',
 		) );
 
 		$sso_settings = add_submenu_page(
@@ -744,9 +774,12 @@ class DiscourseAdmin {
 		<?php
 	}
 
+	/**
+	 * Resets the `discourse_configurable_text` option to its default values.
+	 */
 	public function process_reset() {
-		if ( ! isset( $_POST['process_options_reset_nonce'] ) ||
-		! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) ) {
+		if ( ! isset( $_POST['process_options_reset_nonce'] ) || // Input var okay.
+		! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) ) { // Input var okay.
 			exit;
 		}
 
@@ -783,6 +816,9 @@ class DiscourseAdmin {
 		$this->options_pages_display( 'commenting_options' );
 	}
 
+	/**
+	 * Called to display the 'text_content_options' tab.
+	 */
 	public function text_content_options_tab() {
 		$this->options_pages_display( 'text_content_options' );
 	}
@@ -843,6 +879,9 @@ class DiscourseAdmin {
 		<?php
 	}
 
+	/**
+	 * Details for the 'text_content_options' tab.
+	 */
 	public function configurable_text_tab_details() {
 		?>
 		<p class="documentation-link">
@@ -900,7 +939,7 @@ class DiscourseAdmin {
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
 				                          "Please check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-				                          'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -928,7 +967,7 @@ class DiscourseAdmin {
 		<div class="notice notice-warning is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
-				                          "To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
+				"To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -974,8 +1013,8 @@ class DiscourseAdmin {
 	 * @param string $option The name of the option.
 	 * @param string $option_group The option group for the field to be saved to.
 	 * @param string $description The description of the settings field.
-	 * @param null $type The type of input ('number', 'url', etc).
-	 * @param null $min The min value (applied to number inputs).
+	 * @param null   $type The type of input ('number', 'url', etc).
+	 * @param null   $min The min value (applied to number inputs).
 	 */
 	protected function text_input( $option, $option_group, $description, $type = null, $min = null ) {
 		$options = $this->options;
@@ -998,7 +1037,7 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-			} ?>
+} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -1043,7 +1082,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array $post_types An array of available post types.
+	 * @param array  $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	protected function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -1097,8 +1136,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array $group The array of items to be selected.
-	 * @param int $selected The value of the selected option.
+	 * @param array  $group The array of items to be selected.
+	 * @param int    $selected The value of the selected option.
 	 * @param string $description The description of the option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected, $description ) {

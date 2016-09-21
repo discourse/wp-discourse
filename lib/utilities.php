@@ -14,6 +14,13 @@ namespace WPDiscourse\Utilities;
  */
 class Utilities {
 
+	/**
+	 * Returns a single array of options from a given array of arrays.
+	 *
+	 * @param array $option_names An array of option names.
+	 *
+	 * @return array
+	 */
 	public static function get_options( $option_names ) {
 		$options = [];
 		foreach ( $option_names as $option_name ) {

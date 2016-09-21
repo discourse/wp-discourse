@@ -429,6 +429,13 @@ class SettingsValidator {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validates the 'validate_start_discussion_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_start_discussion_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -437,6 +444,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_continue_discussion_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_continue_discussion_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -445,6 +459,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_notable_replies_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_notable_replies_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -453,6 +474,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_comments_not_available_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_comments_not_available_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -461,6 +489,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_participants_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_participants_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -469,6 +504,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_published_at_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_published_at_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -477,6 +519,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_leave_a_reply_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_leave_a_reply_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -485,6 +534,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_single_reply_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_single_reply_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -493,6 +549,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_many_replies_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_many_replies_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
@@ -501,6 +564,13 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Validates the 'validate_more_replies_more_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_more_replies_more_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );

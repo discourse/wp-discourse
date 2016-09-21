@@ -34,6 +34,9 @@ class DiscoursePublish {
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 	}
 
+	/**
+	 * Setup options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options(
 			array(
@@ -267,7 +270,7 @@ class DiscoursePublish {
 	/**
 	 * Strip html tags from titles before passing them to Discourse.
 	 *
-	 * @param $title The title of the post.
+	 * @param string $title The title of the post.
 	 *
 	 * @return string
 	 */

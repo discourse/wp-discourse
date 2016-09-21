@@ -16,6 +16,13 @@ namespace WPDiscourse\Templates;
  */
 class HTMLTemplates {
 
+	/**
+	 * Gets the 'discourse_configurable_text' options.
+	 *
+	 * @param string $option The option key.
+	 *
+	 * @return mixed|null
+	 */
 	protected static function get_text_options( $option ) {
 		static $options = [];
 		if ( ! $options ) {

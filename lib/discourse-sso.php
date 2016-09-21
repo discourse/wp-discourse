@@ -44,6 +44,9 @@ class DiscourseSSO {
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 	}
 
+	/**
+	 * Setup options.
+	 */
 	public function setup_options() {
 		$this->options                  = DiscourseUtilities::get_options(
 			array(

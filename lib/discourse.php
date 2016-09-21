@@ -19,12 +19,21 @@ class Discourse {
 	 */
 	public static $version = '1.0.0';
 
+	/**
+	 * The connection options array.
+	 * @var array
+	 */
 	protected $discourse_connect = array(
 		'url' => '',
 		'api-key' => '',
 		'publish-username' => 'system',
 	);
 
+	/**
+	 * The publishing options array.
+	 *
+	 * @var array
+	 */
 	protected $discourse_publish = array(
 		'display-subcategories' => 0,
 		'publish-category' => '',
@@ -34,6 +43,11 @@ class Discourse {
 		'custom-excerpt-length'     => 55,
 	);
 
+	/**
+	 * The commenting options array.
+	 *
+	 * @var array
+	 */
 	protected $discourse_comment = array(
 		'max-comments' => 5,
 		'use-discourse-comments'    => 0,
@@ -47,6 +61,11 @@ class Discourse {
 		'only-show-moderator-liked' => 0,
 	);
 
+	/**
+	 * The configurable text options array.
+	 *
+	 * @var array
+	 */
 	protected $discourse_configurable_text = array(
 		'start-discussion-text' => 'Start the discussion at',
 		'notable-replies-text' => 'Notable Replies',
@@ -60,6 +79,11 @@ class Discourse {
 		'more-replies-more-text' => 'more',
 	);
 
+	/**
+	 * The SSO options array.
+	 *
+	 * @var array
+	 */
 	protected $discourse_sso = array(
 		'enable-sso' => 0,
 		'sso-secret' => '',

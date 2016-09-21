@@ -31,6 +31,9 @@ class MetaBox {
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
 	}
 
+	/**
+	 * Setup options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options(
 			array( 'discourse_publish' )
