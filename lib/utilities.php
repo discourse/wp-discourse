@@ -21,12 +21,18 @@ class Utilities {
 	 *
 	 * @return array
 	 */
-	public static function get_options( $option_names ) {
-		$options = [];
-		foreach ( $option_names as $option_name ) {
-			if ( get_option( $option_name ) ) {
-				$option  = get_option( $option_name );
-				$options = array_merge( $options, $option );
+	public static function get_options() {
+		static $options = [];
+
+		if ( ! $options ) {
+			$discourse_option_groups = get_option( 'discourse_option_groups' );
+			if ( $discourse_option_groups ) {
+				foreach ( $discourse_option_groups as $option_name ) {
+					if ( get_option( $option_name ) ) {
+						$option  = get_option( $option_name );
+						$options = array_merge( $options, $option );
+					}
+				}
 			}
 		}
 
