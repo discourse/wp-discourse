@@ -201,7 +201,7 @@ class DiscourseComment {
 	 * If both Discourse and WordPress comments are being used for a post a comments number string
 	 * is created that references both. Otherwise the output from WordPress is returned unchanged.
 	 *
-	 * @param int $count The comment count supplied by WordPress.
+	 * @param string $output The number string supplied by WordPress.
 	 *
 	 * @return mixed|string
 	 */
