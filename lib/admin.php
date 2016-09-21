@@ -334,7 +334,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the publish-category-update input.
 	 */
 	public function publish_category_input_update() {
-		$this->checkbox_input( 'publish-category-update', 'discourse_publish', __( 'Update the discourse publish category list, (normally set to refresh every hour)', 'wp-discourse' ) );
+		$this->checkbox_input( 'publish-category-update', 'discourse_publish', __( 'Update the discourse publish category list, (normally set to refresh every hour.)', 'wp-discourse' ) );
 	}
 
 	/**
@@ -344,7 +344,7 @@ class DiscourseAdmin {
 		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
 			$discourse_admin_posting_link = '<a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.';
-			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button
+			$description                  = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button
             from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse.
 			This setting is found at ', 'wp-discourse' ) . $discourse_admin_posting_link;
 		} else {
@@ -366,14 +366,14 @@ class DiscourseAdmin {
 	 * Outputs markup for the auto-publish checkbox.
 	 */
 	public function auto_publish_checkbox() {
-		$this->checkbox_input( 'auto-publish', 'discourse_publish', __( 'Publish all new posts to Discourse', 'wp-discourse' ) );
+		$this->checkbox_input( 'auto-publish', 'discourse_publish', __( 'Publish all new posts to Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the auto-track checkbox.
 	 */
 	public function auto_track_checkbox() {
-		$this->checkbox_input( 'auto-track', 'discourse_publish', __( 'Author automatically tracks published Discourse topics', 'wp-discourse' ) );
+		$this->checkbox_input( 'auto-track', 'discourse_publish', __( 'Author automatically tracks published Discourse topics.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -382,7 +382,7 @@ class DiscourseAdmin {
 	public function post_types_select() {
 		$this->post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -409,7 +409,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the existing-comments-heading input.
 	 */
 	public function existing_comments_heading_input() {
-		$this->text_input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive").', 'wp-discourse' ) );
+		$this->text_input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive".)', 'wp-discourse' ) );
 	}
 
 	/**
@@ -430,14 +430,14 @@ class DiscourseAdmin {
 	 * Outputs markup for the min-score input.
 	 */
 	public function min_score_input() {
-		$this->text_input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read).', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read.)', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-trust-level input.
 	 */
 	public function min_trust_level_input() {
-		$this->text_input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0 );
+		$this->text_input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0, 5 );
 	}
 
 	/**
@@ -455,7 +455,7 @@ class DiscourseAdmin {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -763,7 +763,8 @@ class DiscourseAdmin {
 	 */
 	public function process_reset() {
 		if ( ! isset( $_POST['process_options_reset_nonce'] ) || // Input var okay.
-		! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) ) { // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' )
+		) { // Input var okay.
 			exit;
 		}
 
@@ -776,7 +777,7 @@ class DiscourseAdmin {
 
 		$configurable_text_url = add_query_arg( array(
 			'page' => 'wp_discourse_options',
-			'tab' => 'text_content_options',
+			'tab'  => 'text_content_options',
 		), admin_url( 'admin.php' ) );
 
 		wp_safe_redirect( esc_url_raw( $configurable_text_url ) );
@@ -1000,10 +1001,10 @@ class DiscourseAdmin {
 	 * @param string $option The name of the option.
 	 * @param string $option_group The option group for the field to be saved to.
 	 * @param string $description The description of the settings field.
-	 * @param null   $type The type of input ('number', 'url', etc).
-	 * @param null   $min The min value (applied to number inputs).
+	 * @param null $type The type of input ('number', 'url', etc).
+	 * @param null $min The min value (applied to number inputs).
 	 */
-	protected function text_input( $option, $option_group, $description, $type = null, $min = null ) {
+	protected function text_input( $option, $option_group, $description, $type = null, $min = null, $max = null ) {
 		$options = $this->options;
 		$allowed = array(
 			'a' => array(
@@ -1024,7 +1025,10 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
+			<?php if ( isset( $max ) ) {
+				echo 'max="' . esc_attr( $max ) . '"';
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -1069,7 +1073,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $post_types An array of available post types.
+	 * @param array $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	protected function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -1123,8 +1127,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array  $group The array of items to be selected.
-	 * @param int    $selected The value of the selected option.
+	 * @param array $group The array of items to be selected.
+	 * @param int $selected The value of the selected option.
 	 * @param string $description The description of the option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected, $description ) {
