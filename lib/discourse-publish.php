@@ -201,6 +201,7 @@ class DiscoursePublish {
 			$data         = array(
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
+				'title' => $title,
 				'post[raw]'        => $baked,
 				'skip_validations' => 'true',
 			);
