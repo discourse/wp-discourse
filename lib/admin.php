@@ -45,13 +45,7 @@ class DiscourseAdmin {
 	 */
 	public function admin_init() {
 		// Get the plugin's options.
-		$this->options = DiscourseUtilities::get_options( array(
-			'discourse_connect',
-			'discourse_publish',
-			'discourse_comment',
-			'discourse_configurable_text',
-			'discourse_sso',
-		) );
+		$this->options = DiscourseUtilities::get_options();
 
 		// Connection settings.
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connection Settings', 'wp-discourse' ), array(
@@ -541,9 +535,9 @@ class DiscourseAdmin {
 	/**
 	 * Outputs the markup for the single-reply-text input.
 	 */
-	public function single_reply_text() {
-		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
-	}
+//	public function single_reply_text() {
+//		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
+//	}
 
 	/**
 	 * Outputs the markup for the 'many-replies-text' input.
@@ -784,6 +778,8 @@ class DiscourseAdmin {
 		! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) ) { // Input var okay.
 			exit;
 		}
+		// Todo: make sure the user is allowed to be here
+		// Todo: add a confirmation
 
 		delete_option( 'discourse_configurable_text' );
 		add_option( 'discourse_configurable_text', get_option( 'discourse_configurable_text_backup' ) );

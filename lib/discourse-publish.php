@@ -38,12 +38,7 @@ class DiscoursePublish {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options(
-			array(
-				'discourse_connect',
-				'discourse_publish',
-			)
-		);
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**

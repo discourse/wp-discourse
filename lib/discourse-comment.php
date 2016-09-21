@@ -26,7 +26,7 @@ class DiscourseComment {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-		add_filter( 'comments_number', array( $this, 'comments_number' ) );
+		add_filter( 'comments_number', array( $this, 'comments_number' ), 10, 2 );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
@@ -37,14 +37,7 @@ class DiscourseComment {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options(
-			array(
-				'discourse_connect',
-				'discourse_publish',
-				'discourse_comment',
-				'discourse_configurable_text',
-			)
-		);
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
@@ -212,19 +205,28 @@ class DiscourseComment {
 	 *
 	 * @return mixed|string
 	 */
-	function comments_number( $count ) {
+	function comments_number( $output, $number ) {
 		global $post;
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
-			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
-			if ( ! $count ) {
-				$count = esc_html( $this->options['leave-a-reply-text'] );
-			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html( $this->options['single-reply-text'] ) : $count . ' ' . esc_html( $this->options['many-replies-text'] );
+			$discourse_comment_count = get_post_meta( $post->ID, 'discourse_comments_count', true );
+			$wp_comment_count = $post->comment_count;
+
+			if ( $discourse_comment_count && $wp_comment_count ) {
+				if ( 1 === intval( $discourse_comment_count ) && 1 === intval( $wp_comment_count ) ) {
+					$output = esc_html__( 'there is one Discourse comment and 1 Wordpress comment', 'wp-discourse' );
+				} elseif ( 1 === intval( $discourse_comment_count ) ) {
+					$output = sprintf( esc_html__( '1 Discourse comment and %d WordPress comments', 'wp-discourse' ), $wp_comment_count );
+
+				} elseif ( 1 === intval( $wp_comment_count ) ) {
+					$output = sprintf( esc_html__( '%s Discourse comments and 1 WordPress comment', 'wp-discourse' ), $discourse_comment_count );
+				} else {
+					$output = sprintf( esc_html__( '%s Discourse comments and %s WordPress comments', 'wp-discourse' ), $discourse_comment_count, $wp_comment_count );
+				}
 			}
 		}
 
-		return $count;
+		return $output;
 	}
 
 	/**
@@ -239,9 +241,7 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	function get_comments_number( $count, $post_id ) {
-		$use_wordpress_comments = isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] );
-
-		if ( $this->use_discourse_comments( $post_id ) && ( ! $use_wordpress_comments ) ) {
+		if ( $this->use_discourse_comments( $post_id ) ) {
 			$this->sync_comments( $post_id );
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 		}

@@ -35,9 +35,7 @@ class MetaBox {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options(
-			array( 'discourse_publish' )
-		);
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
