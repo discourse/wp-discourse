@@ -766,8 +766,10 @@ class DiscourseAdmin {
 		! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) ) { // Input var okay.
 			exit;
 		}
-		// Todo: make sure the user is allowed to be here
-		// Todo: add a confirmation
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			exit;
+		}
 
 		delete_option( 'discourse_configurable_text' );
 		add_option( 'discourse_configurable_text', get_option( 'discourse_configurable_text_backup' ) );
