@@ -89,6 +89,9 @@ for more details
 - Display the Discourse username instead of the fullname in the default comments template
 - Add a 'Participants' heading
 - Don't display the category-select option in posts that have already been published to Discourse
+- Only hook into the WordPress `comments_number` hook when both Discourse and WordPress comments are used for a post
+- Sync changed post title with Discourse
+- Get options more efficiently
 
 #### 0.9.9 13/09/16
 
