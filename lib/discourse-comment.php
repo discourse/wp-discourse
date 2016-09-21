@@ -220,9 +220,9 @@ class DiscourseComment {
 					$output = sprintf( esc_html__( '1 Discourse comment and %d WordPress comments', 'wp-discourse' ), $wp_comment_count );
 
 				} elseif ( 1 === intval( $wp_comment_count ) ) {
-					$output = sprintf( esc_html__( '%s Discourse comments and 1 WordPress comment', 'wp-discourse' ), $discourse_comment_count );
+					$output = sprintf( esc_html__( '%d Discourse comments and 1 WordPress comment', 'wp-discourse' ), $discourse_comment_count );
 				} else {
-					$output = sprintf( esc_html__( '%s Discourse comments and %s WordPress comments', 'wp-discourse' ), $discourse_comment_count, $wp_comment_count );
+					$output = sprintf( esc_html__( '%1$d Discourse comments and %2$d WordPress comments', 'wp-discourse' ), $discourse_comment_count, $wp_comment_count );
 				}
 			}
 		}
