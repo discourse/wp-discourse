@@ -82,9 +82,13 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
 #### 1.0.0 15/09/16
 
+- Move WooCommerce support into a separate plugin, see the wiki page [WooCommerce Support](https://github.com/discourse/wp-discourse/wiki/WooCommerce-Support)
+for more details
 - Break settings page into tabbed sections
+- Add a settings section for customizing all user facing text
+- Display the Discourse username instead of the fullname in the default comments template
+- Add a 'Participants' heading
 - Don't display the category-select option in posts that have already been published to Discourse
-- Use
 
 #### 0.9.9 13/09/16
 
