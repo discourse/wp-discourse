@@ -11,6 +11,8 @@
 
 namespace WPDiscourse\Templates;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class HTMLTemplates
  */
@@ -24,12 +26,9 @@ class HTMLTemplates {
 	 * @return mixed|null
 	 */
 	protected static function get_text_options( $option ) {
-		static $options = [];
-		if ( ! $options ) {
-			$options = get_option( 'discourse_configurable_text' );
-		}
+		$options = DiscourseUtilities::get_options();
 
-		return isset( $options[ $option ] ) ? $options[ $option ] : null;
+		echo $options[$option];
 	}
 
 	/**
