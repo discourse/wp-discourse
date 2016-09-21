@@ -416,7 +416,7 @@ class DiscourseAdmin {
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->text_input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number' );
+		$this->text_input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
