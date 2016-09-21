@@ -524,14 +524,14 @@ class DiscourseAdmin {
 	 * Outputs the markup for the single-reply-text input.
 	 */
 	public function single_reply_text() {
-		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used for when there is a single comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
+		$this->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used in the Discourse comments template when there is only one reply.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the 'many-replies-text' input.
 	 */
 	public function many_replies_text() {
-		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used when there is more than one comment. This will be used both by the plugin and the WordPress `comments_number` function.', 'wp-discourse' ) );
+		$this->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used in the Discourse comments template when there is more than one reply.', 'wp-discourse' ) );
 	}
 
 	/**
