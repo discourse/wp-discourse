@@ -7,10 +7,11 @@
     <description>A custom set of code standard rules for the WP Discourse plugin.</description>
 
     <!-- Include the WordPress ruleset, with exclusions. -->
-    <rule ref="WordPress Core">
+    <rule ref="WordPress">
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
+        <exclude name="WordPress.VIP.RestrictedFunctions" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->
