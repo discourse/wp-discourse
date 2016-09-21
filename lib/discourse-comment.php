@@ -218,9 +218,9 @@ class DiscourseComment {
 			$this->sync_comments( $post->ID );
 			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			if ( ! $count ) {
-				$count = esc_html__( $this->options['leave-a-reply-text'] , 'wp-discourse' );
+				$count = esc_html( $this->options['leave-a-reply-text'] );
 			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html__( $this->options['single-reply-text'], 'wp-discourse' ) : $count . ' ' . esc_html__( $this->options['many-replies-text'], 'wp-discourse' );
+				$count = ( 1 === intval( $count ) ) ? '1 ' . esc_html($this->options['single-reply-text'] ) : $count . ' ' . esc_html( $this->options['many-replies-text'] );
 			}
 		}
 

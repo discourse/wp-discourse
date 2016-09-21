@@ -49,17 +49,17 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
-			<h2 class="comments-title"><?php esc_html_e( self::get_text_options( 'notable-replies-text' ), 'wp-discourse' ); ?></h2>
+			<h2 class="comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php esc_html_e( self::get_text_options( 'continue-discussion-text' ) . ' ', 'wp-discourse' ); ?>
+					<a href="{topic_url}"><?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' '); ?>
 						{discourse_url_name}
 					</a>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
 				<div class="comment-reply-title">
-					<h4 class="discourse-participants"><?php esc_html_e( self::get_text_options( 'participants-text', 'wp-discourse' ) ); ?></h4>
+					<h4 class="discourse-participants"><?php esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
 					<p>{participants}</p>
 				</div>
 			</div><!-- #respond -->
@@ -87,7 +87,7 @@ class HTMLTemplates {
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
-						<?php esc_html_e( self::get_text_options( 'start-discussion-text' ) . ' ', 'wp-discourse' ); ?>
+						<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' '); ?>
 						{discourse_url_name}
 					</a></h3>
 			</div><!-- #respond -->
@@ -113,7 +113,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php esc_html_e( self::get_text_options( 'comments-not-available-text' ), 'wp-discourse' ); ?></p>
+				<p><?php esc_html( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -204,7 +204,7 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small><?php esc_html_e( self::get_text_options( 'published-at-text', 'wp-discourse' ) ); ?>
+		<small><?php esc_html( self::get_text_options( 'published-at-text') ); ?>
 			{blogurl}
 		</small><br>{excerpt}
 		<?php

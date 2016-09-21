@@ -354,8 +354,10 @@ class DiscourseAdmin {
 	public function full_post_checkbox() {
 		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
-			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse.
-			This setting is found at <a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.', 'wp-discourse' );
+			$discourse_admin_posting_link = '<a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.';
+			$description = __( '<strong>Note:</strong> to keep the \'Show Full Post\'</strong> button
+            from appearing under your post on Discourse, you must unselect the <strong>\'embed truncate\'</strong> setting on Discourse.
+			This setting is found at ', 'wp-discourse' ) . $discourse_admin_posting_link;
 		} else {
 			$description = __( '<strong>Note: to keep the \'Show Full Post\'</strong> button from appearing under your post on Discourse, you must uncheck the <strong>\'embed truncate\'</strong> setting on Discourse.
 			This setting is found at http://discourse.example.com/admin/site_settings/category/posting.', 'wp-discourse' );
@@ -491,7 +493,7 @@ class DiscourseAdmin {
 	 * Outputs the markup for the start-discussion-text input.
 	 */
 	public function start_discussion_text() {
-		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of a post with no comments, for starting a discussion on Discourse.', 'wp-discourse', 'wp-discourse' ) );
+		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of a post with no comments, for starting a discussion on Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -937,9 +939,8 @@ class DiscourseAdmin {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
-				                          "Please check your settings for 'Discourse URL', 'API Key', and 'Publishing username'. " .
-				'Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
+				Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -966,8 +967,8 @@ class DiscourseAdmin {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. ' .
-				"To establish a connection navigate back to the 'Connection' tab and check your settings.", 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
+				navigate back to the \'Connection\' tab and check your settings.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php

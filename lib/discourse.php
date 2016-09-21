@@ -21,6 +21,7 @@ class Discourse {
 
 	/**
 	 * The connection options array.
+	 *
 	 * @var array
 	 */
 	protected $discourse_connect = array(
