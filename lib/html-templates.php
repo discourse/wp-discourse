@@ -23,12 +23,12 @@ class HTMLTemplates {
 	 *
 	 * @param string $option The option key.
 	 *
-	 * @return mixed|null
+	 * @return void
 	 */
 	protected static function get_text_options( $option ) {
 		$options = DiscourseUtilities::get_options();
 
-		echo $options[$option];
+		echo esc_html( $options[ $option ] );
 	}
 
 	/**

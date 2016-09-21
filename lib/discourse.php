@@ -91,6 +91,11 @@ class Discourse {
 		'login-path' => '',
 	);
 
+	/**
+	 * The array of option groups, used for assembling the options into a single array.
+	 *
+	 * @var array
+	 */
 	protected $discourse_option_groups = array(
 		'discourse_connect',
 		'discourse_publish',
