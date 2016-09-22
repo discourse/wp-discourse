@@ -1013,7 +1013,7 @@ class DiscourseAdmin {
 			),
 		);
 
-		if ( array_key_exists( $option, $options ) ) {
+		if ( isset( $options[ $option ] ) ) {
 			$value = $options[ $option ];
 		} else {
 			$value = '';
@@ -1051,7 +1051,7 @@ class DiscourseAdmin {
 			),
 			'strong' => array(),
 		);
-		if ( array_key_exists( $option, $options ) and 1 === intval( $options[ $option ] ) ) {
+		if ( ! empty( $options[ $option ] ) && 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';
 		} else {
 			$checked = '';
