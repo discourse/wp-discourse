@@ -17,16 +17,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	echo wp_kses_post( Templates::bad_response_html() );
 
 } else {
-	// todo: fix this
-	$options       = DiscourseUtilities::get_options(
-		array(
-			'discourse_connect',
-			'discourse_publish',
-			'discourse_comment',
-			'discourse_configurable_text',
-			'discourse_sso',
-		)
-	);
+	$options       = DiscourseUtilities::get_options();
 	$is_enable_sso = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$redirect_without_login = isset( $options['redirect-without-login'] ) && 1 === intval( $options['redirect-without-login'] );
 	$permalink     = (string) $custom['discourse_permalink'][0];
