@@ -180,6 +180,8 @@ class DiscourseComment {
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
 			$options         = $this->options;
+			// Use $post->comment_count because get_comments_number will return the Discourse comments
+			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
 			if ( ! isset( $options['show-existing-comments'] ) || 0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
@@ -187,6 +189,7 @@ class DiscourseComment {
 			} else {
 				// Show the Discourse comments then show the existing WP comments (in $old).
 				include WPDISCOURSE_PATH . 'templates/comments.php';
+
 				echo '<div class="discourse-existing-comments-heading">' . wp_kses_post( $options['existing-comments-heading'] ) . '</div>';
 
 				return $old;
