@@ -17,6 +17,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	echo wp_kses_post( Templates::bad_response_html() );
 
 } else {
+	// todo: fix this
 	$options       = DiscourseUtilities::get_options(
 		array(
 			'discourse_connect',
