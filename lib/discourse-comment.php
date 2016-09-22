@@ -6,6 +6,7 @@
  */
 
 namespace WPDiscourse\DiscourseComment;
+
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
@@ -47,22 +48,23 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array  $allowedposttags  The array of allowed post tags.
-	 * @param string $context   The current context ('post', 'data', etc.).
+	 * @param array $allowedposttags The array of allowed post tags.
+	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
 	 */
 	public function extend_allowed_html( $allowedposttags, $context ) {
 		if ( 'post' === $context ) {
 			$allowedposttags['div'] = array(
-				'class' => true,
-				'id' => true,
-				'style' => true,
-				'title' => true,
-				'role' => true,
+				'class'           => true,
+				'id'              => true,
+				'style'           => true,
+				'title'           => true,
+				'role'            => true,
 				'data-youtube-id' => array(),
 			);
 		}
+
 		return $allowedposttags;
 	}
 
@@ -82,7 +84,7 @@ class DiscourseComment {
 					true
 				);
 				// Localize script.
-				$data              = array(
+				$data = array(
 					'url' => $this->options['url'],
 				);
 				wp_localize_script( 'discourse-comments-js', 'discourse', $data );
@@ -98,7 +100,7 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function use_discourse_comments( $postid ) {
-		if ( ( ! isset( $this->options['use-discourse-comments'] ) ) || ! $this->options['use-discourse-comments'] ) {
+		if ( empty ( $this->options['use-discourse-comments'] ) ) {
 			return 0;
 		}
 
@@ -178,8 +180,8 @@ class DiscourseComment {
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
 			$options         = $this->options;
-			$num_wp_comments = get_comments_number();
-			if ( ! isset( $options['show-existing-comments'] ) ||  0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+			$num_wp_comments = $post->comment_count;
+			if ( ! isset( $options['show-existing-comments'] ) || 0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
 				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
@@ -210,10 +212,11 @@ class DiscourseComment {
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
 			$discourse_comment_count = get_post_meta( $post->ID, 'discourse_comments_count', true );
-			$wp_comment_count = $post->comment_count;
+			$wp_comment_count        = $post->comment_count;
 
 			if ( $discourse_comment_count && $wp_comment_count &&
-			     ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) ) ) {
+			     ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) )
+			) {
 				if ( 1 === intval( $discourse_comment_count ) && 1 === intval( $wp_comment_count ) ) {
 					$output = esc_html__( '1 Discourse comment and 1 Wordpress comment', 'wp-discourse' );
 				} elseif ( 1 === intval( $discourse_comment_count ) ) {
