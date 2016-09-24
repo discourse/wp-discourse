@@ -41,7 +41,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$allowedposttags['time'] = array( 'datetime' => array() );
 
 	// Use custom datetime format string if provided, else global date format.
-	$datetime_format = '' === $options['custom-datetime-format'] ? get_option( 'date_format' ) : $options['custom-datetime-format'];
+	$datetime_format = empty( $options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
 	// Add some protection in the event our metadata doesn't look how we expect it to.
 	$discourse_info = ( object ) wp_parse_args( ( array ) $discourse_info, $defaults );
