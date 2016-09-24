@@ -57,6 +57,7 @@ class Discourse {
 		'min-replies'               => 1,
 		'min-trust-level'           => 1,
 		'bypass-trust-level-score'  => 50,
+		'custom-datetime-format' => '',
 		'debug-mode'                => 0,
 		'full-post-content'         => 0,
 		'only-show-moderator-liked' => 0,
