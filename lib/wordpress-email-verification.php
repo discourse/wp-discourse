@@ -254,7 +254,7 @@ class WordPressEmailVerification {
 			$message .= sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
 			$message .= sprintf( __( 'Email: %s', 'wp-email-verification' ), $user->user_email ) . "\r\n";
 
-			@wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] Existing User Email Verification', 'wp-email-verification' ), $blogname ), $message );
+			wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] Existing User Email Verification', 'wp-email-verification' ), $blogname ), $message );
 		}
 
 		$email_verification_sig = $current_time . '_' . wp_generate_password( 20, false );

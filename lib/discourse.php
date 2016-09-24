@@ -25,8 +25,8 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_connect = array(
-		'url' => '',
-		'api-key' => '',
+		'url'              => '',
+		'api-key'          => '',
 		'publish-username' => 'system',
 	);
 
@@ -37,11 +37,11 @@ class Discourse {
 	 */
 	protected $discourse_publish = array(
 		'display-subcategories' => 0,
-		'publish-category' => '',
-		'auto-publish' => 0,
-		'allowed_post_types' => array( 'post' ),
-		'auto-track' => 1,
-		'custom-excerpt-length'     => 55,
+		'publish-category'      => '',
+		'auto-publish'          => 0,
+		'allowed_post_types'    => array( 'post' ),
+		'auto-track'            => 1,
+		'custom-excerpt-length' => 55,
 	);
 
 	/**
@@ -50,7 +50,7 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_comment = array(
-		'max-comments' => 5,
+		'max-comments'              => 5,
 		'use-discourse-comments'    => 0,
 		'show-existing-comments'    => 0,
 		'min-score'                 => 0,
@@ -68,16 +68,16 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_configurable_text = array(
-		'start-discussion-text' => 'Start the discussion at',
-		'notable-replies-text' => 'Notable Replies',
-		'continue-discussion-text' => 'Continue the discussion',
+		'start-discussion-text'       => 'Start the discussion at',
+		'notable-replies-text'        => 'Notable Replies',
+		'continue-discussion-text'    => 'Continue the discussion',
 		'comments-not-available-text' => 'Comments are not currently available for this post.',
-		'participants-text' => 'Participants',
-		'published-at-text' => 'Originally published at:',
-		'leave-a-reply-text' => 'Leave a reply',
-		'single-reply-text' => 'Reply',
-		'many-replies-text' => 'Replies',
-		'more-replies-more-text' => 'more',
+		'participants-text'           => 'Participants',
+		'published-at-text'           => 'Originally published at:',
+		'leave-a-reply-text'          => 'Leave a reply',
+		'single-reply-text'           => 'Reply',
+		'many-replies-text'           => 'Replies',
+		'more-replies-more-text'      => 'more',
 	);
 
 	/**
@@ -118,31 +118,53 @@ class Discourse {
 	public function initialize_plugin_configuration() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		if ( false === get_option( 'discourse_connect' ) ) {
-			add_option( 'discourse_connect', $this->discourse_connect );
+		add_option( 'discourse_option_groups', $this->discourse_option_groups );
+
+		// If the plugin is being updated from a version < 1.0.0 the way options are stored has changed.
+		if ( get_option( 'discourse' ) ) {
+			// Transfer the old options into the new option groups.
+			$this->transfer_options();
+			delete_option( 'discourse' );
 		}
 
-		if ( false === get_option( 'discourse_publish' ) ) {
-			add_option( 'discourse_publish', $this->discourse_publish );
+		foreach ( $this->discourse_option_groups as $group_name ) {
+			add_option( $group_name, $this->$group_name );
+		}
+	}
+
+	/**
+	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
+	 */
+	protected function transfer_options() {
+		$discourse_options = get_option( 'discourse' );
+		$transferable_option_groups     = array(
+			'discourse_connect',
+			'discourse_publish',
+			'discourse_comment',
+			'discourse_sso',
+		);
+
+		foreach ( $transferable_option_groups as $group_name ) {
+			$this->transfer_option_group( $discourse_options, $group_name );
+		}
+	}
+
+	/**
+	 * Transfers saved option values to the new options group.
+	 *
+	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param string $group_name The name of the current options group.
+	 */
+	protected function transfer_option_group( $existing_options, $group_name ) {
+		$transferred_options = [];
+
+		foreach ( $this->$group_name as $key => $value ) {
+			if ( isset( $existing_options[ $key ] ) ) {
+				$transferred_options[ $key ] = $existing_options[ $key ];
+			}
 		}
 
-		if ( false === get_option( 'discourse_comment' ) ) {
-			add_option( 'discourse_comment', $this->discourse_comment );
-		}
-
-		if ( false === get_option( 'discourse_configurable_text' ) ) {
-			add_option( 'discourse_configurable_text', $this->discourse_configurable_text );
-		}
-
-		if ( false === get_option( 'discourse_configurable_text_backup' ) ) {
-			add_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
-		}
-
-		if ( false === get_option( 'discourse_sso' ) ) {
-			add_option( 'discourse_sso', $this->discourse_sso );
-		}
-
-		update_option( 'discourse_option_groups', $this->discourse_option_groups );
+		add_option( $group_name, $transferred_options );
 	}
 
 	/**
