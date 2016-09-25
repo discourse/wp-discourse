@@ -162,6 +162,8 @@ class DiscourseSSO {
 					$require_activation = true;
 				}
 
+				$require_activation = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
+
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
 				$sig     = $wp->query_vars['sig'];
