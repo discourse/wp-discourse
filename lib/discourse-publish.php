@@ -111,13 +111,14 @@ class DiscoursePublish {
 	 * @param string $raw The raw content of the post.
 	 */
 	public function sync_to_discourse( $postid, $title, $raw ) {
-		$lock = 'publishing_locked_for_post_' . $postid;
+		global $wpdb;
+
+		wp_cache_set( 'discourse_publishing_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 
 		// This avoids a double sync, just 1 is allowed to go through at a time.
-		if ( ! 'locked' === get_transient( $lock ) ) {
-			set_transient( $lock, 'locked', 60 );
+		if ( 1 === intval( wp_cache_get( 'discourse_publishing_lock' )->got_it ) ) {
 			$this->sync_to_discourse_work( $postid, $title, $raw );
-			delete_transient( $lock );
+			wp_cache_set( 'discourse_publishing_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
 		}
 	}
 
