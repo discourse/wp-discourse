@@ -115,6 +115,7 @@ class DiscourseComment {
 	 * @param int $postid The WordPress post id.
 	 */
 	function sync_comments( $postid ) {
+		global $wpdb;
 		$discourse_options = $this->options;
 		// Every 10 minutes do a json call to sync comment count and top comments.
 		$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
@@ -122,9 +123,9 @@ class DiscourseComment {
 		$debug     = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 
 		if ( $debug || $last_sync + 60 * 10 < $time ) {
-			$lock = 'comments_locked_for_' . $postid;
-			if ( ! 'locked' === get_transient( $lock ) ) {
-				set_transient( $lock, 'locked', 60 );
+			// Avoids a double sync.
+			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
+			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
@@ -164,7 +165,8 @@ class DiscourseComment {
 						}
 					}
 				}
-				delete_transient( $lock );
+
+				wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
 			}
 		}
 	}
