@@ -20,16 +20,14 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_options() {
-		static $options = [];
+		$options = [];
 
-		if ( ! $options ) {
-			$discourse_option_groups = get_option( 'discourse_option_groups' );
-			if ( $discourse_option_groups ) {
-				foreach ( $discourse_option_groups as $option_name ) {
-					if ( get_option( $option_name ) ) {
-						$option  = get_option( $option_name );
-						$options = array_merge( $options, $option );
-					}
+		$discourse_option_groups = get_option( 'discourse_option_groups' );
+		if ( $discourse_option_groups ) {
+			foreach ( $discourse_option_groups as $option_name ) {
+				if ( get_option( $option_name ) ) {
+					$option  = get_option( $option_name );
+					$options = array_merge( $options, $option );
 				}
 			}
 		}
@@ -100,7 +98,7 @@ class Utilities {
 	 * Substitutes the value for `$size` into the template.
 	 *
 	 * @param string $template The avatar template.
-	 * @param int    $size The size of the avarar.
+	 * @param int $size The size of the avarar.
 	 *
 	 * @return mixed
 	 */
@@ -143,19 +141,20 @@ class Utilities {
 			)
 		);
 
-		$url = add_query_arg( array(
-			'api_key' => $options['api-key'],
+		$url          = add_query_arg( array(
+			'api_key'      => $options['api-key'],
 			'api_username' => $options['publish-username'],
 		), $options['url'] . '/site.json' );
 		$force_update = isset( $options['publish-category-update'] ) ? $options['publish-category-update'] : '0';
-		$remote = get_transient( 'discourse_settings_categories_cache' );
-		$cache = $remote;
+		$remote       = get_transient( 'discourse_settings_categories_cache' );
+		$cache        = $remote;
 		if ( empty( $remote ) || $force_update ) {
 			$remote = wp_remote_get( $url );
 			if ( ! self::validate( $remote ) ) {
 				if ( ! empty( $cache ) ) {
 					return $cache;
 				}
+
 				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
 			}
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
@@ -173,6 +172,7 @@ class Utilities {
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
 			}
 		}
+
 		return $remote;
 	}
 
