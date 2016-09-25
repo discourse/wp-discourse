@@ -20,7 +20,7 @@ class TemplateFunctions {
 	 * Substitutes the value for `$size` into the template.
 	 *
 	 * @param string $template The avatar template.
-	 * @param int $size The size of the avarar.
+	 * @param int    $size The size of the avarar.
 	 *
 	 * @return mixed
 	 */

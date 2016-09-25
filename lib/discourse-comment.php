@@ -48,7 +48,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array $allowedposttags The array of allowed post tags.
+	 * @param array  $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
