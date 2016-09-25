@@ -61,6 +61,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_html    = '';
 	$comments_html     = '';
 	$participants_html = '';
+	$topic_id = $discourse_info->id;
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {
@@ -104,4 +105,6 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 	$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
 	echo wp_kses_post( $discourse_html );
+
+	do_action( 'wp_discourse_after_comments', $topic_id );
 }
