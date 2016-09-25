@@ -34,7 +34,8 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 
 require_once( __DIR__ . '/lib/utilities.php' );
-require_once( __DIR__ . '/lib/html-templates.php' );
+require_once( __DIR__ . '/templates/html-templates.php' );
+require_once( __DIR__ . '/templates/template-functions.php' );
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
 require_once( __DIR__ . '/lib/admin.php' );

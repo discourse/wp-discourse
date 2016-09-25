@@ -6,10 +6,10 @@
  */
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
+use WPDiscourse\Templates\TemplateFunctions as TemplateFunctions;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 $custom = get_post_custom();
-
 
 // If, when a new post is published to Discourse, there is not a valid response from
 // the forum, the `discourse_permalink` key will not be set. Display the `bad_response_html` template.
@@ -69,14 +69,14 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 			$comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
 			$comment_html = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
-			$avatar_url   = DiscourseUtilities::avatar( $post->avatar_template, 64 );
+			$avatar_url   = TemplateFunctions::avatar( $post->avatar_template, 64 );
 			$comment_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
-			$user_url     = DiscourseUtilities::homepage( $options['url'], $post );
+			$user_url     = TemplateFunctions::homepage( $options['url'], $post );
 			$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 			$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 			$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
 			$comment_body = wp_kses_post( $post->cooked );
-			$comment_body = DiscourseUtilities::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
+			$comment_body = TemplateFunctions::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
 			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
 			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, get_date_from_gmt( $post->created_at ) ), $comment_html );
 			$comments_html .= $comment_html;
@@ -86,9 +86,9 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$participant_html = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 			$participant_html = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 			$participant_html = str_replace( '{topic_url}', $permalink, $participant_html );
-			$avatar_url       = DiscourseUtilities::avatar( $participant->avatar_template, 64 );
+			$avatar_url       = TemplateFunctions::avatar( $participant->avatar_template, 64 );
 			$participant_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
-			$user_url         = DiscourseUtilities::homepage( $options['url'], $participant );
+			$user_url         = TemplateFunctions::homepage( $options['url'], $participant );
 			$participant_html = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
 			$participant_html = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 			$participants_html .= $participant_html;
