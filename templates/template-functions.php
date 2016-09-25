@@ -1,7 +1,15 @@
 <?php
+/**
+ * Tempate utility functions.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\Templates;
 
+/**
+ * Class TemplateFunctions
+ */
 class TemplateFunctions {
 
 	/**
