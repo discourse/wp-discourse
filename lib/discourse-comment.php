@@ -141,7 +141,11 @@ class DiscourseComment {
 						$options = $options . '&only_moderator_liked=true';
 					}
 
-					$permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
+					if ( ! $discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true ) ) {
+						return 0;
+					}
+					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
+
 					$result    = wp_remote_get( $permalink );
 
 					if ( DiscourseUtilities::validate( $result ) ) {
@@ -213,7 +217,6 @@ class DiscourseComment {
 	function comments_number( $output ) {
 		global $post;
 		if ( $this->use_discourse_comments( $post->ID ) ) {
-			$this->sync_comments( $post->ID );
 			$discourse_comment_count = get_post_meta( $post->ID, 'discourse_comments_count', true );
 			$wp_comment_count        = $post->comment_count;
 
@@ -245,6 +248,7 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	function get_comments_number( $count, $post_id ) {
+		// This is really inefficient.
 		if ( $this->use_discourse_comments( $post_id ) ) {
 			$this->sync_comments( $post_id );
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
