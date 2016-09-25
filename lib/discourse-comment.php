@@ -48,7 +48,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array  $allowedposttags The array of allowed post tags.
+	 * @param array $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
@@ -252,8 +252,12 @@ class DiscourseComment {
 	 */
 	function get_comments_number( $count, $post_id ) {
 		if ( $this->use_discourse_comments( $post_id ) ) {
-			// This is really inefficient.
-			$this->sync_comments( $post_id );
+
+			//Only sync comments for individual posts, it's too inefficient to do this with a category index page.
+			if ( is_single( $post_id ) || is_page( $post_id ) ) {
+				$this->sync_comments( $post_id );
+			}
+
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 		}
 
