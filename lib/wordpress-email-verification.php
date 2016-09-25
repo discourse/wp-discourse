@@ -43,13 +43,6 @@ class WordPressEmailVerification {
 	protected $site_prefix;
 
 	/**
-	 * The plugin text domain.
-	 *
-	 * @var string
-	 */
-	protected $text_domain;
-
-	/**
 	 * The time period for which the key sent by the `send_verification_email` method is valid.
 	 *
 	 * @var int
