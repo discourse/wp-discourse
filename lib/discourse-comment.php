@@ -48,7 +48,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array  $allowedposttags The array of allowed post tags.
+	 * @param array $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
@@ -148,7 +148,7 @@ class DiscourseComment {
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
 
-					$result    = wp_remote_get( $permalink );
+					$result = wp_remote_get( $permalink );
 
 					if ( DiscourseUtilities::validate( $result ) ) {
 
@@ -186,7 +186,7 @@ class DiscourseComment {
 
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
-			$options         = $this->options;
+			$options = $this->options;
 			// Use $post->comment_count because get_comments_number will return the Discourse comments
 			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
@@ -251,8 +251,8 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	function get_comments_number( $count, $post_id ) {
-		// This is really inefficient.
 		if ( $this->use_discourse_comments( $post_id ) ) {
+			// This is really inefficient.
 			$this->sync_comments( $post_id );
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 		}
