@@ -27,12 +27,21 @@ class DiscoursePublish {
 	 * DiscoursePublish constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'discourse' );
-
+		add_action( 'init', array( $this, 'setup_options' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
-		add_action( 'transition_post_status', array( $this, 'publish_post_after_transition' ), 10, 3 );
+		add_action( 'transition_post_status', array(
+			$this,
+			'publish_post_after_transition',
+		), 10, 3 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
@@ -83,7 +92,7 @@ class DiscoursePublish {
 	 * @param int $postid The post id.
 	 */
 	public function xmlrpc_publish_post_to_discourse( $postid ) {
-		$post = get_post( $postid );
+		$post                 = get_post( $postid );
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
 
@@ -102,13 +111,14 @@ class DiscoursePublish {
 	 * @param string $raw The raw content of the post.
 	 */
 	public function sync_to_discourse( $postid, $title, $raw ) {
-		$lock = 'publishing_locked_for_post_' . $postid;
+		global $wpdb;
+
+		wp_cache_set( 'discourse_publishing_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_publish_lock', 0 ) got_it" ) );
 
 		// This avoids a double sync, just 1 is allowed to go through at a time.
-		if ( ! 'locked' === get_transient( $lock ) ) {
-			set_transient( $lock, 'locked', 60 );
+		if ( 1 === intval( wp_cache_get( 'discourse_publishing_lock' )->got_it ) ) {
 			$this->sync_to_discourse_work( $postid, $title, $raw );
-			delete_transient( $lock );
+			wp_cache_set( 'discourse_publishing_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_publish_lock' )" ) );
 		}
 	}
 
@@ -195,6 +205,7 @@ class DiscoursePublish {
 			$data         = array(
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
+				'title'            => $title,
 				'post[raw]'        => $baked,
 				'skip_validations' => 'true',
 			);
@@ -259,7 +270,7 @@ class DiscoursePublish {
 	/**
 	 * Strip html tags from titles before passing them to Discourse.
 	 *
-	 * @param $title The title of the post.
+	 * @param string $title The title of the post.
 	 *
 	 * @return string
 	 */

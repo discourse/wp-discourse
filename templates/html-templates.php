@@ -11,10 +11,25 @@
 
 namespace WPDiscourse\Templates;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class HTMLTemplates
  */
 class HTMLTemplates {
+
+	/**
+	 * Gets the 'discourse_configurable_text' options.
+	 *
+	 * @param string $option The option key.
+	 *
+	 * @return void
+	 */
+	protected static function get_text_options( $option ) {
+		$options = DiscourseUtilities::get_options();
+
+		echo esc_html( $options[ $option ] );
+	}
 
 	/**
 	 * HTML template for replies.
@@ -33,15 +48,20 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
-			<h2 class="comments-title"><?php esc_html_e( 'Notable Replies', 'wp-discourse' ); ?></h2>
+			<h2 class="comments-title discourse-comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<a href="{topic_url}"><?php esc_html_e( 'Continue the discussion', 'wp-discourse' ); ?>
-					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}
+					<?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
+					<a href="{topic_url}">
+						{discourse_url_name}
+					</a>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
-				<p class="comment-reply-title">{participants}</p>
+				<div class="comment-reply-title">
+					<h4 class="discourse-participants"><?php esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
+					<p>{participants}</p>
+				</div>
 			</div><!-- #respond -->
 		</div>
 		<?php
@@ -66,9 +86,11 @@ class HTMLTemplates {
 		?>
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
-				<h3 id="reply-title" class="comment-reply-title"><a href="{topic_url}">
-						<?php esc_html_e( 'Start the discussion', 'wp-discourse' ); ?>
-					</a><?php esc_html_e( ' at ', 'wp-discourse' ); ?>{discourse_url_name}</h3>
+				<h3 id="reply-title" class="comment-reply-title">
+					<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' ' ); ?>
+					<a href="{topic_url}">
+						{discourse_url_name}
+					</a></h3>
 			</div><!-- #respond -->
 		</div>
 		<?php
@@ -92,7 +114,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php esc_html_e( 'Comments are not enabled for this post.', 'wp-discourse' ); ?></p>
+				<p><?php esc_html( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -121,10 +143,12 @@ class HTMLTemplates {
 			<article class="comment-body">
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
-						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default" height="64"
+						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
+						     height="64"
 						     width="64">
-						<b class="fn"><a href="{topic_url}" rel="external" class="url">{fullname}</a></b>
-						<span class="says">says:</span>
+						<b class="fn"><a href="{topic_url}" rel="external"
+						                 class="url">{username}</a></b>
+						<span class="says">says:</span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
@@ -181,7 +205,9 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small>Originally published at: {blogurl}</small><br>{excerpt}
+		<small><?php esc_html( self::get_text_options( 'published-at-text' ) ); ?>
+			{blogurl}
+		</small><br>{excerpt}
 		<?php
 		$output = ob_get_clean();
 

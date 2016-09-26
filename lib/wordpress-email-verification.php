@@ -43,13 +43,6 @@ class WordPressEmailVerification {
 	protected $site_prefix;
 
 	/**
-	 * The plugin text domain.
-	 *
-	 * @var string
-	 */
-	protected $text_domain;
-
-	/**
 	 * The time period for which the key sent by the `send_verification_email` method is valid.
 	 *
 	 * @var int
@@ -64,13 +57,10 @@ class WordPressEmailVerification {
 	 *
 	 * @param string $verification_signature_key_name The name of the key that the verification signature is stored under.
 	 * @param string $site_prefix A site prefix to avoid naming collisions in the database, for example 'testeleven'.
-	 * @param string $text_domain The key for your text domain.
 	 */
-	public function __construct( $verification_signature_key_name, $site_prefix, $text_domain = '' ) {
-
+	public function __construct( $verification_signature_key_name, $site_prefix ) {
 		$this->verification_signature_key_name = $verification_signature_key_name;
 		$this->site_prefix                     = $site_prefix;
-		$this->text_domain                     = $text_domain;
 
 		add_action( 'init', array( $this, 'initialize' ) );
 	}
@@ -186,25 +176,25 @@ class WordPressEmailVerification {
 		$error  = isset( $_REQUEST['error'] ) ? sanitize_key( wp_unslash( $_REQUEST['error'] ) ) : ''; // Input var okay.
 
 		if ( 'rp' === $action && 'emailnotverified' === $error ) {
-			$message = '<p class="message">' . __( 'To allow us to verify your email address, please update your password and log into the site.', $this->text_domain ) . '</p>';
+			$message = '<p class="message">' . __( 'To allow us to verify your email address, please update your password and log into the site.', 'wp-email-verification' ) . '</p>';
 
 			return $message;
 		}
 
 		if ( 'login' === $action && 'emailnotverified' === $error ) {
-			$message = '<p class="message">' . __( 'To allow us to verify your email address, please log into the site.', $this->text_domain ) . '</p>';
+			$message = '<p class="message">' . __( 'To allow us to verify your email address, please log into the site.', 'wp-email-verification' ) . '</p>';
 
 			return $message;
 		}
 
 		if ( 'login' === $action && 'expiredemailkey' === $error ) {
-			$message = '<p class="message">' . __( 'Your email verification key has expired. A new one has been sent to you. Please check your inbox and try again.', $this->text_domain ) . '</p>';
+			$message = '<p class="message">' . __( 'Your email verification key has expired. A new one has been sent to you. Please check your inbox and try again.', 'wp-email-verification' ) . '</p>';
 
 			return $message;
 		}
 
 		if ( 'login' === $action && 'mismatchedemailkey' === $error ) {
-			$message = '<p class="message">' . __( 'There has been a problem with processing your email verification. A new email has been sent to you. Please check your inbox and try again.', $this->text_domain ) . '</p>';
+			$message = '<p class="message">' . __( 'There has been a problem with processing your email verification. A new email has been sent to you. Please check your inbox and try again.', 'wp-email-verification' ) . '</p>';
 
 			return $message;
 		}
@@ -253,11 +243,11 @@ class WordPressEmailVerification {
 		$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 
 		if ( $admin ) {
-			$message = sprintf( __( 'An existing user is verifying their email address on your site %s:', $this->text_domain ), $blogname ) . "\r\n\r\n";
-			$message .= sprintf( __( 'Username: %s', $this->text_domain ), $user->user_login ) . "\r\n\r\n";
-			$message .= sprintf( __( 'Email: %s', $this->text_domain ), $user->user_email ) . "\r\n";
+			$message = sprintf( __( 'An existing user is verifying their email address on your site %s:', 'wp-email-verification' ), $blogname ) . "\r\n\r\n";
+			$message .= sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
+			$message .= sprintf( __( 'Email: %s', 'wp-email-verification' ), $user->user_email ) . "\r\n";
 
-			@wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] Existing User Email Verification', $this->text_domain ), $blogname ), $message );
+			wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] Existing User Email Verification', 'wp-email-verification' ), $blogname ), $message );
 		}
 
 		$email_verification_sig = $current_time . '_' . wp_generate_password( 20, false );
@@ -266,13 +256,13 @@ class WordPressEmailVerification {
 
 		$redirect = urlencode( home_url( '/' ) );
 
-		$message = sprintf( __( 'Username: %s', $this->text_domain ), $user->user_login ) . "\r\n\r\n";
-		$message .= __( 'To verify your email address, visit the following address:', $this->text_domain ) . "\r\n\r\n";
+		$message = sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
+		$message .= __( 'To verify your email address, visit the following address:', 'wp-email-verification' ) . "\r\n\r\n";
 		$message .= '<' . network_site_url( "wp-login.php?action=login&mail_key=$email_verification_sig&error=emailnotverified&redirect_to=$redirect&login=" . rawurlencode( $user->user_login ), 'login' ) . ">\r\n\r\n";
 
 		$message .= wp_login_url() . "\r\n";
 
-		wp_mail( $user->user_email, sprintf( __( '[%s] Verify your email address', $this->text_domain ), $blogname ), $message );
+		wp_mail( $user->user_email, sprintf( __( '[%s] Verify your email address', 'wp-email-verification' ), $blogname ), $message );
 	}
 
 	/**

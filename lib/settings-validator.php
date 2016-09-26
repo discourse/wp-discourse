@@ -111,6 +111,18 @@ class SettingsValidator {
 			'validate_display_subcategories',
 		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
+
+		add_filter( 'validate_discourse_link_text', array( $this, 'validate_discourse_link_text' ) );
+		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
+		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
+		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
+		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_comments_not_available_text' ) );
+		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
+		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
+		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
+		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
+		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
+
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
@@ -129,7 +141,7 @@ class SettingsValidator {
 
 		// Make sure the url starts with a valid protocol.
 		if ( ! preg_match( $regex, $input ) ) {
-			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to begin with either \'http:\' or \'https:\'.' ) );
+			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to be set to a valid URL that begins with either \'http:\' or \'https:\'.', 'wp-discourse' ) );
 			return '';
 		}
 
@@ -415,6 +427,156 @@ class SettingsValidator {
 	 */
 	public function validate_debug_mode( $input ) {
 		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the 'discourse_link_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_discourse_link_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'start_discussion_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_start_discussion_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'continue_discussion_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_continue_discussion_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'notable_replies_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_notable_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'comments_not_available_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_comments_not_available_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'participants_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_participants_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'published_at_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_published_at_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'single_reply_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_single_reply_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'many_replies_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_many_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'more_replies_more_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_more_replies_more_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
 	}
 
 	/**

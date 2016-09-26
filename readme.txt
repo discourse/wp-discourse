@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.6.1
-Stable tag: 0.9.9
+Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,14 +12,14 @@ This plugin allows you to use Discourse as a community engine for your WordPress
 == Description ==
 
 The WP Discourse plugin acts as an interface between your WordPress site and your
-[Discourse](http://www.discourse.org/) forum.
+[Discourse](http://www.discourse.org/) community.
 
-It allows you to:
+###Use Discourse for comments:
 
-- Publish WordPress posts to Discourse
-- Use Discourse to generate comments and discussion for your WordPress posts
-- Select which comments are to be displayed on the WordPress site based on post score and commenter trust level
-- Use your WordPress site as the Single Sign On provider for your Discourse forum
+- Automatically creates a forum topic for discussion when a new blog post is published.
+- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
+based on post score and commenter "trust level" -- see docs.
 
 #### See it live
 
@@ -27,6 +27,23 @@ It allows you to:
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
 - [talkingpointsmemo.com](http://talkingpointsmemo.com/)
+
+###Single Sign On
+
+The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
+Single Sign On provider for your Discourse forum.
+
+This will override Discourse's native (and powerful) login flow and is only recommended for use cases
+that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
+
+###Contact
+
+- The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
+
+- Bug reports and other developer inquiries should be directed at our GitHub Issues:
+[https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
+
+- Please post support requests to our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
 
 == Installation ==
 
@@ -55,6 +72,15 @@ Discourse forum. You can install Discourse for yourself following either of thes
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
 
+= Can I import old WordPress comments as Discourse comments (i.e. "replies")? =
+
+No.
+
+= Do WordPress and Discourse have to be installed on the same server? =
+
+The plugin uses the Discourse API, so your forum and blog can be hosted separately and the integration will still work.
+In fact, we strongly recommend hosting the two applications separately, since their hosting requirements are very different.
+
 = Is it possible to customize the comment templates? =
 
 Yes, the html templates used for publishing posts on Discourse and for displaying comments on WordPress can be customized in your theme.
@@ -79,6 +105,24 @@ For more details on template customization, take a look at this section of our w
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.0.0 26/09/16
+
+- Move WooCommerce support into a separate plugin, see the wiki page [WooCommerce Support](https://github.com/discourse/wp-discourse/wiki/WooCommerce-Support)
+for more details
+- Break settings page into tabbed sections
+- Add a settings section for customizing all user facing text
+- Display the Discourse username instead of the fullname in the default comments template
+- Add a 'Participants' heading
+- Don't display the category-select option in posts that have already been published to Discourse
+- Only hook into the WordPress `comments_number` hook when both Discourse and WordPress comments are used for a post
+- Sync changed post title with Discourse
+- Get options more efficiently
+- Add a longer sync period for comments on archive pages
+- Add a 'Discourse link text' option
+- Copy 'discourse' options to the new option_groups when upgrading from versions < 1.0.0
+- Delete the 'discourse' option when upgrading from versions < 1.0.0
+- Improve option descriptions
 
 #### 0.9.9 13/09/16
 
