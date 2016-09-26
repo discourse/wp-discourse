@@ -113,12 +113,12 @@ class DiscoursePublish {
 	public function sync_to_discourse( $postid, $title, $raw ) {
 		global $wpdb;
 
-		wp_cache_set( 'discourse_publishing_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
+		wp_cache_set( 'discourse_publishing_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_publish_lock', 0 ) got_it" ) );
 
 		// This avoids a double sync, just 1 is allowed to go through at a time.
 		if ( 1 === intval( wp_cache_get( 'discourse_publishing_lock' )->got_it ) ) {
 			$this->sync_to_discourse_work( $postid, $title, $raw );
-			wp_cache_set( 'discourse_publishing_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
+			wp_cache_set( 'discourse_publishing_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_publish_lock' )" ) );
 		}
 	}
 
