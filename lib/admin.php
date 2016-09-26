@@ -202,12 +202,12 @@ class DiscourseAdmin {
 			'discourse_link_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_start_discussion_text', __( '\'Start discussion\' link', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_start_discussion_text', __( '\'Start discussion\' text', 'wp-discourse' ), array(
 			$this,
 			'start_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_continue_discussion_text', __( '\'Continue discussion\' link', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_continue_discussion_text', __( '\'Continue discussion\' text', 'wp-discourse' ), array(
 			$this,
 			'continue_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
@@ -488,22 +488,23 @@ class DiscourseAdmin {
 	 * Outputs the markup for the discourse-link-text input.
 	 */
 	public function discourse_link_text() {
-		$this->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'Used for the link-text
-		for the links to the Discourse topic. This is used after both the \'start discussion\' text and the \'continue discussion\' text.', 'wp-discourse' ) );
+		$this->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
+		for links to the Discourse topic. Used after both the \'start discussion\' and \'continue discussion\' text. Combined with the
+		next two settings, this will form the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the start-discussion-text input.
 	 */
 	public function start_discussion_text() {
-		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of a post with no comments, for starting a discussion on Discourse.', 'wp-discourse' ) );
+		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used after posts with no comments, for starting a discussion on Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the continue-discussion-text input.
 	 */
 	public function continue_discussion_text() {
-		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used at the bottom of the comments template, for continuing the discussion on Discourse.', 'wp-discourse' ) );
+		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used after posts that have comments, for continuing the discussion on Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
