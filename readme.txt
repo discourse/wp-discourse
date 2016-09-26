@@ -12,14 +12,14 @@ This plugin allows you to use Discourse as a community engine for your WordPress
 == Description ==
 
 The WP Discourse plugin acts as an interface between your WordPress site and your
-[Discourse](http://www.discourse.org/) forum.
+[Discourse](http://www.discourse.org/) community.
 
-It allows you to:
+###Use Discourse for comments:
 
-- Publish WordPress posts to Discourse
-- Use Discourse to generate comments and discussion for your WordPress posts
-- Select which comments are to be displayed on the WordPress site based on post score and commenter trust level
-- Use your WordPress site as the Single Sign On provider for your Discourse forum
+- Automatically creates a forum topic for discussion when a new blog post is published.
+- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
+based on post score and commenter "trust level" -- see docs.
 
 #### See it live
 
@@ -27,6 +27,23 @@ It allows you to:
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
 - [talkingpointsmemo.com](http://talkingpointsmemo.com/)
+
+###Single Sign On
+
+The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
+Single Sign On provider for your Discourse forum.
+
+This will override Discourse's native (and powerful) login flow and is only recommended for use cases
+that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
+
+###Contact
+
+- The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
+
+- Bug reports and other developer inquiries should be directed at our GitHub Issues:
+[https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
+
+- Please post support requests to our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
 
 == Installation ==
 
@@ -54,6 +71,15 @@ Discourse forum. You can install Discourse for yourself following either of thes
 
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
+
+= Can I import old WordPress comments as Discourse comments (i.e. "replies")? =
+
+No.
+
+= Do WordPress and Discourse have to be installed on the same server? =
+
+The plugin uses the Discourse API, so your forum and blog can be hosted separately and the integration will still work.
+In fact, we strongly recommend hosting the two applications separately, since their hosting requirements are very different.
 
 = Is it possible to customize the comment templates? =
 
