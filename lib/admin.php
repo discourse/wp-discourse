@@ -191,7 +191,6 @@ class DiscourseAdmin {
 		) );
 
 		// Configurable text content settings.
-
 		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
 			$this,
 			'configurable_text_tab_details',
@@ -1063,7 +1062,7 @@ class DiscourseAdmin {
 	 * @param string      $option The name of the option.
 	 * @param string      $option_group The option group for the field to be saved to.
 	 * @param string      $description The description of the settings field.
-	 * @param string $default The default value to use when the option isn't set.
+	 * @param string      $default The default value to use when the option isn't set.
 	 * @param null|string $type The type of input ('number', 'url', etc).
 	 * @param null|ing    $min The min value (applied to number inputs).
 	 * @param null|int    $max The max value (applies to number inputs).
@@ -1091,10 +1090,10 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-			} ?>
+} ?>
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-			} ?>
+} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
