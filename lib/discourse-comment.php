@@ -253,9 +253,17 @@ class DiscourseComment {
 	function get_comments_number( $count, $post_id ) {
 		if ( $this->use_discourse_comments( $post_id ) ) {
 
-			// Only sync comments for individual posts, it's too inefficient to do this with a category index page.
+			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
 			if ( is_single( $post_id ) || is_page( $post_id ) ) {
 				$this->sync_comments( $post_id );
+			} else {
+				// For archive pages, check $last_sync against $archive_page_sync_period.
+				$archive_page_sync_period = intval( apply_filters( 'discourse_archive_page_sync_period', DAY_IN_SECONDS, $post_id ) );
+				$last_sync = intval( get_post_meta( $post_id, 'discourse_last_sync', true ) );
+
+				if ( $last_sync + $archive_page_sync_period < time() ) {
+					$this->sync_comments( $post_id );
+				}
 			}
 
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
