@@ -325,7 +325,8 @@ class DiscourseAdmin {
 	 * Outputs markup for the display-subcategories checkbox.
 	 */
 	public function display_subcategories() {
-		$this->checkbox_input( 'display-subcategories', 'discourse_publish', __( 'Include subcategories in the list of available categories.', 'wp-discourse' ) );
+		$this->checkbox_input( 'display-subcategories', 'discourse_publish', __( 'Include subcategories in the list of available categories. You need to
+		save this setting before subcategories will be available in the category list.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -1177,7 +1178,7 @@ class DiscourseAdmin {
 		$categories = DiscourseUtilities::get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
-			esc_html_e( 'The category list will be synced with Discourse when you establish a connection.', 'wp-discourse' );
+			esc_html_e( 'The Discourse category list will be available when you establish a connection with Discourse.', 'wp-discourse' );
 
 			return;
 		}
