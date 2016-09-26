@@ -80,7 +80,7 @@ For more details on template customization, take a look at this section of our w
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
-#### 1.0.0 15/09/16
+#### 1.0.0 26/09/16
 
 - Move WooCommerce support into a separate plugin, see the wiki page [WooCommerce Support](https://github.com/discourse/wp-discourse/wiki/WooCommerce-Support)
 for more details
@@ -92,6 +92,11 @@ for more details
 - Only hook into the WordPress `comments_number` hook when both Discourse and WordPress comments are used for a post
 - Sync changed post title with Discourse
 - Get options more efficiently
+- Add a longer sync period for comments on archive pages
+- Add a 'Discourse link text' option
+- Copy 'discourse' options to the new option_groups when upgrading from versions < 1.0.0
+- Delete the 'discourse' option when upgrading from versions < 1.0.0
+- Improve option descriptions
 
 #### 0.9.9 13/09/16
 
