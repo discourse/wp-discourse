@@ -38,10 +38,12 @@ class Discourse {
 	protected $discourse_publish = array(
 		'display-subcategories' => 0,
 		'publish-category'      => '',
-		'auto-publish'          => 0,
-		'allowed_post_types'    => array( 'post' ),
-		'auto-track'            => 1,
+		'publish-category-update' => 0,
+		'full-post-content' => 0,
 		'custom-excerpt-length' => 55,
+		'auto-publish'          => 0,
+		'auto-track'            => 1,
+		'allowed_post_types'    => array( 'post' ),
 	);
 
 	/**
@@ -50,17 +52,17 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_comment = array(
-		'max-comments'              => 5,
 		'use-discourse-comments'    => 0,
 		'show-existing-comments'    => 0,
-		'min-score'                 => 0,
+		'existing-comments-heading' => '',
+		'max-comments'              => 5,
 		'min-replies'               => 1,
+		'min-score'                 => 0,
 		'min-trust-level'           => 1,
 		'bypass-trust-level-score'  => 50,
 		'custom-datetime-format' => '',
-		'debug-mode'                => 0,
-		'full-post-content'         => 0,
 		'only-show-moderator-liked' => 0,
+		'debug-mode'                => 0,
 	);
 
 	/**
@@ -70,12 +72,11 @@ class Discourse {
 	 */
 	protected $discourse_configurable_text = array(
 		'start-discussion-text'       => 'Start the discussion at',
-		'notable-replies-text'        => 'Notable Replies',
 		'continue-discussion-text'    => 'Continue the discussion',
+		'notable-replies-text'        => 'Notable Replies',
 		'comments-not-available-text' => 'Comments are not currently available for this post.',
 		'participants-text'           => 'Participants',
 		'published-at-text'           => 'Originally published at:',
-		'leave-a-reply-text'          => 'Leave a reply',
 		'single-reply-text'           => 'Reply',
 		'many-replies-text'           => 'Replies',
 		'more-replies-more-text'      => 'more',
