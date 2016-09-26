@@ -44,7 +44,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$datetime_format = empty( $options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
 	// Add some protection in the event our metadata doesn't look how we expect it to.
-	$discourse_info = ( object ) wp_parse_args( ( array ) $discourse_info, $defaults );
+	$discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
 
 	$more_replies = intval( ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 ) );
 	$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : esc_html( strtolower( $options['more-replies-more-text'] ) ) . ' ';
