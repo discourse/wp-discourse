@@ -191,10 +191,16 @@ class DiscourseAdmin {
 		) );
 
 		// Configurable text content settings.
+
 		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
 			$this,
 			'configurable_text_tab_details',
 		), 'discourse_configurable_text' );
+
+		add_settings_field( 'discourse_link_text', __( 'Discourse link text', 'wp-discourse' ), array(
+			$this,
+			'discourse_link_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		add_settings_field( 'discourse_start_discussion_text', __( '\'Start discussion\' link', 'wp-discourse' ), array(
 			$this,
@@ -477,6 +483,14 @@ class DiscourseAdmin {
 	 * Configurable text settings fields.
 	 * ----------------------------------
 	 */
+
+	/**
+	 * Outputs the markup for the discourse-link-text input.
+	 */
+	public function discourse_link_text() {
+		$this->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'Used for the link-text
+		for the links to the Discourse topic. This is used after both the \'start discussion\' text and the \'continue discussion\' text.', 'wp-discourse' ) );
+	}
 
 	/**
 	 * Outputs the markup for the start-discussion-text input.

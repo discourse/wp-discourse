@@ -71,6 +71,7 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_configurable_text = array(
+		'discourse-link-text' => '',
 		'start-discussion-text'       => 'Start the discussion at',
 		'continue-discussion-text'    => 'Continue the discussion',
 		'notable-replies-text'        => 'Notable Replies',

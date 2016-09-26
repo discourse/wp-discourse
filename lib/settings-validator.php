@@ -112,6 +112,7 @@ class SettingsValidator {
 		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
 
+		add_filter( 'validate_discourse_link_text', array( $this, 'validate_discourse_link_text' ) );
 		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
 		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
 		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
@@ -429,7 +430,22 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_start_discussion_text' text input.
+	 * Validates the 'discourse_link_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_discourse_link_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'start_discussion_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -444,7 +460,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_continue_discussion_text' text input.
+	 * Validates the 'continue_discussion_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -459,7 +475,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_notable_replies_text' text input.
+	 * Validates the 'notable_replies_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -474,7 +490,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_comments_not_available_text' text input.
+	 * Validates the 'comments_not_available_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -489,7 +505,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_participants_text' text input.
+	 * Validates the 'participants_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -504,7 +520,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_published_at_text' text input.
+	 * Validates the 'published_at_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -519,7 +535,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_single_reply_text' text input.
+	 * Validates the 'single_reply_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -534,7 +550,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_many_replies_text' text input.
+	 * Validates the 'many_replies_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *
@@ -549,7 +565,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'validate_more_replies_more_text' text input.
+	 * Validates the 'more_replies_more_text' text input.
 	 *
 	 * @param string $input The input to be validated.
 	 *

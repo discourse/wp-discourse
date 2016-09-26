@@ -21,15 +21,23 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$is_enable_sso = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$redirect_without_login = isset( $options['redirect-without-login'] ) && 1 === intval( $options['redirect-without-login'] );
 	$permalink     = (string) $custom['discourse_permalink'][0];
+
 	if ( $is_enable_sso && ! $redirect_without_login ) {
 		$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
 	}
-	$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
+
+	if ( ! empty( $options['discourse-link-text'] ) ) {
+		$discourse_url_name = esc_html( $options['discourse-link-text'] );
+	} else {
+		$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
+	}
+
 	if ( isset( $custom['discourse_comments_raw'] ) ) {
 		$discourse_info = json_decode( $custom['discourse_comments_raw'][0] );
 	} else {
 		$discourse_info = array();
 	}
+
 	$defaults = array(
 		'posts_count'  => 0,
 		'posts'        => array(),
