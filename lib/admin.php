@@ -488,23 +488,26 @@ class DiscourseAdmin {
 	 * Outputs the markup for the discourse-link-text input.
 	 */
 	public function discourse_link_text() {
-		$this->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
-		for links to the Discourse topic. Used after both the \'start discussion\' and \'continue discussion\' text. Combined with the
-		next two settings, this will form the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ) );
+		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
+		$this->empty_option_text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
+		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
+		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), $default );
 	}
 
 	/**
 	 * Outputs the markup for the start-discussion-text input.
 	 */
 	public function start_discussion_text() {
-		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used after posts with no comments, for starting a discussion on Discourse.', 'wp-discourse' ) );
+		$this->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used after posts with no comments, for starting a discussion on Discourse.
+		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the continue-discussion-text input.
 	 */
 	public function continue_discussion_text() {
-		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used after posts that have comments, for continuing the discussion on Discourse.', 'wp-discourse' ) );
+		$this->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used after posts that have comments, for continuing the discussion on Discourse.
+		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -1045,6 +1048,53 @@ class DiscourseAdmin {
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
 } ?>
+			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
+		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Outputs the markup for an input box, defaults to outputting a text input, but
+	 * can be used for other types.
+	 *
+	 * This function is a temporary workaround for adding a default value to a text input when
+	 * no options is set. Eventually, the $default parameter can be added to the text_input function.
+	 *
+	 * @param string      $option The name of the option.
+	 * @param string      $option_group The option group for the field to be saved to.
+	 * @param string      $description The description of the settings field.
+	 * @param string $default The default value to use when the option isn't set.
+	 * @param null|string $type The type of input ('number', 'url', etc).
+	 * @param null|ing    $min The min value (applied to number inputs).
+	 * @param null|int    $max The max value (applies to number inputs).
+	 */
+	protected function empty_option_text_input( $option, $option_group, $description, $default = '', $type = null, $min = null, $max = null ) {
+		$options = $this->options;
+		$allowed = array(
+			'a' => array(
+				'href'   => array(),
+				'target' => array(),
+			),
+		);
+
+		if ( ! empty( $options[ $option ] ) ) {
+			$value = $options[ $option ];
+		} elseif ( ! empty( $default ) ) {
+			$value = $default;
+		} else {
+			$value = '';
+		}
+
+		?>
+		<input id='discourse-<?php echo esc_attr( $option ); ?>'
+		       name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
+			<?php if ( isset( $min ) ) {
+				echo 'min="' . esc_attr( $min ) . '"';
+			} ?>
+			<?php if ( isset( $max ) ) {
+				echo 'max="' . esc_attr( $max ) . '"';
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
