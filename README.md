@@ -53,16 +53,17 @@ that strictly require such a setup, e.g. a site that is already using WordPress 
 If you're using Composer to manage WordPress, add WP-Discourse to your project's dependencies. Run:
 
 ```sh
-composer require discourse/wp-discourse 1.0.0
+composer require discourse/wp-discourse dev-beta
 ```
 
 Or manually add it to your `composer.json`:
 
 ```json
-"require": {
-  "php": ">=5.3.0",
-  "wordpress": "4.4.0",
-  "discourse/wp-discourse": "1.0.0"
+{
+  "require": {
+    "php": ">=5.4.0",
+    "discourse/wp-discourse": "dev-beta"
+  }
 }
 ```
 
