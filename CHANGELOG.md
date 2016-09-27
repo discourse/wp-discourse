@@ -1,3 +1,14 @@
+### 0.9.7: August 18th, 2016
+* Set expiration on sync_lock transients ([248](https://github.com/discourse/wp-discourse/pull/248))
+
+### 0.9.6: August 16th, 2016
+* Sync logout with Discourse ([247](https://github.com/discourse/wp-discourse/pull/247))
+* Require user activation after email change ([246](https://github.com/discourse/wp-discourse/pull/246))
+* Require user activation ([245](https://github.com/discourse/wp-discourse/pull/245))
+
+### 0.9.4: August 10th, 2016
+* Fix existing comment regression ([243](https://github.com/discourse/wp-discourse/pull/243))
+
 ### 0.7.0: May 18th, 2016
 * Move templates out of options ([#194](https://github.com/discourse/wp-discourse/pull/194))
 * Validate settings ([#189](https://github.com/discourse/wp-discourse/pull/189))

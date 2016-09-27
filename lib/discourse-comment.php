@@ -6,6 +6,7 @@
  */
 
 namespace WPDiscourse\DiscourseComment;
+
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
@@ -25,12 +26,19 @@ class DiscourseComment {
 	 * DiscourseComment constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'discourse' );
+		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'comments_number', array( $this, 'comments_number' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
@@ -40,22 +48,23 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array  $allowedposttags  The array of allowed post tags.
-	 * @param string $context   The current context ('post', 'data', etc.).
+	 * @param array  $allowedposttags The array of allowed post tags.
+	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
 	 */
 	public function extend_allowed_html( $allowedposttags, $context ) {
 		if ( 'post' === $context ) {
 			$allowedposttags['div'] = array(
-				'class' => true,
-				'id' => true,
-				'style' => true,
-				'title' => true,
-				'role' => true,
+				'class'           => true,
+				'id'              => true,
+				'style'           => true,
+				'title'           => true,
+				'role'            => true,
 				'data-youtube-id' => array(),
 			);
 		}
+
 		return $allowedposttags;
 	}
 
@@ -75,7 +84,7 @@ class DiscourseComment {
 					true
 				);
 				// Localize script.
-				$data              = array(
+				$data = array(
 					'url' => $this->options['url'],
 				);
 				wp_localize_script( 'discourse-comments-js', 'discourse', $data );
@@ -91,7 +100,7 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function use_discourse_comments( $postid ) {
-		if ( ( ! isset( $this->options['use-discourse-comments'] ) ) || ! $this->options['use-discourse-comments'] ) {
+		if ( empty( $this->options['use-discourse-comments'] ) ) {
 			return 0;
 		}
 
@@ -106,6 +115,7 @@ class DiscourseComment {
 	 * @param int $postid The WordPress post id.
 	 */
 	function sync_comments( $postid ) {
+		global $wpdb;
 		$discourse_options = $this->options;
 		// Every 10 minutes do a json call to sync comment count and top comments.
 		$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
@@ -113,9 +123,9 @@ class DiscourseComment {
 		$debug     = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 
 		if ( $debug || $last_sync + 60 * 10 < $time ) {
-			$lock = 'comments_locked_for_' . $postid;
-			if ( ! 'locked' === get_transient( $lock ) ) {
-				set_transient( $lock, 'locked', 60 );
+			// Avoids a double sync.
+			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
+			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
@@ -131,9 +141,14 @@ class DiscourseComment {
 					if ( isset( $discourse_options['only-show-moderator-liked'] ) && 1 === intval( $discourse_options['only-show-moderator-liked'] ) ) {
 						$options = $options . '&only_moderator_liked=true';
 					}
+					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-					$permalink = esc_url_raw( get_post_meta( $postid, 'discourse_permalink', true ) ) . '/wordpress.json?' . $options;
-					$result    = wp_remote_get( $permalink );
+					if ( ! $discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true ) ) {
+						return 0;
+					}
+					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
+
+					$result = wp_remote_get( $permalink );
 
 					if ( DiscourseUtilities::validate( $result ) ) {
 
@@ -151,7 +166,8 @@ class DiscourseComment {
 						}
 					}
 				}
-				delete_transient( $lock );
+
+				wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
 			}
 		}
 	}
@@ -170,14 +186,17 @@ class DiscourseComment {
 
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
-			$options         = $this->options;
-			$num_wp_comments = get_comments_number();
-			if ( ! isset( $options['show-existing-comments'] ) ||  0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+			$options = $this->options;
+			// Use $post->comment_count because get_comments_number will return the Discourse comments
+			// number for posts that are published to Discourse.
+			$num_wp_comments = $post->comment_count;
+			if ( ! isset( $options['show-existing-comments'] ) || 0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
 				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
 				// Show the Discourse comments then show the existing WP comments (in $old).
 				include WPDISCOURSE_PATH . 'templates/comments.php';
+
 				echo '<div class="discourse-existing-comments-heading">' . wp_kses_post( $options['existing-comments-heading'] ) . '</div>';
 
 				return $old;
@@ -189,35 +208,42 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Returns the comments number.
+	 * Returns the comments number string.
 	 *
-	 * If Discourse comments are enabled, returns the 'discourse_comments_count', otherwise
-	 * returns the $count value. Hooks into 'comments_number'.
+	 * If both Discourse and WordPress comments are being used for a post a comments number string
+	 * is created that references both. Otherwise the output from WordPress is returned unchanged.
 	 *
-	 * @param int $count The comment count supplied by WordPress.
+	 * @param string $output The number string supplied by WordPress.
 	 *
 	 * @return mixed|string
 	 */
-	function comments_number( $count ) {
+	function comments_number( $output ) {
 		global $post;
 		if ( $this->use_discourse_comments( $post->ID ) ) {
-			$this->sync_comments( $post->ID );
-			$count = get_post_meta( $post->ID, 'discourse_comments_count', true );
-			if ( ! $count ) {
-				$count = __( 'Leave a reply', 'wp-discourse' );
-			} else {
-				$count = ( 1 === intval( $count ) ) ? '1 ' . __( 'Reply', 'wp-discourse' ) : $count . ' ' . __( 'Replies', 'wp-discourse' );
+			$discourse_comment_count = get_post_meta( $post->ID, 'discourse_comments_count', true );
+			$wp_comment_count        = $post->comment_count;
+
+			if ( $discourse_comment_count && $wp_comment_count &&
+			     ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) )
+			) {
+				if ( 1 === intval( $discourse_comment_count ) && 1 === intval( $wp_comment_count ) ) {
+					$output = esc_html__( '1 Discourse comment and 1 Wordpress comment', 'wp-discourse' );
+				} elseif ( 1 === intval( $discourse_comment_count ) ) {
+					$output = sprintf( esc_html__( '1 Discourse comment and %d WordPress comments', 'wp-discourse' ), $wp_comment_count );
+
+				} elseif ( 1 === intval( $wp_comment_count ) ) {
+					$output = sprintf( esc_html__( '%d Discourse comments and 1 WordPress comment', 'wp-discourse' ), $discourse_comment_count );
+				} else {
+					$output = sprintf( esc_html__( '%1$d Discourse comments and %2$d WordPress comments', 'wp-discourse' ), $discourse_comment_count, $wp_comment_count );
+				}
 			}
 		}
 
-		return $count;
+		return $output;
 	}
 
 	/**
-	 * Return the 'discourse_comment_count'.
-	 *
-	 * When the 'show-existing-comments' option is not enabled, return the 'discourse_comment_count'
-	 * so that it is available for themes using `get_comments_number`.
+	 * Returns the 'discourse_comments_count' for posts that use Discourse comments.
 	 *
 	 * @param int $count The comment count supplied by WordPress.
 	 * @param int $post_id The ID of the post.
@@ -225,10 +251,21 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	function get_comments_number( $count, $post_id ) {
-		$use_wordpress_comments = isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] );
+		if ( $this->use_discourse_comments( $post_id ) ) {
 
-		if ( $this->use_discourse_comments( $post_id ) && ( ! $use_wordpress_comments ) ) {
-			$this->sync_comments( $post_id );
+			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
+			if ( is_single( $post_id ) || is_page( $post_id ) ) {
+				$this->sync_comments( $post_id );
+			} else {
+				// For archive pages, check $last_sync against $archive_page_sync_period.
+				$archive_page_sync_period = intval( apply_filters( 'discourse_archive_page_sync_period', DAY_IN_SECONDS, $post_id ) );
+				$last_sync = intval( get_post_meta( $post_id, 'discourse_last_sync', true ) );
+
+				if ( $last_sync + $archive_page_sync_period < time() ) {
+					$this->sync_comments( $post_id );
+				}
+			}
+
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 		}
 

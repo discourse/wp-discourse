@@ -26,9 +26,16 @@ class MetaBox {
 	 * MetaBox constructor.
 	 */
 	public function __construct() {
-		$this->options = get_option( 'discourse' );
+		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
@@ -53,56 +60,77 @@ class MetaBox {
 	 * @param object $post The current Post object.
 	 */
 	public function render_meta_box( $post ) {
+		$post_id    = $post->ID;
+		$published  = get_post_meta( $post_id, 'discourse_post_id', true );
 		$categories = DiscourseUtilities::get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
 			$selected_category    = null;
 			$publish_to_discourse = 0;
-		} elseif ( ! get_post_meta( $post->ID, 'has_been_saved', true ) ) {
+		} elseif ( ! $published ) {
 
-			// If the post has not yet been saved, use the default setting. If it has been saved use the meta value.
-			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
+			// If the post has not yet been published, use the default setting.
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
+			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
 
-			$selected_category    = get_post_meta( $post->ID, 'publish_post_category', true );
-			$publish_to_discourse = get_post_meta( $post->ID, 'publish_to_discourse', true );
+			// The post has been published, use the saved values.
+			$publish_to_discourse   = get_post_meta( $post_id, 'publish_to_discourse', true );
+			$selected_category      = get_post_meta( $post_id, 'publish_post_category', true );
+			$selected_category_name = '';
+			foreach ( $categories as $category ) {
+				if ( intval( $selected_category ) === $category['id'] ) {
+					$selected_category_name = $category['name'];
+					break;
+				}
+			}
 		}
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 		?>
 
-		<label for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+		<label
+			for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
 		</label>
 		<br>
-		<label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
+		<?php if ( is_null( $selected_category ) ) : ?>
+			<hr>
+			<div class="warning">
+				<p>
+					<?php
+					esc_html_e( 'The Discourse categories list is not currently available. To publish this post to Discourse, please check the WP Discourse connection settings.', 'wp-discourse' );
+					?>
+				</p>
+			</div>
 
-			<?php if ( is_null( $selected_category ) ) : ?>
-				<div class="warning">
-					<p>
-						<?php
-						esc_html_e( "The Discourse categories list is not currently available. To publish this post to Discourse, please check the wp-discourse settings for 'Discourse URL', 'API Key', and 'Publishing username'. Also, make sure that your Discourse forum is online.", 'wp-discourse' );
-						?>
-					</p>
-				</div>
-			<?php else : ?>
+		<?php elseif ( $published ) : ?>
+			<hr>
+			<?php
+			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
+			$allowed = array(
+				'strong' => array(),
+			);
+			echo wp_kses( $message, $allowed );
+			?>
 
-				<select name="publish_post_category" id="publish_post_category">
-					<?php foreach ( $categories as $category ) : ?>
-						<option
-							value="<?php echo( esc_attr( $category['id'] ) ); ?>"
-							<?php selected( $selected_category, $category['id'] ); ?>>
-							<?php echo( esc_html( $category['name'] ) ); ?>
-						</option>
-					<?php endforeach; ?>
-				</select>
+		<?php else : ?>
+			<label
+			for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
 
-			<?php endif; ?>
+			<select name="publish_post_category" id="publish_post_category">
+				<?php foreach ( $categories as $category ) : ?>
+					<option
+						value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+						<?php selected( $selected_category, $category['id'] ); ?>>
+						<?php echo( esc_html( $category['name'] ) ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
 
+		<?php endif; ?>
 		</label>
-
 		<?php
 	}
 
@@ -125,9 +153,6 @@ class MetaBox {
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
 			return 0;
 		}
-
-		// Indicate that the post has been saved so that the meta-box gets its values from the meta-data instead of the defaults.
-		update_post_meta( $post_id, 'has_been_saved', 1 );
 
 		if ( isset( $_POST['publish_post_category'] ) ) { // Input var okay.
 			update_post_meta( $post_id, 'publish_post_category', intval( wp_unslash( $_POST['publish_post_category'] ) ) ); // Input var okay.

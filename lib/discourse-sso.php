@@ -35,13 +35,20 @@ class DiscourseSSO {
 	 * @param object $wordpress_email_verifier An object for verifying email addresses.
 	 */
 	public function __construct( $wordpress_email_verifier ) {
-		$this->options                  = get_option( 'discourse' );
 		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
+		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	/**
@@ -56,9 +63,8 @@ class DiscourseSSO {
 	 * @return string
 	 */
 	public function set_login_url( $login_url, $redirect ) {
-		$options = get_option( 'discourse' );
-		if ( $options['login-path'] ) {
-			$login_url = $options['login-path'];
+		if ( ! empty( $this->options['login-path'] ) ) {
+			$login_url = $this->options['login-path'];
 
 			if ( ! empty( $redirect ) ) {
 				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
@@ -148,13 +154,15 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$current_user = wp_get_current_user();
-				$user_id = $current_user->ID;
+				$current_user       = wp_get_current_user();
+				$user_id            = $current_user->ID;
 				$require_activation = false;
 
 				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ) {
 					$require_activation = true;
 				}
+
+				$require_activation = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
 
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
@@ -174,15 +182,15 @@ class DiscourseSSO {
 
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
-					'nonce'       => $nonce,
-					'name'        => $current_user->display_name,
-					'username'    => $current_user->user_login,
-					'email'       => $current_user->user_email,
+					'nonce'              => $nonce,
+					'name'               => $current_user->display_name,
+					'username'           => $current_user->user_login,
+					'email'              => $current_user->user_email,
 					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
 					'require_activation' => $require_activation ? 'true' : 'false',
-					'about_me'    => $current_user->description,
-					'external_id' => $current_user->ID,
-					'avatar_url'  => get_avatar_url( get_current_user_id() ),
+					'about_me'           => $current_user->description,
+					'external_id'        => $current_user->ID,
+					'avatar_url'         => get_avatar_url( get_current_user_id() ),
 				);
 
 				$q = $sso->build_login_string( $params );
@@ -203,14 +211,14 @@ class DiscourseSSO {
 	 * @return \WP_Error
 	 */
 	public function logout_from_discourse() {
-		$user    = wp_get_current_user();
-		$user_id = $user->ID;
+		$user         = wp_get_current_user();
+		$user_id      = $user->ID;
 		$base_url     = $this->options['url'];
 		$api_key      = $this->options['api-key'];
 		$api_username = $this->options['publish-username'];
 		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
 		// user info on login to WordPress and store it in the user_metadata table.
-		$user_url = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
+		$user_url  = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
 		$user_data = wp_remote_get( $user_url );
 		if ( ! DiscourseUtilities::validate( $user_data ) ) {
 			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
@@ -219,8 +227,8 @@ class DiscourseSSO {
 		if ( array_key_exists( 'user', $user_data ) ) {
 			$discourse_user_id = $user_data['user']['id'];
 			if ( isset( $discourse_user_id ) ) {
-				$logout_url = $base_url . "/admin/users/$discourse_user_id/log_out";
-				$logout_url = esc_url_raw( $logout_url );
+				$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
+				$logout_url      = esc_url_raw( $logout_url );
 				$logout_response = wp_remote_post( $logout_url, array(
 					'method' => 'POST',
 					'body'   => array(
