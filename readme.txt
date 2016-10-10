@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.6.1
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,13 +98,16 @@ For more details on template customization, take a look at this section of our w
 
 4. The comment appears on WordPress.
 
-
 == Changelog ==
-
 
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.0.1 10/10/2016
+
+- Fix: Don't call `array_key_exists` on null
+- Fix: Don't logout from Discourse when SSO is not enabled
 
 #### 1.0.0 26/09/16
 
