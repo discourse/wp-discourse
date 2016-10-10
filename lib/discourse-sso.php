@@ -211,6 +211,11 @@ class DiscourseSSO {
 	 * @return \WP_Error
 	 */
 	public function logout_from_discourse() {
+		// If SSO is not enabled, don't make the request.
+		if ( empty( $this->options['enable-sso'] ) || 1 !== intval( $this->options['enable-sso'] ) ) {
+			return;
+		}
+
 		$user         = wp_get_current_user();
 		$user_id      = $user->ID;
 		$base_url     = $this->options['url'];
@@ -223,8 +228,9 @@ class DiscourseSSO {
 		if ( ! DiscourseUtilities::validate( $user_data ) ) {
 			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
 		}
+
 		$user_data = json_decode( wp_remote_retrieve_body( $user_data ), true );
-		if ( array_key_exists( 'user', $user_data ) ) {
+		if ( ! empty( $user_data['user'] ) ) {
 			$discourse_user_id = $user_data['user']['id'];
 			if ( isset( $discourse_user_id ) ) {
 				$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
