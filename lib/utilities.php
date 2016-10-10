@@ -36,7 +36,7 @@ class Utilities {
 	}
 
 	/**
-	 * Checks the connection status to Discourse.
+	 * Checks the connection status to Discourse
 	 *
 	 * @return int
 	 */
