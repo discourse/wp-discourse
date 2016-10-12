@@ -47,7 +47,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array $allowedposttags The array of allowed post tags.
+	 * @param array  $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
@@ -236,8 +236,8 @@ class DiscourseComment {
 
 			// If WordPress comments are also being used, add them to the comment count.
 			if ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) ) {
-				$post             = get_post( $post_id );
-				$wp_comment_count = $post->comment_count;
+				$current_post             = get_post( $post_id );
+				$wp_comment_count = $current_post->comment_count;
 				$count            = $count + $wp_comment_count;
 			}
 		}
