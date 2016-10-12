@@ -87,7 +87,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 			$comment_body = wp_kses_post( $post->cooked );
 			$comment_body = TemplateFunctions::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
 			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
-			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, get_date_from_gmt( $post->created_at ) ), $comment_html );
+			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );
 			$comments_html .= $comment_html;
 		}
 		foreach ( $discourse_info->participants as &$participant ) {
