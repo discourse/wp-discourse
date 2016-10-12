@@ -47,7 +47,7 @@ class HTMLTemplates {
 	public static function replies_html() {
 		ob_start();
 		?>
-		<div id="comments" class="comments-area">
+		<div id="comments" class="comments-area discourse-comments-area">
 			<h2 class="comments-title discourse-comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
