@@ -148,7 +148,7 @@ class HTMLTemplates {
 						     width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
 						                 class="url">{username}</a></b>
-						<span class="says">says:</span><!-- screen reader text -->
+						<span class="says screen-reader-text"><?php esc_html_e( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
