@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.6.1
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -103,6 +103,14 @@ For more details on template customization, take a look at this section of our w
 **note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.0.2 12/10/2016
+
+- Don't call `get_date_from_gmt` on `datetime` returned from Discourse
+- Add WordPress comments_number to Discourse comments_number when both are used
+- Add `'.screen-reader-text'` class to screen-reader text
+- Add `'.discourse-comments-area'` class to Discourse comments area
+- Add filter to Discourse categories before displaying them in the 'Publish to Discourse' meta-box
 
 #### 1.0.1 10/10/2016
 
