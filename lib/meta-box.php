@@ -63,6 +63,7 @@ class MetaBox {
 		$post_id    = $post->ID;
 		$published  = get_post_meta( $post_id, 'discourse_post_id', true );
 		$categories = DiscourseUtilities::get_discourse_categories();
+		$categories = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 
 		if ( is_wp_error( $categories ) ) {
 			$selected_category    = null;
