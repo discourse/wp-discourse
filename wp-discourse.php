@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages

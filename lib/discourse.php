@@ -17,7 +17,7 @@ class Discourse {
 	 *
 	 * @var string
 	 */
-	public static $version = '1.0.1';
+	public static $version = '1.0.2';
 
 	/**
 	 * The connection options array.

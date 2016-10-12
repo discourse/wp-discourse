@@ -47,7 +47,7 @@ class HTMLTemplates {
 	public static function replies_html() {
 		ob_start();
 		?>
-		<div id="comments" class="comments-area">
+		<div id="comments" class="comments-area discourse-comments-area">
 			<h2 class="comments-title discourse-comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
@@ -148,7 +148,7 @@ class HTMLTemplates {
 						     width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
 						                 class="url">{username}</a></b>
-						<span class="says">says:</span><!-- screen reader text -->
+						<span class="says screen-reader-text"><?php esc_html_e( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
