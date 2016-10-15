@@ -1,23 +1,43 @@
 <?php
 /**
  * Syncs and displays Discourse content through ajax calls.
+ *
+ * This class allows current Discourse content to be displayed on cached WordPress pages.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\DiscourseAjaxContent;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class DiscourseAjaxContent
+ */
 class DiscourseAjaxContent {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
 
+	/**
+	 * DiscourseAjaxContent constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup' ) );
 	}
 
+	/**
+	 * Setup options and conditionally add hooks.
+	 */
 	public function setup() {
 		$this->options = DiscourseUtilities::get_options();
 
-		if ( ! empty( $this->options['ajax-refresh-comments-number'] ) ) {
+		if ( ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) {
 			add_action( 'wp', array( $this, 'adjust_hooks' ) );
 			add_action( 'wp_ajax_nopriv_get_discourse_comments_number', array(
 				$this,
@@ -30,6 +50,9 @@ class DiscourseAjaxContent {
 		}
 	}
 
+	/**
+	 * Filter 'comments_number' and add 'wp_enqueue_scripts' action.
+	 */
 	public function adjust_hooks() {
 		global $wp_query;
 
@@ -45,6 +68,9 @@ class DiscourseAjaxContent {
 		}
 	}
 
+	/**
+	 * Register, localize, and enqueue script.
+	 */
 	public function comments_number_script() {
 		$single_reply_text = ! empty( $this->option['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
 		$many_replies_text = ! empty( $this->options['many-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'Replies';
@@ -61,6 +87,12 @@ class DiscourseAjaxContent {
 		wp_enqueue_script( 'comments_number_js' );
 	}
 
+	/**
+	 * Adds a span to the page that supplies data for the ajax script.
+	 *
+	 * @param string $output The comments_number string returned from WordPress.
+	 * @param int $number The number of comments.
+	 */
 	public function comments_number_ajax_placeholder( $output, $number ) {
 		global $post;
 		$post_id    = $post->ID;
@@ -70,6 +102,9 @@ class DiscourseAjaxContent {
 		     $nonce_name . '" data-old-number="' . esc_attr( $number ) . '"></span>';
 	}
 
+	/**
+	 * Handles the ajax request.
+	 */
 	public function handle_comments_number_ajax_request() {
 		$nonce_name   = ! empty( $_POST['nonce_name'] ) ? sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) : null;
 		$nonce        = ! empty( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : null;
@@ -130,6 +165,9 @@ class DiscourseAjaxContent {
 		exit;
 	}
 
+	/**
+	 * Echoes an error response.
+	 */
 	protected function ajax_error_response() {
 		header( 'Content-type: application/json' );
 		$ajax_response['status'] = 'error';
