@@ -110,6 +110,14 @@ class SettingsValidator {
 			$this,
 			'validate_display_subcategories',
 		) );
+		add_filter( 'validate_ajax_refresh_comments_number', array(
+			$this,
+			'validate_ajax_refresh_comments_number',
+		) );
+		add_filter( 'validate_ajax_refresh_comments', array(
+			$this,
+			'validate_ajax_refresh_comments',
+		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
 
 		add_filter( 'validate_discourse_link_text', array( $this, 'validate_discourse_link_text' ) );
@@ -415,6 +423,28 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_only_show_moderator_liked( $input ) {
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the 'ajax_refresh_comments_number' checkbox.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_ajax_refresh_comments_number( $input ) {
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the 'ajax_refresh_comments' checkbox.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_ajax_refresh_comments( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 

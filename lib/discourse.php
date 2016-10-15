@@ -62,6 +62,8 @@ class Discourse {
 		'bypass-trust-level-score'  => 50,
 		'custom-datetime-format' => '',
 		'only-show-moderator-liked' => 0,
+		'ajax-refresh-comments-number' => 0,
+		'ajax-refresh-comments' => 0,
 		'debug-mode'                => 0,
 	);
 

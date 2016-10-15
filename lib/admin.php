@@ -180,6 +180,16 @@ class DiscourseAdmin {
 			'only_show_moderator_liked_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
+		add_settings_field( 'discourse_ajax_refresh_comments_number', __( 'Refresh comments number with ajax request', 'wp-discourse' ), array(
+			$this,
+			'ajax_refresh_comments_number_checkbox',
+		), 'discourse_comment', 'discourse_commenting_settings_section' );
+
+		add_settings_field( 'discourse_ajax_refresh_comments', __( 'Refresh comments content with ajax request', 'wp-discourse' ), array(
+			$this,
+			'ajax_refresh_comments_checkbox',
+		), 'discourse_comment', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_debug_mode', __( 'Debug mode', 'wp-discourse' ), array(
 			$this,
 			'debug_mode_checkbox',
@@ -469,6 +479,20 @@ class DiscourseAdmin {
 	 */
 	public function only_show_moderator_liked_checkbox() {
 		$this->checkbox_input( 'only-show-moderator-liked', 'discourse_comment' );
+	}
+
+	/**
+	 * Outputs markup for the ajax-refresh-comments-number checkbox.
+	 */
+	public function ajax_refresh_comments_number_checkbox() {
+		$this->checkbox_input( 'ajax-refresh-comments-number', 'discourse_comment' );
+	}
+
+	/**
+	 * Outputs markup for the ajax-refresh-comments checkbox.
+	 */
+	public function ajax_refresh_comments_checkbox() {
+		$this->checkbox_input( 'ajax-refresh-comments', 'discourse_comment' );
 	}
 
 	/**
