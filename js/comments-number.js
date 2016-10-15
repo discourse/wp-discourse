@@ -5,9 +5,12 @@ jQuery(document).ready(function () {
         noRepliesText = comments_number_script.no_replies_text;
 
     function formatCommentsNumber(number, singleText, manyText, noneText) {
-        var formattedText;
+        var formattedText,
+            number = parseInt(number, 10);
+        console.log('number', number);
         if (number < 1) {
             formattedText = noneText;
+            console.log('no replies text', noneText);
         } else if (number === 1) {
             formattedText = 1 + ' ' + singleText;
         } else {
