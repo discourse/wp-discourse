@@ -76,7 +76,7 @@ class DiscourseAjaxContent {
 	public function comments_number_script() {
 		$single_reply_text = ! empty( $this->option['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
 		$many_replies_text = ! empty( $this->options['many-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'Replies';
-		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'No Replies';
+		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['no-replies-text'] ) : 'No Replies';
 
 		wp_register_script( 'comments_number_js', plugins_url( '/../js/comments-number.js', __FILE__ ), array( 'jquery' ), null, true );
 		wp_localize_script( 'comments_number_js', 'comments_number_script', array(
@@ -113,7 +113,7 @@ class DiscourseAjaxContent {
 		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
-		if ( empty( $comment_count ) ) {
+		if ( empty( $comment_count ) && 0 !== intval( $comment_count ) ) {
 
 			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
 				$this->ajax_error_response();
