@@ -37,7 +37,9 @@ class DiscourseAjaxContent {
 	public function setup() {
 		$this->options = DiscourseUtilities::get_options();
 
-		if ( ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) {
+		if ( ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ||
+		     ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] )
+		) {
 			add_action( 'wp', array( $this, 'adjust_hooks' ) );
 			add_action( 'wp_ajax_nopriv_get_discourse_comments_number', array(
 				$this,
@@ -56,7 +58,7 @@ class DiscourseAjaxContent {
 	public function adjust_hooks() {
 		global $wp_query;
 
-		if ( $wp_query->is_singular() ) {
+		if ( $wp_query->is_singular() || ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === $this->options['ajax-refresh-archive-comments-number'] ) {
 			$post_id = $wp_query->post->ID;
 			if ( $post_id &&
 			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
@@ -74,8 +76,7 @@ class DiscourseAjaxContent {
 	public function comments_number_script() {
 		$single_reply_text = ! empty( $this->option['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
 		$many_replies_text = ! empty( $this->options['many-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'Replies';
-		// Todo: add an option for this.
-		$no_replies_text = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'No Replies';
+		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'No Replies';
 
 		wp_register_script( 'comments_number_js', plugins_url( '/../js/comments-number.js', __FILE__ ), array( 'jquery' ), null, true );
 		wp_localize_script( 'comments_number_js', 'comments_number_script', array(
@@ -109,7 +110,7 @@ class DiscourseAjaxContent {
 		$nonce_name   = ! empty( $_POST['nonce_name'] ) ? sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) : null;
 		$nonce        = ! empty( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : null;
 		$current_span = ! empty( $_POST['current_span'] ) ? sanitize_key( wp_unslash( $_POST['current_span'] ) ) : null;
-		$post_id = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
+		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
 		if ( empty( $comment_count ) ) {
@@ -157,7 +158,7 @@ class DiscourseAjaxContent {
 		}
 
 		header( 'Content-type: application/json' );
-		$ajax_response['status'] = 'success';
+		$ajax_response['status']         = 'success';
 		$ajax_response['comments_count'] = $comment_count;
 
 		echo json_encode( $ajax_response );

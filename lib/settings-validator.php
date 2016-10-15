@@ -114,6 +114,10 @@ class SettingsValidator {
 			$this,
 			'validate_ajax_refresh_comments_number',
 		) );
+		add_filter( 'validate_ajax_refresh_archive_comments_number', array(
+			$this,
+			'validate_ajax_refresh_archive_comments_number',
+		));
 		add_filter( 'validate_ajax_refresh_comments', array(
 			$this,
 			'validate_ajax_refresh_comments',
@@ -130,6 +134,7 @@ class SettingsValidator {
 		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
 		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
 		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
+		add_filter( 'validate_no_replies_text', array( $this, 'validate_no_replies_text' ) );
 
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
@@ -427,13 +432,24 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'ajax_refresh_comments_number' checkbox.
+ * Validates the 'ajax_refresh_comments_number' checkbox.
+ *
+ * @param int $input The input to be validated.
+ *
+ * @return int
+ */
+	public function validate_ajax_refresh_comments_number( $input ) {
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the 'ajax_refresh_archive_comments_number' checkbox.
 	 *
 	 * @param int $input The input to be validated.
 	 *
 	 * @return int
 	 */
-	public function validate_ajax_refresh_comments_number( $input ) {
+	public function validate_ajax_refresh_archive_comments_number( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
@@ -587,6 +603,21 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_many_replies_text( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates the 'no_replies_text' text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_no_replies_text( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {

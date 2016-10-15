@@ -180,12 +180,17 @@ class DiscourseAdmin {
 			'only_show_moderator_liked_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_ajax_refresh_comments_number', __( 'Refresh comments number with ajax request', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_ajax_refresh_comments_number', __( 'Ajax refresh single page comments-number', 'wp-discourse' ), array(
 			$this,
 			'ajax_refresh_comments_number_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_ajax_refresh_comments', __( 'Refresh comments content with ajax request', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_ajax_refresh_comments_archive_number', __( 'Ajax refresh archive page comments-number', 'wp-discourse' ), array(
+			$this,
+			'ajax_refresh_archive_comments_number_checkbox',
+		), 'discourse_comment', 'discourse_commenting_settings_section' );
+
+		add_settings_field( 'discourse_ajax_refresh_comments', __( 'Ajax refresh comments content', 'wp-discourse' ), array(
 			$this,
 			'ajax_refresh_comments_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
@@ -254,6 +259,11 @@ class DiscourseAdmin {
 		add_settings_field( 'discourse_more_replies_text', __( 'More replies \'more\' text', 'wp-discourse' ), array(
 			$this,
 			'more_replies_more_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_no_replies_text', __( 'No replies text', 'wp-discourse' ), array(
+			$this,
+			'no_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
@@ -485,14 +495,26 @@ class DiscourseAdmin {
 	 * Outputs markup for the ajax-refresh-comments-number checkbox.
 	 */
 	public function ajax_refresh_comments_number_checkbox() {
-		$this->checkbox_input( 'ajax-refresh-comments-number', 'discourse_comment' );
+		$this->checkbox_input( 'ajax-refresh-comments-number', 'discourse_comment', __( 'Use ajax requests to get the current comments number on single pages from Discourse.', 'wp-discourse' ),
+			__( 'This setting is intended for sites that are caching pages with a CDN. It adds a filter to the WordPress `comments_number` filter-hook. The output of that filter
+			supplies the data required for the ajax request. This setting is applied to single pages.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for the ajax-refresh-archive-comments-number checkbox.
+	 */
+	public function ajax_refresh_archive_comments_number_checkbox() {
+		$this->checkbox_input( 'ajax-refresh-archive-comments-number', 'discourse_comment', __( 'Use ajax requests to get the current comments number on archive pages from Discourse.', 'wp-discourse' ),
+			__( 'This setting is intended for sites that are caching pages with a CDN. It adds a filter to the WordPress `comments_number` filter-hook. The output of that filter
+			supplies the data required for the ajax request. This setting is applied to archive pages.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the ajax-refresh-comments checkbox.
 	 */
 	public function ajax_refresh_comments_checkbox() {
-		$this->checkbox_input( 'ajax-refresh-comments', 'discourse_comment' );
+		$this->checkbox_input( 'ajax-refresh-comments', 'discourse_comment',  __( 'Use ajax requests to get the current comment content from Discourse.', 'wp-discourse' ),
+			__( 'This setting is intended for sites that are caching pages with a CDN.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -581,6 +603,13 @@ class DiscourseAdmin {
 	 */
 	public function more_replies_more_text() {
 		$this->text_input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs the markup for the no-replies-text input.
+	 */
+	public function no_replies_text() {
+		$this->text_input( 'no-replies-text', 'discourse_configurable_text', __( 'Text used when there are no replies and the \'ajax refresh comments-number\' setting is enabled.', 'wp-discourse' ) );
 	}
 
 	/**
