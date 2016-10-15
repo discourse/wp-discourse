@@ -43,6 +43,7 @@ jQuery(document).ready(function () {
         };
 
         jQuery.post(ajaxURL, data, function (response) {
+            console.log('response', response);
             var commentCount = response.comments_count,
                 target = '#' + currentSpan,
                 formattedText;

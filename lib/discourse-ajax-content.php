@@ -50,6 +50,19 @@ class DiscourseAjaxContent {
 				'handle_comments_number_ajax_request',
 			) );
 		}
+
+		if ( ! empty( $this->options['ajax-refresh-comments'] ) && 1 === intval( $this->options['ajax-refresh-comments'] ) ) {
+			add_filter( 'wp_discourse_comments_content', array( $this, 'comments_content_ajax_placeholder' ), 10, 2 );
+			add_action( 'wp_ajax_nopriv_get_discourse_comments_content', array(
+				$this,
+				'handle_comments_content_ajax_request',
+			) );
+			add_action( 'wp_ajax_get_discourse_comments_content', array(
+				$this,
+				'handle_comments_content_ajax_request',
+			) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'comments_content_script' ) );
+		}
 	}
 
 	/**
@@ -58,7 +71,8 @@ class DiscourseAjaxContent {
 	public function adjust_hooks() {
 		global $wp_query;
 
-		if ( $wp_query->is_singular() || ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === $this->options['ajax-refresh-archive-comments-number'] ) {
+		if ( ( $wp_query->is_singular && ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) ||
+		     ( ! $wp_query->is_singular && ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] ) ) ) {
 			$post_id = $wp_query->post->ID;
 			if ( $post_id &&
 			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
@@ -89,6 +103,23 @@ class DiscourseAjaxContent {
 	}
 
 	/**
+	 * Register, localize, and enqueue script.
+	 */
+	public function comments_content_script() {
+		wp_register_script( 'comments_content_js', plugins_url( '/../js/comments-content.js', __FILE__ ), array( 'jquery' ), null, true );
+		wp_localize_script( 'comments_content_js', 'comments_content_script', array(
+			'ajaxurl'           => admin_url( 'admin-ajax.php' ),
+		) );
+		wp_enqueue_script( 'comments_content_js' );
+	}
+
+	/**
+	 * ----------------
+	 * Comments number.
+	 * ----------------
+	 */
+
+	/**
 	 * Adds a span to the page that supplies data for the ajax script.
 	 *
 	 * @param string $output The comments_number string returned from WordPress.
@@ -113,6 +144,7 @@ class DiscourseAjaxContent {
 		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
+		write_log($comment_count);
 		if ( empty( $comment_count ) && 0 !== intval( $comment_count ) ) {
 
 			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
@@ -146,6 +178,7 @@ class DiscourseAjaxContent {
 			$json = json_decode( $response['body'] );
 			if ( isset( $json->posts_count ) ) {
 				$comment_count = intval( $json->posts_count ) - 1;
+				write_log($comment_count);
 				update_post_meta( $post_id, 'discourse_comments_count', $comment_count );
 
 				// Todo: make this configurable.
@@ -165,6 +198,21 @@ class DiscourseAjaxContent {
 
 		exit;
 	}
+
+	/**
+	 * -----------------
+	 * Comments content.
+	 * -----------------
+	 */
+
+	public function comments_content_ajax_placeholder( $discourse_html, $permalink ) {
+
+	}
+
+	public function handle_comments_content_ajax_request() {
+
+	}
+
 
 	/**
 	 * Echoes an error response.
