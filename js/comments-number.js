@@ -1,3 +1,4 @@
+/* globals commentsNumberScript */
 jQuery( document ).ready(function() {
     var ajaxURL = commentsNumberScript.ajaxurl,
         singleReplyText = commentsNumberScript.singleReplyText,
@@ -6,13 +7,13 @@ jQuery( document ).ready(function() {
 
     function formatCommentsNumber( number, singleText, manyText, noneText ) {
         var formattedText,
-            number = parseInt( number, 10 );
-        if ( 1 > number ) {
+            commentsNumber = parseInt( number, 10 );
+        if ( 1 > commentsNumber ) {
             formattedText = noneText;
-        } else if ( 1 === number ) {
+        } else if ( 1 === commentsNumber ) {
             formattedText = 1 + ' ' + singleText;
-        } else if ( 1 < number ) {
-            formattedText = number + ' ' + manyText;
+        } else if ( 1 < commentsNumber ) {
+            formattedText = commentsNumber + ' ' + manyText;
         } else {
             formattedText = '<span class="error">Unable to retrieve comments number</span>';
         }
@@ -32,9 +33,8 @@ jQuery( document ).ready(function() {
             nonceName = jQuery( this ).data( 'nonce-name' ),
             nonce = jQuery( this ).data( 'nonce' ),
             currentSpan = jQuery( this ).attr( 'id' ),
-            oldNumber = jQuery( this ).data( 'old-number' );
-
-        data = {
+            oldNumber = jQuery( this ).data( 'old-number' ),
+            data = {
             action: 'get_discourse_comments_number',
             nonce_name: nonceName,
             nonce: nonce,
@@ -55,7 +55,7 @@ jQuery( document ).ready(function() {
 
             setCommentNumberText( formattedText, target );
 
-        }).fail(function( response ) {
+        }).fail(function() {
             var commentCount = oldNumber,
                 target = '#' + currentSpan,
                 formattedText;
