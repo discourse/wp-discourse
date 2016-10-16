@@ -7,10 +7,8 @@ jQuery(document).ready(function () {
     function formatCommentsNumber(number, singleText, manyText, noneText) {
         var formattedText,
             number = parseInt(number, 10);
-        console.log('number', number);
         if (number < 1) {
             formattedText = noneText;
-            console.log('no replies text', noneText);
         } else if (number === 1) {
             formattedText = 1 + ' ' + singleText;
         } else if (number > 1) {
@@ -45,7 +43,6 @@ jQuery(document).ready(function () {
         };
 
         jQuery.post(ajaxURL, data, function (response) {
-            console.log('response', response);
             var commentCount = response.comments_count,
                 target = '#' + currentSpan,
                 formattedText;
