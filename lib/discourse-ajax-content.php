@@ -50,19 +50,6 @@ class DiscourseAjaxContent {
 				'handle_comments_number_ajax_request',
 			) );
 		}
-
-		if ( ! empty( $this->options['ajax-refresh-comments'] ) && 1 === intval( $this->options['ajax-refresh-comments'] ) ) {
-			add_filter( 'wp_discourse_comments_content', array( $this, 'comments_content_ajax_placeholder' ), 10, 2 );
-			add_action( 'wp_ajax_nopriv_get_discourse_comments_content', array(
-				$this,
-				'handle_comments_content_ajax_request',
-			) );
-			add_action( 'wp_ajax_get_discourse_comments_content', array(
-				$this,
-				'handle_comments_content_ajax_request',
-			) );
-			add_action( 'wp_enqueue_scripts', array( $this, 'comments_content_script' ) );
-		}
 	}
 
 	/**
@@ -100,17 +87,6 @@ class DiscourseAjaxContent {
 			'no_replies_text'   => $no_replies_text,
 		) );
 		wp_enqueue_script( 'comments_number_js' );
-	}
-
-	/**
-	 * Register, localize, and enqueue script.
-	 */
-	public function comments_content_script() {
-		wp_register_script( 'comments_content_js', plugins_url( '/../js/comments-content.js', __FILE__ ), array( 'jquery' ), null, true );
-		wp_localize_script( 'comments_content_js', 'comments_content_script', array(
-			'ajaxurl'           => admin_url( 'admin-ajax.php' ),
-		) );
-		wp_enqueue_script( 'comments_content_js' );
 	}
 
 	/**
@@ -200,21 +176,6 @@ class DiscourseAjaxContent {
 	}
 
 	/**
-	 * -----------------
-	 * Comments content.
-	 * -----------------
-	 */
-
-	public function comments_content_ajax_placeholder( $discourse_html, $permalink ) {
-
-	}
-
-	public function handle_comments_content_ajax_request() {
-
-	}
-
-
-	/**
 	 * Echoes an error response.
 	 */
 	protected function ajax_error_response() {
@@ -223,5 +184,4 @@ class DiscourseAjaxContent {
 
 		echo json_encode( $ajax_response );
 	}
-
 }
