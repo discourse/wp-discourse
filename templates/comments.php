@@ -13,6 +13,7 @@ $custom = get_post_custom();
 
 // If, when a new post is published to Discourse, there is not a valid response from
 // the forum, the `discourse_permalink` key will not be set. Display the `bad_response_html` template.
+// Todo: use empty, if the key doesn't exist it probably isn't an array.
 if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	echo wp_kses_post( Templates::bad_response_html() );
 
