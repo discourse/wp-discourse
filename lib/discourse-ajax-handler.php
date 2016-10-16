@@ -1,19 +1,37 @@
 <?php
 /**
  * Handles ajax requests.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\DiscourseAjaxHandler;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class DiscourseAjaxHandler
+ */
 class DiscourseAjaxHandler {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
 
+	/**
+	 * DiscourseAjaxHandler constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup' ) );
 	}
 
+	/**
+	 * Setup options an add ajax action hooks.
+	 */
 	public function setup() {
 		$this->options = DiscourseUtilities::get_options();
 
