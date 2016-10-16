@@ -75,11 +75,11 @@ class DiscourseAjaxContent {
 		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['no-replies-text'] ) : 'No Replies';
 
 		wp_register_script( 'comments_number_js', plugins_url( '/../js/comments-number.js', __FILE__ ), array( 'jquery' ), null, true );
-		wp_localize_script( 'comments_number_js', 'comments_number_script', array(
+		wp_localize_script( 'comments_number_js', 'commentsNumberScript', array(
 			'ajaxurl'           => admin_url( 'admin-ajax.php' ),
-			'single_reply_text' => $single_reply_text,
-			'many_replies_text' => $many_replies_text,
-			'no_replies_text'   => $no_replies_text,
+			'singleReplyText' => $single_reply_text,
+			'manyRepliesText' => $many_replies_text,
+			'noRepliesText'   => $no_replies_text,
 		) );
 
 		wp_register_style( 'loading_spinner_css', plugins_url( '/../css/ajax-styles.css', __FILE__ ) );
@@ -98,7 +98,7 @@ class DiscourseAjaxContent {
 	 * Adds a span to the page that supplies data for the ajax script.
 	 *
 	 * @param string $output The comments_number string returned from WordPress.
-	 * @param int $number The number of comments.
+	 * @param int    $number The number of comments.
 	 */
 	public function comments_number_ajax_placeholder( $output, $number ) {
 		global $post;
@@ -114,7 +114,8 @@ class DiscourseAjaxContent {
 	 */
 	public function handle_comments_number_ajax_request() {
 
-		if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) ) ) { // Input var okay.
+		if ( ! isset( $_POST['nonce'] ) || ! isset( $_POST['nonce_name'] ) || // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) ) ) { // Input var okay.
 			$this->ajax_error_response();
 
 			exit;
