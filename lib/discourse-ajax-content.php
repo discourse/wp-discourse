@@ -81,7 +81,11 @@ class DiscourseAjaxContent {
 			'many_replies_text' => $many_replies_text,
 			'no_replies_text'   => $no_replies_text,
 		) );
+
+		wp_register_style( 'loading_spinner_css', plugins_url( '/../css/ajax-styles.css', __FILE__ ) );
+
 		wp_enqueue_script( 'comments_number_js' );
+		wp_enqueue_style( 'loading_spinner_css' );
 	}
 
 	/**
