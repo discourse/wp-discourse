@@ -9,7 +9,7 @@ jQuery( document ).ready(function() {
             number = parseInt( number, 10 );
         if ( 1 > number ) {
             formattedText = noneText;
-        } else if ( number === 1 ) {
+        } else if ( 1 === number ) {
             formattedText = 1 + ' ' + singleText;
         } else if ( 1 < number ) {
             formattedText = number + ' ' + manyText;
