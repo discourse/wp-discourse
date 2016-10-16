@@ -14,6 +14,13 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * Class CommentsNumber.
  */
 class CommentsNumber {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
 
 	/**
