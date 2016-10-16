@@ -7,11 +7,11 @@ jQuery( document ).ready(function() {
     function formatCommentsNumber( number, singleText, manyText, noneText ) {
         var formattedText,
             number = parseInt( number, 10 );
-        if ( number < 1 ) {
+        if ( 1 > number ) {
             formattedText = noneText;
         } else if ( number === 1 ) {
             formattedText = 1 + ' ' + singleText;
-        } else if ( number > 1 ) {
+        } else if ( 1 < number ) {
             formattedText = number + ' ' + manyText;
         } else {
             formattedText = '<span class="error">Unable to retrieve comments number</span>';
@@ -47,7 +47,7 @@ jQuery( document ).ready(function() {
                 target = '#' + currentSpan,
                 formattedText;
 
-            if ( response.status === 'success' ) {
+            if ( 'success' === response.status ) {
                 formattedText = formatCommentsNumber( commentCount, singleReplyText, manyRepliesText, noRepliesText );
             } else {
                 formattedText = formatCommentsNumber( oldNumber, singleReplyText, manyRepliesText, noRepliesText );
@@ -55,7 +55,7 @@ jQuery( document ).ready(function() {
 
             setCommentNumberText( formattedText, target );
 
-        }).fail(function ( response ) {
+        }).fail(function( response ) {
             var commentCount = oldNumber,
                 target = '#' + currentSpan,
                 formattedText;
