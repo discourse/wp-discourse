@@ -190,11 +190,6 @@ class DiscourseAdmin {
 			'ajax_refresh_archive_comments_number_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_ajax_refresh_comments', __( 'Ajax refresh comments content', 'wp-discourse' ), array(
-			$this,
-			'ajax_refresh_comments_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
-
 		add_settings_field( 'discourse_debug_mode', __( 'Debug mode', 'wp-discourse' ), array(
 			$this,
 			'debug_mode_checkbox',
@@ -507,14 +502,6 @@ class DiscourseAdmin {
 		$this->checkbox_input( 'ajax-refresh-archive-comments-number', 'discourse_comment', __( 'Use ajax requests to get the current comments number on archive pages from Discourse.', 'wp-discourse' ),
 			__( 'This setting is intended for sites that are caching pages with a CDN. It adds a filter to the WordPress `comments_number` filter-hook. The output of that filter
 			supplies the data required for the ajax request. This setting is applied to archive pages.', 'wp-discourse' ) );
-	}
-
-	/**
-	 * Outputs markup for the ajax-refresh-comments checkbox.
-	 */
-	public function ajax_refresh_comments_checkbox() {
-		$this->checkbox_input( 'ajax-refresh-comments', 'discourse_comment',  __( 'Use ajax requests to get the current comment content from Discourse.', 'wp-discourse' ),
-			__( 'This setting is intended for sites that are caching pages with a CDN.', 'wp-discourse' ) );
 	}
 
 	/**
