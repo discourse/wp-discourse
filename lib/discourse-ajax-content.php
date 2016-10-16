@@ -113,7 +113,8 @@ class DiscourseAjaxContent {
 		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
-		if ( empty( $comment_count ) && 0 !== intval( $comment_count ) ) {
+		if ( empty( $comment_count ) ) {
+		write_log('here we are');
 
 			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
 				$this->ajax_error_response();
@@ -134,6 +135,7 @@ class DiscourseAjaxContent {
 			}
 
 			$discourse_permalink = esc_url_raw( $discourse_permalink ) . '.json';
+			write_log($discourse_permalink);
 
 			$response = wp_remote_get( $discourse_permalink );
 
