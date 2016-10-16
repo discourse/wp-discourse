@@ -59,16 +59,11 @@ class DiscourseAjaxContent {
 		global $wp_query;
 
 		if ( ( $wp_query->is_singular && ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) ||
-		     ( ! $wp_query->is_singular && ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] ) ) ) {
-			$post_id = $wp_query->post->ID;
-//			if ( $post_id &&
-//			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
-//			     1 === intval( get_post_meta( $post_id, 'publish_to_discourse', true ) )
-//			) {
-				add_filter( 'comments_number', array( $this, 'comments_number_ajax_placeholder' ), 10, 2 );
-				add_action( 'wp_enqueue_scripts', array( $this, 'comments_number_script' ) );
-			}
-//		}
+		     ( ! $wp_query->is_singular && ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] ) )
+		) {
+			add_filter( 'comments_number', array( $this, 'comments_number_ajax_placeholder' ), 10, 2 );
+			add_action( 'wp_enqueue_scripts', array( $this, 'comments_number_script' ) );
+		}
 	}
 
 	/**
@@ -141,7 +136,7 @@ class DiscourseAjaxContent {
 			}
 
 			$discourse_permalink = esc_url_raw( $discourse_permalink ) . '.json';
-			write_log($discourse_permalink);
+			write_log( $discourse_permalink );
 
 			$response = wp_remote_get( $discourse_permalink );
 
@@ -154,7 +149,7 @@ class DiscourseAjaxContent {
 			$json = json_decode( $response['body'] );
 			if ( isset( $json->posts_count ) ) {
 				$comment_count = intval( $json->posts_count ) - 1;
-				write_log($comment_count);
+				write_log( $comment_count );
 				update_post_meta( $post_id, 'discourse_comments_count', $comment_count );
 
 				// Todo: make this configurable.
