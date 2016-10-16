@@ -32,19 +32,19 @@ jQuery( document ).ready(function() {
         var postID = jQuery( this ).data( 'post-id' ),
             nonceName = jQuery( this ).data( 'nonce-name' ),
             nonce = jQuery( this ).data( 'nonce' ),
-            currentSpan = jQuery( this ).attr( 'id' ),
+            location = jQuery( this ).attr( 'id' ),
             oldNumber = jQuery( this ).data( 'old-number' ),
             data = {
             action: 'get_discourse_comments_number',
             nonce_name: nonceName,
             nonce: nonce,
             post_id: postID,
-            current_span: currentSpan
+            location: location
         };
 
         jQuery.post( ajaxURL, data, function( response ) {
             var commentCount = response.comments_count,
-                target = '#' + currentSpan,
+                target = '#' + location,
                 formattedText;
 
             if ( 'success' === response.status ) {
@@ -57,7 +57,7 @@ jQuery( document ).ready(function() {
 
         }).fail(function() {
             var commentCount = oldNumber,
-                target = '#' + currentSpan,
+                target = '#' + location,
                 formattedText;
 
             formattedText = formatCommentsNumber( commentCount, singleReplyText, manyRepliesText, noRepliesText );
