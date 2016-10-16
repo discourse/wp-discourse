@@ -428,12 +428,12 @@ class SettingsValidator {
 	}
 
 	/**
- * Validates the 'ajax_refresh_comments_number' checkbox.
- *
- * @param int $input The input to be validated.
- *
- * @return int
- */
+	 * Validates the 'ajax_refresh_comments_number' checkbox.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_ajax_refresh_comments_number( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}

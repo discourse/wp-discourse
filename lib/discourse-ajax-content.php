@@ -104,30 +104,29 @@ class DiscourseAjaxContent {
 		global $post;
 		$post_id    = $post->ID;
 		$nonce_name = 'discourse_comments_number_' . $post_id;
-		echo '<span class="wp-discourse-comments-number-ajax wp-discourse-comments-number-loading" id="wp-discourse-comments-number-span-' . esc_attr( $post_id ) . '"' .
-		     ' data-post-id="' . esc_attr( $post_id ) . '" data-nonce="' . wp_create_nonce( $nonce_name ) . '" data-nonce-name="' .
-		     $nonce_name . '" data-old-number="' . esc_attr( $number ) . '"></span>';
+		echo '<span class="wp-discourse-comments-number-ajax wp-discourse-comments-number-loading" id="wp-discourse-comments-number-span-' . esc_attr( $post_id ) . '" 
+		data-post-id="' . esc_attr( $post_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( $nonce_name ) ) . '" data-nonce-name="' .
+		     esc_attr( $nonce_name ) . '" data-old-number="' . esc_attr( $number ) . '"></span>';
 	}
 
 	/**
 	 * Handles the ajax request.
 	 */
 	public function handle_comments_number_ajax_request() {
-		$nonce_name   = ! empty( $_POST['nonce_name'] ) ? sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) : null;
-		$nonce        = ! empty( $_POST['nonce'] ) ? sanitize_key( wp_unslash( $_POST['nonce'] ) ) : null;
-		$current_span = ! empty( $_POST['current_span'] ) ? sanitize_key( wp_unslash( $_POST['current_span'] ) ) : null;
-		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
+
+		if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), sanitize_key( wp_unslash( $_POST['nonce_name'] ) ) ) ) { // Input var okay.
+			$this->ajax_error_response();
+
+			exit;
+		}
+
+		$current_span = ! empty( $_POST['current_span'] ) ? sanitize_key( wp_unslash( $_POST['current_span'] ) ) : null; // Input var okay.
+		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null; // Input var okay.
 
 		$comment_count = get_transient( $current_span );
 		if ( false === $comment_count ) {
 
-			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
-				$this->ajax_error_response();
-
-				exit;
-			}
-
-			if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['nonce'] ) ), $nonce_name ) ) {
+			if ( ! $current_span || ! $post_id ) {
 				$this->ajax_error_response();
 
 				exit;
@@ -140,7 +139,6 @@ class DiscourseAjaxContent {
 			}
 
 			$discourse_permalink = esc_url_raw( $discourse_permalink ) . '.json';
-			write_log( $discourse_permalink );
 
 			$response = wp_remote_get( $discourse_permalink );
 
@@ -153,7 +151,6 @@ class DiscourseAjaxContent {
 			$json = json_decode( $response['body'] );
 			if ( isset( $json->posts_count ) ) {
 				$comment_count = intval( $json->posts_count ) - 1;
-				write_log( $comment_count );
 				update_post_meta( $post_id, 'discourse_comments_count', $comment_count );
 
 				// Todo: make this configurable.
@@ -169,7 +166,7 @@ class DiscourseAjaxContent {
 		$ajax_response['status']         = 'success';
 		$ajax_response['comments_count'] = $comment_count;
 
-		echo json_encode( $ajax_response );
+		echo wp_json_encode( $ajax_response );
 
 		exit;
 	}
@@ -181,6 +178,6 @@ class DiscourseAjaxContent {
 		header( 'Content-type: application/json' );
 		$ajax_response['status'] = 'error';
 
-		echo json_encode( $ajax_response );
+		echo wp_json_encode( $ajax_response );
 	}
 }
