@@ -13,8 +13,10 @@ jQuery(document).ready(function () {
             console.log('no replies text', noneText);
         } else if (number === 1) {
             formattedText = 1 + ' ' + singleText;
-        } else {
+        } else if (number > 1) {
             formattedText = number + ' ' + manyText;
+        } else {
+            formattedText = '<span class="error">Unable to retrieve comments number</span>';
         }
 
         return formattedText;
@@ -43,6 +45,7 @@ jQuery(document).ready(function () {
         };
 
         jQuery.post(ajaxURL, data, function (response) {
+            console.log('response', response);
             var commentCount = response.comments_count,
                 target = '#' + currentSpan,
                 formattedText;

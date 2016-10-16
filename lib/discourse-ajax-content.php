@@ -50,6 +50,19 @@ class DiscourseAjaxContent {
 				'handle_comments_number_ajax_request',
 			) );
 		}
+
+		if ( ! empty( $this->options['ajax-refresh-comments'] ) && 1 === intval( $this->options['ajax-refresh-comments'] ) ) {
+			add_filter( 'wp_discourse_comments_content', array( $this, 'comments_content_ajax_placeholder' ), 10, 2 );
+			add_action( 'wp_ajax_nopriv_get_discourse_comments_content', array(
+				$this,
+				'handle_comments_content_ajax_request',
+			) );
+			add_action( 'wp_ajax_get_discourse_comments_content', array(
+				$this,
+				'handle_comments_content_ajax_request',
+			) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'comments_content_script' ) );
+		}
 	}
 
 	/**
@@ -58,23 +71,24 @@ class DiscourseAjaxContent {
 	public function adjust_hooks() {
 		global $wp_query;
 
-		if ( $wp_query->is_singular() || ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === $this->options['ajax-refresh-archive-comments-number'] ) {
+		if ( ( $wp_query->is_singular && ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) ||
+		     ( ! $wp_query->is_singular && ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] ) ) ) {
 			$post_id = $wp_query->post->ID;
-			if ( $post_id &&
-			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
-			     1 === intval( get_post_meta( $post_id, 'publish_to_discourse', true ) )
-			) {
+//			if ( $post_id &&
+//			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
+//			     1 === intval( get_post_meta( $post_id, 'publish_to_discourse', true ) )
+//			) {
 				add_filter( 'comments_number', array( $this, 'comments_number_ajax_placeholder' ), 10, 2 );
 				add_action( 'wp_enqueue_scripts', array( $this, 'comments_number_script' ) );
 			}
-		}
+//		}
 	}
 
 	/**
 	 * Register, localize, and enqueue script.
 	 */
 	public function comments_number_script() {
-		$single_reply_text = ! empty( $this->option['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
+		$single_reply_text = ! empty( $this->options['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
 		$many_replies_text = ! empty( $this->options['many-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'Replies';
 		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['no-replies-text'] ) : 'No Replies';
 
@@ -87,6 +101,23 @@ class DiscourseAjaxContent {
 		) );
 		wp_enqueue_script( 'comments_number_js' );
 	}
+
+	/**
+	 * Register, localize, and enqueue script.
+	 */
+	public function comments_content_script() {
+		wp_register_script( 'comments_content_js', plugins_url( '/../js/comments-content.js', __FILE__ ), array( 'jquery' ), null, true );
+		wp_localize_script( 'comments_content_js', 'comments_content_script', array(
+			'ajaxurl'           => admin_url( 'admin-ajax.php' ),
+		) );
+		wp_enqueue_script( 'comments_content_js' );
+	}
+
+	/**
+	 * ----------------
+	 * Comments number.
+	 * ----------------
+	 */
 
 	/**
 	 * Adds a span to the page that supplies data for the ajax script.
@@ -113,8 +144,7 @@ class DiscourseAjaxContent {
 		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
-		if ( empty( $comment_count ) ) {
-		write_log('here we are');
+		if ( false === $comment_count ) {
 
 			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
 				$this->ajax_error_response();
@@ -148,6 +178,7 @@ class DiscourseAjaxContent {
 			$json = json_decode( $response['body'] );
 			if ( isset( $json->posts_count ) ) {
 				$comment_count = intval( $json->posts_count ) - 1;
+				write_log($comment_count);
 				update_post_meta( $post_id, 'discourse_comments_count', $comment_count );
 
 				// Todo: make this configurable.
@@ -167,6 +198,21 @@ class DiscourseAjaxContent {
 
 		exit;
 	}
+
+	/**
+	 * -----------------
+	 * Comments content.
+	 * -----------------
+	 */
+
+	public function comments_content_ajax_placeholder( $discourse_html, $permalink ) {
+
+	}
+
+	public function handle_comments_content_ajax_request() {
+
+	}
+
 
 	/**
 	 * Echoes an error response.
