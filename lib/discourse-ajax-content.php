@@ -74,21 +74,21 @@ class DiscourseAjaxContent {
 		if ( ( $wp_query->is_singular && ! empty( $this->options['ajax-refresh-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-comments-number'] ) ) ||
 		     ( ! $wp_query->is_singular && ! empty( $this->options['ajax-refresh-archive-comments-number'] ) && 1 === intval( $this->options['ajax-refresh-archive-comments-number'] ) ) ) {
 			$post_id = $wp_query->post->ID;
-			if ( $post_id &&
-			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
-			     1 === intval( get_post_meta( $post_id, 'publish_to_discourse', true ) )
-			) {
+//			if ( $post_id &&
+//			     ! empty( $this->options['use-discourse-comments'] ) && 1 === intval( $this->options['use-discourse-comments'] ) &&
+//			     1 === intval( get_post_meta( $post_id, 'publish_to_discourse', true ) )
+//			) {
 				add_filter( 'comments_number', array( $this, 'comments_number_ajax_placeholder' ), 10, 2 );
 				add_action( 'wp_enqueue_scripts', array( $this, 'comments_number_script' ) );
 			}
-		}
+//		}
 	}
 
 	/**
 	 * Register, localize, and enqueue script.
 	 */
 	public function comments_number_script() {
-		$single_reply_text = ! empty( $this->option['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
+		$single_reply_text = ! empty( $this->options['single-reply-text'] ) ? esc_html( $this->options['single-reply-text'] ) : 'Reply';
 		$many_replies_text = ! empty( $this->options['many-replies-text'] ) ? esc_html( $this->options['many-replies-text'] ) : 'Replies';
 		$no_replies_text   = ! empty( $this->options['no-replies-text'] ) ? esc_html( $this->options['no-replies-text'] ) : 'No Replies';
 
@@ -144,8 +144,7 @@ class DiscourseAjaxContent {
 		$post_id      = ! empty( $_POST['post_id'] ) ? sanitize_key( wp_unslash( $_POST['post_id'] ) ) : null;
 
 		$comment_count = get_transient( $current_span );
-		write_log($comment_count);
-		if ( empty( $comment_count ) && 0 !== intval( $comment_count ) ) {
+		if ( false === $comment_count ) {
 
 			if ( ! $nonce_name || ! $nonce || ! $current_span || ! $post_id ) {
 				$this->ajax_error_response();
