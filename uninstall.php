@@ -16,5 +16,7 @@ delete_option( 'discourse_comment' );
 delete_option( 'discourse_sso' );
 delete_option( 'discourse_configurable_text' );
 delete_option( 'discourse_configurable_text_backup' );
+// Delete the old `discourse` options array if it is present.
+delete_option( 'discourse' );
 
 delete_transient( 'discourse_settings_categories_cache' );
