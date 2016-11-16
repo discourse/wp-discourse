@@ -36,6 +36,11 @@ Single Sign On provider for your Discourse forum.
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
 
+###Note
+
+The WP Discourse plugin requires PHP version 5.4.0 and greater. If >=PHP-5.4.0 is not available, the plugin installation
+will fail.
+
 ###Contact
 
 - The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
@@ -100,7 +105,9 @@ For more details on template customization, take a look at this section of our w
 
 == Changelog ==
 
-**note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
+**Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+**Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
