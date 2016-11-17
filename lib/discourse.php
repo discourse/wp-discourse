@@ -17,7 +17,7 @@ class Discourse {
 	 *
 	 * @var string
 	 */
-	public static $version = '1.0.2';
+	public static $version = '1.1.0';
 
 	/**
 	 * The connection options array.
@@ -162,7 +162,7 @@ class Discourse {
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {
-		$transferred_options = [];
+		$transferred_options = array();
 
 		foreach ( $this->$group_name as $key => $value ) {
 			if ( isset( $existing_options[ $key ] ) ) {
@@ -179,6 +179,28 @@ class Discourse {
 	 * Called with `register_activation_hook` from `wp-discourse.php`.
 	 */
 	public static function install() {
+		global $wp_version;
+		$flags = array();
+
+		// Halt activation if requirements aren't met.
+		if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
+			$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION . '.';
+		}
+
+		if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
+			$flags['wordpress_version'] = 'The WP Discourse plugin requires at least WordPress version ' . MIN_WP_VERSION . '.';
+		}
+
+		if ( ! empty( $flags ) ) {
+			$message = '';
+			foreach ( $flags as $flag ) {
+				$message .= '<p><strong>' . $flag . '</strong></p>';
+			}
+
+			deactivate_plugins( deactivate_plugins( plugin_basename( __FILE__ ) ) );
+			wp_die( $message, 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+		}
+
 		update_option( 'discourse_version', self::$version );
 	}
 
