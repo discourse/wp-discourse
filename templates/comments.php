@@ -11,16 +11,15 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 $custom = get_post_custom();
 
-// If, when a new post is published to Discourse, there is not a valid response from
-// the forum, the `discourse_permalink` key will not be set. Display the `bad_response_html` template.
-if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
+// If a post is published to Discourse when there is no connection to the forum the `discourse_permalink` key will not be set.
+if ( empty( $custom['discourse_permalink'] ) ) {
 	echo wp_kses_post( Templates::bad_response_html() );
 
 } else {
-	$options       = DiscourseUtilities::get_options();
-	$is_enable_sso = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
+	$options                = DiscourseUtilities::get_options();
+	$is_enable_sso          = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$redirect_without_login = isset( $options['redirect-without-login'] ) && 1 === intval( $options['redirect-without-login'] );
-	$permalink     = (string) $custom['discourse_permalink'][0];
+	$permalink              = (string) $custom['discourse_permalink'][0];
 
 	if ( $is_enable_sso && ! $redirect_without_login ) {
 		$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
@@ -69,7 +68,7 @@ if ( ! array_key_exists( 'discourse_permalink', $custom ) ) {
 	$discourse_html    = '';
 	$comments_html     = '';
 	$participants_html = '';
-	$topic_id = $discourse_info->id;
+	$topic_id          = $discourse_info->id;
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {

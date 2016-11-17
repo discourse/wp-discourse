@@ -41,9 +41,7 @@ class Utilities {
 	 * @return int
 	 */
 	public static function check_connection_status() {
-		$options = self::get_options(
-			array( 'discourse_connect' )
-		);
+		$options = self::get_options();
 		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
 		$url     = add_query_arg( array(
 			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
@@ -64,8 +62,11 @@ class Utilities {
 	 * @return int
 	 */
 	public static function validate( $response ) {
-		// There will be a WP_Error if the server can't be accessed.
-		if ( is_wp_error( $response ) ) {
+		if ( empty( $response ) ) {
+			error_log( 'Discourse has returned an empty response.' );
+
+			return 0;
+		} elseif ( is_wp_error( $response ) ) {
 			error_log( $response->get_error_message() );
 
 			return 0;
@@ -88,12 +89,7 @@ class Utilities {
 	 * @return array|mixed|object|\WP_Error|WP_Error
 	 */
 	public static function get_discourse_categories() {
-		$options = self::get_options(
-			array(
-				'discourse_connect',
-				'discourse_publish',
-			)
-		);
+		$options = self::get_options();
 
 		$url          = add_query_arg( array(
 			'api_key'      => $options['api-key'],
