@@ -191,7 +191,7 @@ class Discourse {
 			}
 
 			deactivate_plugins( deactivate_plugins( plugin_basename( __FILE__ ) ) );
-			wp_die( $message, 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+			wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
 		}
 
 		update_option( 'discourse_version', WPDISCOURSE_VERSION );
