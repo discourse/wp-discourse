@@ -111,6 +111,13 @@ For more details on template customization, take a look at this section of our w
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
+#### 1.1.0 16/11/2016
+
+- Halt plugin installation if >= PHP-5.4.0 is not available
+- Halt plugin installation WordPress version is < 4.4.0
+- Don't override WordPress new-user notification email when SSO is not enabled
+- Delete old `discourse` options on plugin uninstall if it is still in the database
+
 #### 1.0.2 12/10/2016
 
 - Don't call `get_date_from_gmt` on `datetime` returned from Discourse
