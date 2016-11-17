@@ -1,5 +1,7 @@
 # WP Discourse
 
+**Note:** the wp-discourse plugin requires >= PHP-5.4.0.
+
 The WP Discourse plugin acts as an interface between your WordPress site and your
 [Discourse](http://www.discourse.org/) community.
 
