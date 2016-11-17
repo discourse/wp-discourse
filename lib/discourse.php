@@ -13,13 +13,6 @@ namespace WPDiscourse\Discourse;
 class Discourse {
 
 	/**
-	 * Sets the plugin version.
-	 *
-	 * @var string
-	 */
-	public static $version = '1.1.0';
-
-	/**
 	 * The connection options array.
 	 *
 	 * @var array
@@ -201,7 +194,7 @@ class Discourse {
 			wp_die( $message, 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
 		}
 
-		update_option( 'discourse_version', self::$version );
+		update_option( 'discourse_version', WPDISCOURSE_VERSION );
 	}
 
 	/**
