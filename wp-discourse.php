@@ -32,6 +32,8 @@
 
 define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
+define( 'MIN_WP_VERSION', '4.4' );
+define( 'MIN_PHP_VERSION', '5.4.0' );
 
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/templates/html-templates.php' );
