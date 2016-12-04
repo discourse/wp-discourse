@@ -1,11 +1,13 @@
 <?php
 /**
- * Allows for Single Sign On between between WordPress and Discourse.
+ * Allows for Single Sign On between WordPress and Discourse with Discourse as SSO Provider
  *
  * @package WPDiscourse\DiscourseSSO
  */
 
 namespace WPDiscourse\DiscourseSSO;
+
+use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class DiscourseExternalSSO
 {
@@ -16,11 +18,16 @@ class DiscourseExternalSSO
 		add_action('parse_request', array($this, 'parse_request'), 5);
 	}
 
+	/**
+	 * Parse Reuqst Hook
+	 */
 	public function parse_request()
 	{
 		if (empty($_GET['sso']) || empty($_GET['sig'])) {
 			return;
 		}
+
+		$this->options = DiscourseUtilities::get_options();
 
 		if (!$this->is_valid_signatiure()) {
 			return;
@@ -28,7 +35,6 @@ class DiscourseExternalSSO
 
 		$this->disable_notification_on_user_update();
 		$user_id = $this->get_user_id();
-
 
 		if (is_wp_error($user_id)) {
 			return;
@@ -38,6 +44,11 @@ class DiscourseExternalSSO
 		$this->auth_user($user_id);
 	}
 
+	/**
+	 * Update WP user with discourse user data
+	 *
+	 * @param  int      $user_id the user ID
+	 */
 	private function update_user($user_id)
 	{
 		$query = $this->get_sso_response();
@@ -51,16 +62,21 @@ class DiscourseExternalSSO
 			'first_name' => $query['name'],
 		], $updated_user);
 
-    $updated_user = apply_filters( 'discourse_as_sso_provider_updated_user', $updated_user, $query );
+		$updated_user = apply_filters('discourse_as_sso_provider_updated_user', $updated_user, $query);
 
 		wp_update_user($updated_user);
 
 		update_user_meta($user_id, $this->sso_meta_key, $query['external_id']);
 	}
 
+	/**
+	 * Set suth cookies
+	 *
+	 * @param  int    $user_id the user ID
+	 */
 	private function auth_user($user_id)
 	{
-    $query = $this->get_sso_response();
+		$query = $this->get_sso_response();
 
 		wp_set_current_user($user_id, $query['username']);
 		wp_set_auth_cookie($user_id);
@@ -68,12 +84,20 @@ class DiscourseExternalSSO
 		wp_redirect(home_url('/'));
 	}
 
+	/**
+	 * Disable built in notification on email/password changes.
+	 */
 	private function disable_notification_on_user_update()
 	{
 		add_filter('send_password_change_email', '__return_false');
 		add_filter('send_email_change_email', '__return_false');
 	}
 
+	/**
+	 * Get user id or create an user
+	 *
+	 * @return int      user id
+	 */
 	private function get_user_id()
 	{
 		if (is_user_logged_in()) {
@@ -100,9 +124,14 @@ class DiscourseExternalSSO
 		}
 	}
 
+	/**
+	 * Validates SSO signature
+	 *
+	 * @return boolean
+	 */
 	private function is_valid_signatiure()
 	{
-    $sso = urldecode($this->get_sso_response('raw'));
+		$sso = urldecode($this->get_sso_response('raw'));
 		return hash_hmac('sha256', $sso, $this->get_sso_secret()) == $this->get_sso_signature();
 	}
 
@@ -113,20 +142,29 @@ class DiscourseExternalSSO
 
 	private function get_sso_secret()
 	{
-		return '';
+		return $this->options['sso-secret'];
 	}
 
-	private function get_sso_response($return_type = null)
+	/**
+	 * Parse SSO response
+	 *
+	 * @method get_sso_response
+	 *
+	 * @param  string           $return_key
+	 *
+	 * @return string
+	 */
+	private function get_sso_response($return_key = null)
 	{
 		if (empty($_GET['sso'])) {
 			return null;
 		};
 
-		if ($return_type == 'raw') {
+		if ($return_key == 'raw') {
 			return $_GET['sso'];
 		}
 
-    $sso = urldecode(sanitize_text_field($_GET['sso']));
+		$sso = urldecode(sanitize_text_field($_GET['sso']));
 
 		$response = [];
 
@@ -137,8 +175,8 @@ class DiscourseExternalSSO
 			return null;
 		}
 
-		if (is_string($return_type) && isset($response[$return_type])) {
-			return $response[$return_type];
+		if (is_string($return_key) && isset($response[$return_key])) {
+			return $response[$return_key];
 		}
 
 		return $response;
