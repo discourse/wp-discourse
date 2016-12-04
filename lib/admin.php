@@ -262,6 +262,11 @@ class DiscourseAdmin {
 			'enable_sso_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
+		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable Discourse SSO', 'wp-discourse' ), array(
+			$this,
+			'enable_discourse_sso_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
 		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
 			$this,
 			'wordpress_login_path',
@@ -570,6 +575,15 @@ class DiscourseAdmin {
 	 */
 	public function enable_sso_checkbox() {
 		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO to Discourse.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for enable-discourse-sso checkbox
+	 *
+	 */
+	public function enable_discourse_sso_checkbox() {
+		$description = __( 'Use external Discourse instance as a SSO provider. In order to enable this functionality, you <strong>must</strong> fill <code>SSO Secret key</code> and <code>Discourse URL</code> fields', 'wp-discourse' );
+		$this->checkbox_input( 'enable-discourse-sso', 'discourse_sso', __( 'Enable SSO From Discourse.', 'wp-discourse' ), $description );
 	}
 
 	/**

@@ -45,6 +45,7 @@ require_once( __DIR__ . '/lib/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
+require_once( __DIR__ . '/lib/discourse-external-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
@@ -56,6 +57,7 @@ $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublis
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+$discourse_external_sso       = new WPDiscourse\DiscourseSSO\DiscourseExternalSSO();
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
