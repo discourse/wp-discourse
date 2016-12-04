@@ -1,7 +1,20 @@
 <?php
+/**
+ * Shortcode for discourse SSO
+ *
+ * @package WPDiscourse
+ */
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+
+/**
+ * Gets a auth URL for discourse
+ *
+ * @param  array $options anchor, link.
+ *
+ * @return string.
+ */
 function get_discourse_sso_url( $options ) {
 	$discourse_options = DiscourseUtilities::get_options();
 
@@ -41,6 +54,15 @@ function get_discourse_sso_url( $options ) {
 	return apply_filters( 'discourse_as_sso_provider_login_anchor', $anchor, $sso_login_url, $options, $discourse_options );
 }
 
+/**
+ * Shortcode for SSO link
+ *
+ * @method discourse_sso_shortcode
+ *
+ * @param  array $atts shortcode params.
+ *
+ * @return string markup
+ */
 function discourse_sso_shortcode( $atts = array() ) {
 	$options = shortcode_atts(array(
 		'login' => null,
