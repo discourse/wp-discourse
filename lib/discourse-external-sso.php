@@ -9,10 +9,21 @@ namespace WPDiscourse\DiscourseSSO;
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class DiscourseExternalSSO
+ */
 class DiscourseExternalSSO {
 
+	/**
+	 * The user meta key name that would store the Discourse user id
+	 *
+	 * @var string
+	 */
 	private $sso_meta_key = 'discourse_sso_user_id';
 
+	/**
+	 * Constructor
+	 */
 	public function __construct() {
 		add_action( 'parse_request', array( $this, 'parse_request' ), 5 );
 	}
@@ -45,7 +56,7 @@ class DiscourseExternalSSO {
 	/**
 	 * Update WP user with discourse user data
 	 *
-	 * @param  int $user_id the user ID
+	 * @param  int $user_id the user ID.
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
@@ -69,7 +80,7 @@ class DiscourseExternalSSO {
 	/**
 	 * Set suth cookies
 	 *
-	 * @param  int $user_id the user ID
+	 * @param  int $user_id the user ID.
 	 */
 	private function auth_user( $user_id ) {
 		$query = $this->get_sso_response();
@@ -79,7 +90,7 @@ class DiscourseExternalSSO {
 		do_action( 'wp_login', $query['username'], $query['email'] );
 
 		$redirect_to = apply_filters( 'discourse_as_sso_provider_redirect_after_login', $query['return_sso_url'] );
-		wp_redirect( $redirect_to );
+		wp_safe_redirect( $redirect_to );
 	}
 
 	/**
@@ -127,38 +138,46 @@ class DiscourseExternalSSO {
 	 */
 	private function is_valid_signatiure() {
 		$sso = urldecode( $this->get_sso_response( 'raw' ) );
-		return hash_hmac( 'sha256', $sso, $this->get_sso_secret() ) == $this->get_sso_signature();
+		return hash_hmac( 'sha256', $sso, $this->get_sso_secret() ) === $this->get_sso_signature();
 	}
 
+	/**
+	 * Get SSO Signature
+	 */
 	private function get_sso_signature() {
-		return sanitize_text_field( $_GET['sig'] );
+		$sig = isset( $_GET['sig'] ) ? sanitize_text_field( wp_unslash( $_GET['sig'] ) ) : '';
+		return sanitize_text_field( $sig );
 	}
 
+	/**
+	 * Get SSO Secret from options
+	 */
 	private function get_sso_secret() {
 		return $this->options['sso-secret'];
 	}
 
 	/**
-	 * Parse SSO response
+	 * Parse SSO Response
 	 *
-	 * @method get_sso_response
-	 *
-	 * @param  string $return_key
+	 * @param string $return_key ss.
 	 *
 	 * @return string
 	 */
-	private function get_sso_response( $return_key = null ) {
+	private function get_sso_response( $return_key = '' ) {
 		if ( empty( $_GET['sso'] ) ) {
 			return null;
 		};
 
-		if ( $return_key == 'raw' ) {
+		if ( 'raw' === $return_key ) {
+			// since sanitization do bad things to our sso payload, we must pass it raw in order to be validated
+			// @codingStandardsIgnoreStart
 			return $_GET['sso'];
+			// @codingStandardsIgnoreEnd
 		}
 
-		$sso = urldecode( sanitize_text_field( $_GET['sso'] ) );
+		$sso = urldecode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ) );
 
-		$response = [];
+		$response = array();
 
 		parse_str( base64_decode( $sso ), $response );
 		$response = array_map( 'sanitize_text_field', $response );
@@ -167,7 +186,7 @@ class DiscourseExternalSSO {
 			return null;
 		}
 
-		if ( is_string( $return_key ) && isset( $response[ $return_key ] ) ) {
+		if ( ! empty( $return_key ) && isset( $response[ $return_key ] ) ) {
 			return $response[ $return_key ];
 		}
 
