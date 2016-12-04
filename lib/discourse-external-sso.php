@@ -53,14 +53,14 @@ class DiscourseExternalSSO
 	{
 		$query = $this->get_sso_response();
 
-		$updated_user = array_merge([
+		$updated_user = array(
 			'ID' => $user_id,
 			'user_login' => $query['username'],
 			'user_email' => $query['email'],
 			'user_nicename' => $query['name'],
 			'display_name' => $query['name'],
 			'first_name' => $query['name'],
-		], $updated_user);
+		);
 
 		$updated_user = apply_filters('discourse_as_sso_provider_updated_user', $updated_user, $query);
 
@@ -80,8 +80,10 @@ class DiscourseExternalSSO
 
 		wp_set_current_user($user_id, $query['username']);
 		wp_set_auth_cookie($user_id);
-		do_action('wp_login', $query['username']);
-		wp_redirect(home_url('/'));
+		do_action('wp_login', $query['username'], $query['email']);
+
+		$redirect_to = apply_filters('discourse_as_sso_provider_redirect_after_login', $query['return_sso_url']);
+		wp_redirect($redirect_to);
 	}
 
 	/**
