@@ -578,8 +578,7 @@ class DiscourseAdmin {
 	}
 
 	/**
-	 * Outputs markup for enable-discourse-sso checkbox
-	 *
+	 * Outputs markup for enable-discourse-sso checkbox.
 	 */
 	public function enable_discourse_sso_checkbox() {
 		$description = __( 'Use external Discourse instance as a SSO provider. In order to enable this functionality, you <strong>must</strong> fill <code>SSO Secret key</code> and <code>Discourse URL</code> fields', 'wp-discourse' );
