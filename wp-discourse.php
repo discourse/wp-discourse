@@ -50,6 +50,7 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/shortcodes/external-sso.php' );
+require_once( __DIR__ . '/lib/sso-login-form.php' );
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();

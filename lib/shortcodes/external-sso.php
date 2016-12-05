@@ -15,7 +15,7 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  *
  * @return string.
  */
-function get_discourse_sso_url( $options ) {
+function get_discourse_sso_url( $options = array() ) {
 	$discourse_options = DiscourseUtilities::get_options();
 
 	if ( is_user_logged_in() ) {
