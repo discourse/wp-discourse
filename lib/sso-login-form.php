@@ -7,6 +7,11 @@
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Decides if checkbox for login form alteration are enabled
+ *
+ * @return boolean
+ */
 function discourse_sso_auto_inject_button() {
 	$options = DiscourseUtilities::get_options();
 	return ! empty( $options['enable-discourse-sso'] ) && ! empty( $options['enable-discourse-sso-login-form-change'] );
@@ -20,7 +25,7 @@ function discourse_sso_alter_login_form() {
 		return;
 	}
 
-	printf( '<p>%s</p><p>&nbsp;</p>', get_discourse_sso_url() );
+	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_url() ) );
 }
 
 add_action( 'login_form', 'discourse_sso_alter_login_form' );
@@ -43,7 +48,7 @@ function discourse_sso_alter_user_profile() {
 	if ( DiscourseUtilities::user_is_linked_to_sso() ) {
 		esc_html_e( 'You\'re already linked to discourse!', 'wp-discourse' );
 	} else {
-		echo get_discourse_sso_url();
+		echo  wp_kses_data( get_discourse_sso_url() );
 	}
 		?>
 	  </td>
