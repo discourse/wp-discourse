@@ -7,7 +7,6 @@
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
-
 /**
  * Gets a auth URL for discourse
  *
@@ -17,10 +16,10 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 function get_discourse_sso_url( $options = array() ) {
 	$discourse_options = DiscourseUtilities::get_options();
+	$is_user_logged_in = is_user_logged_in();
 
-	if ( is_user_logged_in() ) {
-		$user = wp_get_current_user();
-		if ( get_user_meta( $user->ID, 'discourse_sso_user_id', true ) ) {
+	if ( $is_user_logged_in ) {
+		if ( DiscourseUtilities::user_is_linked_to_sso() ) {
 			return;
 		}
 		$anchor = ! empty( $options['link'] ) ? $options['link'] : __( 'Link your account to Discourse', 'wp-discourse' );
@@ -33,7 +32,8 @@ function get_discourse_sso_url( $options = array() ) {
 	$redirect_to = get_permalink();
 
 	if ( empty( $redirect_to ) ) {
-		$redirect_to = home_url( '/' );
+		$redirect_to = $is_user_logged_in ? admin_url( 'profile.php' ) : home_url( '/' );
+		;
 	}
 
 	$payload = base64_encode(http_build_query(array(

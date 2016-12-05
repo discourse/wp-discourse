@@ -125,4 +125,19 @@ class Utilities {
 
 		return $remote;
 	}
+
+	/**
+	 * Check if an user is linked to a discourse instance
+	 *
+	 * @return boolean
+	 */
+	public static function user_is_linked_to_sso() {
+		$user = wp_get_current_user();
+
+		if ( ! $user ) {
+			return false;
+		}
+
+		return get_user_meta( $user->ID, 'discourse_sso_user_id', true );
+	}
 }

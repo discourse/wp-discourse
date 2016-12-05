@@ -25,7 +25,8 @@ class DiscourseExternalSSO {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'parse_request', array( $this, 'parse_request' ), 5 );
+		add_action( 'init', array( $this, 'parse_request' ), 5 );
+		add_filter( 'wp_login_errors', array( $this, 'handle_login_errors' ) );
 	}
 
 	/**
@@ -46,6 +47,7 @@ class DiscourseExternalSSO {
 		$user_id = $this->get_user_id();
 
 		if ( is_wp_error( $user_id ) ) {
+			$this->handle_errors( $user_id );
 			return;
 		}
 
@@ -75,6 +77,46 @@ class DiscourseExternalSSO {
 		wp_update_user( $updated_user );
 
 		update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+	}
+
+	/**
+	 * Handle Login errors
+	 *
+	 * @param  WP_Error $error WP_Error object.
+	 */
+	private function handle_errors( $error ) {
+	 	$redirect_to = apply_filters( 'discourse_as_sso_provider_redirect_after_failed_login', wp_login_url() );
+
+	 	$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
+
+		wp_safe_redirect( $redirect_to );
+	}
+
+
+	/**
+	 * Add errors on the login form.
+	 *
+	 * @param  WP_Error $errors the WP_Error object.
+	 *
+	 * @return WP_Error updated errors.
+	 */
+	public function handle_login_errors( $errors ) {
+		if ( isset( $_GET['discourse_sso_error'] ) ) {
+			$err = sanitize_text_field( wp_unslash( $_GET['discourse_sso_error'] ) );
+			switch ( $err ) {
+				case 'existing_user_email':
+					$message = __( 'Your are already registered with this email. You should login with your user/password, then link your account to discourse.', 'wp-discourse' );
+					$errors->add( 'discourse_sso_existing_user', $message );
+					break;
+
+				default:
+					// code...
+					break;
+			}
+		}
+
+		return $errors;
+		;
 	}
 
 	/**
