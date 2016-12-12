@@ -2,8 +2,8 @@
 Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
-Tested up to: 4.6.1
-Stable tag: 1.1.1
+Tested up to: 4.7
+Stable tag: 1.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,6 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
-- [talkingpointsmemo.com](http://talkingpointsmemo.com/)
 
 ###Single Sign On
 
@@ -110,6 +109,10 @@ For more details on template customization, take a look at this section of our w
 **Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.1.2 12/12/2016
+
+- Test against WordPress version 4.7
 
 #### 1.1.0 16/11/2016
 

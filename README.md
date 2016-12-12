@@ -17,7 +17,6 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
-- [talkingpointsmemo.com](http://talkingpointsmemo.com/)
 
 ###Single Sign On
 
