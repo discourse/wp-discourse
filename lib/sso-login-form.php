@@ -35,7 +35,8 @@ add_action( 'login_form', 'discourse_sso_alter_login_form' );
  * Alter user profile
  */
 function discourse_sso_alter_user_profile() {
-	if ( ! discourse_sso_auto_inject_button() ) {
+	$auto_inject_button = discourse_sso_auto_inject_button();
+	if ( ! apply_filters( 'discourse_as_sso_provider_add_link_buttons_on_profile', $auto_inject_button ) ) {
 		return;
 	}
 
