@@ -51,7 +51,7 @@ function get_discourse_sso_url( $options = array() ) {
 
 	$anchor = sprintf( '<a href="%s">%s</a>', $sso_login_url, $anchor );
 
-	return apply_filters( 'discourse_as_sso_provider_login_anchor', $anchor, $sso_login_url, $options, $discourse_options );
+	return apply_filters( 'discourse/sso/provider/login_anchor', $anchor, $sso_login_url, $options, $discourse_options );
 }
 
 /**
