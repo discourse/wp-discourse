@@ -1,0 +1,20 @@
+.wp-discourse-comments-number-loading {
+    display: inline-block;
+    border: 4px solid #e9e9e9;
+    border-top: 4px solid #a9a9a9;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    -webkit-animation: spin 1s linear infinite;
+    animation: spin 1s linear infinite;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { -webkit-transform: rotate(0deg); transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); transform: rotate(360deg); }
+}

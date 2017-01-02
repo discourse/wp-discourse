@@ -111,7 +111,7 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 	$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
 	$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 	$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
-	echo wp_kses_post( $discourse_html );
+	echo wp_kses_post( apply_filters( 'wp_discourse_comments_content', $discourse_html, $permalink, $topic_id ) );
 
 	do_action( 'wp_discourse_after_comments', $topic_id );
 }
