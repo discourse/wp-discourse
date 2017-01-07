@@ -51,7 +51,12 @@ class DiscourseExternalSSO {
 			return;
 		}
 
-		$this->update_user( $user_id );
+		$update_user = $this->update_user( $user_id );
+		if ( is_wp_error( $update_user ) ) {
+			$this->handle_errors( $update_user );
+			return;
+		}
+
 		$this->auth_user( $user_id );
 	}
 
@@ -62,6 +67,11 @@ class DiscourseExternalSSO {
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
+		$nonce = DiscourseUtilities::verify_nonce( $query['nonce'], '_discourse_sso' );
+
+		if ( ! $nonce ) {
+			return new \WP_Error( 'expired_nonce' );
+		}
 
 		$updated_user = array(
 			'ID' => $user_id,
@@ -103,14 +113,21 @@ class DiscourseExternalSSO {
 	public function handle_login_errors( $errors ) {
 		if ( isset( $_GET['discourse_sso_error'] ) ) {
 			$err = sanitize_text_field( wp_unslash( $_GET['discourse_sso_error'] ) );
+
 			switch ( $err ) {
 				case 'existing_user_email':
 					$message = __( 'Your are already registered with this email. You should login with your user/password, then link your account to discourse.', 'wp-discourse' );
 					$errors->add( 'discourse_sso_existing_user', $message );
 					break;
 
+				case 'expired_nonce':
+					$message = __( 'Expired Nonce', 'wp-discourse' );
+					$errors->add( 'discourse_sso_expired_nonce', $message );
+				break;
+
 				default:
-					// code...
+					$message = __( 'Unhandled Error', 'wp-discourse' );
+					$errors->add( 'discourse_sso_unhandled_error', $message );
 					break;
 			}
 		}

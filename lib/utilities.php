@@ -140,4 +140,95 @@ class Utilities {
 
 		return get_user_meta( $user->ID, 'discourse_sso_user_id', true );
 	}
+
+	/**
+	 * Get the time-dependent variable for nonce creation.
+	 *
+	 * Overrides the default WP nonce_tick function to allow smaller lifespan.
+	 *
+	 * @method nonce_tick
+	 *
+	 * @return integer
+	 */
+	private static function nonce_tick() {
+		/**
+		 * One can override the default nonce life.
+		 *
+		 * The default is set to 10 minutes, which is plenty for most of the cases
+		 *
+		 * @var int
+		 */
+		$nonce_life = apply_filters( 'discourse/nonce_life', 600 );
+
+		return ceil( time() / ( $nonce_life / 2 ) );
+	}
+
+	/**
+	 * Provides a wrapper of the default WP nonce system, one that allows setting an expiring time
+	 *
+	 * @method create_nonce
+	 *
+	 * @param string|int $action Scalar value to add context to the nonce.
+	 *
+	 * @return string
+	 */
+	public static function create_nonce( $action = -1 ) {
+		$user = wp_get_current_user();
+		$uid = (int) $user->ID;
+		if ( ! $uid ) {
+			/** This filter is documented in wp-includes/pluggable.php */
+			$uid = apply_filters( 'nonce_user_logged_out', $uid, $action );
+		}
+
+		$token = wp_get_session_token();
+		$i = self::nonce_tick();
+
+		return substr( wp_hash( $i . '|' . $action . '|' . $uid . '|' . $token, 'nonce' ), -12, 10 );
+	}
+
+	/**
+	 * Verify that correct nonce was used with time limit.
+	 *
+	 * The user is given an amount of time to use the token, so therefore, since the
+	 * UID and $action remain the same, the independent variable is the time.
+	 *
+	 * @param string     $nonce  Nonce that was used in the form to verify.
+	 * @param string|int $action Should give context to what is taking place and be the same when nonce was created.
+	 * @return false|int False if the nonce is invalid, 1 if the nonce is valid and generated in the
+	 *                   first half of the nonce_tick, 2 if the nonce is valid and generated in the second half of the nonce_tick.
+	 */
+	public static function verify_nonce( $nonce, $action = -1 ) {
+		$nonce = (string) $nonce;
+		$user = wp_get_current_user();
+		$uid = (int) $user->ID;
+		if ( ! $uid ) {
+			/** This filter is documented in wp-includes/pluggable.php */
+			$uid = apply_filters( 'nonce_user_logged_out', $uid, $action );
+		}
+
+		if ( empty( $nonce ) ) {
+			return false;
+		}
+
+		$token = wp_get_session_token();
+		$i = self::nonce_tick();
+
+		// Nonce generated in the first half of the time returned by `nonce_tick` passed.
+		$expected = substr( wp_hash( $i . '|' . $action . '|' . $uid . '|' . $token, 'nonce' ), -12, 10 );
+		if ( hash_equals( $expected, $nonce ) ) {
+			return 1;
+		}
+
+		// Nonce generated in the second half of the time returned by `nonce_tick` passed.
+		$expected = substr( wp_hash( ( $i - 1 ) . '|' . $action . '|' . $uid . '|' . $token, 'nonce' ), -12, 10 );
+		if ( hash_equals( $expected, $nonce ) ) {
+			return 2;
+		}
+
+		/** This filter is documented in wp-includes/pluggable.php */
+		do_action( 'wp_verify_nonce_failed', $nonce, $action, $user, $token );
+
+		// Invalid nonce.
+		return false;
+	}
 }

@@ -27,7 +27,7 @@ function get_discourse_sso_url( $options = array() ) {
 		$anchor = ! empty( $options['login'] ) ? $options['login'] : __( 'Log in with Discourse', 'wp-discourse' );
 	}
 
-	$nonce = hash( 'sha512', mt_rand() );
+	$nonce = DiscourseUtilities::create_nonce( '_discourse_sso' );
 
 	$redirect_to = get_permalink();
 
