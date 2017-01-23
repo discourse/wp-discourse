@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.7
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -109,6 +109,10 @@ For more details on template customization, take a look at this section of our w
 **Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.1.3 22/01/2017
+
+- Display saved meta-box values for scheduled and draft posts
 
 #### 1.1.2 12/12/2016
 
