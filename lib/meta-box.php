@@ -91,24 +91,24 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 		?>
 
-        <label
-                for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
-            <input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
+		<label
+				for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
-        </label>
-        <br>
+		</label>
+		<br>
 		<?php if ( is_null( $selected_category ) ) : ?>
-            <hr>
-            <div class="warning">
-                <p>
+			<hr>
+			<div class="warning">
+				<p>
 					<?php
 					esc_html_e( 'The Discourse categories list is not currently available. To publish this post to Discourse, please check the WP Discourse connection settings.', 'wp-discourse' );
 					?>
-                </p>
-            </div>
+				</p>
+			</div>
 
 		<?php elseif ( $published ) : ?>
-            <hr>
+			<hr>
 			<?php
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
 			$allowed = array(
@@ -118,21 +118,21 @@ class MetaBox {
 			?>
 
 		<?php else : ?>
-            <label
-            for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
+			<label
+			for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
 
-            <select name="publish_post_category" id="publish_post_category">
+			<select name="publish_post_category" id="publish_post_category">
 				<?php foreach ( $categories as $category ) : ?>
-                    <option
-                            value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+					<option
+							value="<?php echo( esc_attr( $category['id'] ) ); ?>"
 						<?php selected( $selected_category, $category['id'] ); ?>>
 						<?php echo( esc_html( $category['name'] ) ); ?>
-                    </option>
+					</option>
 				<?php endforeach; ?>
-            </select>
+			</select>
 
 		<?php endif; ?>
-        </label>
+		</label>
 		<?php
 	}
 
