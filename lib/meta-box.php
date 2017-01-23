@@ -60,25 +60,26 @@ class MetaBox {
 	 * @param object $post The current Post object.
 	 */
 	public function render_meta_box( $post ) {
-		$post_id    = $post->ID;
-		$published  = get_post_meta( $post_id, 'discourse_post_id', true );
-		$categories = DiscourseUtilities::get_discourse_categories();
-		$categories = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
+		$post_id                = $post->ID;
+		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
+		$saved                  = 'publish' === get_post_status( $post_id ) || 'future' === get_post_status( $post_id ) || 'draft' === get_post_status( $post_id );
+		$categories             = DiscourseUtilities::get_discourse_categories();
+		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
+		$selected_category_name = '';
 
 		if ( is_wp_error( $categories ) ) {
 			$selected_category    = null;
 			$publish_to_discourse = 0;
-		} elseif ( ! $published ) {
+		} elseif ( ! $saved ) {
 
-			// If the post has not yet been published, use the default setting.
+			// If the post has not yet been saved, use the default setting.
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
 
-			// The post has been published, use the saved values.
-			$publish_to_discourse   = get_post_meta( $post_id, 'publish_to_discourse', true );
-			$selected_category      = get_post_meta( $post_id, 'publish_post_category', true );
-			$selected_category_name = '';
+			// The post has been saved, use the saved values.
+			$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			foreach ( $categories as $category ) {
 				if ( intval( $selected_category ) === $category['id'] ) {
 					$selected_category_name = $category['name'];
@@ -91,7 +92,7 @@ class MetaBox {
 		?>
 
 		<label
-			for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+				for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
 		</label>
@@ -123,7 +124,7 @@ class MetaBox {
 			<select name="publish_post_category" id="publish_post_category">
 				<?php foreach ( $categories as $category ) : ?>
 					<option
-						value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+							value="<?php echo( esc_attr( $category['id'] ) ); ?>"
 						<?php selected( $selected_category, $category['id'] ); ?>>
 						<?php echo( esc_html( $category['name'] ) ); ?>
 					</option>
