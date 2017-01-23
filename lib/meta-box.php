@@ -77,7 +77,7 @@ class MetaBox {
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
 
-			// The post has been published, use the saved values.
+			// The post has been saved, use the saved values.
 			$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			foreach ( $categories as $category ) {
