@@ -18,6 +18,9 @@
   "support": {
     "issues": "https://github.com/discourse/wp-discourse/issues"
   },
+  "require": {
+    "php": ">=5.3"
+  },
   "autoload": {
       "psr-4": {
           "WPDiscourse\\": "lib"
