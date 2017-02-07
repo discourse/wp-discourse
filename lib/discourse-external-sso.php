@@ -67,7 +67,7 @@ class DiscourseExternalSSO {
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
-		$nonce = DiscourseUtilities::verify_nonce( $query['nonce'], '_discourse_sso' );
+		$nonce = \WPDiscourse\Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
 
 		if ( ! $nonce ) {
 			return new \WP_Error( 'expired_nonce' );
@@ -82,7 +82,7 @@ class DiscourseExternalSSO {
 			'first_name' => $query['name'],
 		);
 
-		$updated_user = apply_filters( 'discourse/sso/provider/updated_user', $updated_user, $query );
+		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
 
 		wp_update_user( $updated_user );
 
@@ -95,7 +95,7 @@ class DiscourseExternalSSO {
 	 * @param  WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
-	 	$redirect_to = apply_filters( 'discourse/sso/provider/redirect_after_failed_login', wp_login_url() );
+	 	$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_failed_login', wp_login_url() );
 
 	 	$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
@@ -148,7 +148,8 @@ class DiscourseExternalSSO {
 		wp_set_auth_cookie( $user_id );
 		do_action( 'wp_login', $query['username'], $query['email'] );
 
-		$redirect_to = apply_filters( 'discourse/sso/provider/redirect_after_login', $query['return_sso_url'] );
+		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_login', $query['return_sso_url'] );
+
 		wp_safe_redirect( $redirect_to );
 	}
 

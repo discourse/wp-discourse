@@ -37,6 +37,7 @@ define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.1.1' );
 
 require_once( __DIR__ . '/lib/utilities.php' );
+require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/templates/html-templates.php' );
 require_once( __DIR__ . '/templates/template-functions.php' );
 require_once( __DIR__ . '/lib/discourse.php' );

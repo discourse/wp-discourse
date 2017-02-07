@@ -25,7 +25,7 @@ function discourse_sso_alter_login_form() {
 		return;
 	}
 
-	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_url() ) );
+	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_link_markup() ) );
 }
 
 add_action( 'login_form', 'discourse_sso_alter_login_form' );
@@ -36,7 +36,7 @@ add_action( 'login_form', 'discourse_sso_alter_login_form' );
  */
 function discourse_sso_alter_user_profile() {
 	$auto_inject_button = discourse_sso_auto_inject_button();
-	if ( ! apply_filters( 'discourse/sso/provider/add_link_buttons_on_profile', $auto_inject_button ) ) {
+	if ( ! apply_filters( 'discourse/sso/client/add_link_buttons_on_profile', $auto_inject_button ) ) {
 		return;
 	}
 
@@ -49,7 +49,7 @@ function discourse_sso_alter_user_profile() {
 	if ( DiscourseUtilities::user_is_linked_to_sso() ) {
 		esc_html_e( 'You\'re already linked to discourse!', 'wp-discourse' );
 	} else {
-		echo  wp_kses_data( get_discourse_sso_url() );
+		echo wp_kses_data( get_discourse_sso_link_markup() );
 	}
 		?>
 	  </td>
