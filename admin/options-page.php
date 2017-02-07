@@ -162,11 +162,9 @@ class OptionsPage {
 						settings_fields( 'discourse_sso' );
 						do_settings_sections( 'discourse_sso' );
 						break;
-
-					default:
-						settings_fields( 'discourse_connect' );
-						do_settings_sections( 'discourse_connect' );
 				}
+
+				do_action( 'discourse-after-settings-menu', $tab );
 
 				submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 				?>
