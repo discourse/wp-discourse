@@ -7,7 +7,6 @@ $baseDir = dirname($vendorDir);
 
 return array(
     '191c68385fa25fcf7c0ba64b69c63c81' => $baseDir . '/lib/utilities.php',
-    'a16245baefd6785ef0345cff114aa134' => $baseDir . '/lib/nonce.php',
     '0c7c4aacd75fdaf585b72348270cb3de' => $baseDir . '/templates/html-templates.php',
     '8c3c05c3c2519b6641a1e486567145b8' => $baseDir . '/templates/template-functions.php',
     'e5efb0fa381f8438272be104b093e499' => $baseDir . '/lib/discourse.php',

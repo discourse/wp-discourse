@@ -28,7 +28,6 @@
 
       "files" : [
         "lib/utilities.php",
-        "lib/nonce.php",
         "templates/html-templates.php",
         "templates/template-functions.php",
         "lib/discourse.php",
