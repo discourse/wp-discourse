@@ -55,6 +55,7 @@ require_once( __DIR__ . '/admin/publish-settings.php' );
 require_once( __DIR__ . '/admin/comment-settings.php' );
 require_once( __DIR__ . '/admin/configurable-text-settings.php' );
 require_once( __DIR__ . '/admin/sso-settings.php' );
+require_once( __DIR__ . '/admin/options-page.php' );
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
