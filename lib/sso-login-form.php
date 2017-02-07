@@ -14,7 +14,7 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 function discourse_sso_auto_inject_button() {
 	$options = DiscourseUtilities::get_options();
-	return ! empty( $options['enable-discourse-sso'] ) && ! empty( $options['enable-discourse-sso-login-form-change'] );
+	return ! empty( $options['sso-client-enabled'] ) && ! empty( $options['sso-client-login-form-change'] );
 }
 
 /**

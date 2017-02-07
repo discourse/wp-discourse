@@ -2,17 +2,17 @@
 /**
  * Allows for Single Sign On between WordPress and Discourse with Discourse as SSO Provider
  *
- * @package WPDiscourse\DiscourseSSO
+ * @package WPDiscourse\sso
  */
 
-namespace WPDiscourse\DiscourseSSO;
+namespace WPDiscourse\sso;
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
- * Class DiscourseExternalSSO
+ * Class Client
  */
-class DiscourseExternalSSO {
+class Client {
 
 	/**
 	 * The user meta key name that would store the Discourse user id
