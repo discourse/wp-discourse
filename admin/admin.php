@@ -10,6 +10,8 @@ namespace WPDiscourse\DiscourseAdmin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+require_once( __DIR__ . '/connection-settings.php' );
+
 /**
  * Class DiscourseAdmin
  */
@@ -22,6 +24,8 @@ class DiscourseAdmin {
 	 */
 	protected $options;
 
+	protected $connection_settings;
+
 	/**
 	 * Discourse constructor.
 	 */
@@ -30,13 +34,16 @@ class DiscourseAdmin {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 		add_action( 'admin_menu', array( $this, 'discourse_settings_menu' ) );
 		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
+
+		$this->connection_settings = new \WPDiscourse\ConnectionSettings\ConnectionSettings();
+
 	}
 
 	/**
 	 * Enqueues the admin stylesheet.
 	 */
 	public function admin_styles() {
-		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/css/admin-styles.css' );
+		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
 		wp_enqueue_style( 'wp_discourse_admin' );
 	}
 
@@ -388,7 +395,7 @@ class DiscourseAdmin {
 	public function post_types_select() {
 		$this->post_type_select_input( 'allowed_post_types',
 			$this->post_types_to_publish( array( 'attachment' ) ),
-		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -461,7 +468,7 @@ class DiscourseAdmin {
 		$this->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -1016,12 +1023,12 @@ class DiscourseAdmin {
 	 * Outputs the markup for an input box, defaults to outputting a text input, but
 	 * can be used for other types.
 	 *
-	 * @param string      $option The name of the option.
-	 * @param string      $option_group The option group for the field to be saved to.
-	 * @param string      $description The description of the settings field.
+	 * @param string $option The name of the option.
+	 * @param string $option_group The option group for the field to be saved to.
+	 * @param string $description The description of the settings field.
 	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|ing    $min The min value (applied to number inputs).
-	 * @param null|int    $max The max value (applies to number inputs).
+	 * @param null|ing $min The min value (applied to number inputs).
+	 * @param null|int $max The max value (applies to number inputs).
 	 */
 	protected function text_input( $option, $option_group, $description, $type = null, $min = null, $max = null ) {
 		$options = $this->options;
@@ -1044,10 +1051,10 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-} ?>
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -1060,13 +1067,13 @@ class DiscourseAdmin {
 	 * This function is a temporary workaround for adding a default value to a text input when
 	 * no options is set. Eventually, the $default parameter can be added to the text_input function.
 	 *
-	 * @param string      $option The name of the option.
-	 * @param string      $option_group The option group for the field to be saved to.
-	 * @param string      $description The description of the settings field.
-	 * @param string      $default The default value to use when the option isn't set.
+	 * @param string $option The name of the option.
+	 * @param string $option_group The option group for the field to be saved to.
+	 * @param string $description The description of the settings field.
+	 * @param string $default The default value to use when the option isn't set.
 	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|ing    $min The min value (applied to number inputs).
-	 * @param null|int    $max The max value (applies to number inputs).
+	 * @param null|ing $min The min value (applied to number inputs).
+	 * @param null|int $max The max value (applies to number inputs).
 	 */
 	protected function empty_option_text_input( $option, $option_group, $description, $default = '', $type = null, $min = null, $max = null ) {
 		$options = $this->options;
@@ -1091,10 +1098,10 @@ class DiscourseAdmin {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
+			} ?>
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-} ?>
+			} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -1139,7 +1146,7 @@ class DiscourseAdmin {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $post_types An array of available post types.
+	 * @param array $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	protected function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -1193,8 +1200,8 @@ class DiscourseAdmin {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array  $group The array of items to be selected.
-	 * @param int    $selected The value of the selected option.
+	 * @param array $group The array of items to be selected.
+	 * @param int $selected The value of the selected option.
 	 * @param string $description The description of the option.
 	 */
 	protected function option_input( $option, $option_name, $group, $selected, $description ) {

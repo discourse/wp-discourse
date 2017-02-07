@@ -41,7 +41,7 @@ require_once( __DIR__ . '/templates/html-templates.php' );
 require_once( __DIR__ . '/templates/template-functions.php' );
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
-require_once( __DIR__ . '/lib/admin.php' );
+require_once( __DIR__ . '/admin/admin.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
