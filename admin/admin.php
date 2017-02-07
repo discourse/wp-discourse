@@ -30,7 +30,7 @@ class DiscourseAdmin {
 	public function __construct() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
 
-		new \WPDiscourse\OptionInput\OptionInput();
+		$this->option_input = new \WPDiscourse\OptionInput\OptionInput();
 		new \WPDiscourse\ConnectionSettings\ConnectionSettings( $this->option_input );
 		new \WPDiscourse\PublishSettings\PublishSettings( $this->option_input );
 		new \WPDiscourse\CommentSettings\CommentSettings( $this->option_input );
