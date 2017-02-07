@@ -49,6 +49,13 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 
+require_once( __DIR__ . '/admin/option-input.php' );
+require_once( __DIR__ . '/admin/connection-settings.php' );
+require_once( __DIR__ . '/admin/publish-settings.php' );
+require_once( __DIR__ . '/admin/comment-settings.php' );
+require_once( __DIR__ . '/admin/configurable-text-settings.php' );
+require_once( __DIR__ . '/admin/sso-settings.php' );
+
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
 $discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
