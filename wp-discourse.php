@@ -47,7 +47,7 @@ $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordP
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 
-// refactored classes that use autoload
+// refactored classes that use autoload.
 $discourse_external_sso       = new WPDiscourse\sso\Client();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
