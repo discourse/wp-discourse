@@ -125,6 +125,11 @@ class Client {
 					$errors->add( 'discourse_sso_expired_nonce', $message );
 				break;
 
+				case 'discourse_already_logged_in':
+					$message = __( "It seems that you're already logged in!", 'wp-discourse' );
+					$errors->add( 'discourse_already_logged_in', $message );
+				break;
+
 				default:
 					$message = __( 'Unhandled Error', 'wp-discourse' );
 					$errors->add( 'discourse_sso_unhandled_error', $message );
@@ -162,15 +167,29 @@ class Client {
 	}
 
 	/**
+	 * Gets the url to be redirected to
+	 *
+	 * @return string
+	 */
+	public function get_redirect_to_after_sso()
+	{
+		return $this->get_sso_response('return_sso_url');
+	}
+
+	/**
 	 * Get user id or create an user
 	 *
 	 * @return int      user id
 	 */
 	private function get_user_id() {
 		if ( is_user_logged_in() ) {
-			return get_current_user_id();
+			$user_id = get_current_user_id();
+			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
+				add_filter( 'discourse/sso/client/redirect_after_failed_login', array( $this, 'get_redirect_to_after_sso' ) );
+				return new \WP_Error( 'discourse_already_logged_in' );
+			}
+			return $user_id;
 		} else {
-
 			$user_query = new \WP_User_Query([
 				'meta_key' => $this->sso_meta_key,
 				'meta_value' => $this->get_sso_response( 'external_id' ),
