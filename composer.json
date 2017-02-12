@@ -39,8 +39,12 @@
         "lib/discourse-publish.php",
         "lib/discourse-comment.php",
         "lib/meta-box.php",
-        "lib/shortcodes/external-sso.php",
-        "lib/sso-login-form.php"
+
+        "lib/shortcodes/sso-client.php",
+        "lib/sso-login-form.php",
+        "lib/sso/query-redirect.php",
+        "lib/sso/sso-url.php",
+        "lib/sso/button-markup.php"
       ]
   }
 }

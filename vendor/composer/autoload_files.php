@@ -18,6 +18,9 @@ return array(
     'ad23c5c120928b04a64d78776bec03a9' => $baseDir . '/lib/discourse-publish.php',
     '3ef930cf0d8770f15146243e7a52ec35' => $baseDir . '/lib/discourse-comment.php',
     'b417e751a51291c9433c4df9c572ce7e' => $baseDir . '/lib/meta-box.php',
-    'ebb56e0ef496de48d5b73d0229747ab3' => $baseDir . '/lib/shortcodes/external-sso.php',
+    'df97fbe337e472dc46c3fd2cee3f8d3a' => $baseDir . '/lib/shortcodes/sso-client.php',
     'dce7995de1a1d2d76b86220bac8dbbff' => $baseDir . '/lib/sso-login-form.php',
+    'c6dc89ddaaef8585975a784b2d98a361' => $baseDir . '/lib/sso/query-redirect.php',
+    '296c82653ca5d760175462c8c2c7412d' => $baseDir . '/lib/sso/sso-url.php',
+    '448231abb0631956ebdfb78be8bac02b' => $baseDir . '/lib/sso/button-markup.php',
 );
