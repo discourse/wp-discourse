@@ -171,9 +171,8 @@ class Client {
 	 *
 	 * @return string
 	 */
-	public function get_redirect_to_after_sso()
-	{
-		return $this->get_sso_response('return_sso_url');
+	public function get_redirect_to_after_sso() {
+		return $this->get_sso_response( 'return_sso_url' );
 	}
 
 	/**
