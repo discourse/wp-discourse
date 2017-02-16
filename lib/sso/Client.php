@@ -20,6 +20,7 @@ class Client {
 	 * @var string
 	 */
 	private $sso_meta_key = 'discourse_sso_user_id';
+
 	/**
 	 * Constructor
 	 */
@@ -47,12 +48,14 @@ class Client {
 
 		if ( is_wp_error( $user_id ) ) {
 			$this->handle_errors( $user_id );
+
 			return;
 		}
 
 		$update_user = $this->update_user( $user_id );
 		if ( is_wp_error( $update_user ) ) {
 			$this->handle_errors( $update_user );
+
 			return;
 		}
 
@@ -74,13 +77,15 @@ class Client {
 			return new \WP_Error( 'expired_nonce' );
 		}
 
+		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
+
 		$updated_user = array(
-			'ID' => $user_id,
-			'user_login' => $query['username'],
-			'user_email' => $query['email'],
-			'user_nicename' => $query['name'],
-			'display_name' => $query['name'],
-			'first_name' => $query['name'],
+			'ID'            => $user_id,
+			'user_login'    => $query['username'],
+			'user_email'    => $query['email'],
+			'user_nicename' => $name,
+			'display_name'  => $name,
+			'first_name'    => $name,
 		);
 
 		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
@@ -100,9 +105,9 @@ class Client {
 	 * @param  WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
-	 	$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_failed_login', wp_login_url() );
+		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_failed_login', wp_login_url() );
 
-	 	$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
+		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
 		wp_safe_redirect( $redirect_to );
 		exit;
@@ -129,12 +134,12 @@ class Client {
 				case 'expired_nonce':
 					$message = __( 'Expired Nonce', 'wp-discourse' );
 					$errors->add( 'discourse_sso_expired_nonce', $message );
-				break;
+					break;
 
 				case 'discourse_already_logged_in':
 					$message = __( "It seems that you're already logged in!", 'wp-discourse' );
 					$errors->add( 'discourse_already_logged_in', $message );
-				break;
+					break;
 
 				default:
 					$message = __( 'Unhandled Error', 'wp-discourse' );
@@ -190,20 +195,26 @@ class Client {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-				add_filter( 'discourse/sso/client/redirect_after_failed_login', array( $this, 'get_redirect_to_after_sso' ) );
+				add_filter( 'discourse/sso/client/redirect_after_failed_login', array(
+					$this,
+					'get_redirect_to_after_sso'
+				) );
+
 				return new \WP_Error( 'discourse_already_logged_in' );
 			}
+
 			return $user_id;
 		} else {
-			$user_query = new \WP_User_Query([
-				'meta_key' => $this->sso_meta_key,
+			$user_query = new \WP_User_Query( [
+				'meta_key'   => $this->sso_meta_key,
 				'meta_value' => $this->get_sso_response( 'external_id' ),
-			]);
+			] );
 
 			$user_query_results = $user_query->get_results();
 
 			if ( empty( $user_query_results ) ) {
 				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
+
 				return wp_create_user(
 					$this->get_sso_response( 'username' ),
 					$user_password,
@@ -222,6 +233,7 @@ class Client {
 	 */
 	private function is_valid_signatiure() {
 		$sso = urldecode( $this->get_sso_response( 'raw' ) );
+
 		return hash_hmac( 'sha256', $sso, $this->get_sso_secret() ) === $this->get_sso_signature();
 	}
 
@@ -230,6 +242,7 @@ class Client {
 	 */
 	private function get_sso_signature() {
 		$sig = isset( $_GET['sig'] ) ? sanitize_text_field( wp_unslash( $_GET['sig'] ) ) : '';
+
 		return sanitize_text_field( $sig );
 	}
 
