@@ -39,7 +39,6 @@ function discourse_sso_url_redirect( $wp ) {
 	}
 
 	$discourse_options = DiscourseUtilities::get_options();
-	$is_user_logged_in = is_user_logged_in();
 
 	if ( ! empty( $_GET['redirect_to'] ) ) {
 		$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) );
