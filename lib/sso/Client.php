@@ -20,7 +20,6 @@ class Client {
 	 * @var string
 	 */
 	private $sso_meta_key = 'discourse_sso_user_id';
-
 	/**
 	 * Constructor
 	 */
@@ -64,6 +63,8 @@ class Client {
 	 * Update WP user with discourse user data
 	 *
 	 * @param  int $user_id the user ID.
+	 *
+	 * @return int|WP_Error integer if the update was successful, WP_Error otherwise.
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
@@ -84,9 +85,13 @@ class Client {
 
 		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
 
-		wp_update_user( $updated_user );
+		$update = wp_update_user( $updated_user );
 
-		update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+		if ( ! is_wp_error( $update ) && ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
+			update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+		}
+
+		return $update;
 	}
 
 	/**
@@ -100,6 +105,7 @@ class Client {
 	 	$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
 		wp_safe_redirect( $redirect_to );
+		exit;
 	}
 
 
@@ -156,6 +162,7 @@ class Client {
 		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_login', $query['return_sso_url'] );
 
 		wp_safe_redirect( $redirect_to );
+		exit;
 	}
 
 	/**
