@@ -257,9 +257,19 @@ class DiscourseAdmin {
 			'sso_settings_tab_details',
 		), 'discourse_sso' );
 
-		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO Server', 'wp-discourse' ), array(
 			$this,
-			'enable_sso_checkbox',
+			'enable_sso_provider_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
+			$this,
+			'enable_sso_client_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add "Login with Discourse" on the login form', 'wp-discourse' ), array(
+			$this,
+			'enable_discourse_sso_login_form_change_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
 		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
@@ -568,9 +578,26 @@ class DiscourseAdmin {
 	/**
 	 * Outputs markup for the enable-sso checkbox.
 	 */
-	public function enable_sso_checkbox() {
-		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO to Discourse.', 'wp-discourse' ) );
+	public function enable_sso_provider_checkbox() {
+		$description = __( 'Use this WP Instance as a SSO provider.', 'wp-discourse' );
+		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
 	}
+
+	/**
+	 * Outputs markup for sso-client-enabled checkbox.
+	 */
+	public function enable_sso_client_checkbox() {
+		$description = __( 'Use external Discourse instance as a SSO provider. In order to enable this functionality, you <strong>must</strong> fill <code>SSO Secret key</code> and <code>Discourse URL</code> fields', 'wp-discourse' );
+		$this->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
+	}
+
+	/**
+	 * Outputs markup for sso-client-login-form-change
+	 */
+	public function enable_discourse_sso_login_form_change_checkbox() {
+		$this->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'Add "Login with Discourse" on the login form', 'wp-discourse' ) );
+	}
+
 
 	/**
 	 * Outputs markup for the login-path input.

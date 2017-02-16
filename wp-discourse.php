@@ -36,18 +36,7 @@ define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.1.3' );
 
-require_once( __DIR__ . '/lib/utilities.php' );
-require_once( __DIR__ . '/templates/html-templates.php' );
-require_once( __DIR__ . '/templates/template-functions.php' );
-require_once( __DIR__ . '/lib/discourse.php' );
-require_once( __DIR__ . '/lib/settings-validator.php' );
-require_once( __DIR__ . '/lib/admin.php' );
-require_once( __DIR__ . '/lib/sso.php' );
-require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
-require_once( __DIR__ . '/lib/discourse-sso.php' );
-require_once( __DIR__ . '/lib/discourse-publish.php' );
-require_once( __DIR__ . '/lib/discourse-comment.php' );
-require_once( __DIR__ . '/lib/meta-box.php' );
+require 'vendor/autoload.php';
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();
@@ -57,5 +46,8 @@ $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseCommen
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
+
+// refactored classes that use autoload.
+$discourse_external_sso       = new WPDiscourse\sso\Client();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
