@@ -144,11 +144,10 @@ class Client {
 		}
 
 		return $errors;
-		;
 	}
 
 	/**
-	 * Set suth cookies
+	 * Set auth cookies
 	 *
 	 * @param  int $user_id the user ID.
 	 */
