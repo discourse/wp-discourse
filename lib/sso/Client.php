@@ -127,7 +127,7 @@ class Client {
 
 			switch ( $err ) {
 				case 'existing_user_email':
-					$message = __( 'Your are already registered with this email. You should login with your user/password, then link your account to discourse.', 'wp-discourse' );
+					$message = __( 'You are already registered with this email. You should login with your user/password, then link your account to discourse.', 'wp-discourse' );
 					$errors->add( 'discourse_sso_existing_user', $message );
 					break;
 
@@ -139,6 +139,11 @@ class Client {
 				case 'discourse_already_logged_in':
 					$message = __( "It seems that you're already logged in!", 'wp-discourse' );
 					$errors->add( 'discourse_already_logged_in', $message );
+					break;
+
+				case 'existing_user_login':
+					$message = __( 'There is an already an account registed with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
+					$errors->add( 'existing_user_login', $message );
 					break;
 
 				default:
