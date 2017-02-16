@@ -197,7 +197,7 @@ class Client {
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 				add_filter( 'discourse/sso/client/redirect_after_failed_login', array(
 					$this,
-					'get_redirect_to_after_sso'
+					'get_redirect_to_after_sso',
 				) );
 
 				return new \WP_Error( 'discourse_already_logged_in' );
