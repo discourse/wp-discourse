@@ -19,7 +19,7 @@
     "issues": "https://github.com/discourse/wp-discourse/issues"
   },
   "require": {
-    "php": ">=5.3"
+    "php": ">=5.4"
   },
   "autoload": {
       "psr-4": {
