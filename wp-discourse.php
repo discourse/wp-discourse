@@ -49,6 +49,6 @@ $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 
 // refactored classes that use autoload.
 $discourse_external_sso       = new WPDiscourse\sso\Client();
-$discourse_query_redirect = new WPDiscourse\sso\Query_Redirect();
+$discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );

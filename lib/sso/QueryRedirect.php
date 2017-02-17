@@ -5,7 +5,7 @@ namespace WPDiscourse\sso;
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 use \WPDiscourse\Nonce;
 
-class Query_Redirect {
+class QueryRedirect {
 
 	/**
 	 * Gives access to the plugin options.
