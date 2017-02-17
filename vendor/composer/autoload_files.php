@@ -20,7 +20,6 @@ return array(
     'b417e751a51291c9433c4df9c572ce7e' => $baseDir . '/lib/meta-box.php',
     'df97fbe337e472dc46c3fd2cee3f8d3a' => $baseDir . '/lib/shortcodes/sso-client.php',
     'dce7995de1a1d2d76b86220bac8dbbff' => $baseDir . '/lib/sso-login-form.php',
-    'c6dc89ddaaef8585975a784b2d98a361' => $baseDir . '/lib/sso/query-redirect.php',
     '296c82653ca5d760175462c8c2c7412d' => $baseDir . '/lib/sso/sso-url.php',
     '448231abb0631956ebdfb78be8bac02b' => $baseDir . '/lib/sso/button-markup.php',
 );

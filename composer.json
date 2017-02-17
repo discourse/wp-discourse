@@ -42,7 +42,6 @@
 
         "lib/shortcodes/sso-client.php",
         "lib/sso-login-form.php",
-        "lib/sso/query-redirect.php",
         "lib/sso/sso-url.php",
         "lib/sso/button-markup.php"
       ]

@@ -38,7 +38,7 @@ class Client {
 	}
 
 	/**
-	 * Parse Reuqst Hook
+	 * Parse Request Hook
 	 */
 	public function parse_request() {
 		$this->options = DiscourseUtilities::get_options();
@@ -98,9 +98,13 @@ class Client {
 			'first_name'    => $name,
 		);
 
+		write_log('user params', $updated_user);
+
 		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
 
 		$update = wp_update_user( $updated_user );
+
+		write_log('this should be an error', $update );
 
 		if ( ! is_wp_error( $update ) && ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 			update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );

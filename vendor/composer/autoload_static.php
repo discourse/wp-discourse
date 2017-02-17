@@ -21,7 +21,6 @@ class ComposerStaticInit84ee4b11e1a06824858e5d8dc456d533
         'b417e751a51291c9433c4df9c572ce7e' => __DIR__ . '/../..' . '/lib/meta-box.php',
         'df97fbe337e472dc46c3fd2cee3f8d3a' => __DIR__ . '/../..' . '/lib/shortcodes/sso-client.php',
         'dce7995de1a1d2d76b86220bac8dbbff' => __DIR__ . '/../..' . '/lib/sso-login-form.php',
-        'c6dc89ddaaef8585975a784b2d98a361' => __DIR__ . '/../..' . '/lib/sso/query-redirect.php',
         '296c82653ca5d760175462c8c2c7412d' => __DIR__ . '/../..' . '/lib/sso/sso-url.php',
         '448231abb0631956ebdfb78be8bac02b' => __DIR__ . '/../..' . '/lib/sso/button-markup.php',
     );
