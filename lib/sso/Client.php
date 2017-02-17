@@ -49,7 +49,7 @@ class Client {
 			return;
 		}
 
-		if ( ! $this->is_valid_signatiure() ) {
+		if ( ! $this->is_valid_signature() ) {
 			return;
 		}
 
@@ -89,6 +89,11 @@ class Client {
 
 		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
 
+		$user = get_user_by( 'ID', $user_id );
+		if ( $user->user_login !== $query['username'] && $user->user_email !== $query['email'] ) {
+			return new \WP_Error( 'mismatched_users' );
+		}
+
 		$updated_user = array(
 			'ID'            => $user_id,
 			'user_login'    => $query['username'],
@@ -98,13 +103,9 @@ class Client {
 			'first_name'    => $name,
 		);
 
-		write_log('user params', $updated_user);
-
 		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
 
 		$update = wp_update_user( $updated_user );
-
-		write_log('this should be an error', $update );
 
 		if ( ! is_wp_error( $update ) && ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 			update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
@@ -141,7 +142,7 @@ class Client {
 
 			switch ( $err ) {
 				case 'existing_user_email':
-					$message = __( 'The email address supplied by Discourse doesn not match your account. Probably a user other than yourself is logged into Discourse on your computer. Please try visiting the Discourse forum and logging that user out. You should then be able to sync your account with Discourse.', 'wp-discourse' );
+					$message = __( 'The email address supplied by Discourse doesn not match your account. Probably a user other than yourself is logged into Discourse on your device. Please try visiting the Discourse forum and logging that user out. You should then be able to sync your account with Discourse.', 'wp-discourse' );
 					$errors->add( 'discourse_sso_existing_user', $message );
 					break;
 
@@ -158,6 +159,11 @@ class Client {
 				case 'existing_user_login':
 					$message = __( 'There is already an account registed with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
 					$errors->add( 'existing_user_login', $message );
+					break;
+
+				case 'mismatched_users':
+					$message = __( 'Neither the username or email address returned by Discourse match your WordPress account. There is probably another user logged into Discourse on your device. Please try visiting the Discourse forum and logging that user out.', 'wp-discourse' );
+					$errors->add( 'mismatched_users', $message );
 					break;
 
 				default:
@@ -250,7 +256,7 @@ class Client {
 	 *
 	 * @return boolean
 	 */
-	private function is_valid_signatiure() {
+	private function is_valid_signature() {
 		$sso = urldecode( $this->get_sso_response( 'raw' ) );
 
 		return hash_hmac( 'sha256', $sso, $this->get_sso_secret() ) === $this->get_sso_signature();
