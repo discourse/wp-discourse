@@ -2,8 +2,8 @@
 Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
-Tested up to: 4.7
-Stable tag: 1.1.3
+Tested up to: 4.7.2
+Stable tag: 1.2.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,13 +27,17 @@ based on post score and commenter "trust level" -- see docs.
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
 
-###Single Sign On
+###Single Sign On from WordPress to Discourse
 
 The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
 Single Sign On provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
+
+###Authentication from Discourse to WordPress
+
+The plugin allows you to use Discourse as an authentication provider for your WordPress site.
 
 ###Note
 
@@ -68,6 +72,10 @@ For more detailed instructions please see the [setup](https://github.com/discour
 
 == Frequently Asked Questions ==
 
+= Does it work with a WordPress multi-site configuration? =
+
+Yes
+
 = Does this plugin install Discourse for me? =
 
 No this plugin acts as an interface between Discourse and WordPress. For it to work you will need to first set up
@@ -92,6 +100,11 @@ This is done by hooking into the filters that are applied to each template.
 
 For more details on template customization, take a look at this section of our wiki: [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 
+= Can my Discourse theme inherit the styling of my WordPress theme? =
+
+Not automatically. You need to apply custom HTML&CSS to Discourse in order to match the theme of your WordPress site.
+To create a coherent top menu, see our tutorial on how to make a [Custom nav header](https://meta.discourse.org/t/custom-header-with-dropdown-navigation/33451)
+
 == Screenshots ==
 
 1. Select whether a post is to be published to Discourse, and what category it is to be published into.
@@ -109,6 +122,10 @@ For more details on template customization, take a look at this section of our w
 **Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.2.0 16/02/2017
+
+- Allow Discourse to be used as the SSO provider for WordPress
 
 #### 1.1.3 22/01/2017
 
