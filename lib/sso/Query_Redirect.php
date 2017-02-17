@@ -17,7 +17,7 @@ class Query_Redirect {
 
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-		add_filter( 'query_vars', array( $this, 'discourse_sso_custom_query_vars'));
+		add_filter( 'query_vars', array( $this, 'discourse_sso_custom_query_vars' ) );
 		add_action( 'parse_query', array( $this, 'discourse_sso_url_redirect' ) );
 	}
 
@@ -39,6 +39,7 @@ class Query_Redirect {
 	 */
 	public function discourse_sso_custom_query_vars( $vars ) {
 		$vars[] = 'discourse_sso';
+
 		return $vars;
 	}
 
@@ -50,7 +51,9 @@ class Query_Redirect {
 	 * @param  object $wp the wp_query.
 	 */
 	public function discourse_sso_url_redirect( $wp ) {
-		if ( empty( $wp->query['discourse_sso'] ) ) {
+		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
+		     empty( $wp->query['discourse_sso'] )
+		) {
 			return;
 		}
 
@@ -60,11 +63,11 @@ class Query_Redirect {
 			$redirect_to = home_url( '/' );
 		}
 
-		$payload = base64_encode(http_build_query(array(
-				'nonce' => Nonce::get_instance()->create( '_discourse_sso' ),
+		$payload = base64_encode( http_build_query( array(
+				'nonce'          => Nonce::get_instance()->create( '_discourse_sso' ),
 				'return_sso_url' => $redirect_to,
 			)
-		));
+		) );
 
 		$request = array(
 			'sso' => $payload,
