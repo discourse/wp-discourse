@@ -15,6 +15,14 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 class Client {
 
 	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
 	 * The user meta key name that would store the Discourse user id
 	 *
 	 * @var string
@@ -33,11 +41,13 @@ class Client {
 	 * Parse Reuqst Hook
 	 */
 	public function parse_request() {
-		if ( empty( $_GET['sso'] ) || empty( $_GET['sig'] ) ) {
+		$this->options = DiscourseUtilities::get_options();
+
+		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
+		     empty( $_GET['sso'] ) || empty( $_GET['sig'] )
+		) {
 			return;
 		}
-
-		$this->options = DiscourseUtilities::get_options();
 
 		if ( ! $this->is_valid_signatiure() ) {
 			return;
