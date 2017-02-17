@@ -80,7 +80,7 @@ class Nonce {
 	 * @method maybe_create_db
 	 */
 	private function maybe_create_db() {
-	if ( version_compare( get_option( 'wpdiscourse_nonce_db_version', -1 ), $this->db_version ) !== 1 ) {
+		if ( version_compare( get_option( 'wpdiscourse_nonce_db_version', -1 ), $this->db_version ) !== 1 ) {
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 			$table_name = $this->get_table_name();

@@ -153,7 +153,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array $existing_options The old 'discourse' options array.
+	 * @param array  $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {

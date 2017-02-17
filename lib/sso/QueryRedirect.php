@@ -79,6 +79,4 @@ class QueryRedirect {
 		wp_redirect( $sso_login_url );
 		exit;
 	}
-
-
 }
