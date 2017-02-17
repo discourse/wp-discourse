@@ -1,10 +1,18 @@
 <?php
+/**
+ * WP-Discourse query redirects for when Discourse is used as the SSO provider.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\sso;
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 use \WPDiscourse\Nonce;
 
+/**
+ * Class QueryRedirect
+ */
 class QueryRedirect {
 
 	/**
@@ -15,6 +23,9 @@ class QueryRedirect {
 	 */
 	protected $options;
 
+	/**
+	 * QueryRedirect constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'query_vars', array( $this, 'discourse_sso_custom_query_vars' ) );
