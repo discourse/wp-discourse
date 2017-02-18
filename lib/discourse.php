@@ -129,7 +129,7 @@ class Discourse {
 			add_option( $group_name, $this->$group_name );
 		}
 
-		// Create a backup for the discourse_configurable_text option, use 'update' in case more text is added.
+		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
 	}
 
