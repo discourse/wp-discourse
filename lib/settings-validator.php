@@ -276,7 +276,7 @@ class SettingsValidator {
 	 * @return array
 	 */
 	public function validate_allowed_post_types( $input ) {
-		return array_map( 'sanitize_text_field', $post_type );
+		return array_map( 'sanitize_text_field', $input );
 	}
 
 	/**
