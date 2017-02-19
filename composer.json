@@ -21,29 +21,5 @@
   "require": {
     "php": ">=5.4"
   },
-  "autoload": {
-      "psr-4": {
-          "WPDiscourse\\": "lib"
-      },
-
-      "files" : [
-        "lib/utilities.php",
-        "templates/html-templates.php",
-        "templates/template-functions.php",
-        "lib/discourse.php",
-        "lib/settings-validator.php",
-        "lib/admin.php",
-        "lib/sso.php",
-        "lib/wordpress-email-verification.php",
-        "lib/discourse-sso.php",
-        "lib/discourse-publish.php",
-        "lib/discourse-comment.php",
-        "lib/meta-box.php",
-
-        "lib/shortcodes/sso-client.php",
-        "lib/sso-login-form.php",
-        "lib/sso/sso-url.php",
-        "lib/sso/button-markup.php"
-      ]
-  }
+  "autoload": {}
 }
