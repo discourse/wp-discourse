@@ -81,6 +81,7 @@ class Client {
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
+		write_log( 'query', $query );
 		$nonce = \WPDiscourse\Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
 
 		if ( ! $nonce ) {
@@ -107,8 +108,11 @@ class Client {
 
 		$update = wp_update_user( $updated_user );
 
-		if ( ! is_wp_error( $update ) && ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-			update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+		if ( ! is_wp_error( $update ) ) {
+			update_user_meta( $user_id, 'discourse_username', $query['username'] );
+			if ( ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
+				update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+			}
 		}
 
 		return $update;
