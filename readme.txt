@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.7.2
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -123,7 +123,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
-#### 1.2.1 18/02/2018
+#### 1.2.2 19/02/2017
+
+- Populate the Discourse username field when using Discourse as the SSO provider
+
+#### 1.2.1 18/02/2017
 
 - Delete options for multi-site installations
 - Improve copy

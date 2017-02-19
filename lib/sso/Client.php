@@ -89,8 +89,9 @@ class Client {
 
 		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
 
-		$user = get_user_by( 'ID', $user_id );
-		if ( $user->user_login !== $query['username'] && $user->user_email !== $query['email'] ) {
+		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
+		$wp_user = get_user_by( 'ID', $user_id );
+		if ( $wp_user->user_login !== $query['username'] && $wp_user->user_email !== $query['email'] ) {
 			return new \WP_Error( 'mismatched_users' );
 		}
 
@@ -107,8 +108,11 @@ class Client {
 
 		$update = wp_update_user( $updated_user );
 
-		if ( ! is_wp_error( $update ) && ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-			update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+		if ( ! is_wp_error( $update ) ) {
+			update_user_meta( $user_id, 'discourse_username', $query['username'] );
+			if ( ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
+				update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+			}
 		}
 
 		return $update;
