@@ -81,7 +81,6 @@ class Client {
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
-		write_log( 'query', $query );
 		$nonce = \WPDiscourse\Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
 
 		if ( ! $nonce ) {
@@ -90,8 +89,9 @@ class Client {
 
 		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
 
-		$user = get_user_by( 'ID', $user_id );
-		if ( $user->user_login !== $query['username'] && $user->user_email !== $query['email'] ) {
+		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
+		$wp_user = get_user_by( 'ID', $user_id );
+		if ( $wp_user->user_login !== $query['username'] && $wp_user->user_email !== $query['email'] ) {
 			return new \WP_Error( 'mismatched_users' );
 		}
 
