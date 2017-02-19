@@ -112,16 +112,16 @@ class SettingsValidator {
 		) );
 		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
 
-		add_filter( 'validate_discourse_link_text', array( $this, 'validate_discourse_link_text' ) );
-		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
-		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
-		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
-		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_comments_not_available_text' ) );
-		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
-		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
-		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
-		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
-		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
+		add_filter( 'validate_discourse_link_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_start_discussion_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_continue_discussion_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_notable_replies_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_comments_not_available_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_participants_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_published_at_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_single_reply_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_many_replies_text', array( $this, 'sanitize_text' ) );
+		add_filter( 'validate_more_replies_more_text', array( $this, 'sanitize_text' ) );
 
 		add_filter( 'validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
 		add_filter( 'validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
@@ -190,8 +190,9 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_publish_username( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
+		$sanitized_input = $this->sanitize_text( $input );
+		if ( ! empty( $sanitized_input ) ) {
+			return $sanitized_input;
 		} else {
 			add_settings_error( 'discourse', 'publish_username', __( 'You must provide a Discourse username with which to publish the posts', 'wp-discourse' ) );
 
@@ -275,12 +276,7 @@ class SettingsValidator {
 	 * @return array
 	 */
 	public function validate_allowed_post_types( $input ) {
-		$output = array();
-		foreach ( $input as $post_type ) {
-			$output[] = sanitize_text_field( $post_type );
-		}
-
-		return $output;
+		return array_map( 'sanitize_text_field', $post_type );
 	}
 
 	/**
@@ -433,156 +429,6 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'discourse_link_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_discourse_link_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'start_discussion_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_start_discussion_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'continue_discussion_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_continue_discussion_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'notable_replies_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_notable_replies_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'comments_not_available_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_comments_not_available_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'participants_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_participants_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'published_at_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_published_at_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'single_reply_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_single_reply_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'many_replies_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_many_replies_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'more_replies_more_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_more_replies_more_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
 	 * Validated the 'enable_sso'checkbox.
 	 *
 	 * This function is only called if the checkbox is checked. It sets the `sso_enabled` property to true.
@@ -606,18 +452,11 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
-		if ( strlen( sanitize_text_field( $input ) ) >= 10 ) {
-			return sanitize_text_field( $input );
-
-			// Only add a settings error if sso is enabled, otherwise just sanitize the input.
-		} elseif ( $this->sso_enabled ) {
+		$sanitized = sanitize_text_field( $input );
+		if ( strlen( $sanitized ) < 10 &&  $this->sso_enabled  ) {
 			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key setting must be at least 10 characters long.', 'wp-discourse' ) );
-
-			return sanitize_text_field( $input );
-
-		} else {
-			return sanitize_text_field( $input );
 		}
+		return $sanitized;
 	}
 
 	/**
@@ -633,16 +472,8 @@ class SettingsValidator {
 			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
-
-				return $this->sanitize_text( $input );
-
 			}
-
-			// It's valid.
-			return $this->sanitize_text( $input );
 		}
-
-		// Sanitize, but don't validate. SSO is not enabled.
 		return $this->sanitize_text( $input );
 	}
 
@@ -676,11 +507,13 @@ class SettingsValidator {
 	 * A helper method to sanitize text inputs.
 	 *
 	 * @param string $input The input to be sanitized.
+	 * @param string $default_value The default value to be returned if the $input is empty.
 	 *
 	 * @return string
 	 */
-	protected function sanitize_text( $input ) {
-		return sanitize_text_field( $input );
+	protected function sanitize_text( $input, $default_value = '' ) {
+		$sanitized = sanitize_text_field( $input );
+		return ! empty( $sanitized ) ? $sanitized : $default_value;
 	}
 
 	/**
