@@ -29,14 +29,14 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_publish = array(
-		'display-subcategories' => 0,
-		'publish-category'      => '',
+		'display-subcategories'   => 0,
+		'publish-category'        => '',
 		'publish-category-update' => 0,
-		'full-post-content' => 0,
-		'custom-excerpt-length' => 55,
-		'auto-publish'          => 0,
-		'auto-track'            => 1,
-		'allowed_post_types'    => array( 'post' ),
+		'full-post-content'       => 0,
+		'custom-excerpt-length'   => 55,
+		'auto-publish'            => 0,
+		'auto-track'              => 1,
+		'allowed_post_types'      => array( 'post' ),
 	);
 
 	/**
@@ -53,7 +53,7 @@ class Discourse {
 		'min-score'                 => 0,
 		'min-trust-level'           => 1,
 		'bypass-trust-level-score'  => 50,
-		'custom-datetime-format' => '',
+		'custom-datetime-format'    => '',
 		'only-show-moderator-liked' => 0,
 		'debug-mode'                => 0,
 	);
@@ -64,7 +64,7 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_configurable_text = array(
-		'discourse-link-text' => '',
+		'discourse-link-text'         => '',
 		'start-discussion-text'       => 'Start the discussion at',
 		'continue-discussion-text'    => 'Continue the discussion',
 		'notable-replies-text'        => 'Notable Replies',
@@ -82,9 +82,11 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_sso = array(
-		'enable-sso' => 0,
-		'sso-secret' => '',
-		'login-path' => '',
+		'enable-sso'                   => 0,
+		'sso-client-enabled'           => 0,
+		'sso-client-login-form-change' => 0,
+		'sso-secret'                   => '',
+		'login-path'                   => '',
 	);
 
 	/**
@@ -127,7 +129,7 @@ class Discourse {
 			add_option( $group_name, $this->$group_name );
 		}
 
-		// Create a backup for the discourse_configurable_text option, use 'update' in case more text is added.
+		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
 	}
 
@@ -135,8 +137,8 @@ class Discourse {
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
 	 */
 	protected function transfer_options() {
-		$discourse_options = get_option( 'discourse' );
-		$transferable_option_groups     = array(
+		$discourse_options          = get_option( 'discourse' );
+		$transferable_option_groups = array(
 			'discourse_connect',
 			'discourse_publish',
 			'discourse_comment',
