@@ -257,14 +257,24 @@ class DiscourseAdmin {
 			'sso_settings_tab_details',
 		), 'discourse_sso' );
 
-		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_enable_sso', __( 'Enable SSO Provider', 'wp-discourse' ), array(
 			$this,
-			'enable_sso_checkbox',
+			'enable_sso_provider_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
 		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
 			$this,
 			'wordpress_login_path',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
+			$this,
+			'enable_sso_client_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add "Login with Discourse" on the login form', 'wp-discourse' ), array(
+			$this,
+			'enable_discourse_sso_login_form_change_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
 		add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
@@ -568,15 +578,36 @@ class DiscourseAdmin {
 	/**
 	 * Outputs markup for the enable-sso checkbox.
 	 */
-	public function enable_sso_checkbox() {
-		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO to Discourse.', 'wp-discourse' ) );
+	public function enable_sso_provider_checkbox() {
+		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum. 
+		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
+		$this->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
 	}
+
+	/**
+	 * Outputs markup for sso-client-enabled checkbox.
+	 */
+	public function enable_sso_client_checkbox() {
+		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
+		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
+		$this->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
+	}
+
+	/**
+	 * Outputs markup for sso-client-login-form-change
+	 */
+	public function enable_discourse_sso_login_form_change_checkbox() {
+		$this->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'When using your site as as an SSO client for Discourse, 
+		this setting will add a "Login with Discourse" link to your WordPress login form.', 'wp-discourse' ) );
+	}
+
 
 	/**
 	 * Outputs markup for the login-path input.
 	 */
 	public function wordpress_login_path() {
-		$this->text_input( 'login-path', 'discourse_sso', __( '(Optional) The path to your login page. It should start with \'/\'. Leave blank to use the default WordPress login page.', 'wp-discourse' ) );
+		$this->text_input( 'login-path', 'discourse_sso', __( '(Optional) When using WordPress as the SSO provider, you can set the path to your login page here. 
+		It should start with \'/\'. Leave blank to use the default WordPress login page.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -905,7 +936,10 @@ class DiscourseAdmin {
 	function sso_settings_tab_details() {
 		?>
 		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring WordPress as the Single Sign On provider for Discourse. Unless you have a need to manage your forum\'s users through your WordPress site, you can leave this setting alone. For more information, see the ', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
+            or a Single Sign On client, for your Discourse forum. Unless you have a need to manage your forum\'s users
+            through your WordPress site, or to log users into your WordPress site through Discourse, you can leave this setting alone. 
+            For more information, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>

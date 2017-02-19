@@ -4,3 +4,9 @@
 .idea/*
 
 vendor/*
+!vendor/autoload.php
+!vendor/composer/
+!vendor/composer/**
+
+*.sublime-workspace
+*.sublime-project
