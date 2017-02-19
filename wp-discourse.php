@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.1.3
+ * Version: 1.2.2
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,21 +34,27 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.1.3' );
+define( 'WPDISCOURSE_VERSION', '1.2.2' );
 
 require_once( __DIR__ . '/lib/utilities.php' );
+require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/templates/html-templates.php' );
 require_once( __DIR__ . '/templates/template-functions.php' );
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/settings-validator.php' );
-require_once( __DIR__ . '/admin/admin.php' );
-require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 
+require_once( __DIR__ . '/lib/Nonce.php' );
+require_once( __DIR__ . '/lib/shortcodes/sso-client.php' );
+require_once( __DIR__ . '/lib/sso-login-form.php' );
+require_once( __DIR__ . '/lib/sso/sso-url.php' );
+require_once( __DIR__ . '/lib/sso/button-markup.php' );
+
+require_once( __DIR__ . '/admin/admin.php' );
 require_once( __DIR__ . '/admin/option-input.php' );
 require_once( __DIR__ . '/admin/connection-settings.php' );
 require_once( __DIR__ . '/admin/publish-settings.php' );
@@ -65,5 +71,9 @@ $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseCommen
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 $discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
+
+// refactored classes that use autoload.
+$discourse_external_sso       = new WPDiscourse\sso\Client();
+$discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );

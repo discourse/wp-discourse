@@ -123,6 +123,9 @@ class SettingsValidator {
 		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
 		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
 
+		add_filter( 'validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
+
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
@@ -651,6 +654,17 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_redirect_without_login( $input ) {
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validate a checkbox input.
+	 *
+	 * @param string $input The input to be validates.
+	 *
+	 * @return int
+	 */
+	public function validate_checkbox( $input ) {
 		return $this->sanitize_checkbox( $input );
 	}
 
