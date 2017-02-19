@@ -150,7 +150,7 @@ class Nonce {
 		$valid_nonce = $this->wpdb->get_row( $this->wpdb->prepare( "SELECT id FROM {$table_name} WHERE nonce = %s AND action = %s", $nonce, $action ) );
 
 		if ( ! empty( $valid_nonce ) ) {
-			return ( bool ) $this->invalidate_nonce( $valid_nonce->id );
+			return (bool) $this->invalidate_nonce( $valid_nonce->id );
 		}
 
 		return false;

@@ -36,7 +36,24 @@ define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.2.1' );
 
-require 'vendor/autoload.php';
+require 'class-autoload-discourse-classes.php';
+
+require 'lib/utilities.php';
+require 'templates/html-templates.php';
+require 'templates/template-functions.php';
+require 'lib/discourse.php';
+require 'lib/settings-validator.php';
+require 'lib/admin.php';
+require 'lib/sso.php';
+require 'lib/wordpress-email-verification.php';
+require 'lib/discourse-sso.php';
+require 'lib/discourse-publish.php';
+require 'lib/discourse-comment.php';
+require 'lib/meta-box.php';
+require 'lib/shortcodes/sso-client.php';
+require 'lib/sso-login-form.php';
+require 'lib/sso/sso-url.php';
+require 'lib/sso/button-markup.php';
 
 $discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
 $discourse                    = new WPDiscourse\Discourse\Discourse();

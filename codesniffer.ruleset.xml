@@ -8,7 +8,6 @@
 
     <!-- Include the WordPress ruleset, with exclusions. -->
     <rule ref="WordPress">
-        <exclude name="Generic.Files.LowercasedFilename" />
         <exclude name="WordPress.NamingConventions.ValidHookName" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
