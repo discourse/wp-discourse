@@ -3,7 +3,7 @@
  * Options Page.
  */
 
-namespace WPDiscourse\OptionsPage;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 

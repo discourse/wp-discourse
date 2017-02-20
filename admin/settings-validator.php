@@ -6,7 +6,7 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\Validator;
+namespace WPDiscourse\Admin;
 
 /**
  * Class SettingsValidator
@@ -48,80 +48,35 @@ class SettingsValidator {
 			$this,
 			'validate_publish_category',
 		) );
-		add_filter( 'validate_publish_category_update', array(
-			$this,
-			'validate_publish_category_update',
-		) );
-		add_filter( 'validate_full_post_content', array(
-			$this,
-			'validate_full_post_content',
-		) );
-		add_filter( 'validate_auto_publish', array(
-			$this,
-			'validate_auto_publish',
-		) );
-		add_filter( 'validate_auto_track', array( $this, 'validate_auto_track' ) );
-		add_filter( 'validate_allowed_post_types', array(
-			$this,
-			'validate_allowed_post_types',
-		) );
-		add_filter( 'validate_use_discourse_comments', array(
-			$this,
-			'validate_use_discourse_comments',
-		) );
-		add_filter( 'validate_show_existing_comments', array(
-			$this,
-			'validate_show_existing_comments',
-		) );
-		add_filter( 'validate_existing_comments_heading', array(
-			$this,
-			'validate_existing_comments_heading',
-		) );
-		add_filter( 'validate_max_comments', array(
-			$this,
-			'validate_max_comments',
-		) );
-		add_filter( 'validate_min_replies', array(
-			$this,
-			'validate_min_replies',
-		) );
+		add_filter( 'validate_publish_category_update', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_full_post_content', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_auto_publish', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_auto_track', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
+		add_filter( 'validate_use_discourse_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
+		add_filter( 'validate_max_comments', array( $this, 'validate_max_comments' ) );
+		add_filter( 'validate_min_replies', array( $this, 'validate_min_replies' ) );
 		add_filter( 'validate_min_score', array( $this, 'validate_min_score' ) );
-		add_filter( 'validate_min_trust_level', array(
-			$this,
-			'validate_min_trust_level',
-		) );
-		add_filter( 'validate_bypass_trust_level_score', array(
-			$this,
-			'validate_bypass_trust_level_score',
-		) );
-		add_filter( 'validate_custom_excerpt_length', array(
-			$this,
-			'validate_custom_excerpt_length',
-		) );
-		add_filter( 'validate_custom_datetime_format', array(
-			$this,
-			'validate_custom_datetime_format',
-		) );
-		add_filter( 'validate_only_show_moderator_liked', array(
-			$this,
-			'validate_only_show_moderator_liked',
-		) );
-		add_filter( 'validate_display_subcategories', array(
-			$this,
-			'validate_display_subcategories',
-		) );
-		add_filter( 'validate_debug_mode', array( $this, 'validate_debug_mode' ) );
+		add_filter( 'validate_min_trust_level', array( $this, 'validate_min_trust_level' ) );
+		add_filter( 'validate_bypass_trust_level_score', array( $this, 'validate_bypass_trust_level_score' ) );
+		add_filter( 'validate_custom_excerpt_length', array( $this, 'validate_custom_excerpt_length' ) );
+		add_filter( 'validate_custom_datetime_format', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_only_show_moderator_liked', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_display_subcategories', array( $this, 'validate_checkbox' ) );
+		add_filter( 'validate_debug_mode', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'validate_discourse_link_text', array( $this, 'validate_discourse_link_text' ) );
-		add_filter( 'validate_start_discussion_text', array( $this, 'validate_start_discussion_text' ) );
-		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_continue_discussion_text' ) );
-		add_filter( 'validate_notable_replies_text', array( $this, 'validate_notable_replies_text' ) );
-		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_comments_not_available_text' ) );
-		add_filter( 'validate_participants_text', array( $this, 'validate_participants_text' ) );
-		add_filter( 'validate_published_at_text', array( $this, 'validate_published_at_text' ) );
-		add_filter( 'validate_single_reply_text', array( $this, 'validate_single_reply_text' ) );
-		add_filter( 'validate_many_replies_text', array( $this, 'validate_many_replies_text' ) );
-		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_more_replies_more_text' ) );
+		add_filter( 'validate_discourse_link_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_start_discussion_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_notable_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_participants_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_published_at_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_single_reply_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_many_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_text_input' ) );
 
 		add_filter( 'validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
 		add_filter( 'validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
@@ -145,6 +100,7 @@ class SettingsValidator {
 		// Make sure the url starts with a valid protocol.
 		if ( ! preg_match( $regex, $input ) ) {
 			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to be set to a valid URL that begins with either \'http:\' or \'https:\'.', 'wp-discourse' ) );
+
 			return '';
 		}
 
@@ -200,17 +156,6 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validated the 'display_subcategories' checkbox.
-	 *
-	 * @param int $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_display_subcategories( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
 	 * Validates the 'publish_category' select input.
 	 *
 	 * Returns the category id.
@@ -221,50 +166,6 @@ class SettingsValidator {
 	 */
 	public function validate_publish_category( $input ) {
 		return $this->sanitize_int( $input );
-	}
-
-	/**
-	 * Validates the 'publish_category_update' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_publish_category_update( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'full_post_content' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_full_post_content( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'auto_publish' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_auto_publish( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'auto_track' checkbox.
-	 *
-	 * @param string $input The input to be validates.
-	 *
-	 * @return int
-	 */
-	public function validate_auto_track( $input ) {
-		return $this->sanitize_checkbox( $input );
 	}
 
 	/**
@@ -281,33 +182,6 @@ class SettingsValidator {
 		}
 
 		return $output;
-	}
-
-	/**
-	 * Validates the 'use_discourse_comments' checkbox.
-	 *
-	 * If this function is called, it sets the 'use_discourse_comments' property to true. This makes it possible
-	 * to only show warnings for the comment settings if Discourse is being used for comments.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_use_discourse_comments( $input ) {
-		$this->use_discourse_comments = true;
-
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'show_existing_comments' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_show_existing_comments( $input ) {
-		return $this->sanitize_checkbox( $input );
 	}
 
 	/**
@@ -331,7 +205,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 1, null,
 			__( 'The max visible comments setting requires a positive integer.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -344,7 +218,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -357,7 +231,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -370,7 +244,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -383,7 +257,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -396,190 +270,7 @@ class SettingsValidator {
 	public function validate_custom_excerpt_length( $input ) {
 		return $this->validate_int( $input, 'excerpt_length', 1, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-		$this->use_discourse_comments );
-	}
-
-	/**
-	 * Validates the 'custom_date_time' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_custom_datetime_format( $input ) {
-		return sanitize_text_field( $input );
-	}
-
-	/**
-	 * Validates the 'only_show_moderator_liked' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_only_show_moderator_liked( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'debug_mode' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_debug_mode( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
-	 * Validates the 'discourse_link_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_discourse_link_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'start_discussion_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_start_discussion_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'continue_discussion_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_continue_discussion_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'notable_replies_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_notable_replies_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'comments_not_available_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_comments_not_available_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'participants_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_participants_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'published_at_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_published_at_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'single_reply_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_single_reply_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'many_replies_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_many_replies_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
-	}
-
-	/**
-	 * Validates the 'more_replies_more_text' text input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_more_replies_more_text( $input ) {
-		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
-		} else {
-			return '';
-		}
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -668,6 +359,14 @@ class SettingsValidator {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	public function validate_text_input( $input ) {
+		if ( ! empty( $input ) ) {
+			return $this->sanitize_text( $input );
+		} else {
+			return '';
+		}
+	}
+
 	/**
 	 * Helper methods
 	 ******************************/
@@ -719,12 +418,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int    $input The input to be validated.
+	 * @param int $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null   $min The minimum allowed value.
-	 * @param null   $max The maximum allowed value.
+	 * @param null $min The minimum allowed value.
+	 * @param null $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool   $add_error Whether or not to add a setting error.
+	 * @param bool $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */

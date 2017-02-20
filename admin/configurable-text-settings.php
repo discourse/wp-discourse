@@ -3,7 +3,7 @@
  * Configurable Text Settings.
  */
 
-namespace WPDiscourse\ConfigurableTextSettings;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -76,7 +76,7 @@ class ConfigurableTextSettings {
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
-			$this,
+			$this->option_input,
 			'discourse_validate_options',
 		) );
 	}
@@ -173,26 +173,5 @@ class ConfigurableTextSettings {
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
 		</p>
 		<?php
-	}
-
-	/**
-	 * The callback for validating the 'discourse' options.
-	 *
-	 * @param array $inputs The inputs to be validated.
-	 *
-	 * @return array
-	 */
-	public function discourse_validate_options( $inputs ) {
-		$output = array();
-		foreach ( $inputs as $key => $input ) {
-			$filter = 'validate_' . str_replace( '-', '_', $key );
-
-			if ( ! has_filter( $filter ) ) {
-				error_log( 'Missing validation filter: ' . $filter );
-			}
-			$output[ $key ] = apply_filters( $filter, $input );
-		}
-
-		return $output;
 	}
 }

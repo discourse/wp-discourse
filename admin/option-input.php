@@ -1,6 +1,6 @@
 <?php
 
-namespace WPDiscourse\OptionInput;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -253,6 +253,27 @@ class OptionInput {
 		}
 
 		return apply_filters( 'discourse_post_types_to_publish', $post_types );
+	}
+
+	/**
+	 * The callback for validating the 'discourse' options.
+	 *
+	 * @param array $inputs The inputs to be validated.
+	 *
+	 * @return array
+	 */
+	public function discourse_validate_options( $inputs ) {
+		$output = array();
+		foreach ( $inputs as $key => $input ) {
+			$filter = 'validate_' . str_replace( '-', '_', $key );
+
+			if ( ! has_filter( $filter ) ) {
+				error_log( 'Missing validation filter: ' . $filter );
+			}
+			$output[ $key ] = apply_filters( $filter, $input );
+		}
+
+		return $output;
 	}
 
 	/**

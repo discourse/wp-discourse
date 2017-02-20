@@ -6,45 +6,31 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\DiscourseAdmin;
+namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+if ( is_admin() ) {
+	require_once( __DIR__ . '/option-input.php' );
+	require_once( __DIR__ . '/connection-settings.php' );
+	require_once( __DIR__ . '/publish-settings.php' );
+	require_once( __DIR__ . '/comment-settings.php' );
+	require_once( __DIR__ . '/configurable-text-settings.php' );
+	require_once( __DIR__ . '/sso-settings.php' );
+	require_once( __DIR__ . '/options-page.php' );
+	require_once( __DIR__ . '/settings-validator.php' );
 
-/**
- * Class DiscourseAdmin
- */
-class DiscourseAdmin {
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
+	$option_input = new \WPDiscourse\Admin\OptionInput();
+	new \WPDiscourse\Admin\ConnectionSettings( $option_input );
+	new \WPDiscourse\Admin\PublishSettings( $option_input );
+	new \WPDiscourse\Admin\CommentSettings( $option_input );
+	new \WPDiscourse\Admin\ConfigurableTextSettings( $option_input );
+	new \WPDiscourse\Admin\SSOSettings( $option_input );
+	new \WPDiscourse\Admin\OptionsPage();
+	new \WPDiscourse\Admin\SettingsValidator();
 
-	protected $option_input;
+	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts');
+}
 
-	/**
-	 * Discourse constructor.
-	 */
-	public function __construct() {
-		add_action( 'admin_enqueue_scripts', array( $this, 'admin_styles' ) );
-
-		$this->option_input = new \WPDiscourse\OptionInput\OptionInput();
-		new \WPDiscourse\ConnectionSettings\ConnectionSettings( $this->option_input );
-		new \WPDiscourse\PublishSettings\PublishSettings( $this->option_input );
-		new \WPDiscourse\CommentSettings\CommentSettings( $this->option_input );
-		new \WPDiscourse\ConfigurableTextSettings\ConfigurableTextSettings( $this->option_input );
-		new \WPDiscourse\SSOSettings\SSOSettings( $this->option_input );
-		new \WPDiscourse\OptionsPage\OptionsPage();
-
-	}
-
-	/**
-	 * Enqueues the admin stylesheet.
-	 */
-	public function admin_styles() {
-		wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
-		wp_enqueue_style( 'wp_discourse_admin' );
-	}
+function enqueue_admin_scripts() {
+	wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
+	wp_enqueue_style( 'wp_discourse_admin' );
 }

@@ -3,7 +3,7 @@
  * Connection Settings
  */
 
-namespace WPDiscourse\ConnectionSettings;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -41,7 +41,7 @@ class ConnectionSettings {
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
 		register_setting( 'discourse_connect', 'discourse_connect', array(
-			$this,
+			$this->option_input,
 			'discourse_validate_options',
 		) );
 	}
@@ -91,27 +91,4 @@ class ConnectionSettings {
 		</p>
 		<?php
 	}
-
-	/**
-	 * The callback for validating the 'discourse' options.
-	 *
-	 * @param array $inputs The inputs to be validated.
-	 *
-	 * @return array
-	 */
-	function discourse_validate_options( $inputs ) {
-		$output = array();
-		foreach ( $inputs as $key => $input ) {
-			$filter = 'validate_' . str_replace( '-', '_', $key );
-
-			if ( ! has_filter( $filter ) ) {
-				error_log( 'Missing validation filter: ' . $filter );
-			}
-			$output[ $key ] = apply_filters( $filter, $input );
-		}
-
-		return $output;
-	}
-
-
 }

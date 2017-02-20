@@ -3,7 +3,7 @@
  * Commenting Settings.
  */
 
-namespace WPDiscourse\CommentSettings;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -81,7 +81,7 @@ class CommentSettings {
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
 		register_setting( 'discourse_comment', 'discourse_comment', array(
-			$this,
+			$this->option_input,
 			'discourse_validate_options',
 		) );
 	}
@@ -189,26 +189,4 @@ class CommentSettings {
 		</p>
 		<?php
 	}
-
-	/**
-	 * The callback for validating the 'discourse' options.
-	 *
-	 * @param array $inputs The inputs to be validated.
-	 *
-	 * @return array
-	 */
-	public function discourse_validate_options( $inputs ) {
-		$output = array();
-		foreach ( $inputs as $key => $input ) {
-			$filter = 'validate_' . str_replace( '-', '_', $key );
-
-			if ( ! has_filter( $filter ) ) {
-				error_log( 'Missing validation filter: ' . $filter );
-			}
-			$output[ $key ] = apply_filters( $filter, $input );
-		}
-
-		return $output;
-	}
-
 }
