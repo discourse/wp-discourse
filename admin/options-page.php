@@ -164,8 +164,6 @@ class OptionsPage {
 						break;
 				}
 
-				do_action( 'discourse-after-settings-menu', $tab );
-
 				submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 				?>
 			</form>
