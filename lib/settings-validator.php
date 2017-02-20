@@ -511,7 +511,7 @@ class SettingsValidator {
 	 *
 	 * @return string
 	 */
-	protected function sanitize_text( $input, $default_value = '' ) {
+	public function sanitize_text( $input, $default_value = '' ) {
 		$sanitized = sanitize_text_field( $input );
 		return ! empty( $sanitized ) ? $sanitized : $default_value;
 	}
