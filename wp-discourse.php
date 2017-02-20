@@ -36,11 +36,29 @@ define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.2.2' );
 
-require 'vendor/autoload.php';
+require_once( __DIR__ . '/lib/utilities.php' );
+require_once( __DIR__ . '/lib/sso.php' );
+require_once( __DIR__ . '/templates/html-templates.php' );
+require_once( __DIR__ . '/templates/template-functions.php' );
+require_once( __DIR__ . '/lib/discourse.php' );
+//require_once( __DIR__ . '/lib/settings-validator.php' );
+require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
+require_once( __DIR__ . '/lib/discourse-sso.php' );
+require_once( __DIR__ . '/lib/discourse-publish.php' );
+require_once( __DIR__ . '/lib/discourse-comment.php' );
+require_once( __DIR__ . '/lib/meta-box.php' );
 
-$discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
+require_once( __DIR__ . '/lib/Nonce.php' );
+require_once( __DIR__ . '/lib/shortcodes/sso-client.php' );
+require_once( __DIR__ . '/lib/sso/Client.php' );
+require_once( __DIR__ . '/lib/sso/QueryRedirect.php');
+require_once( __DIR__ . '/lib/sso-login-form.php' );
+require_once( __DIR__ . '/lib/sso/sso-url.php' );
+require_once( __DIR__ . '/lib/sso/button-markup.php' );
+
+require_once( __DIR__ . '/admin/admin.php' );
+
 $discourse                    = new WPDiscourse\Discourse\Discourse();
-$discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
 $discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublish();
 $discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
