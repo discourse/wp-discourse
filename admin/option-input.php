@@ -6,8 +6,17 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class OptionInput {
 	protected $options;
+	protected static $instance;
 
-	public function __construct() {
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	protected function __construct() {
 		add_action( 'admin_init', array( $this, 'setup_options' ) );
 	}
 

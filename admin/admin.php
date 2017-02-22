@@ -18,7 +18,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/options-page.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
 
-	$option_input = new \WPDiscourse\Admin\OptionInput();
+	$option_input = \WPDiscourse\Admin\OptionInput::get_instance();
 	new \WPDiscourse\Admin\ConnectionSettings( $option_input );
 	new \WPDiscourse\Admin\PublishSettings( $option_input );
 	new \WPDiscourse\Admin\CommentSettings( $option_input );
