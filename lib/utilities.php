@@ -34,7 +34,7 @@ class Utilities {
 			}
 		}
 
-		return $options;
+		return apply_filters( 'discourse/utilities/options-array', $options );
 	}
 
 	/**
