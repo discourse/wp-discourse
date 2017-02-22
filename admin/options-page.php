@@ -133,6 +133,7 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
+                <?php do_action( 'discourse/admin/options-page/fter-settings-tabs' ); ?>
 			</h2>
 
 			<form action="options.php" method="post" class="wp-discourse-options-form">
@@ -163,6 +164,8 @@ class OptionsPage {
 						do_settings_sections( 'discourse_sso' );
 						break;
 				}
+
+				do_action( 'discourse/admin/options-page/after-tab-switch', $tab );
 
 				submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 				?>
