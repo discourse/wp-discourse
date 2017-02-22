@@ -68,6 +68,9 @@ class OptionInput {
 	/**
 	 * Outputs the markup for an input box, defaults to outputting a text input, but
 	 * can be used for other types.
+     *
+     * Allows for setting a default value.
+     * Todo: merge this with the `text_input` function.
 	 *
 	 * This function is a temporary workaround for adding a default value to a text input when
 	 * no options is set. Eventually, the $default parameter can be added to the text_input function.
