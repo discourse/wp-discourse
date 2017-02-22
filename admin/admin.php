@@ -24,7 +24,7 @@ if ( is_admin() ) {
 	new \WPDiscourse\Admin\CommentSettings( $option_input );
 	new \WPDiscourse\Admin\ConfigurableTextSettings( $option_input );
 	new \WPDiscourse\Admin\SSOSettings( $option_input );
-	new \WPDiscourse\Admin\OptionsPage();
+	\WPDiscourse\Admin\OptionsPage::get_instance();
 	new \WPDiscourse\Admin\SettingsValidator();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts');

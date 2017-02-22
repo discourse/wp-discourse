@@ -9,7 +9,17 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class OptionsPage {
 
-	public function __construct() {
+    protected static $instance;
+
+    public static function get_instance() {
+        if ( null === self::$instance ) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+	protected function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
 		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
 	}
@@ -133,7 +143,7 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
-                <?php do_action( 'discourse/admin/options-page/fter-settings-tabs' ); ?>
+                <?php do_action( 'discourse/admin/options-page/after-settings-tabs', $tab ); ?>
 			</h2>
 
 			<form action="options.php" method="post" class="wp-discourse-options-form">
