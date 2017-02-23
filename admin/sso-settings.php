@@ -9,10 +9,10 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class SSOSettings {
 	protected $options;
-	protected $option_input;
+	protected $form_helper;
 
-	public function __construct( $option_input ) {
-		$this->option_input = $option_input;
+	public function __construct( $form_helper ) {
+		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
@@ -57,7 +57,7 @@ class SSOSettings {
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
 		register_setting( 'discourse_sso', 'discourse_sso', array(
-			$this->option_input,
+			$this->form_helper,
 			'discourse_validate_options',
 		) );
 
@@ -75,7 +75,7 @@ class SSOSettings {
 	public function enable_sso_provider_checkbox() {
 		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum. 
 		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->option_input->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -84,14 +84,14 @@ class SSOSettings {
 	public function enable_sso_client_checkbox() {
 		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
 		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->option_input->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
 	}
 
 	/**
 	 * Outputs markup for sso-client-login-form-change
 	 */
 	public function enable_discourse_sso_login_form_change_checkbox() {
-		$this->option_input->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'When using your site as as an SSO client for Discourse, 
+		$this->form_helper->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'When using your site as as an SSO client for Discourse, 
 		this setting will add a "Login with Discourse" link to your WordPress login form.', 'wp-discourse' ) );
 	}
 
@@ -99,7 +99,7 @@ class SSOSettings {
 	 * Outputs markup for the login-path input.
 	 */
 	public function wordpress_login_path() {
-		$this->option_input->text_input( 'login-path', 'discourse_sso', __( '(Optional) When using WordPress as the SSO provider, you can set the path to your login page here. 
+		$this->form_helper->input( 'login-path', 'discourse_sso', __( '(Optional) When using WordPress as the SSO provider, you can set the path to your login page here. 
 		It should start with \'/\'. Leave blank to use the default WordPress login page.', 'wp-discourse' ) );
 	}
 
@@ -109,9 +109,9 @@ class SSOSettings {
 	public function sso_secret_input() {
 		$options = $this->options;
 		if ( isset( $options['url'] ) && ! empty( $options['url'] ) ) {
-			$this->option_input->text_input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . '/admin/site_settings/category/login</a>' );
+			$this->form_helper->input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . '/admin/site_settings/category/login</a>' );
 		} else {
-			$this->option_input->text_input( 'sso-secret', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
+			$this->form_helper->input( 'sso-secret', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
 		}
 	}
 
@@ -119,7 +119,7 @@ class SSOSettings {
 	 * Outputs markup for the redirect-without-login checkbox.
 	 */
 	public function redirect_without_login_checkbox() {
-		$this->option_input->checkbox_input( 'redirect-without-login', 'discourse_sso', __( 'Do not force login for link to Discourse comments thread.' ) );
+		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso', __( 'Do not force login for link to Discourse comments thread.' ) );
 	}
 
 	/**
