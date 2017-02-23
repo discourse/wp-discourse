@@ -113,46 +113,10 @@ class OptionsPage {
 					submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 					?>
                 </form>
-				<?php if ( 'text_content_options' === $tab ) : ?>
-                    <form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-                          method="post">
-						<?php wp_nonce_field( 'process_options_reset', 'process_options_reset_nonce' ); ?>
-
-                        <input type="hidden" name="action" value="process_options_reset">
-						<?php submit_button( 'Reset Default Values', 'secondary', 'discourse_reset_options', false ); ?>
-                    </form>
-				<?php endif; ?>
-
+				<?php do_action( 'discourse/admin/options-page/after-form', $tab ); ?>
 			<?php endif; ?>
 
         </div>
 		<?php
-	}
-
-	/**
-	 * Resets the `discourse_configurable_text` option to its default values.
-	 */
-	public function process_reset() {
-		if ( ! isset( $_POST['process_options_reset_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['process_options_reset_nonce'] ) ), 'process_options_reset' ) // Input var okay.
-		) {
-			exit;
-		}
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			exit;
-		}
-
-		delete_option( 'discourse_configurable_text' );
-		add_option( 'discourse_configurable_text', get_option( 'discourse_configurable_text_backup' ) );
-
-		$configurable_text_url = add_query_arg( array(
-			'page' => 'wp_discourse_options',
-			'tab'  => 'text_content_options',
-		), admin_url( 'admin.php' ) );
-
-		wp_safe_redirect( esc_url_raw( $configurable_text_url ) );
-
-		exit;
 	}
 }
