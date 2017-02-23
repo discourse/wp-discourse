@@ -14,7 +14,6 @@ class AdminMenu {
 		$this->options_page = $options_page;
 
 		add_action( 'admin_menu', array( $this, 'add_menu_pages' ) );
-		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
 	}
 
 	/**
