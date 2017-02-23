@@ -222,6 +222,10 @@ class OptionsPage {
 	}
 
 	/**
+	 * TODO: each of these pages needs to confirm that the user can 'manage options'.
+	 */
+
+	/**
 	 * Called to display the 'connection_options' tab.
 	 */
 	public function connection_options_tab() {
