@@ -9,10 +9,10 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class ConnectionSettings {
 	protected $options;
-	protected $option_input;
+	protected $form_helper;
 
-	public function __construct( $option_input ) {
-		$this->option_input = $option_input;
+	public function __construct( $form_helper ) {
+		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'admin_init'));
 	}
@@ -41,8 +41,8 @@ class ConnectionSettings {
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
 		register_setting( 'discourse_connect', 'discourse_connect', array(
-			$this->option_input,
-			'discourse_validate_options',
+			$this->form_helper,
+			'validate_options',
 		) );
 	}
 	/**
@@ -55,7 +55,7 @@ class ConnectionSettings {
 	 * Outputs markup for the Discourse-url input.
 	 */
 	public function url_input() {
-		$this->option_input->text_input( 'url', 'discourse_connect', __( 'e.g. http://discourse.example.com', 'wp-discourse' ), 'url' );
+		$this->form_helper->input( 'url', 'discourse_connect', __( 'e.g. http://discourse.example.com', 'wp-discourse' ), 'url' );
 	}
 
 	/**
@@ -64,9 +64,9 @@ class ConnectionSettings {
 	public function api_key_input() {
 		$discourse_options = $this->options;
 		if ( isset( $discourse_options['url'] ) && ! empty( $discourse_options['url'] ) ) {
-			$this->option_input->text_input( 'api-key', 'discourse_connect', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) . '/admin/api" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api</a>' );
+			$this->form_helper->input( 'api-key', 'discourse_connect', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) . '/admin/api" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api</a>' );
 		} else {
-			$this->option_input->text_input( 'api-key', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/api', 'wp-discourse' ) );
+			$this->form_helper->input( 'api-key', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/api', 'wp-discourse' ) );
 		}
 	}
 
@@ -74,7 +74,7 @@ class ConnectionSettings {
 	 * Outputs markup for the publish-username input.
 	 */
 	public function publish_username_input() {
-		$this->option_input->text_input( 'publish-username', 'discourse_connect', __( 'The default username under which posts will be published on Discourse. This will be overriden if a Discourse username has been supplied by the user (this can be set on the user\'s WordPress profile page.)', 'wp-discourse' ) );
+		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default username under which posts will be published on Discourse. This will be overriden if a Discourse username has been supplied by the user (this can be set on the user\'s WordPress profile page.)', 'wp-discourse' ) );
 	}
 
 
