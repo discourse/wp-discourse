@@ -13,14 +13,14 @@ class AdminMenu {
 	public function __construct( $options_page ) {
 		$this->options_page = $options_page;
 
-		add_action( 'admin_menu', array( $this, 'admin_menu_pages' ) );
+		add_action( 'admin_menu', array( $this, 'add_menu_pages' ) );
 		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
 	}
 
 	/**
 	 * Adds the Discourse menu and submenu page, called from the 'admin_menu' action hook.
 	 */
-	public function admin_menu() {
+	public function add_menu_pages() {
 		$settings = add_menu_page(
 			__( 'Discourse', 'wp-discourse' ),
 			__( 'Discourse', 'wp-discourse' ),

@@ -4,7 +4,7 @@ namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
-class OptionInput {
+class FormHelper {
 	protected $options;
 	protected static $instance;
 

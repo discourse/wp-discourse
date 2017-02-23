@@ -9,7 +9,7 @@
 namespace WPDiscourse\Admin;
 
 if ( is_admin() ) {
-	require_once( __DIR__ . '/option-input.php' );
+	require_once( __DIR__ . '/form-helper.php' );
 	require_once( __DIR__ . '/connection-settings.php' );
 	require_once( __DIR__ . '/publish-settings.php' );
 	require_once( __DIR__ . '/comment-settings.php' );
@@ -19,7 +19,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/options-page.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
 
-	$form_helper = \WPDiscourse\Admin\OptionInput::get_instance();
+	$form_helper = \WPDiscourse\Admin\FormHelper::get_instance();
 	$options_page = \WPDiscourse\Admin\OptionsPage::get_instance();
 	new \WPDiscourse\Admin\AdminMenu( $options_page );
 	new \WPDiscourse\Admin\ConnectionSettings( $form_helper );
