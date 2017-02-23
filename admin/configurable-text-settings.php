@@ -15,6 +15,8 @@ class ConfigurableTextSettings {
 		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'discourse/admin/options-page/after-form', array( $this, 'reset_options_form' ) );
+		add_action( 'wp_ajax_text_options_reset', array( $this, 'process_text_options_reset' ) );
 	}
 
 	public function admin_init() {
@@ -94,7 +96,7 @@ class ConfigurableTextSettings {
 		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
 		$this->form_helper->input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
 		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
-		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), 'text', null, null,  $default );
+		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), 'text', null, null, $default );
 	}
 
 	/**
@@ -167,11 +169,53 @@ class ConfigurableTextSettings {
 	 */
 	public function configurable_text_tab_details() {
 		?>
-		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-		</p>
+        <p class="documentation-link">
+            <em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+        </p>
 		<?php
+	}
+
+	public function reset_options_form( $tab ) {
+		if ( 'text_content_options' === $tab ) {
+			?>
+            <form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+                  method="post">
+				<?php wp_nonce_field( 'text_options_reset', 'text_options_reset_nonce' ); ?>
+
+                <input type="hidden" name="action" value="text_options_reset">
+				<?php submit_button( 'Reset Default Values', 'secondary', 'discourse_reset_options', false ); ?>
+            </form>
+			<?php
+		}
+	}
+
+	/**
+	 * Resets the `discourse_configurable_text` option to its default values.
+	 */
+	public function process_text_options_reset() {
+		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+		) {
+
+			exit;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			exit;
+		}
+
+		delete_option( 'discourse_configurable_text' );
+		add_option( 'discourse_configurable_text', get_option( 'discourse_configurable_text_backup' ) );
+
+		$configurable_text_url = add_query_arg( array(
+			'page' => 'wp_discourse_options',
+			'tab'  => 'text_content_options',
+		), admin_url( 'admin.php' ) );
+
+		wp_safe_redirect( esc_url_raw( $configurable_text_url ) );
+
+		exit;
 	}
 }
