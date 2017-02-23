@@ -15,16 +15,18 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/comment-settings.php' );
 	require_once( __DIR__ . '/configurable-text-settings.php' );
 	require_once( __DIR__ . '/sso-settings.php' );
+	require_once( __DIR__ . '/admin-menu.php' );
 	require_once( __DIR__ . '/options-page.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
 
-	$option_input = \WPDiscourse\Admin\OptionInput::get_instance();
-	new \WPDiscourse\Admin\ConnectionSettings( $option_input );
-	new \WPDiscourse\Admin\PublishSettings( $option_input );
-	new \WPDiscourse\Admin\CommentSettings( $option_input );
-	new \WPDiscourse\Admin\ConfigurableTextSettings( $option_input );
-	new \WPDiscourse\Admin\SSOSettings( $option_input );
-	\WPDiscourse\Admin\OptionsPage::get_instance();
+	$form_helper = \WPDiscourse\Admin\OptionInput::get_instance();
+	$options_page = \WPDiscourse\Admin\OptionsPage::get_instance();
+	new \WPDiscourse\Admin\AdminMenu( $options_page );
+	new \WPDiscourse\Admin\ConnectionSettings( $form_helper );
+	new \WPDiscourse\Admin\PublishSettings( $form_helper );
+	new \WPDiscourse\Admin\CommentSettings( $form_helper );
+	new \WPDiscourse\Admin\ConfigurableTextSettings( $form_helper );
+	new \WPDiscourse\Admin\SSOSettings( $form_helper );
 	new \WPDiscourse\Admin\SettingsValidator();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts');
