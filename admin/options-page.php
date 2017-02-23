@@ -20,8 +20,8 @@ class OptionsPage {
 	}
 
 	protected function __construct() {
-		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
-		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
+//		add_action( 'admin_menu', array( $this, 'admin_menu' ) );
+//		add_action( 'wp_ajax_process_options_reset', array( $this, 'process_reset' ) );
 	}
 
 	/**
@@ -106,7 +106,7 @@ class OptionsPage {
 	 *
 	 * @param string $active_tab The current tab, used if `$_GET['tab']` is not set.
 	 */
-	public function options_pages_display( $active_tab = '', $parent_tab = null, $fields = 'fields' ) {
+	public function display( $active_tab = '', $parent_tab = null, $fields = 'fields' ) {
 		?>
         <div class="wrap discourse-options-page-wrap">
             <h2>
