@@ -35,7 +35,7 @@ class FormHelper {
 	 * @param null|int $min The min value (applied to number inputs).
 	 * @param null|int $max The max value (applies to number inputs).
 	 */
-	public function text_input( $option, $option_group, $description, $type = null, $min = null, $max = null, $default = null ) {
+	public function input( $option, $option_group, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$options = $this->options;
 		$allowed = array(
 			'a' => array(
