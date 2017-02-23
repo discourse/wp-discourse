@@ -106,7 +106,7 @@ class OptionsPage {
 	 *
 	 * @param string $active_tab The current tab, used if `$_GET['tab']` is not set.
 	 */
-	public function options_pages_display( $active_tab = '' ) {
+	public function options_pages_display( $active_tab = '', $parent_tab = null ) {
 		?>
 		<div class="wrap discourse-options-page-wrap">
 			<h2>
@@ -125,6 +125,14 @@ class OptionsPage {
 			} else {
 				$tab = 'connection_options';
 			}
+
+			if ( isset( $_GET['parent_tab'])) {
+			    $parent = sanitize_key( wp_unslash( $_GET['parent_tab']));
+            } elseif ( $parent_tab ) {
+			    $parent = $parent_tab;
+            } else {
+			    $parent = null;
+            }
 			?>
 
 			<h2 class="nav-tab-wrapper">
@@ -143,8 +151,10 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
-                <?php do_action( 'discourse/admin/options-page/after-settings-tabs', $tab ); ?>
+                <?php do_action( 'discourse/admin/options-page/append-settings-tabs', $tab, $parent ); ?>
 			</h2>
+
+            <?php do_action( 'discourse/admin/options-page/after-settings-tabs', $tab, $parent ); ?>
 
 			<form action="options.php" method="post" class="wp-discourse-options-form">
 				<?php
