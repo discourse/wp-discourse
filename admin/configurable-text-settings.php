@@ -92,9 +92,9 @@ class ConfigurableTextSettings {
 	 */
 	public function discourse_link_text() {
 		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
-		$this->option_input->empty_option_text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
+		$this->option_input->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
 		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
-		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), $default );
+		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), 'text', null, null,  $default );
 	}
 
 	/**
