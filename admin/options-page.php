@@ -135,7 +135,7 @@ class OptionsPage {
             }
 			?>
 
-			<h2 class="nav-tab-wrapper">
+			<h2 class="nav-tab-wrapper nav-tab-first-level">
 				<a href="?page=wp_discourse_options&tab=connection_options"
 				   class="nav-tab <?php echo 'connection_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Connection', 'wp-discourse' ); ?>
 				</a>
