@@ -9,10 +9,10 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class CommentSettings {
 	protected $options;
-	protected $option_input;
+	protected $form_helper;
 
-	public function __construct( $option_input ) {
-		$this->option_input = $option_input;
+	public function __construct( $form_helper ) {
+		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
@@ -81,8 +81,8 @@ class CommentSettings {
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
 		register_setting( 'discourse_comment', 'discourse_comment', array(
-			$this->option_input,
-			'discourse_validate_options',
+			$this->form_helper,
+			'validate_options',
 		) );
 	}
 
@@ -96,56 +96,56 @@ class CommentSettings {
 	 * Outputs markup for the use-discourse-comments checkbox.
 	 */
 	public function use_discourse_comments_checkbox() {
-		$this->option_input->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the show-existing-comments checkbox.
 	 */
 	public function show_existing_comments_checkbox() {
-		$this->option_input->checkbox_input( 'show-existing-comments', 'discourse_comment', __( 'Display existing WordPress comments beneath Discourse comments.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'show-existing-comments', 'discourse_comment', __( 'Display existing WordPress comments beneath Discourse comments.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the existing-comments-heading input.
 	 */
 	public function existing_comments_heading_input() {
-		$this->option_input->text_input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive".)', 'wp-discourse' ) );
+		$this->form_helper->input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive".)', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->option_input->text_input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-replies input.
 	 */
 	public function min_replies_input() {
-		$this->option_input->text_input( 'min-replies', 'discourse_comment', __( 'Minimum replies required prior to pulling comments across.', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'min-replies', 'discourse_comment', __( 'Minimum replies required prior to pulling comments across.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-score input.
 	 */
 	public function min_score_input() {
-		$this->option_input->text_input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read.)', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'min-score', 'discourse_comment', __( 'Minimum score required prior to pulling comments across (score = 15 points per like, 5 per reply, 5 per incoming link, 0.2 per read.)', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
 	 * Outputs markup for the min-trust-level input.
 	 */
 	public function min_trust_level_input() {
-		$this->option_input->text_input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0, 5 );
+		$this->form_helper->input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0, 5 );
 	}
 
 	/**
 	 * Outputs markup for the bypass-trust-level input.
 	 */
 	public function bypass_trust_level_input() {
-		$this->option_input->text_input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score.', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score.', 'wp-discourse' ), 'number', 0 );
 	}
 
 
@@ -153,7 +153,7 @@ class CommentSettings {
 	 * Outputs markup for the custom-datetime input.
 	 */
 	public function custom_datetime_format() {
-		$this->option_input->text_input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
+		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
 		                                                                  get_option( 'date_format' ) . '").' .
 		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
 		                                                                  __( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
@@ -163,14 +163,14 @@ class CommentSettings {
 	 * Outputs markup for the only-show-moderator-liked checkbox.
 	 */
 	public function only_show_moderator_liked_checkbox() {
-		$this->option_input->checkbox_input( 'only-show-moderator-liked', 'discourse_comment' );
+		$this->form_helper->checkbox_input( 'only-show-moderator-liked', 'discourse_comment' );
 	}
 
 	/**
 	 * Outputs markup for the debug-mode checkbox.
 	 */
 	public function debug_mode_checkbox() {
-		$this->option_input->checkbox_input( 'debug-mode', 'discourse_comment', __( 'Always refresh comments.', 'wp-discourse' ), __( 'This setting is not recommended for production, when this setting is not enabled comments will be cached for 10 minutes.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'debug-mode', 'discourse_comment', __( 'Always refresh comments.', 'wp-discourse' ), __( 'This setting is not recommended for production, when this setting is not enabled comments will be cached for 10 minutes.', 'wp-discourse' ) );
 	}
 
 	/**
