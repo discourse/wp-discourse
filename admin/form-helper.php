@@ -226,7 +226,7 @@ class FormHelper {
 	 *
 	 * @return array
 	 */
-	public function discourse_validate_options( $inputs ) {
+	public function validate_options( $inputs ) {
 		$output = array();
 		foreach ( $inputs as $key => $input ) {
 			$filter = 'validate_' . str_replace( '-', '_', $key );
