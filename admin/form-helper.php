@@ -35,55 +35,7 @@ class FormHelper {
 	 * @param null|int $min The min value (applied to number inputs).
 	 * @param null|int $max The max value (applies to number inputs).
 	 */
-	public function text_input( $option, $option_group, $description, $type = null, $min = null, $max = null ) {
-		$options = $this->options;
-		$allowed = array(
-			'a' => array(
-				'href'   => array(),
-				'target' => array(),
-			),
-		);
-
-		if ( isset( $options[ $option ] ) ) {
-			$value = $options[ $option ];
-		} else {
-			$value = '';
-		}
-
-		?>
-		<input id='discourse-<?php echo esc_attr( $option ); ?>'
-		       name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
-			<?php if ( isset( $min ) ) {
-				echo 'min="' . esc_attr( $min ) . '"';
-			} ?>
-			<?php if ( isset( $max ) ) {
-				echo 'max="' . esc_attr( $max ) . '"';
-			} ?>
-			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
-		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
-		<?php
-	}
-
-	/**
-	 * Outputs the markup for an input box, defaults to outputting a text input, but
-	 * can be used for other types.
-     *
-     * Allows for setting a default value.
-     * Todo: merge this with the `text_input` function.
-	 *
-	 * This function is a temporary workaround for adding a default value to a text input when
-	 * no options is set. Eventually, the $default parameter can be added to the text_input function.
-	 *
-	 * @param string $option The name of the option.
-	 * @param string $option_group The option group for the field to be saved to.
-	 * @param string $description The description of the settings field.
-	 * @param string $default The default value to use when the option isn't set.
-	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|ing $min The min value (applied to number inputs).
-	 * @param null|int $max The max value (applies to number inputs).
-	 */
-	public function empty_option_text_input( $option, $option_group, $description, $default = '', $type = null, $min = null, $max = null ) {
+	public function text_input( $option, $option_group, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$options = $this->options;
 		$allowed = array(
 			'a' => array(
