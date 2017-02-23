@@ -9,10 +9,10 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 class ConfigurableTextSettings {
 	protected $options;
-	protected $option_input;
+	protected $form_helper;
 
-	public function __construct( $option_input ) {
-		$this->option_input = $option_input;
+	public function __construct( $form_helper ) {
+		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
@@ -76,8 +76,8 @@ class ConfigurableTextSettings {
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
-			$this->option_input,
-			'discourse_validate_options',
+			$this->form_helper,
+			'validate_options',
 		) );
 	}
 
@@ -92,7 +92,7 @@ class ConfigurableTextSettings {
 	 */
 	public function discourse_link_text() {
 		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
-		$this->option_input->text_input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
+		$this->form_helper->input( 'discourse-link-text', 'discourse_configurable_text', __( 'The link-text
 		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
 		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse' ), 'text', null, null,  $default );
 	}
@@ -101,7 +101,7 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the start-discussion-text input.
 	 */
 	public function start_discussion_text() {
-		$this->option_input->text_input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used after posts with no comments, for starting a discussion on Discourse.
+		$this->form_helper->input( 'start-discussion-text', 'discourse_configurable_text', __( 'Text used after posts with no comments, for starting a discussion on Discourse.
 		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse' ) );
 	}
 
@@ -109,7 +109,7 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the continue-discussion-text input.
 	 */
 	public function continue_discussion_text() {
-		$this->option_input->text_input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used after posts that have comments, for continuing the discussion on Discourse.
+		$this->form_helper->input( 'continue-discussion-text', 'discourse_configurable_text', __( 'Text used after posts that have comments, for continuing the discussion on Discourse.
 		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse' ) );
 	}
 
@@ -117,49 +117,49 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the notable-replies-text input.
 	 */
 	public function notable_replies_text() {
-		$this->option_input->text_input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used at the top of the comments section, when there are comments.', 'wp-discourse' ) );
+		$this->form_helper->input( 'notable-replies-text', 'discourse_configurable_text', __( 'Text used at the top of the comments section, when there are comments.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the comments-not-available input.
 	 */
 	public function comments_not_available_text() {
-		$this->option_input->text_input( 'comments-not-available-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
+		$this->form_helper->input( 'comments-not-available-text', 'discourse_configurable_text', __( 'Text used beneath the post when there is a configuration error with Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the participants-text input.
 	 */
 	public function participants_text() {
-		$this->option_input->text_input( 'participants-text', 'discourse_configurable_text', __( 'Header text for the participants section, used when there are comments.', 'wp-discourse' ) );
+		$this->form_helper->input( 'participants-text', 'discourse_configurable_text', __( 'Header text for the participants section, used when there are comments.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the published-at-text input.
 	 */
 	public function published_at_text() {
-		$this->option_input->text_input( 'published-at-text', 'discourse_configurable_text', __( 'Text used on Discourse to link back to the WordPress post.', 'wp-discourse' ) );
+		$this->form_helper->input( 'published-at-text', 'discourse_configurable_text', __( 'Text used on Discourse to link back to the WordPress post.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the single-reply-text input.
 	 */
 	public function single_reply_text() {
-		$this->option_input->text_input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used in the Discourse comments template when there is only one reply.', 'wp-discourse' ) );
+		$this->form_helper->input( 'single-reply-text', 'discourse_configurable_text', __( 'The text used in the Discourse comments template when there is only one reply.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the 'many-replies-text' input.
 	 */
 	public function many_replies_text() {
-		$this->option_input->text_input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used in the Discourse comments template when there is more than one reply.', 'wp-discourse' ) );
+		$this->form_helper->input( 'many-replies-text', 'discourse_configurable_text', __( 'Text used in the Discourse comments template when there is more than one reply.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs the markup for the more-replies-more-text input.
 	 */
 	public function more_replies_more_text() {
-		$this->option_input->text_input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
+		$this->form_helper->input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
 	}
 
 	/**
