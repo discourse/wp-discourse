@@ -14,15 +14,29 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 class CommentSettings {
 
+	/**
+	 * An instance of the FormHelper class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\FormHelper
+	 */
 	protected $form_helper;
 
+	/**
+	 * CommentSettings constructor.
+	 *
+	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 */
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'register_connection_settings' ) );
 	}
 
-	public function admin_init() {
+	/**
+	 * Add settings section, settings fields, and register the setting.
+	 */
+	public function register_connection_settings() {
 		add_settings_section( 'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
 			$this,
 			'commenting_settings_tab_details',
@@ -90,12 +104,6 @@ class CommentSettings {
 	}
 
 	/**
-	 * ---------------------------
-	 * Commenting settings fields.
-	 * ---------------------------
-	 */
-
-	/**
 	 * Outputs markup for the use-discourse-comments checkbox.
 	 */
 	public function use_discourse_comments_checkbox() {
@@ -151,14 +159,13 @@ class CommentSettings {
 		$this->form_helper->input( 'bypass-trust-level-score', 'discourse_comment', __( 'Bypass trust level check on posts with this score.', 'wp-discourse' ), 'number', 0 );
 	}
 
-
 	/**
 	 * Outputs markup for the custom-datetime input.
 	 */
 	public function custom_datetime_format() {
 		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
-		                                                                  get_option( 'date_format' ) . '").' .
-		                                                                  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+																				  get_option( 'date_format' ) . '").' .
+																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
 		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
 	}
 
