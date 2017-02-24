@@ -124,18 +124,18 @@ class AdminMenu {
 	 * Called to display the 'text_content_options' tab.
 	 */
 	public function text_content_options_tab() {
-	    if ( current_user_can( 'manage_options' ) ) {
-		$this->options_page->display( 'text_content_options' );
-        }
+		if ( current_user_can( 'manage_options' ) ) {
+			$this->options_page->display( 'text_content_options' );
+		}
 	}
 
 	/**
 	 * Called to display the 'sso_options' tab.
 	 */
 	public function sso_options_tab() {
-	    if ( current_user_can( 'manage_options' ) ) {
-		$this->options_page->display( 'sso_options' );
-        }
+		if ( current_user_can( 'manage_options' ) ) {
+			$this->options_page->display( 'sso_options' );
+		}
 	}
 
 	/**
