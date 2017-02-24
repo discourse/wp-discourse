@@ -1,23 +1,50 @@
 <?php
 /**
  * Publishing Settings.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class PublishSettings
+ */
 class PublishSettings {
-	protected $options;
+
+	/**
+	 * An instance of the FormHelper class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\FormHelper
+	 */
 	protected $form_helper;
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * PublishSettings constructor.
+	 *
+	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 */
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'register_publish_settings' ) );
 	}
 
-	public function admin_init() {
+	/**
+	 * Add settings section, settings fields, and register the setting.
+	 */
+	public function register_publish_settings() {
 		$this->options = DiscourseUtilities::get_options();
 
 		add_settings_section( 'discourse_publishing_settings_section', __( 'Publishing Settings', 'wp-discourse' ), array(
@@ -70,12 +97,6 @@ class PublishSettings {
 			'validate_options',
 		) );
 	}
-
-	/**
-	 * ---------------------------
-	 * Publishing settings fields.
-	 * ---------------------------
-	 */
 
 	/**
 	 * Outputs markup for the display-subcategories checkbox.

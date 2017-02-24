@@ -1,23 +1,50 @@
 <?php
 /**
  * Connection Settings
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class ConnectionSettings
+ */
 class ConnectionSettings {
-	protected $options;
+
+	/**
+	 * An instance of the FormHelper class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\FormHelper
+	 */
 	protected $form_helper;
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * ConnectionSettings constructor.
+	 *
+	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 */
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'register_connection_settings' ) );
 	}
 
-	public function admin_init() {
+	/**
+	 * Add settings section, settings fields, and register the setting.
+	 */
+	public function register_connection_settings() {
 		$this->options = DiscourseUtilities::get_options();
 
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connection Settings', 'wp-discourse' ), array(
@@ -45,11 +72,6 @@ class ConnectionSettings {
 			'validate_options',
 		) );
 	}
-	/**
-	 * ---------------------------
-	 * Connection settings fields.
-	 * ---------------------------
-	 */
 
 	/**
 	 * Outputs markup for the Discourse-url input.
@@ -76,8 +98,6 @@ class ConnectionSettings {
 	public function publish_username_input() {
 		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default username under which posts will be published on Discourse. This will be overriden if a Discourse username has been supplied by the user (this can be set on the user\'s WordPress profile page.)', 'wp-discourse' ) );
 	}
-
-
 
 	/**
 	 * Details for the connection_options tab.

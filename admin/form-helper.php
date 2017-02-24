@@ -1,13 +1,40 @@
 <?php
+/**
+ * Used for creating form elements.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class FormHelper
+ */
 class FormHelper {
-	protected $options;
+
+	/**
+	 * Used for containing a single instance of the FormHelper class throughout a request.
+	 *
+	 * @access protected
+	 * @var FormHelper
+	 */
 	protected static $instance;
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * Gets an instance of the FormHelper class.
+	 *
+	 * @return FormHelper
+	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -16,10 +43,16 @@ class FormHelper {
 		return self::$instance;
 	}
 
+	/**
+	 * FormHelper constructor.
+	 */
 	protected function __construct() {
 		add_action( 'admin_init', array( $this, 'setup_options' ) );
 	}
 
+	/**
+	 * Sets the plugin options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 	}
@@ -34,6 +67,7 @@ class FormHelper {
 	 * @param null|string $type The type of input ('number', 'url', etc).
 	 * @param null|int    $min The min value (applied to number inputs).
 	 * @param null|int    $max The max value (applies to number inputs).
+	 * @param null|string $default The default value of the input.
 	 */
 	public function input( $option, $option_group, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$options = $this->options;
@@ -54,8 +88,8 @@ class FormHelper {
 
 		?>
 		<input id='discourse-<?php echo esc_attr( $option ); ?>'
-		       name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
+			   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+			   type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
 } ?>
@@ -93,9 +127,9 @@ class FormHelper {
 		?>
 		<label>
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
-			       name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-			       type='checkbox'
-			       value='1' <?php echo esc_attr( $checked ); ?> />
+				   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+				   type='checkbox'
+				   value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo wp_kses( $label, $allowed ); ?>
 		</label>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
@@ -197,7 +231,7 @@ class FormHelper {
 
 		?>
 		<textarea cols=100 rows=6 id='discourse_<?php echo esc_attr( $option ); ?>'
-		          name='<?php echo esc_attr( $option ); ?>'><?php echo esc_textarea( $value ); ?></textarea>
+				  name='<?php echo esc_attr( $option ); ?>'><?php echo esc_textarea( $value ); ?></textarea>
 		<p class="description"><?php echo esc_html( $description ); ?></p>
 		<?php
 

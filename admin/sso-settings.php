@@ -1,26 +1,52 @@
 <?php
 /**
  * SSO Settings.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class SSOSettings
+ */
 class SSOSettings {
-	protected $options;
+
+	/**
+	 * An instance of the FormHelper class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\FormHelper
+	 */
 	protected $form_helper;
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * SSOSettings constructor.
+	 *
+	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 */
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'register_sso_settings' ) );
 	}
 
-	public function admin_init() {
+	/**
+	 * Add settings section, settings fields, and register the setting.
+	 */
+	public function register_sso_settings() {
 		$this->options = DiscourseUtilities::get_options();
 
-		// Setup SSO settings.
 		add_settings_section( 'discourse_sso_settings_section', __( 'SSO Settings', 'wp-discourse' ), array(
 			$this,
 			'sso_settings_tab_details',
@@ -62,12 +88,6 @@ class SSOSettings {
 		) );
 
 	}
-
-	/**
-	 * --------------------
-	 * SSO settings fields.
-	 * --------------------
-	 */
 
 	/**
 	 * Outputs markup for the enable-sso checkbox.

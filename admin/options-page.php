@@ -1,16 +1,30 @@
 <?php
 /**
  * Options Page.
+ *
+ * @package WordPress
  */
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
-
+/**
+ * Class OptionsPage
+ */
 class OptionsPage {
 
+	/**
+	 * Used for containing a single instance of the OptionsPage class throughout a request.
+	 *
+	 * @access protected
+	 * @var null|OptionsPage
+	 */
 	protected static $instance;
 
+	/**
+	 * Gets an instance of the OptionsPage class.
+	 *
+	 * @return OptionsPage
+	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
 			self::$instance = new self();
@@ -19,6 +33,9 @@ class OptionsPage {
 		return self::$instance;
 	}
 
+	/**
+	 * OptionsPage constructor.
+	 */
 	protected function __construct() {
 		// Empty constructor.
 	}
@@ -26,7 +43,9 @@ class OptionsPage {
 	/**
 	 * Displays the options options page and options page tabs.
 	 *
-	 * @param string $active_tab The current tab, used if `$_GET['tab']` is not set.
+	 * @param string      $active_tab The current tab, used if `$_GET['tab']` is not set.
+	 * @param null|string $parent_tab An optional parent tab, useful for plugins that add a second-level menu.
+	 * @param bool        $form Whether or not to display the form on the page.
 	 */
 	public function display( $active_tab = '', $parent_tab = null, $form = true ) {
 		?>
@@ -48,8 +67,8 @@ class OptionsPage {
 				$tab = 'connection_options';
 			}
 
-			if ( isset( $_GET['parent_tab'] ) ) {
-				$parent = sanitize_key( wp_unslash( $_GET['parent_tab'] ) );
+			if ( isset( $_GET['parent_tab'] ) ) { // Input var okay.
+				$parent = sanitize_key( wp_unslash( $_GET['parent_tab'] ) ); // Input var okay.
 			} else {
 				$parent = $parent_tab;
 			}

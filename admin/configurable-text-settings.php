@@ -1,25 +1,52 @@
 <?php
 /**
  * Configurable Text Settings.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class ConfigurableTextSettings
+ */
 class ConfigurableTextSettings {
-	protected $options;
+
+	/**
+	 * An instance of the FormHelper class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\FormHelper
+	 */
 	protected $form_helper;
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * ConfigurableTextSettings constructor.
+	 *
+	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 */
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_init', array( $this, 'register_text_settings' ) );
 		add_action( 'discourse/admin/options-page/after-form', array( $this, 'reset_options_form' ) );
 		add_action( 'wp_ajax_text_options_reset', array( $this, 'process_text_options_reset' ) );
 	}
 
-	public function admin_init() {
+	/**
+	 * Add settings section, settings fields, and register the setting.
+	 */
+	public function register_text_settings() {
 		$this->options = DiscourseUtilities::get_options();
 
 		add_settings_section( 'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
@@ -82,12 +109,6 @@ class ConfigurableTextSettings {
 			'validate_options',
 		) );
 	}
-
-	/**
-	 * ----------------------------------
-	 * Configurable text settings fields.
-	 * ----------------------------------
-	 */
 
 	/**
 	 * Outputs the markup for the discourse-link-text input.
@@ -177,6 +198,11 @@ class ConfigurableTextSettings {
 		<?php
 	}
 
+	/**
+	 * Creates the reset_options form.
+	 *
+	 * @param string $tab The current options tab.
+	 */
 	public function reset_options_form( $tab ) {
 		if ( 'text_content_options' === $tab ) {
 			?>
@@ -196,7 +222,7 @@ class ConfigurableTextSettings {
 	 */
 	public function process_text_options_reset() {
 		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
 		) {
 
 			exit;
