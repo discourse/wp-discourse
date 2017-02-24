@@ -143,21 +143,22 @@ class AdminMenu {
 	 *
 	 * This method is called by the `load-{settings_page_hook}` action - see https://codex.wordpress.org/Plugin_API/Action_Reference/load-(page).
 	 */
-	function connection_status_notice() {
-		$tab = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : ''; // Input var okay.
-		if ( ! $tab ) {
-			$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // Input var okay.
-		}
+	public function connection_status_notice() {
+		if ( ! empty( $_GET['tab'] ) ) {
+			$current_page = sanitize_key( wp_unslash( $_GET['tab'] ) );
+		} elseif ( ! empty( $_GET['page'] ) ) {
+			$current_page = sanitize_key( wp_unslash( $_GET['page'] ) );
+		} else {
+		    $current_page = null;
+        }
 
-		$current_page = $tab ? $tab : $page;
+		if ( $current_page && ! DiscourseUtilities::check_connection_status() ) {
 
-		if ( ! DiscourseUtilities::check_connection_status() ) {
-
-			if ( 'publishing_options' === $current_page || 'commenting_options' === $current_page || 'text_content_options' === $current_page || 'sso_options' === $current_page ) {
-				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
-			} else {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
-			}
+		    if ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) {
+		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
+            } else {
+		        add_action( 'admin_notices', array( $this, 'establish_connection' ) );
+            }
 		} else if ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
 		}
@@ -166,7 +167,7 @@ class AdminMenu {
 	/**
 	 * Outputs the markup for the 'disconnected' notice that is displayed on the 'connection_options' tab.
 	 */
-	function disconnected() {
+	public function disconnected() {
 		?>
         <div class="notice notice-warning is-dismissible">
             <p>
@@ -180,7 +181,7 @@ class AdminMenu {
 	/**
 	 * Outputs the markup for the 'connected' notice that is displayed on the 'connection_options' tab.
 	 */
-	function connected() {
+	public function connected() {
 		?>
         <div class="notice notice-success is-dismissible">
             <p>
@@ -194,7 +195,7 @@ class AdminMenu {
 	 * Outputs the markup for the 'establish_connection' notice that is displayed when a connection is
 	 * not established on all tabs except 'connection_options'.
 	 */
-	function establish_connection() {
+	public function establish_connection() {
 		?>
         <div class="notice notice-warning is-dismissible">
             <p>
