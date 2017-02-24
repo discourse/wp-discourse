@@ -14,7 +14,7 @@ class ConnectionSettings {
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init'));
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
 
 	public function admin_init() {

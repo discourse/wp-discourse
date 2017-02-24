@@ -28,12 +28,12 @@ class FormHelper {
 	 * Outputs the markup for an input box, defaults to outputting a text input, but
 	 * can be used for other types.
 	 *
-	 * @param string $option The name of the option.
-	 * @param string $option_group The option group for the field to be saved to.
-	 * @param string $description The description of the settings field.
+	 * @param string      $option The name of the option.
+	 * @param string      $option_group The option group for the field to be saved to.
+	 * @param string      $description The description of the settings field.
 	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|int $min The min value (applied to number inputs).
-	 * @param null|int $max The max value (applies to number inputs).
+	 * @param null|int    $min The min value (applied to number inputs).
+	 * @param null|int    $max The max value (applies to number inputs).
 	 */
 	public function input( $option, $option_group, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$options = $this->options;
@@ -58,10 +58,10 @@ class FormHelper {
 		       type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-			} ?>
+} ?>
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-			} ?>
+} ?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -106,7 +106,7 @@ class FormHelper {
 	 * Outputs the post-type select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array $post_types An array of available post types.
+	 * @param array  $post_types An array of available post types.
 	 * @param string $description The description of the settings field.
 	 */
 	public function post_type_select_input( $option, $post_types, $description = '' ) {
@@ -160,8 +160,8 @@ class FormHelper {
 	 *
 	 * @param string $option The name of the option to be saved.
 	 * @param string $option_name Supplies the 'name' value for the select input.
-	 * @param array $group The array of items to be selected.
-	 * @param int $selected The value of the selected option.
+	 * @param array  $group The array of items to be selected.
+	 * @param int    $selected The value of the selected option.
 	 * @param string $description The description of the option.
 	 */
 	public function option_input( $option, $option_name, $group, $selected, $description ) {

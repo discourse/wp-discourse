@@ -14,7 +14,7 @@ class PublishSettings {
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'admin_init'));
+		add_action( 'admin_init', array( $this, 'admin_init' ) );
 	}
 
 	public function admin_init() {
@@ -144,7 +144,7 @@ class PublishSettings {
 	public function post_types_select() {
 		$this->form_helper->post_type_select_input( 'allowed_post_types',
 			$this->form_helper->post_types_to_publish( array( 'attachment' ) ),
-			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
+		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple options.', 'wp-discourse' ) );
 	}
 
 	/**

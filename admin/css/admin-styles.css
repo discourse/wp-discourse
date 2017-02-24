@@ -20,7 +20,7 @@
 }
 
 .discourse-logo {
-    vertical-align: bottom;
+	vertical-align: bottom;
 }
 
 .wrap>h2:first-child {
@@ -50,4 +50,3 @@ input#discourse_reset_options {
 	left: 115px;
 	bottom: 27px;
 }
-

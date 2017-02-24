@@ -1,15 +1,32 @@
 <?php
 /**
- * Adds the admin menu pages.
+ * Adds the admin menu page and sub-menu pages.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class AdminMenu
+ */
 class AdminMenu {
+
+	/**
+	 * An instance of the OptionsPage class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Admin\OptionsPage
+	 */
 	protected $options_page;
 
+	/**
+	 * AdminMenu constructor.
+	 *
+	 * @param \WPDiscourse\Admin\OptionsPage $options_page An instance of the OptionsPage class.
+	 */
 	public function __construct( $options_page ) {
 		$this->options_page = $options_page;
 
@@ -17,7 +34,7 @@ class AdminMenu {
 	}
 
 	/**
-	 * Adds the Discourse menu and submenu page, called from the 'admin_menu' action hook.
+	 * Adds the Discourse menu and submenu pages.
 	 */
 	public function add_menu_pages() {
 		$settings = add_menu_page(
@@ -144,21 +161,21 @@ class AdminMenu {
 	 * This method is called by the `load-{settings_page_hook}` action - see https://codex.wordpress.org/Plugin_API/Action_Reference/load-(page).
 	 */
 	public function connection_status_notice() {
-		if ( ! empty( $_GET['tab'] ) ) {
-			$current_page = sanitize_key( wp_unslash( $_GET['tab'] ) );
-		} elseif ( ! empty( $_GET['page'] ) ) {
-			$current_page = sanitize_key( wp_unslash( $_GET['page'] ) );
+		if ( ! empty( $_GET['tab'] ) ) { // Input var okay.
+			$current_page = sanitize_key( wp_unslash( $_GET['tab'] ) ); // Input var okay.
+		} elseif ( ! empty( $_GET['page'] ) ) { // Input var okay.
+			$current_page = sanitize_key( wp_unslash( $_GET['page'] ) ); // Input var okay.
 		} else {
-		    $current_page = null;
-        }
+			$current_page = null;
+		}
 
 		if ( $current_page && ! DiscourseUtilities::check_connection_status() ) {
 
-		    if ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) {
-		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
-            } else {
-		        add_action( 'admin_notices', array( $this, 'establish_connection' ) );
-            }
+			if ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
+			} else {
+				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
+			}
 		} else if ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
 		}
