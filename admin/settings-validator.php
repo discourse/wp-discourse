@@ -40,14 +40,8 @@ class SettingsValidator {
 	public function __construct() {
 		add_filter( 'validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'validate_api_key', array( $this, 'validate_api_key' ) );
-		add_filter( 'validate_publish_username', array(
-			$this,
-			'validate_publish_username',
-		) );
-		add_filter( 'validate_publish_category', array(
-			$this,
-			'validate_publish_category',
-		) );
+		add_filter( 'validate_publish_username', array( $this, 'validate_publish_username' ) );
+		add_filter( 'validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'validate_publish_category_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'validate_full_post_content', array( $this, 'validate_checkbox' ) );
 		add_filter( 'validate_auto_publish', array( $this, 'validate_checkbox' ) );
@@ -84,7 +78,7 @@ class SettingsValidator {
 		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
-		add_filter( 'validate_redirect_without_login', array( $this, 'validate_redirect_without_login' ) );
+		add_filter( 'validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 	}
 
 	/**
@@ -338,20 +332,9 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'redirect_without_login' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_redirect_without_login( $input ) {
-		return $this->sanitize_checkbox( $input );
-	}
-
-	/**
 	 * Validate a checkbox input.
 	 *
-	 * @param string $input The input to be validates.
+	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */
@@ -359,6 +342,13 @@ class SettingsValidator {
 		return $this->sanitize_checkbox( $input );
 	}
 
+	/**
+	 * Validate a text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_text_input( $input ) {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
