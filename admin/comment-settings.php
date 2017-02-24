@@ -1,14 +1,19 @@
 <?php
 /**
  * Commenting Settings.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class CommentSettings
+ */
 class CommentSettings {
-	protected $options;
+
 	protected $form_helper;
 
 	public function __construct( $form_helper ) {
@@ -18,8 +23,6 @@ class CommentSettings {
 	}
 
 	public function admin_init() {
-		$this->options = DiscourseUtilities::get_options();
-
 		add_settings_section( 'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
 			$this,
 			'commenting_settings_tab_details',
