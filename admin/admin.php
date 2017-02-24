@@ -19,7 +19,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/options-page.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
 
-	$form_helper = \WPDiscourse\Admin\FormHelper::get_instance();
+	$form_helper  = \WPDiscourse\Admin\FormHelper::get_instance();
 	$options_page = \WPDiscourse\Admin\OptionsPage::get_instance();
 	new \WPDiscourse\Admin\AdminMenu( $options_page );
 	new \WPDiscourse\Admin\ConnectionSettings( $form_helper );
@@ -32,6 +32,9 @@ if ( is_admin() ) {
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 }
 
+/**
+ * Enqueue admin styles and scripts.
+ */
 function enqueue_admin_scripts() {
 	wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
 	wp_enqueue_style( 'wp_discourse_admin' );
