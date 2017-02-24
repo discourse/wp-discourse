@@ -34,7 +34,7 @@ class AdminMenu {
 	}
 
 	/**
-	 * Adds the Discourse menu and submenu pages.
+	 * Add menu and sub-menu pages.
 	 */
 	public function add_menu_pages() {
 		$settings = add_menu_page(
@@ -186,12 +186,12 @@ class AdminMenu {
 	 */
 	public function disconnected() {
 		?>
-        <div class="notice notice-warning is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
 				Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+			</p>
+		</div>
 		<?php
 	}
 
@@ -200,11 +200,11 @@ class AdminMenu {
 	 */
 	public function connected() {
 		?>
-        <div class="notice notice-success is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+		<div class="notice notice-success is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
+			</p>
+		</div>
 		<?php
 	}
 
@@ -214,12 +214,12 @@ class AdminMenu {
 	 */
 	public function establish_connection() {
 		?>
-        <div class="notice notice-warning is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
 				navigate back to the \'Connection\' tab and check your settings.', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+			</p>
+		</div>
 		<?php
 	}
 }
