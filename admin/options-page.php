@@ -20,6 +20,7 @@ class OptionsPage {
 	}
 
 	protected function __construct() {
+		// Empty constructor.
 	}
 
 	/**
@@ -27,7 +28,7 @@ class OptionsPage {
 	 *
 	 * @param string $active_tab The current tab, used if `$_GET['tab']` is not set.
 	 */
-	public function display( $active_tab = '', $parent_tab = null, $fields = 'fields' ) {
+	public function display( $active_tab = '', $parent_tab = null, $form = true ) {
 		?>
         <div class="wrap discourse-options-page-wrap">
             <h2>
@@ -49,10 +50,8 @@ class OptionsPage {
 
 			if ( isset( $_GET['parent_tab'] ) ) {
 				$parent = sanitize_key( wp_unslash( $_GET['parent_tab'] ) );
-			} elseif ( $parent_tab ) {
-				$parent = $parent_tab;
 			} else {
-				$parent = null;
+				$parent = $parent_tab;
 			}
 			?>
 
@@ -72,41 +71,41 @@ class OptionsPage {
                 <a href="?page=wp_discourse_options&tab=sso_options"
                    class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
                 </a>
+
 				<?php do_action( 'discourse/admin/options-page/append-settings-tabs', $tab, $parent ); ?>
+
             </h2>
 
 			<?php do_action( 'discourse/admin/options-page/after-settings-tabs', $tab, $parent ); ?>
 
-			<?php if ( 'fields' === $fields ) : ?>
+			<?php if ( $form ) : ?>
 
                 <form action="options.php" method="post" class="wp-discourse-options-form">
 					<?php
-					switch ( $tab ) {
-						case 'connection_options':
-							settings_fields( 'discourse_connect' );
-							do_settings_sections( 'discourse_connect' );
-							break;
+					if ( 'connection_options' === $tab ) {
+						settings_fields( 'discourse_connect' );
+						do_settings_sections( 'discourse_connect' );
+                    }
 
-						case 'publishing_options':
-							settings_fields( 'discourse_publish' );
-							do_settings_sections( 'discourse_publish' );
-							break;
+                    if ( 'publishing_options' === $tab ) {
+	                    settings_fields( 'discourse_publish' );
+	                    do_settings_sections( 'discourse_publish' );
+                    }
 
-						case 'commenting_options':
-							settings_fields( 'discourse_comment' );
-							do_settings_sections( 'discourse_comment' );
-							break;
+                    if( 'commenting_options' === $tab ) {
+	                    settings_fields( 'discourse_comment' );
+	                    do_settings_sections( 'discourse_comment' );
+                    }
 
-						case 'text_content_options':
-							settings_fields( 'discourse_configurable_text' );
-							do_settings_sections( 'discourse_configurable_text' );
-							break;
+                    if ( 'text_content_options' === $tab ) {
+	                    settings_fields( 'discourse_configurable_text' );
+	                    do_settings_sections( 'discourse_configurable_text' );
+                    }
 
-						case 'sso_options':
-							settings_fields( 'discourse_sso' );
-							do_settings_sections( 'discourse_sso' );
-							break;
-					}
+                    if ( 'sso_options' === $tab ) {
+	                    settings_fields( 'discourse_sso' );
+	                    do_settings_sections( 'discourse_sso' );
+                    }
 
 					do_action( 'discourse/admin/options-page/after-tab-switch', $tab );
 
