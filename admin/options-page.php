@@ -95,8 +95,8 @@ class OptionsPage {
 				/**
 				 * wpdc_options_page_append_settings_tabs hook.
 				 */
-                do_action( 'wpdc_options_page_append_settings_tabs', $tab, $parent );
-                ?>
+				do_action( 'wpdc_options_page_append_settings_tabs', $tab, $parent );
+				?>
 
 			</h2>
 
@@ -104,8 +104,8 @@ class OptionsPage {
 			/**
 			 * wpdc_options_page_after_settings_tabs hook.
 			 */
-            do_action( 'wpdc_options_page_after_settings_tabs', $tab, $parent );
-            ?>
+			do_action( 'wpdc_options_page_after_settings_tabs', $tab, $parent );
+			?>
 
 			<?php if ( $form ) : ?>
 
@@ -117,23 +117,23 @@ class OptionsPage {
 					}
 
 					if ( 'publishing_options' === $tab ) {
-	                    settings_fields( 'discourse_publish' );
-	                    do_settings_sections( 'discourse_publish' );
+						settings_fields( 'discourse_publish' );
+						do_settings_sections( 'discourse_publish' );
 					}
 
 					if ( 'commenting_options' === $tab ) {
-	                    settings_fields( 'discourse_comment' );
-	                    do_settings_sections( 'discourse_comment' );
+						settings_fields( 'discourse_comment' );
+						do_settings_sections( 'discourse_comment' );
 					}
 
 					if ( 'text_content_options' === $tab ) {
-	                    settings_fields( 'discourse_configurable_text' );
-	                    do_settings_sections( 'discourse_configurable_text' );
+						settings_fields( 'discourse_configurable_text' );
+						do_settings_sections( 'discourse_configurable_text' );
 					}
 
 					if ( 'sso_options' === $tab ) {
-	                    settings_fields( 'discourse_sso' );
-	                    do_settings_sections( 'discourse_sso' );
+						settings_fields( 'discourse_sso' );
+						do_settings_sections( 'discourse_sso' );
 					}
 
 					do_action( 'discourse/admin/options-page/after-tab-switch', $tab );
@@ -144,12 +144,12 @@ class OptionsPage {
 				</form>
 				<?php
 				/**
-                 * wpdc_options_page_after_form hook.
-                 *
+				 * wpdc_options_page_after_form hook.
+				 *
 				 * @hooked ConfigurableTextSettings::reset_options_form - 10
 				 */
-                do_action( 'wpdc_options_page_after_form', $tab );
-                ?>
+				do_action( 'wpdc_options_page_after_form', $tab );
+				?>
 			<?php endif; ?>
 
 		</div>
