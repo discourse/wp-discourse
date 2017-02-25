@@ -47,10 +47,10 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 
-require_once( __DIR__ . '/lib/Nonce.php' );
+require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/lib/shortcodes/sso-client.php' );
-require_once( __DIR__ . '/lib/sso/Client.php' );
-require_once( __DIR__ . '/lib/sso/QueryRedirect.php' );
+require_once( __DIR__ . '/lib/sso/client.php' );
+require_once( __DIR__ . '/lib/sso/query-redirect.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
 require_once( __DIR__ . '/lib/sso/sso-url.php' );
 require_once( __DIR__ . '/lib/sso/button-markup.php' );
