@@ -39,7 +39,7 @@ class ConfigurableTextSettings {
 		$this->form_helper = $form_helper;
 
 		add_action( 'admin_init', array( $this, 'register_text_settings' ) );
-		add_action( 'discourse/admin/options-page/after-form', array( $this, 'reset_options_form' ) );
+		add_action( 'wpdc_options_page_after_form', array( $this, 'reset_options_form' ) );
 		add_action( 'wp_ajax_text_options_reset', array( $this, 'process_text_options_reset' ) );
 	}
 

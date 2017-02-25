@@ -91,11 +91,21 @@ class OptionsPage {
 				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
 
-				<?php do_action( 'discourse/admin/options-page/append-settings-tabs', $tab, $parent ); ?>
+				<?php
+				/**
+				 * wpdc_options_page_append_settings_tabs hook.
+				 */
+                do_action( 'wpdc_options_page_append_settings_tabs', $tab, $parent );
+                ?>
 
 			</h2>
 
-			<?php do_action( 'discourse/admin/options-page/after-settings-tabs', $tab, $parent ); ?>
+			<?php
+			/**
+			 * wpdc_options_page_after_settings_tabs hook.
+			 */
+            do_action( 'wpdc_options_page_after_settings_tabs', $tab, $parent );
+            ?>
 
 			<?php if ( $form ) : ?>
 
@@ -127,11 +137,19 @@ class OptionsPage {
 					}
 
 					do_action( 'discourse/admin/options-page/after-tab-switch', $tab );
+					do_action( 'wpdc_options_page_after_tabPswitch', $tab );
 
 					submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 					?>
 				</form>
-				<?php do_action( 'discourse/admin/options-page/after-form', $tab ); ?>
+				<?php
+				/**
+                 * wpdc_options_page_after_form hook.
+                 *
+				 * @hooked ConfigurableTextSettings::reset_options_form - 10
+				 */
+                do_action( 'wpdc_options_page_after_form', $tab );
+                ?>
 			<?php endif; ?>
 
 		</div>
