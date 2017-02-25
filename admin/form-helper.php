@@ -263,7 +263,7 @@ class FormHelper {
 	public function validate_options( $inputs ) {
 		$output = array();
 		foreach ( $inputs as $key => $input ) {
-			$filter = 'validate_' . str_replace( '-', '_', $key );
+			$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
 
 			if ( ! has_filter( $filter ) ) {
 				error_log( 'Missing validation filter: ' . $filter );

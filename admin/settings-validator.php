@@ -38,47 +38,47 @@ class SettingsValidator {
 	 * in `admin.php`.
 	 */
 	public function __construct() {
-		add_filter( 'validate_url', array( $this, 'validate_url' ) );
-		add_filter( 'validate_api_key', array( $this, 'validate_api_key' ) );
-		add_filter( 'validate_publish_username', array( $this, 'validate_publish_username' ) );
-		add_filter( 'validate_publish_category', array( $this, 'validate_publish_category' ) );
-		add_filter( 'validate_publish_category_update', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_full_post_content', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_auto_publish', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_auto_track', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
-		add_filter( 'validate_use_discourse_comments', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
-		add_filter( 'validate_max_comments', array( $this, 'validate_max_comments' ) );
-		add_filter( 'validate_min_replies', array( $this, 'validate_min_replies' ) );
-		add_filter( 'validate_min_score', array( $this, 'validate_min_score' ) );
-		add_filter( 'validate_min_trust_level', array( $this, 'validate_min_trust_level' ) );
-		add_filter( 'validate_bypass_trust_level_score', array( $this, 'validate_bypass_trust_level_score' ) );
-		add_filter( 'validate_custom_excerpt_length', array( $this, 'validate_custom_excerpt_length' ) );
-		add_filter( 'validate_custom_datetime_format', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_only_show_moderator_liked', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_display_subcategories', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_debug_mode', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
+		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
+		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
+		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
+		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
+		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
+		add_filter( 'wpdc_validate_max_comments', array( $this, 'validate_max_comments' ) );
+		add_filter( 'wpdc_validate_min_replies', array( $this, 'validate_min_replies' ) );
+		add_filter( 'wpdc_validate_min_score', array( $this, 'validate_min_score' ) );
+		add_filter( 'wpdc_validate_min_trust_level', array( $this, 'validate_min_trust_level' ) );
+		add_filter( 'wpdc_validate_bypass_trust_level_score', array( $this, 'validate_bypass_trust_level_score' ) );
+		add_filter( 'wpdc_validate_custom_excerpt_length', array( $this, 'validate_custom_excerpt_length' ) );
+		add_filter( 'wpdc_validate_custom_datetime_format', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_only_show_moderator_liked', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_display_subcategories', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_debug_mode', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'validate_discourse_link_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_start_discussion_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_continue_discussion_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_notable_replies_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_comments_not_available_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_participants_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_published_at_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_single_reply_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_many_replies_text', array( $this, 'validate_text_input' ) );
-		add_filter( 'validate_more_replies_more_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_discourse_link_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_start_discussion_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_continue_discussion_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_notable_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_comments_not_available_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_participants_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_published_at_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_single_reply_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_many_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_more_replies_more_text', array( $this, 'validate_text_input' ) );
 
-		add_filter( 'validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
-		add_filter( 'validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'validate_enable_sso', array( $this, 'validate_enable_sso' ) );
-		add_filter( 'validate_sso_secret', array( $this, 'validate_sso_secret' ) );
-		add_filter( 'validate_login_path', array( $this, 'validate_login_path' ) );
-		add_filter( 'validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
+		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
+		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
+		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 	}
 
 	/**
