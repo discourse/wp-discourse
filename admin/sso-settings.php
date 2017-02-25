@@ -84,7 +84,7 @@ class SSOSettings {
 
 		register_setting( 'discourse_sso', 'discourse_sso', array(
 			$this->form_helper,
-			'discourse_validate_options',
+			'validate_options',
 		) );
 
 	}
