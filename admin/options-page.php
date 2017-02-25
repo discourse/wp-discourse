@@ -93,7 +93,10 @@ class OptionsPage {
 
 				<?php
 				/**
-				 * wpdc_options_page_append_settings_tabs hook.
+				 * Can be used for adding tabs.
+				 *
+				 * @param string $tab The current tab.
+				 * @param null|string The parent tab.
 				 */
 				do_action( 'wpdc_options_page_append_settings_tabs', $tab, $parent );
 				?>
@@ -102,7 +105,10 @@ class OptionsPage {
 
 			<?php
 			/**
-			 * wpdc_options_page_after_settings_tabs hook.
+			 * Called after the settings tabs.
+			 *
+			 * @param string $tab The current tab.
+			 * @param null|string $parent The parent tab.
 			 */
 			do_action( 'wpdc_options_page_after_settings_tabs', $tab, $parent );
 			?>
@@ -144,8 +150,9 @@ class OptionsPage {
 				</form>
 				<?php
 				/**
-				 * wpdc_options_page_after_form hook.
+				 * Called after the setting-page form.
 				 *
+				 * @param string $tab The active tab.
 				 * @hooked ConfigurableTextSettings::reset_options_form - 10
 				 */
 				do_action( 'wpdc_options_page_after_form', $tab );
