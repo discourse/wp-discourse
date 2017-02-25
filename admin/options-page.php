@@ -142,8 +142,7 @@ class OptionsPage {
 						do_settings_sections( 'discourse_sso' );
 					}
 
-					do_action( 'discourse/admin/options-page/after-tab-switch', $tab );
-					do_action( 'wpdc_options_page_after_tabPswitch', $tab );
+					do_action( 'wpdc_options_page_after_tab_switch', $tab );
 
 					submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 					?>
