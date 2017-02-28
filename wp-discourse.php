@@ -36,6 +36,8 @@ define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.2.2' );
 
+register_activation_hook( __FILE__, 'wp_discourse_check_versions_and_activate' );
+
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/templates/html-templates.php' );
@@ -67,4 +69,30 @@ $discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
 $discourse_external_sso       = new WPDiscourse\sso\Client();
 $discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
 
-register_activation_hook( __FILE__, array( $discourse, 'install' ) );
+
+function wp_discourse_check_versions_and_activate() {
+	global $wp_version;
+	$flags = array();
+
+	// Halt activation if requirements aren't met.
+	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
+		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION . '.';
+	}
+
+	if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
+		$flags['wordpress_version'] = 'The WP Discourse plugin requires at least WordPress version ' . MIN_WP_VERSION . '.';
+	}
+
+	if ( ! empty( $flags ) ) {
+		$message = '';
+		foreach ( $flags as $flag ) {
+			$message .= '<p><strong>' . $flag . '</strong></p>';
+		}
+
+		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
+
+		wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+	}
+
+	update_option( 'discourse_version', WPDISCOURSE_VERSION );
+}
