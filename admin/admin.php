@@ -21,7 +21,7 @@ if ( is_admin() ) {
 
 	$form_helper  = \WPDiscourse\Admin\FormHelper::get_instance();
 	$options_page = \WPDiscourse\Admin\OptionsPage::get_instance();
-	new \WPDiscourse\Admin\AdminMenu( $options_page );
+	new \WPDiscourse\Admin\AdminMenu( $options_page, $form_helper );
 	new \WPDiscourse\Admin\ConnectionSettings( $form_helper );
 	new \WPDiscourse\Admin\PublishSettings( $form_helper );
 	new \WPDiscourse\Admin\CommentSettings( $form_helper );
