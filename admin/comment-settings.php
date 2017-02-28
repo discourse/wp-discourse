@@ -30,13 +30,13 @@ class CommentSettings {
 	public function __construct( $form_helper ) {
 		$this->form_helper = $form_helper;
 
-		add_action( 'admin_init', array( $this, 'register_connection_settings' ) );
+		add_action( 'admin_init', array( $this, 'register_comment_settings' ) );
 	}
 
 	/**
 	 * Add settings section, settings fields, and register the setting.
 	 */
-	public function register_connection_settings() {
+	public function register_comment_settings() {
 		add_settings_section( 'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
 			$this,
 			'commenting_settings_tab_details',
