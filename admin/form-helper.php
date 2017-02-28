@@ -274,7 +274,6 @@ class FormHelper {
 			}
         }
 
-	    write_log('validation', $output );
 		return $output;
 	}
 
