@@ -59,17 +59,18 @@ require_once( __DIR__ . '/lib/sso/button-markup.php' );
 
 require_once( __DIR__ . '/admin/admin.php' );
 
-$discourse                 = new WPDiscourse\Discourse\Discourse();
-$discourse_publisher       = new WPDiscourse\DiscoursePublish\DiscoursePublish();
-$discourse_comment         = new WPDiscourse\DiscourseComment\DiscourseComment();
-$wordpress_email_verifier  = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
-$discourse_sso             = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
-$discourse_publish_metabox = new WPDiscourse\MetaBox\MetaBox();
+$discourse = new WPDiscourse\Discourse\Discourse();
+new WPDiscourse\DiscoursePublish\DiscoursePublish();
+new WPDiscourse\DiscourseComment\DiscourseComment();
+$wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
+new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+new WPDiscourse\MetaBox\MetaBox();
+new WPDiscourse\sso\Client();
+new WPDiscourse\sso\QueryRedirect();
 
-$discourse_external_sso   = new WPDiscourse\sso\Client();
-$discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
-
-
+/**
+ * Check the plugin's php and WordPress version requirements.
+ */
 function wpdc_check_requirements() {
 	global $wp_version;
 	$flags = array();
