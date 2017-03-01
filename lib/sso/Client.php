@@ -44,7 +44,7 @@ class Client {
 		$this->options = DiscourseUtilities::get_options();
 
 		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
-		     empty( $_GET['sso'] ) || empty( $_GET['sig'] )
+		     empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.
 		) {
 			return;
 		}
@@ -141,8 +141,8 @@ class Client {
 	 * @return WP_Error updated errors.
 	 */
 	public function handle_login_errors( $errors ) {
-		if ( isset( $_GET['discourse_sso_error'] ) ) {
-			$err = sanitize_text_field( wp_unslash( $_GET['discourse_sso_error'] ) );
+		if ( isset( $_GET['discourse_sso_error'] ) ) { // Input var okay.
+			$err = sanitize_text_field( wp_unslash( $_GET['discourse_sso_error'] ) ); // Input var okay.
 
 			switch ( $err ) {
 				case 'existing_user_email':
@@ -270,7 +270,7 @@ class Client {
 	 * Get SSO Signature
 	 */
 	private function get_sso_signature() {
-		$sig = isset( $_GET['sig'] ) ? sanitize_text_field( wp_unslash( $_GET['sig'] ) ) : '';
+		$sig = isset( $_GET['sig'] ) ? sanitize_text_field( wp_unslash( $_GET['sig'] ) ) : ''; // Input var okay.
 
 		return sanitize_text_field( $sig );
 	}
@@ -290,18 +290,18 @@ class Client {
 	 * @return string
 	 */
 	private function get_sso_response( $return_key = '' ) {
-		if ( empty( $_GET['sso'] ) ) {
+		if ( empty( $_GET['sso'] ) ) { // Input var okay.
 			return null;
 		};
 
 		if ( 'raw' === $return_key ) {
-			// since sanitization do bad things to our sso payload, we must pass it raw in order to be validated
+			// Since sanitization do bad things to our sso payload, we must pass it raw in order to be validated
 			// @codingStandardsIgnoreStart
-			return $_GET['sso'];
+			return $_GET['sso']; // Input var okay.
 			// @codingStandardsIgnoreEnd
 		}
 
-		$sso = urldecode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ) );
+		$sso = urldecode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ) ); // Input var okay.
 
 		$response = array();
 

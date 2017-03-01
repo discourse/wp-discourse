@@ -34,7 +34,7 @@ class Utilities {
 			}
 		}
 
-		return $options;
+		return apply_filters( 'wpdc_utilities_options_array', $options );
 	}
 
 	/**

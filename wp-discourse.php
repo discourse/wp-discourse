@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.2.3
+ * Version: 1.2.4
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,9 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.2.3' );
+define( 'WPDISCOURSE_VERSION', '1.2.4' );
+
+register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/sso.php' );
@@ -47,27 +49,51 @@ require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/meta-box.php' );
 
-require_once( __DIR__ . '/lib/Nonce.php' );
+require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/lib/shortcodes/sso-client.php' );
-require_once( __DIR__ . '/lib/sso/Client.php' );
-require_once( __DIR__ . '/lib/sso/QueryRedirect.php' );
+require_once( __DIR__ . '/lib/sso/client.php' );
+require_once( __DIR__ . '/lib/sso/query-redirect.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
 require_once( __DIR__ . '/lib/sso/sso-url.php' );
 require_once( __DIR__ . '/lib/sso/button-markup.php' );
 
-require_once( __DIR__ . '/lib/admin.php' );
-require_once( __DIR__ . '/lib/settings-validator.php' );
+require_once( __DIR__ . '/admin/admin.php' );
 
-$discourse_settings_validator = new WPDiscourse\Validator\SettingsValidator();
-$discourse                    = new WPDiscourse\Discourse\Discourse();
-$discourse_admin              = new WPDiscourse\DiscourseAdmin\DiscourseAdmin();
-$discourse_publisher          = new WPDiscourse\DiscoursePublish\DiscoursePublish();
-$discourse_comment            = new WPDiscourse\DiscourseComment\DiscourseComment();
-$wordpress_email_verifier     = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
-$discourse_sso                = new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
-$discourse_publish_metabox    = new WPDiscourse\MetaBox\MetaBox();
+new WPDiscourse\Discourse\Discourse();
+new WPDiscourse\DiscoursePublish\DiscoursePublish();
+new WPDiscourse\DiscourseComment\DiscourseComment();
+$wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
+new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+new WPDiscourse\MetaBox\MetaBox();
+new WPDiscourse\sso\Client();
+new WPDiscourse\sso\QueryRedirect();
 
-$discourse_external_sso       = new WPDiscourse\sso\Client();
-$discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
+/**
+ * Check the plugin's php and WordPress version requirements.
+ */
+function wpdc_check_requirements() {
+	global $wp_version;
+	$flags = array();
 
-register_activation_hook( __FILE__, array( $discourse, 'install' ) );
+	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
+		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION .
+		                        '. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
+	}
+
+	if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
+		$flags['wordpress_version'] = 'The WP Discourse plugin requires at least WordPress version ' . MIN_WP_VERSION . '.';
+	}
+
+	if ( ! empty( $flags ) ) {
+		$message = '';
+		foreach ( $flags as $flag ) {
+			$message .= $flag;
+		}
+
+		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
+
+		wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+	}
+
+	update_option( 'discourse_version', WPDISCOURSE_VERSION );
+}

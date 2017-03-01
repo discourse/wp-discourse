@@ -118,85 +118,12 @@ class Discourse {
 
 		add_option( 'discourse_option_groups', $this->discourse_option_groups );
 
-		// If the plugin is being updated from a version < 1.0.0 the way options are stored has changed.
-		if ( get_option( 'discourse' ) ) {
-			// Transfer the old options into the new option groups.
-			$this->transfer_options();
-			delete_option( 'discourse' );
-		}
-
 		foreach ( $this->discourse_option_groups as $group_name ) {
 			add_option( $group_name, $this->$group_name );
 		}
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
-	}
-
-	/**
-	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
-	 */
-	protected function transfer_options() {
-		$discourse_options          = get_option( 'discourse' );
-		$transferable_option_groups = array(
-			'discourse_connect',
-			'discourse_publish',
-			'discourse_comment',
-			'discourse_sso',
-		);
-
-		foreach ( $transferable_option_groups as $group_name ) {
-			$this->transfer_option_group( $discourse_options, $group_name );
-		}
-	}
-
-	/**
-	 * Transfers saved option values to the new options group.
-	 *
-	 * @param array  $existing_options The old 'discourse' options array.
-	 * @param string $group_name The name of the current options group.
-	 */
-	protected function transfer_option_group( $existing_options, $group_name ) {
-		$transferred_options = array();
-
-		foreach ( $this->$group_name as $key => $value ) {
-			if ( isset( $existing_options[ $key ] ) ) {
-				$transferred_options[ $key ] = $existing_options[ $key ];
-			}
-		}
-
-		add_option( $group_name, $transferred_options );
-	}
-
-	/**
-	 * Adds the options 'discourse' and 'discourse_version'.
-	 *
-	 * Called with `register_activation_hook` from `wp-discourse.php`.
-	 */
-	public static function install() {
-		global $wp_version;
-		$flags = array();
-
-		// Halt activation if requirements aren't met.
-		if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
-			$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION . '.';
-		}
-
-		if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
-			$flags['wordpress_version'] = 'The WP Discourse plugin requires at least WordPress version ' . MIN_WP_VERSION . '.';
-		}
-
-		if ( ! empty( $flags ) ) {
-			$message = '';
-			foreach ( $flags as $flag ) {
-				$message .= '<p><strong>' . $flag . '</strong></p>';
-			}
-
-			deactivate_plugins( deactivate_plugins( plugin_basename( __FILE__ ) ) );
-			wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
-		}
-
-		update_option( 'discourse_version', WPDISCOURSE_VERSION );
 	}
 
 	/**
