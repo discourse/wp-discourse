@@ -55,7 +55,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
-		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
 		add_filter( 'wpdc_validate_max_comments', array( $this, 'validate_max_comments' ) );
@@ -187,6 +187,21 @@ class SettingsValidator {
 	}
 
 	/**
+	 * Validates the 'use_discourse_comments' checkbox.
+	 *
+	 * This function is only called if the checkbox is checked. It sets the property `use_discourse_comments` to true.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_use_discourse_comments( $input ) {
+		$this->use_discourse_comments = true;
+
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
 	 * Validates the 'existing_comments_heading' input.
 	 *
 	 * @param string $input The input to be validated.
@@ -206,7 +221,7 @@ class SettingsValidator {
 	 */
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
-			__( 'The max visible comments setting requires a positive integer.', 'wp-discourse' ),
+			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
 
