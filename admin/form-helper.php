@@ -272,7 +272,7 @@ class FormHelper {
 				}
 				$output[ $key ] = apply_filters( $filter, $input );
 			}
-        }
+		}
 
 		return $output;
 	}
@@ -308,12 +308,12 @@ class FormHelper {
 	 */
 	public function disconnected() {
 		?>
-        <div class="notice notice-warning is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
 				Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+			</p>
+		</div>
 		<?php
 	}
 
@@ -322,11 +322,11 @@ class FormHelper {
 	 */
 	public function connected() {
 		?>
-        <div class="notice notice-success is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+		<div class="notice notice-success is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
+			</p>
+		</div>
 		<?php
 	}
 
@@ -336,12 +336,12 @@ class FormHelper {
 	 */
 	public function establish_connection() {
 		?>
-        <div class="notice notice-warning is-dismissible">
-            <p>
-                <strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
+		<div class="notice notice-warning is-dismissible">
+			<p>
+				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
 				navigate back to the \'Connection\' tab and check your settings.', 'wp-discourse' ); ?></strong>
-            </p>
-        </div>
+			</p>
+		</div>
 		<?php
 	}
 

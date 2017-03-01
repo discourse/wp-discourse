@@ -34,7 +34,7 @@ class AdminMenu {
 	 * AdminMenu constructor.
 	 *
 	 * @param \WPDiscourse\Admin\OptionsPage $options_page An instance of the OptionsPage class.
-	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+	 * @param \WPDiscourse\Admin\FormHelper  $form_helper An instance of the FormHelper class.
 	 */
 	public function __construct( $options_page, $form_helper ) {
 		$this->options_page = $options_page;
