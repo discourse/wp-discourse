@@ -36,7 +36,7 @@ define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.2.2' );
 
-register_activation_hook( __FILE__, 'wp_discourse_check_versions_and_activate' );
+register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/sso.php' );
@@ -70,11 +70,10 @@ $discourse_external_sso   = new WPDiscourse\sso\Client();
 $discourse_query_redirect = new WPDiscourse\sso\QueryRedirect();
 
 
-function wp_discourse_check_versions_and_activate() {
+function wpdc_check_requirements() {
 	global $wp_version;
 	$flags = array();
 
-	// Halt activation if requirements aren't met.
 	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
 		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION .
 		                        '. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
