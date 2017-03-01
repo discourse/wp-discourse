@@ -205,7 +205,7 @@ class SettingsValidator {
 	 * @return mixed
 	 */
 	public function validate_max_comments( $input ) {
-		return $this->validate_int( $input, 'max_comments', 1, null,
+		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments setting requires a positive integer.', 'wp-discourse' ),
 		$this->use_discourse_comments );
 	}
