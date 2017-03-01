@@ -159,7 +159,7 @@ class FormHelper {
 				$value = '';
 			}
 
-			echo '<option ' . esc_attr( $value ) . " value='" . esc_attr( $post_type ) . "'>" . esc_html( $post_type ) . '</option>';
+			echo '<option ' . esc_attr( $value ) . ' value="' . esc_attr( $post_type ) . '">' . esc_html( $post_type ) . '</option>';
 		}
 
 		echo '</select>';
