@@ -24,6 +24,14 @@ class SettingsValidator {
 	protected $sso_enabled = false;
 
 	/**
+	 * Indicates whether or not the SSO client is enabled.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $sso_client_enabled = false;
+
+	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
 	 *
 	 * @access protected
@@ -72,7 +80,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_many_replies_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_more_replies_more_text', array( $this, 'validate_text_input' ) );
 
-		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
@@ -268,7 +276,7 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validated the 'enable_sso'checkbox.
+	 * Validates the 'enable_sso'checkbox.
 	 *
 	 * This function is only called if the checkbox is checked. It sets the `sso_enabled` property to true.
 	 * This allows sso validation notices to only be displayed if sso is enabled.
@@ -279,6 +287,25 @@ class SettingsValidator {
 	 */
 	public function validate_enable_sso( $input ) {
 		$this->sso_enabled = true;
+
+		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the 'sso_client_enabled' checkbox.
+	 *
+	 * This function is only called if the checkbox is checked. It sets the 'sso_client_enabled ' property to true.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_sso_client_enabled( $input ) {
+		if ( $this->sso_enabled ) {
+			add_settings_error( 'discourse', 'sso_client_enabled', __( 'You can not enable both the sso client and the sso provider functionality.', 'wp-discourse' ) );
+
+			return 0;
+		}
 
 		return $this->sanitize_checkbox( $input );
 	}

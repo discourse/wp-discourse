@@ -9,6 +9,8 @@
 #setting-error-min_trust_level ~ form #discourse-min-trust-level,
 #setting-error-bypass_trust_level ~ form #discourse-bypass-trust-level-score,
 #setting-error-excerpt_length ~ form #discourse-custom-excerpt-length,
+#setting-error-sso_client_enabled ~ form #discourse-sso-client-enabled,
+#setting-error-sso_client_enabled ~ form #discourse-enable-sso,
 #setting-error-sso_secret ~ form #discourse-sso-secret,
 #setting-error-login_path ~ form #discourse-login-path {
 	border-color: #dc3232;
