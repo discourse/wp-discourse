@@ -242,7 +242,7 @@ class FormHelper {
 	 *
 	 * @param array $excluded_types An array of post-types to exclude from publishing to Discourse.
 	 *
-	 * @return mixed|void
+	 * @return array
 	 */
 	public function post_types_to_publish( $excluded_types = array() ) {
 		$post_types = get_post_types( array( 'public' => true ) );
