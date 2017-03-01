@@ -270,9 +270,9 @@ class SettingsValidator {
 	 * @return mixed
 	 */
 	public function validate_custom_excerpt_length( $input ) {
-		return $this->validate_int( $input, 'excerpt_length', 1, null,
+		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+		true );
 	}
 
 	/**
@@ -454,18 +454,18 @@ class SettingsValidator {
 			$options['max_range'] = $max;
 		}
 
-		if ( filter_var( $input, FILTER_VALIDATE_INT, array( 'options' => $options ) ) === false ) {
+		$input = filter_var( $input, FILTER_VALIDATE_INT, array( 'options' => $options ) );
+
+		if ( false === $input ) {
 			if ( $add_error ) {
 				add_settings_error( 'discourse', $option_id, $error_message );
-
-				return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
 			}
 
 			// The input is not valid, but the setting's section is not being used, sanitize the input and return it.
-			return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
+			return null;
 		} else {
 			// Valid input.
-			return filter_var( $input, FILTER_SANITIZE_NUMBER_INT );
+			return $input;
 		}
 	}
 }
