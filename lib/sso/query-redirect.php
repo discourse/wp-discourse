@@ -68,8 +68,8 @@ class QueryRedirect {
 			return;
 		}
 
-		if ( ! empty( $_GET['redirect_to'] ) ) {
-			$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) );
+		if ( ! empty( $_GET['redirect_to'] ) ) { // Input var okay.
+			$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) ); // Input var okay.
 		} else {
 			$redirect_to = home_url( '/' );
 		}
