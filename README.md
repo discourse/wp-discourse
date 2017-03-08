@@ -176,3 +176,4 @@ For more details on template customization, take a look at this section of our w
 <a href="https://opencollective.com/wp-discourse/sponsor/27/website" target="_blank"><img src="https://opencollective.com/wp-discourse/sponsor/27/avatar.svg"></a>
 <a href="https://opencollective.com/wp-discourse/sponsor/28/website" target="_blank"><img src="https://opencollective.com/wp-discourse/sponsor/28/avatar.svg"></a>
 <a href="https://opencollective.com/wp-discourse/sponsor/29/website" target="_blank"><img src="https://opencollective.com/wp-discourse/sponsor/29/avatar.svg"></a>
+
