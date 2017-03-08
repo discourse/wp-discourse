@@ -11,7 +11,7 @@ namespace WPDiscourse\SSO;
 /**
  * Class Discourse_SSO
  */
-class Discourse_SSO {
+class SSO {
 
 	/**
 	 * The SSO secret key.
