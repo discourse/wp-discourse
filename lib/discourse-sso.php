@@ -104,9 +104,9 @@ class DiscourseSSO {
 	 * Enables single sign on between WordPress and Discourse.
 	 * Hooks into the 'parse_query' filter.
 	 *
-	 * @param WP_Query $wp The query object that parsed the query.
+	 * @param \WP_Query $wp The query object that parsed the query.
 	 *
-	 * @throws Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
+	 * @throws \Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
 	 */
 	function sso_parse_request( $wp ) {
 
@@ -149,8 +149,9 @@ class DiscourseSSO {
 			} else {
 
 				// Check for helper class.
-				if ( ! class_exists( '\\WPDiscourse\\SSO\\Discourse_SSO' ) ) {
+				if ( ! class_exists( '\WPDiscourse\SSO\SSO' ) ) {
 					echo( 'Helper class is not properly included.' );
+
 					exit;
 				}
 
@@ -173,7 +174,7 @@ class DiscourseSSO {
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];
-				$sso        = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
+				$sso        = new \WPDiscourse\SSO\SSO( $sso_secret );
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
@@ -213,7 +214,8 @@ class DiscourseSSO {
 	public function logout_from_discourse() {
 		// If SSO is not enabled, don't make the request.
 		if ( empty( $this->options['enable-sso'] ) || 1 !== intval( $this->options['enable-sso'] ) ) {
-			return;
+
+			return null;
 		}
 
 		$user         = wp_get_current_user();
@@ -243,9 +245,12 @@ class DiscourseSSO {
 					),
 				) );
 				if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+
 					return new \WP_Error( 'unable_to_log_out_user', 'There was an error in logging out the current user from Discourse.' );
 				}
 			}
 		}
+
+		return null;
 	}
 }
