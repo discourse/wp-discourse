@@ -58,15 +58,6 @@ require_once( __DIR__ . '/lib/sso/query-redirect.php' );
 require_once( __DIR__ . '/lib/sso/sso-url.php' );
 
 require_once( __DIR__ . '/admin/admin.php' );
-require_once( __DIR__ . '/admin/admin-menu.php' );
-require_once( __DIR__ . '/admin/comment-settings.php' );
-require_once( __DIR__ . '/admin/configurable-text-settings.php' );
-require_once( __DIR__ . '/admin/connection-settings.php' );
-require_once( __DIR__ . '/admin/form-helper.php' );
-require_once( __DIR__ . '/admin/options-page.php' );
-require_once( __DIR__ . '/admin/publish-settings.php' );
-require_once( __DIR__ . '/admin/settings-validator.php' );
-require_once( __DIR__ . '/admin/sso-settings.php' );
 
 $discourse = new WPDiscourse\Discourse\Discourse();
 new WPDiscourse\DiscoursePublish\DiscoursePublish();
@@ -76,15 +67,5 @@ new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 new WPDiscourse\MetaBox\MetaBox();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
-
-$form_helper  = WPDiscourse\Admin\FormHelper::get_instance();
-$options_page = WPDiscourse\Admin\OptionsPage::get_instance();
-new WPDiscourse\Admin\AdminMenu( $options_page, $form_helper );
-new WPDiscourse\Admin\ConnectionSettings( $form_helper );
-new WPDiscourse\Admin\PublishSettings( $form_helper );
-new WPDiscourse\Admin\CommentSettings( $form_helper );
-new WPDiscourse\Admin\ConfigurableTextSettings( $form_helper );
-new WPDiscourse\Admin\SSOSettings( $form_helper );
-new WPDiscourse\Admin\SettingsValidator();
 
 register_activation_hook( __FILE__, array( $discourse, 'install' ) );
