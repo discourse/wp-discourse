@@ -138,13 +138,4 @@ class Discourse {
 
 		return $fields;
 	}
-
-	/**
-	 * Adds the options 'discourse' and 'discourse_version'.
-	 *
-	 * Called with `register_activation_hook` from `wp-discourse.php`.
-	 */
-	public static function install() {
-		update_option( 'discourse_version', WPDISCOURSE_VERSION );
-	}
 }
