@@ -72,9 +72,9 @@ For more detailed instructions please see the [setup](https://github.com/discour
 
 == Frequently Asked Questions ==
 
-= Does it work with a WordPress multi-site configuration? =
+= Does it work with a WordPress multisite configuration? =
 
-All of the plugin's functionality except for using Discourse as the SSO provider for WordPress works with multi-site configurations.
+All of the plugin's functionality except for using Discourse as the SSO provider for WordPress works with multisite configurations.
 
 = Does this plugin install Discourse for me? =
 
