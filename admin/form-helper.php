@@ -298,7 +298,7 @@ class FormHelper {
 			} else {
 				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
 			}
-		} else if ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
+		} elseif ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
 			add_action( 'admin_notices', array( $this, 'connected' ) );
 		}
 	}
