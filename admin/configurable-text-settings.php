@@ -182,7 +182,8 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the more-replies-more-text input.
 	 */
 	public function more_replies_more_text() {
-		$this->form_helper->input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
+		$this->form_helper->input( 'more-replies-more-text', 'discourse_configurable_text', __( "Text used when there are more replies on Discourse than are being shown on WordPress.
+		For example, if there are 10 replies on Discourse and 5 replies on WordPress, the text '5 more replies' will be shown underneath the comments section.", 'wp-discourse' ) );
 	}
 
 	/**
