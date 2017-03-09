@@ -17,6 +17,7 @@
         <exclude name="WordPress.VIP.SlowDBQuery" />
         <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
         <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
+        <exclude name="WordPress.Arrays.ArrayDeclaration.NoSpaceAfterOpenParenthesis" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->
