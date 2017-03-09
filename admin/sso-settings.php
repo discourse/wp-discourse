@@ -103,7 +103,7 @@ class SSOSettings {
 	 */
 	public function enable_sso_client_checkbox() {
 		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
-		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
+		To use this functionality, you must fill SSO Secret key field. (Currently, not working with multisite installations.)', 'wp-discourse' );
 		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
 	}
 
