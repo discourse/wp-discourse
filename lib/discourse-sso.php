@@ -181,6 +181,9 @@ class DiscourseSSO {
 					exit;
 				}
 
+				// If the user doesn't have an avatar set with Gravatar, don't send the avatar_url to Discourse.
+				$avatar_url         = $this->get_avatar_url( $user_id );
+
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
 					'nonce'              => $nonce,
@@ -190,8 +193,8 @@ class DiscourseSSO {
 					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
 					'require_activation' => $require_activation ? 'true' : 'false',
 					'about_me'           => $current_user->description,
-					'external_id'        => $current_user->ID,
-					'avatar_url'         => get_avatar_url( get_current_user_id() ),
+					'external_id'        => $user_id,
+					'avatar_url'         => $avatar_url,
 				);
 
 				$q = $sso->build_login_string( $params );
@@ -252,5 +255,26 @@ class DiscourseSSO {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Make a call to the avatar_url to see if the user has an avatar there.
+	 *
+	 * @param int $user_id The user's ID.
+	 *
+	 * @return false|null|string
+	 */
+	protected function get_avatar_url( $user_id ) {
+		$url = get_avatar_url( $user_id, array( 'default' => '404' ) );
+
+		$response = wp_remote_get( $url );
+
+		if ( ! DiscourseUtilities::validate( $response ) ) {
+			error_log( 'Gravatar returned a 404 response for the current user.' );
+
+			return null;
+		}
+
+		return $url;
 	}
 }
