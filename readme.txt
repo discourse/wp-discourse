@@ -74,7 +74,7 @@ For more detailed instructions please see the [setup](https://github.com/discour
 
 = Does it work with a WordPress multi-site configuration? =
 
-Yes
+All of the plugin's functionality except for using Discourse as the SSO provider for WordPress works with multi-site configurations.
 
 = Does this plugin install Discourse for me? =
 
@@ -122,6 +122,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 **Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.2.9 08/03/2017
+
+- If the user has not set a Gravatar image, don't send the default image to WordPress
 
 #### 1.2.8 02/03/2017
 
