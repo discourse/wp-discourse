@@ -34,7 +34,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.2.8' );
+define( 'WPDISCOURSE_VERSION', '1.2.9' );
 
 register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
