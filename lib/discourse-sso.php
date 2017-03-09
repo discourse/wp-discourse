@@ -67,7 +67,7 @@ class DiscourseSSO {
 			$login_url = $this->options['login-path'];
 
 			if ( ! empty( $redirect ) ) {
-				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+				return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
 
 			} else {
 				return $login_url;
@@ -75,7 +75,7 @@ class DiscourseSSO {
 		}
 
 		if ( ! empty( $redirect ) ) {
-			return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+			return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
 		} else {
 			return $login_url;
 		}
@@ -172,7 +172,7 @@ class DiscourseSSO {
 				$sig     = $wp->query_vars['sig'];
 
 				// Change %0B back to %0A.
-				$payload = urldecode( str_replace( '%0B', '%0A', urlencode( $payload ) ) );
+				$payload = urldecode( str_replace( '%0B', '%0A', rawurlencode( $payload ) ) );
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];

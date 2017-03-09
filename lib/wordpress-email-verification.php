@@ -254,7 +254,7 @@ class WordPressEmailVerification {
 		$this->update_user_signature_value( $user_id, $email_verification_sig );
 		$this->update_user_verification_time( $user_id, $current_time );
 
-		$redirect = urlencode( home_url( '/' ) );
+		$redirect = rawurlencode( home_url( '/' ) );
 
 		$message = sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
 		$message .= __( 'To verify your email address, visit the following address:', 'wp-email-verification' ) . "\r\n\r\n";
