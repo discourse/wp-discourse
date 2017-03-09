@@ -87,7 +87,8 @@ class QueryRedirect {
 
 		$sso_login_url = $this->options['url'] . '/session/sso_provider?' . http_build_query( $request );
 
-		wp_redirect( $sso_login_url );
+		wp_safe_redirect( $sso_login_url );
+
 		exit;
 	}
 }

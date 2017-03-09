@@ -451,7 +451,8 @@ class WordPressEmailVerification {
 	protected function process_expired_sig( $user_id ) {
 
 		$this->send_verification_email( $user_id );
-		wp_redirect( site_url( 'wp-login.php?action=login&error=expiredemailkey' ) );
+		wp_safe_redirect( site_url( 'wp-login.php?action=login&error=expiredemailkey' ) );
+
 		exit;
 	}
 
@@ -463,7 +464,8 @@ class WordPressEmailVerification {
 	protected function process_mismatched_sig( $user_id ) {
 
 		$this->send_verification_email( $user_id, true );
-		wp_redirect( site_url( 'wp-login.php?action=login&error=mismatchedemailkey' ) );
+		wp_safe_redirect( site_url( 'wp-login.php?action=login&error=mismatchedemailkey' ) );
+
 		exit;
 	}
 }
