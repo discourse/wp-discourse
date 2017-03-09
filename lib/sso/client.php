@@ -104,7 +104,7 @@ class Client {
 			'first_name'    => $name,
 		);
 
-		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
+		$updated_user = apply_filters( 'wpdc_sso_client_updated_user', $updated_user, $query );
 
 		$update = wp_update_user( $updated_user );
 
@@ -124,7 +124,7 @@ class Client {
 	 * @param  WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
-		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_failed_login', wp_login_url() );
+		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_failed_login', wp_login_url() );
 
 		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
@@ -192,7 +192,7 @@ class Client {
 		wp_set_auth_cookie( $user_id );
 		do_action( 'wp_login', $query['username'], $query['email'] );
 
-		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_login', $query['return_sso_url'] );
+		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
 		wp_safe_redirect( $redirect_to );
 		exit;
@@ -224,7 +224,7 @@ class Client {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-				add_filter( 'discourse/sso/client/redirect_after_failed_login', array(
+				add_filter( 'wpdc_sso_client_redirect_after_failed_login', array(
 					$this,
 					'get_redirect_to_after_sso',
 				) );

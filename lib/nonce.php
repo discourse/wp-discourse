@@ -42,7 +42,7 @@ class Nonce {
 		 *
 		 * @var int
 		 */
-		$this->nonce_life = apply_filters( 'discourse/nonce_life', 600 );
+		$this->nonce_life = apply_filters( 'wpdc_nonce_life', 600 );
 
 		$this->maybe_create_db();
 	}

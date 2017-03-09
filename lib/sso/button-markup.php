@@ -30,8 +30,8 @@ function get_discourse_sso_link_markup( $options = array() ) {
 
 	$sso_login_url = get_discourse_sso_url();
 
-	$anchor = apply_filters( 'discourse/sso/client/login_anchor', $anchor );
+	$anchor = apply_filters( 'wpdc_sso_client_login_anchor', $anchor );
 	$button = sprintf( '<a href="%s">%s</a>', $sso_login_url, $anchor );
 
-	return apply_filters( 'discourse/sso/client/login_button', $button, $sso_login_url, $options );
+	return apply_filters( 'wpdc_sso_client_login_button', $button, $sso_login_url, $options );
 }
