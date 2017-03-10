@@ -183,7 +183,7 @@ class DiscourseSSO {
 					exit;
 				}
 
-				// If the user doesn't have an avatar set with Gravatar, don't send the avatar_url to Discourse.
+				// If the user doesn't have an avatar set with Gravatar, or 'sync-avatars' is not enabled, don't send the avatar_url to Discourse.
 				$avatar_url         = $this->get_avatar_url( $user_id );
 
 				$nonce  = $sso->get_nonce( $payload );
@@ -268,6 +268,9 @@ class DiscourseSSO {
 	 * @return false|null|string
 	 */
 	protected function get_avatar_url( $user_id ) {
+		$sync_avatars = ! empty( $this->options['sync-avatars'] ) && 1 === intval( $this->options['sync-avatars'] ) ? $this->options['sync-avatars'] : null;
+
+		if ( $sync_avatars ) {
 		$url = get_avatar_url( $user_id, array( 'default' => '404' ) );
 
 		$response = wp_remote_get( $url );
@@ -279,5 +282,8 @@ class DiscourseSSO {
 		}
 
 		return $url;
+		}
+
+		return null;
 	}
 }
