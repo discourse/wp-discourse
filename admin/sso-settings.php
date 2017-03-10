@@ -62,6 +62,11 @@ class SSOSettings {
 			'wordpress_login_path',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
+		add_settings_field( 'discourse_sync_avatars', __( 'Send avatar URL to Discourse', 'wp-discourse' ), array(
+			$this,
+			'sync_avatars_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
 		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_client_checkbox',
@@ -95,8 +100,16 @@ class SSOSettings {
 	public function enable_sso_provider_checkbox() {
 		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum. 
 		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO provider.', 'wp-discourse' ), $description );
 	}
+
+	/**
+	 * Outputs markup for the sync-avatars checkbox.
+	 */
+	public function sync_avatars_checkbox() {
+	    $description = __( 'Sends the WordPress avatar URL to Discourse so that it can be used in place of the Discourse avatar.', 'wp-discourse' );
+	    $this->form_helper->checkbox_input( 'sync-avatars', 'discourse_sso', __( 'Send avatar URL.', 'wp-discourse' ), $description );
+    }
 
 	/**
 	 * Outputs markup for sso-client-enabled checkbox.
@@ -104,7 +117,7 @@ class SSOSettings {
 	public function enable_sso_client_checkbox() {
 		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
 		To use this functionality, you must fill SSO Secret key field. (Currently, not working with multisite installations.)', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO client.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -147,14 +160,14 @@ class SSOSettings {
 	 */
 	function sso_settings_tab_details() {
 		?>
-		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
+        <p class="documentation-link">
+            <em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
             or a Single Sign On client, for your Discourse forum. Unless you have a need to manage your forum\'s users
             through your WordPress site, or to log users into your WordPress site through Discourse, you can leave this setting alone. 
             For more information, see the ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-		</p>
+            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+        </p>
 		<?php
 	}
 }
