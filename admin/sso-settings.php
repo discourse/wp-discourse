@@ -62,11 +62,6 @@ class SSOSettings {
 			'wordpress_login_path',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
-		add_settings_field( 'discourse_sync_avatars', __( 'Send avatar URL to Discourse', 'wp-discourse' ), array(
-			$this,
-			'sync_avatars_checkbox',
-		), 'discourse_sso', 'discourse_sso_settings_section' );
-
 		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_client_checkbox',
@@ -91,7 +86,6 @@ class SSOSettings {
 			$this->form_helper,
 			'validate_options',
 		) );
-
 	}
 
 	/**
@@ -102,14 +96,6 @@ class SSOSettings {
 		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
 		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO provider.', 'wp-discourse' ), $description );
 	}
-
-	/**
-	 * Outputs markup for the sync-avatars checkbox.
-	 */
-	public function sync_avatars_checkbox() {
-	    $description = __( 'Sends the WordPress avatar URL to Discourse so that it can be used in place of the Discourse avatar.', 'wp-discourse' );
-	    $this->form_helper->checkbox_input( 'sync-avatars', 'discourse_sso', __( 'Send avatar URL.', 'wp-discourse' ), $description );
-    }
 
 	/**
 	 * Outputs markup for sso-client-enabled checkbox.

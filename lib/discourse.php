@@ -83,7 +83,6 @@ class Discourse {
 	 */
 	protected $discourse_sso = array(
 		'enable-sso'                   => 0,
-		'sync-avatars'                 => 1,
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
 		'sso-secret'                   => '',
