@@ -146,14 +146,14 @@ class SSOSettings {
 	 */
 	function sso_settings_tab_details() {
 		?>
-        <p class="documentation-link">
-            <em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
+		<p class="documentation-link">
+			<em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
             or a Single Sign On client, for your Discourse forum. Unless you have a need to manage your forum\'s users
             through your WordPress site, or to log users into your WordPress site through Discourse, you can leave this setting alone. 
             For more information, see the ', 'wp-discourse' ); ?></em>
-            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-        </p>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+		</p>
 		<?php
 	}
 }
