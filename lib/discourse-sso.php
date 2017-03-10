@@ -183,8 +183,7 @@ class DiscourseSSO {
 					exit;
 				}
 
-				// If the user doesn't have an avatar set with Gravatar, or 'sync-avatars' is not enabled, don't send the avatar_url to Discourse.
-				$avatar_url         = apply_filters( 'wpdc_sso_avatar_url', $this->get_avatar_url( $user_id ), $user_id );
+				$avatar_url = $this->get_avatar_url( $user_id );
 
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
@@ -268,22 +267,8 @@ class DiscourseSSO {
 	 * @return false|null|string
 	 */
 	protected function get_avatar_url( $user_id ) {
-		$sync_avatars = ! empty( $this->options['sync-avatars'] ) && 1 === intval( $this->options['sync-avatars'] ) ? $this->options['sync-avatars'] : null;
+		$avatar_url = get_avatar_url( $user_id, array( 'default' => '404' ) );
 
-		if ( $sync_avatars ) {
-		$url = get_avatar_url( $user_id, array( 'default' => '404' ) );
-
-		$response = wp_remote_get( $url );
-
-		if ( ! DiscourseUtilities::validate( $response ) ) {
-			error_log( 'Gravatar returned a 404 response for the current user.' );
-
-			return null;
-		}
-
-		return $url;
-		}
-
-		return null;
+		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}
 }
