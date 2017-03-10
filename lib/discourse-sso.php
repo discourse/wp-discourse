@@ -184,7 +184,7 @@ class DiscourseSSO {
 				}
 
 				// If the user doesn't have an avatar set with Gravatar, or 'sync-avatars' is not enabled, don't send the avatar_url to Discourse.
-				$avatar_url         = $this->get_avatar_url( $user_id );
+				$avatar_url         = apply_filters( 'wpdc_sso_avatar_url', $this->get_avatar_url( $user_id ), $user_id );
 
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
