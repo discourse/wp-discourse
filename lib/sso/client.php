@@ -224,12 +224,12 @@ class Client {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-				add_filter( 'wpdc_sso_client_redirect_after_failed_login', array(
-					$this,
-					'get_redirect_to_after_sso',
-				) );
 
-				return new \WP_Error( 'discourse_already_logged_in' );
+				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
+				$query = $this->get_sso_response();
+				wp_safe_redirect( $query['return_sso_url'] );
+
+				exit;
 			}
 
 			return $user_id;
