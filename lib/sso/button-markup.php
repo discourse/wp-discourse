@@ -17,15 +17,19 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @return string
  */
 function get_discourse_sso_link_markup( $options = array() ) {
+	$discourse_options = DiscourseUtilities::get_options();
 	$is_user_logged_in = is_user_logged_in();
 
 	if ( $is_user_logged_in ) {
 		if ( DiscourseUtilities::user_is_linked_to_sso() ) {
+
 			return;
 		}
-		$anchor = ! empty( $options['link'] ) ? $options['link'] : __( 'Link your account to Discourse', 'wp-discourse' );
+		$link_account_text = ! empty( $discourse_options['link-to-discourse-text']) ? $discourse_options['link-to-discourse-text'] : '';
+		$anchor = ! empty( $options['link'] ) ? $options['link'] : $link_account_text;
 	} else {
-		$anchor = ! empty( $options['login'] ) ? $options['login'] : __( 'Log in with Discourse', 'wp-discourse' );
+		$login_text = ! empty( $discourse_options['external-login-text']) ? $discourse_options['external-login-text'] : '';
+		$anchor = ! empty( $options['login'] ) ? $options['login'] : $login_text;
 	}
 
 	$sso_login_url = get_discourse_sso_url();
