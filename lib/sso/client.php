@@ -217,13 +217,19 @@ class Client {
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 
 				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
-				$query = $this->get_sso_response();
-				wp_safe_redirect( $query['return_sso_url'] );
+				$redirect = $this->get_sso_response( 'return_sso_url' );
+				wp_safe_redirect( $redirect );
 
 				exit;
 			}
 
 			return $user_id;
+
+		} elseif ( ! empty( $this->options['sso-client-sync-by-email'] ) && 1 === intval( $this->options['sso-client-sync-by-email'] ) ) {
+			$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
+
+			return $user->ID;
+
 		} else {
 			$user_query = new \WP_User_Query( [
 				'meta_key'   => $this->sso_meta_key,
@@ -235,11 +241,15 @@ class Client {
 			if ( empty( $user_query_results ) ) {
 				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
 
-				return wp_create_user(
+				$user_id = wp_create_user(
 					$this->get_sso_response( 'username' ),
 					$user_password,
 					$this->get_sso_response( 'email' )
 				);
+
+				do_action( 'wpdc_sso_client_after_create_user', $user_id );
+
+				return $user_id;
 			}
 
 			return $user_query_results{0}->ID;
