@@ -65,18 +65,14 @@ class Utilities {
 	 */
 	public static function validate( $response ) {
 		if ( empty( $response ) ) {
-			error_log( 'Discourse has returned an empty response.' );
 
 			return 0;
 		} elseif ( is_wp_error( $response ) ) {
-			error_log( $response->get_error_message() );
 
 			return 0;
 
 			// There is a response from the server, but it's not what we're looking for.
 		} elseif ( intval( wp_remote_retrieve_response_code( $response ) ) !== 200 ) {
-			$error_message = wp_remote_retrieve_response_message( $response );
-			error_log( 'There has been a problem accessing the URL. Error Message: ' . $error_message );
 
 			return 0;
 		} else {
