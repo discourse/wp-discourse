@@ -82,6 +82,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_sync_by_email', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );

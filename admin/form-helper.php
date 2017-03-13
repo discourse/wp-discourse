@@ -268,6 +268,7 @@ class FormHelper {
 				$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
 
 				if ( ! has_filter( $filter ) ) {
+				    // It's safe to log errors here. This should never have to be called on a production site.
 					error_log( 'Missing validation filter: ' . $filter );
 				}
 				$output[ $key ] = apply_filters( $filter, $input );
