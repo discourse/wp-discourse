@@ -225,11 +225,6 @@ class Client {
 
 			return $user_id;
 
-		} elseif ( ! empty( $this->options['sso-client-sync-by-email'] ) && 1 === intval( $this->options['sso-client-sync-by-email'] ) ) {
-			$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
-
-			return $user->ID;
-
 		} else {
 			$user_query = new \WP_User_Query( [
 				'meta_key'   => $this->sso_meta_key,
@@ -237,6 +232,12 @@ class Client {
 			] );
 
 			$user_query_results = $user_query->get_results();
+
+			if ( empty( $user_query_results && ! empty( $this->options['sso-client-sync-by-email'] ) &&
+			            1 === intval( $this->options['sso-client-sync-by-email'] ) )
+			) {
+				$user_query_results = get_user_by( 'email', $this->get_sso_response( 'email' ) );
+			}
 
 			if ( empty( $user_query_results ) ) {
 				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
