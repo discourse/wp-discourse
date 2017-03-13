@@ -53,7 +53,6 @@ class Client {
 			return;
 		}
 
-		$this->disable_notification_on_user_update();
 		$user_id = $this->get_user_id();
 
 		if ( is_wp_error( $user_id ) ) {
@@ -196,14 +195,6 @@ class Client {
 
 		wp_safe_redirect( $redirect_to );
 		exit;
-	}
-
-	/**
-	 * Disable built in notification on email/password changes.
-	 */
-	private function disable_notification_on_user_update() {
-		add_filter( 'send_password_change_email', '__return_false' );
-		add_filter( 'send_email_change_email', '__return_false' );
 	}
 
 	/**
