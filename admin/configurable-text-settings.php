@@ -104,6 +104,16 @@ class ConfigurableTextSettings {
 			'more_replies_more_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
+		add_settings_field( 'discourse_external_login_text', __( 'External login text', 'wp-discourse' ), array(
+			$this,
+			'external_login_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_link_to_discourse_text', __( 'Link account to Discourse text', 'wp-discourse' ), array(
+			$this,
+			'link_to_discourse_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
 			$this->form_helper,
 			'validate_options',
@@ -187,15 +197,30 @@ class ConfigurableTextSettings {
 	}
 
 	/**
+	 * Outputs the markup for the external-login-text input.
+	 */
+	public function external_login_text() {
+		$this->form_helper->input( 'external-login-text', 'discourse_configurable_text', __( 'Text for the login page login link when Discourse is used as the SSO provider.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs the markup for the link-to-discourse-text input.
+	 */
+	public function link_to_discourse_text() {
+		$this->form_helper->input( 'link-to-discourse-text', 'discourse_configurable_text', __( 'Text added to the login and profile pages when Discourse is used as the
+	    SSO provider. Used for linking existing accounts between Discourse and WordPress.', 'wp-discourse' ) );
+	}
+
+	/**
 	 * Details for the 'text_content_options' tab.
 	 */
 	public function configurable_text_tab_details() {
 		?>
-		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-		</p>
+        <p class="documentation-link">
+            <em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
+            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+        </p>
 		<?php
 	}
 
@@ -207,13 +232,13 @@ class ConfigurableTextSettings {
 	public function reset_options_form( $tab ) {
 		if ( 'text_content_options' === $tab ) {
 			?>
-			<form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-				  method="post">
+            <form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+                  method="post">
 				<?php wp_nonce_field( 'text_options_reset', 'text_options_reset_nonce' ); ?>
 
-				<input type="hidden" name="action" value="text_options_reset">
+                <input type="hidden" name="action" value="text_options_reset">
 				<?php submit_button( 'Reset Default Values', 'secondary', 'discourse_reset_options', false ); ?>
-			</form>
+            </form>
 			<?php
 		}
 	}
@@ -223,7 +248,7 @@ class ConfigurableTextSettings {
 	 */
 	public function process_text_options_reset() {
 		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
 		) {
 
 			exit;

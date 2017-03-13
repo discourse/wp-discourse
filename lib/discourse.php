@@ -74,6 +74,8 @@ class Discourse {
 		'single-reply-text'           => 'Reply',
 		'many-replies-text'           => 'Replies',
 		'more-replies-more-text'      => 'more',
+		'external-login-text'         => 'Log in with Discourse',
+		'link-to-discourse-text'      => 'Link your account to Discourse',
 	);
 
 	/**
