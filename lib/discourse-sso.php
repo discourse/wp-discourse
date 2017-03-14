@@ -67,7 +67,7 @@ class DiscourseSSO {
 			$login_url = $this->options['login-path'];
 
 			if ( ! empty( $redirect ) ) {
-				return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+				return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
 
 			} else {
 				return $login_url;
@@ -75,7 +75,7 @@ class DiscourseSSO {
 		}
 
 		if ( ! empty( $redirect ) ) {
-			return add_query_arg( 'redirect_to', urlencode( $redirect ), $login_url );
+			return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
 		} else {
 			return $login_url;
 		}
@@ -104,9 +104,9 @@ class DiscourseSSO {
 	 * Enables single sign on between WordPress and Discourse.
 	 * Hooks into the 'parse_query' filter.
 	 *
-	 * @param WP_Query $wp The query object that parsed the query.
+	 * @param \WP_Query $wp The query object that parsed the query.
 	 *
-	 * @throws Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
+	 * @throws \Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
 	 */
 	function sso_parse_request( $wp ) {
 
@@ -122,7 +122,8 @@ class DiscourseSSO {
 		) {
 
 			wp_logout();
-			wp_redirect( $this->options['url'] );
+			wp_safe_redirect( $this->options['url'] );
+
 			exit;
 		}
 		// End logout processing.
@@ -144,13 +145,15 @@ class DiscourseSSO {
 				$login = wp_login_url( esc_url_raw( $redirect ) );
 
 				// Redirect to login.
-				wp_redirect( $login );
+				wp_safe_redirect( $login );
+
 				exit;
 			} else {
 
 				// Check for helper class.
-				if ( ! class_exists( '\\WPDiscourse\\SSO\\Discourse_SSO' ) ) {
+				if ( ! class_exists( '\WPDiscourse\SSO\SSO' ) ) {
 					echo( 'Helper class is not properly included.' );
+
 					exit;
 				}
 
@@ -169,16 +172,18 @@ class DiscourseSSO {
 				$sig     = $wp->query_vars['sig'];
 
 				// Change %0B back to %0A.
-				$payload = urldecode( str_replace( '%0B', '%0A', urlencode( $payload ) ) );
+				$payload = urldecode( str_replace( '%0B', '%0A', rawurlencode( $payload ) ) );
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];
-				$sso        = new \WPDiscourse\SSO\Discourse_SSO( $sso_secret );
+				$sso        = new \WPDiscourse\SSO\SSO( $sso_secret );
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
 					exit;
 				}
+
+				$avatar_url = $this->get_avatar_url( $user_id );
 
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
@@ -189,14 +194,15 @@ class DiscourseSSO {
 					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
 					'require_activation' => $require_activation ? 'true' : 'false',
 					'about_me'           => $current_user->description,
-					'external_id'        => $current_user->ID,
-					'avatar_url'         => get_avatar_url( get_current_user_id() ),
+					'external_id'        => $user_id,
+					'avatar_url'         => $avatar_url,
 				);
 
 				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse.
-				wp_redirect( $this->options['url'] . '/session/sso_login?' . $q );
+				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
+
 				exit;
 			}
 		}
@@ -213,7 +219,8 @@ class DiscourseSSO {
 	public function logout_from_discourse() {
 		// If SSO is not enabled, don't make the request.
 		if ( empty( $this->options['enable-sso'] ) || 1 !== intval( $this->options['enable-sso'] ) ) {
-			return;
+
+			return null;
 		}
 
 		$user         = wp_get_current_user();
@@ -243,9 +250,25 @@ class DiscourseSSO {
 					),
 				) );
 				if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+
 					return new \WP_Error( 'unable_to_log_out_user', 'There was an error in logging out the current user from Discourse.' );
 				}
 			}
 		}
+
+		return null;
+	}
+
+	/**
+	 * Make a call to the avatar_url to see if the user has an avatar there.
+	 *
+	 * @param int $user_id The user's ID.
+	 *
+	 * @return false|null|string
+	 */
+	protected function get_avatar_url( $user_id ) {
+		$avatar_url = get_avatar_url( $user_id, array( 'default' => '404' ) );
+
+		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}
 }

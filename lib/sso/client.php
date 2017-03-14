@@ -53,7 +53,6 @@ class Client {
 			return;
 		}
 
-		$this->disable_notification_on_user_update();
 		$user_id = $this->get_user_id();
 
 		if ( is_wp_error( $user_id ) ) {
@@ -104,7 +103,7 @@ class Client {
 			'first_name'    => $name,
 		);
 
-		$updated_user = apply_filters( 'discourse/sso/client/updated_user', $updated_user, $query );
+		$updated_user = apply_filters( 'wpdc_sso_client_updated_user', $updated_user, $query );
 
 		$update = wp_update_user( $updated_user );
 
@@ -124,7 +123,7 @@ class Client {
 	 * @param  WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
-		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_failed_login', wp_login_url() );
+		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_failed_login', wp_login_url() );
 
 		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
@@ -192,18 +191,10 @@ class Client {
 		wp_set_auth_cookie( $user_id );
 		do_action( 'wp_login', $query['username'], $query['email'] );
 
-		$redirect_to = apply_filters( 'discourse/sso/client/redirect_after_login', $query['return_sso_url'] );
+		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
 		wp_safe_redirect( $redirect_to );
 		exit;
-	}
-
-	/**
-	 * Disable built in notification on email/password changes.
-	 */
-	private function disable_notification_on_user_update() {
-		add_filter( 'send_password_change_email', '__return_false' );
-		add_filter( 'send_email_change_email', '__return_false' );
 	}
 
 	/**
@@ -224,15 +215,16 @@ class Client {
 		if ( is_user_logged_in() ) {
 			$user_id = get_current_user_id();
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-				add_filter( 'discourse/sso/client/redirect_after_failed_login', array(
-					$this,
-					'get_redirect_to_after_sso',
-				) );
 
-				return new \WP_Error( 'discourse_already_logged_in' );
+				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
+				$redirect = $this->get_sso_response( 'return_sso_url' );
+				wp_safe_redirect( $redirect );
+
+				exit;
 			}
 
 			return $user_id;
+
 		} else {
 			$user_query = new \WP_User_Query( [
 				'meta_key'   => $this->sso_meta_key,
@@ -241,14 +233,26 @@ class Client {
 
 			$user_query_results = $user_query->get_results();
 
+			if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-sync-by-email'] ) && 1 === intval( $this->options['sso-client-sync-by-email'] ) ) {
+				$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
+				if ( $user ) {
+
+					return $user->ID;
+				}
+			}
+
 			if ( empty( $user_query_results ) ) {
 				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
 
-				return wp_create_user(
+				$user_id = wp_create_user(
 					$this->get_sso_response( 'username' ),
 					$user_password,
 					$this->get_sso_response( 'email' )
 				);
+
+				do_action( 'wpdc_sso_client_after_create_user', $user_id );
+
+				return $user_id;
 			}
 
 			return $user_query_results{0}->ID;

@@ -74,6 +74,9 @@ class Discourse {
 		'single-reply-text'           => 'Reply',
 		'many-replies-text'           => 'Replies',
 		'more-replies-more-text'      => 'more',
+		'external-login-text'         => 'Log in with Discourse',
+		'link-to-discourse-text'      => 'Link your account to Discourse',
+		'linked-to-discourse-text' => "You're already linked to Discourse!",
 	);
 
 	/**
@@ -85,6 +88,7 @@ class Discourse {
 		'enable-sso'                   => 0,
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
+		'sso-client-sync-by-email'     => 0,
 		'sso-secret'                   => '',
 		'login-path'                   => '',
 	);
@@ -137,14 +141,5 @@ class Discourse {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
-	}
-
-	/**
-	 * Adds the options 'discourse' and 'discourse_version'.
-	 *
-	 * Called with `register_activation_hook` from `wp-discourse.php`.
-	 */
-	public static function install() {
-		update_option( 'discourse_version', WPDISCOURSE_VERSION );
 	}
 }

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.2.8
+ * Version: 1.3.0
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,9 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.2.8' );
+define( 'WPDISCOURSE_VERSION', '1.3.0' );
+
+register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
 require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
@@ -58,15 +60,6 @@ require_once( __DIR__ . '/lib/sso/query-redirect.php' );
 require_once( __DIR__ . '/lib/sso/sso-url.php' );
 
 require_once( __DIR__ . '/admin/admin.php' );
-require_once( __DIR__ . '/admin/admin-menu.php' );
-require_once( __DIR__ . '/admin/comment-settings.php' );
-require_once( __DIR__ . '/admin/configurable-text-settings.php' );
-require_once( __DIR__ . '/admin/connection-settings.php' );
-require_once( __DIR__ . '/admin/form-helper.php' );
-require_once( __DIR__ . '/admin/options-page.php' );
-require_once( __DIR__ . '/admin/publish-settings.php' );
-require_once( __DIR__ . '/admin/settings-validator.php' );
-require_once( __DIR__ . '/admin/sso-settings.php' );
 
 $discourse = new WPDiscourse\Discourse\Discourse();
 new WPDiscourse\DiscoursePublish\DiscoursePublish();
@@ -77,14 +70,32 @@ new WPDiscourse\MetaBox\MetaBox();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
 
-$form_helper  = WPDiscourse\Admin\FormHelper::get_instance();
-$options_page = WPDiscourse\Admin\OptionsPage::get_instance();
-new WPDiscourse\Admin\AdminMenu( $options_page, $form_helper );
-new WPDiscourse\Admin\ConnectionSettings( $form_helper );
-new WPDiscourse\Admin\PublishSettings( $form_helper );
-new WPDiscourse\Admin\CommentSettings( $form_helper );
-new WPDiscourse\Admin\ConfigurableTextSettings( $form_helper );
-new WPDiscourse\Admin\SSOSettings( $form_helper );
-new WPDiscourse\Admin\SettingsValidator();
+/**
+ * Check the plugin's php and WordPress version requirements.
+ */
+function wpdc_check_requirements() {
+	global $wp_version;
+	$flags = array();
 
-register_activation_hook( __FILE__, array( $discourse, 'install' ) );
+	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
+		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION .
+		                        '. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
+	}
+
+	if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
+		$flags['wordpress_version'] = 'The WP Discourse plugin requires at least WordPress version ' . MIN_WP_VERSION . '.';
+	}
+
+	if ( ! empty( $flags ) ) {
+		$message = '';
+		foreach ( $flags as $flag ) {
+			$message .= $flag;
+		}
+
+		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
+
+		wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+	}
+
+	update_option( 'discourse_version', WPDISCOURSE_VERSION );
+}
