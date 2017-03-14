@@ -234,7 +234,7 @@ class Client {
 			$user_query_results = $user_query->get_results();
 
 			if ( empty( $user_query_results && ! empty( $this->options['sso-client-sync-by-email'] ) &&
-			            1 === intval( $this->options['sso-client-sync-by-email'] ) )
+			1 === intval( $this->options['sso-client-sync-by-email'] ) )
 			) {
 				$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
 				if ( $user ) {

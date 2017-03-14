@@ -72,9 +72,9 @@ class QueryRedirect {
 		 * To make this work, enter a URL of the form "http://my-wp-blog.com/?request=logout" in the "logout redirect"
 		 * field in your Discourse admin.
 		 */
-		if ( isset( $_GET['request'] ) && 'logout' === $_GET['request'] ) {
+		if ( isset( $_GET['request'] ) && 'logout' === $_GET['request'] ) { // Input var okay.
 			wp_logout();
-			wp_safe_redirect( $this->options['url']);
+			wp_safe_redirect( $this->options['url'] );
 
 			exit;
 		}
