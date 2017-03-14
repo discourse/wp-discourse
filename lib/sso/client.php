@@ -127,7 +127,7 @@ class Client {
 
 		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
-		wp_safe_redirect( $redirect_to );
+		wp_redirect( $redirect_to );
 		exit;
 	}
 
@@ -193,7 +193,7 @@ class Client {
 
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
-		wp_safe_redirect( $redirect_to );
+		wp_redirect( $redirect_to );
 		exit;
 	}
 
@@ -218,7 +218,7 @@ class Client {
 
 				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
 				$redirect = $this->get_sso_response( 'return_sso_url' );
-				wp_safe_redirect( $redirect );
+				wp_redirect( $redirect );
 
 				exit;
 			}
