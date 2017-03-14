@@ -236,7 +236,11 @@ class Client {
 			if ( empty( $user_query_results && ! empty( $this->options['sso-client-sync-by-email'] ) &&
 			            1 === intval( $this->options['sso-client-sync-by-email'] ) )
 			) {
-				$user_query_results = get_user_by( 'email', $this->get_sso_response( 'email' ) );
+				$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
+				if ( $user ) {
+
+					return $user->ID;
+				}
 			}
 
 			if ( empty( $user_query_results ) ) {
