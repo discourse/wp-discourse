@@ -26,9 +26,9 @@ function discourse_sso_alter_login_form() {
 	}
 
 	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_link_markup() ) );
+	do_action( 'wpdc_sso_client_after_login_link' );
 }
 
-// Todo: shouldn't this be in the function?
 add_action( 'login_form', 'discourse_sso_alter_login_form' );
 
 
