@@ -39,6 +39,8 @@ function discourse_sso_alter_user_profile() {
 	$auto_inject_button = discourse_sso_auto_inject_button();
 	$options = DiscourseUtilities::get_options();
 	$link_text = ! empty( $options['link-to-discourse-text']) ? $options['link-to-discourse-text'] : '';
+	$linked_text = ! empty( $options['linked-to-discourse-text']) ? $options['linked-to-discourse-text'] : '';
+
 	if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
 		return;
 	}
@@ -50,7 +52,7 @@ function discourse_sso_alter_user_profile() {
 	  <td>
 	<?php
 	if ( DiscourseUtilities::user_is_linked_to_sso() ) {
-		esc_html_e( 'You\'re already linked to discourse!', 'wp-discourse' );
+		esc_html_e( $linked_text );
 	} else {
 		echo wp_kses_data( get_discourse_sso_link_markup() );
 	}

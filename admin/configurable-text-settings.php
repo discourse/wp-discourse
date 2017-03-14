@@ -114,6 +114,11 @@ class ConfigurableTextSettings {
 			'link_to_discourse_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
+		add_settings_field( 'discourse_linked_to_discourse_text', __( 'Account is linked to Discourse text', 'wp-discourse' ), array(
+		        $this,
+            'linked_to_discourse_text',
+        ), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
 			$this->form_helper,
 			'validate_options',
@@ -210,6 +215,11 @@ class ConfigurableTextSettings {
 		$this->form_helper->input( 'link-to-discourse-text', 'discourse_configurable_text', __( 'Text added to the login and profile pages when Discourse is used as the
 	    SSO provider. Used for linking existing accounts between Discourse and WordPress.', 'wp-discourse' ) );
 	}
+
+	public function linked_to_discourse_text() {
+	    $this->form_helper->input( 'linked-to-discourse-text', 'discourse_configurable_text', __( "Text added to the user's profile page when Discourse is used as the
+	    SSO proveder. Used to indicate that the user's account is linked to Discourse.", 'wp-discourse' ) );
+    }
 
 	/**
 	 * Details for the 'text_content_options' tab.
