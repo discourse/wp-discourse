@@ -123,9 +123,9 @@ class SSOSettings {
 	 * Outputs markup for sso-client-sync-by-email checkbox.
 	 */
 	public function sso_client_sync_by_email_checkbox() {
-	    $this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso', __( 'Sync existing users.', 'wp-discourse'), __( "When using Discourse as the SSO provider for your site,
+	    $this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso', __( 'Sync existing users.', 'wp-discourse' ), __( "When using Discourse as the SSO provider for your site,
 	    enabling this setting will sync existing accounts based on the user's email address.", 'wp-discourse' ) );
-    }
+	}
 
 	/**
 	 * Outputs markup for the login-path input.
@@ -159,14 +159,14 @@ class SSOSettings {
 	 */
 	function sso_settings_tab_details() {
 		?>
-        <p class="documentation-link">
-            <em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
+		<p class="documentation-link">
+			<em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
             or a Single Sign On client, for your Discourse forum. Unless you have a need to manage your forum\'s users
             through your WordPress site, or to log users into your WordPress site through Discourse, you can leave this setting alone. 
             For more information, see the ', 'wp-discourse' ); ?></em>
-            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-        </p>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+		</p>
 		<?php
 	}
 }
