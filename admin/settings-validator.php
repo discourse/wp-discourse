@@ -79,9 +79,13 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_single_reply_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_many_replies_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_more_replies_more_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_external_login_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_link_to_discourse_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_linked_to_discourse_text', array( $this, 'validate_text_input' ) );
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_sync_by_email', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );

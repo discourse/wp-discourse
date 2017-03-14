@@ -163,7 +163,7 @@ class CommentSettings {
 	 * Outputs markup for the custom-datetime input.
 	 */
 	public function custom_datetime_format() {
-		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'Custom comment meta datetime string format (default: "', 'wp-discourse' ) .
+		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
 																				  get_option( 'date_format' ) . '").' .
 																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
 		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );

@@ -26,6 +26,8 @@ function discourse_sso_alter_login_form() {
 	}
 
 	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_link_markup() ) );
+
+	do_action( 'wpdc_sso_client_after_login_link' );
 }
 
 add_action( 'login_form', 'discourse_sso_alter_login_form' );
@@ -36,18 +38,22 @@ add_action( 'login_form', 'discourse_sso_alter_login_form' );
  */
 function discourse_sso_alter_user_profile() {
 	$auto_inject_button = discourse_sso_auto_inject_button();
-	if ( ! apply_filters( 'discourse/sso/client/add_link_buttons_on_profile', $auto_inject_button ) ) {
+	$options = DiscourseUtilities::get_options();
+	$link_text = ! empty( $options['link-to-discourse-text'] ) ? $options['link-to-discourse-text'] : '';
+	$linked_text = ! empty( $options['linked-to-discourse-text'] ) ? $options['linked-to-discourse-text'] : '';
+
+	if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
 		return;
 	}
 
 	?>
 	<table class="form-table">
 	<tr>
-	  <th><?php esc_html_e( 'Link your account to Discourse', 'wp-discourse' ); ?></th>
+	  <th><?php echo wp_kses_post( $link_text ); ?></th>
 	  <td>
 	<?php
 	if ( DiscourseUtilities::user_is_linked_to_sso() ) {
-		esc_html_e( 'You\'re already linked to discourse!', 'wp-discourse' );
+		echo wp_kses_post( $linked_text );
 	} else {
 		echo wp_kses_data( get_discourse_sso_link_markup() );
 	}

@@ -67,9 +67,14 @@ class SSOSettings {
 			'enable_sso_client_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
-		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add "Login with Discourse" on the login form', 'wp-discourse' ), array(
+		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add "Login with Discourse" to the Login Form', 'wp-discourse' ), array(
 			$this,
 			'enable_discourse_sso_login_form_change_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'discourse_enable_sso_sync', __( 'Sync Existing Users by Email', 'wp-discourse' ), array(
+			$this,
+			'sso_client_sync_by_email_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
 		add_settings_field( 'discourse_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
@@ -86,7 +91,6 @@ class SSOSettings {
 			$this->form_helper,
 			'validate_options',
 		) );
-
 	}
 
 	/**
@@ -95,7 +99,7 @@ class SSOSettings {
 	public function enable_sso_provider_checkbox() {
 		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum. 
 		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO Provider.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso', __( 'Enable SSO provider.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -103,16 +107,24 @@ class SSOSettings {
 	 */
 	public function enable_sso_client_checkbox() {
 		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
-		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO Client.', 'wp-discourse' ), $description );
+		To use this functionality, you must fill SSO Secret key field. (Currently, not working with multisite installations.)', 'wp-discourse' );
+		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso', __( 'Enable SSO client.', 'wp-discourse' ), $description );
 	}
 
 	/**
 	 * Outputs markup for sso-client-login-form-change
 	 */
 	public function enable_discourse_sso_login_form_change_checkbox() {
-		$this->form_helper->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'When using your site as as an SSO client for Discourse, 
-		this setting will add a "Login with Discourse" link to your WordPress login form.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'sso-client-login-form-change', 'discourse_sso', __( 'Add login link.', 'wp-discourse' ), __( 'When using Discourse as the SSO provider for your site, 
+		enabling this setting will add a "Login with Discourse" link to your WordPress login form.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for sso-client-sync-by-email checkbox.
+	 */
+	public function sso_client_sync_by_email_checkbox() {
+	    $this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso', __( 'Sync existing users.', 'wp-discourse' ), __( "When using Discourse as the SSO provider for your site,
+	    enabling this setting will sync existing accounts based on the user's email address.", 'wp-discourse' ) );
 	}
 
 	/**

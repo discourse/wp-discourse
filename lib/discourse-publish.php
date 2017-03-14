@@ -70,10 +70,14 @@ class DiscoursePublish {
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
 		if ( wp_is_post_revision( $post_id ) ) {
+
 			return;
 		}
+
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
 			$title = $this->sanitize_title( $post->post_title );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );

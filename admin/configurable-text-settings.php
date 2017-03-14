@@ -104,6 +104,21 @@ class ConfigurableTextSettings {
 			'more_replies_more_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
+		add_settings_field( 'discourse_external_login_text', __( 'External login text', 'wp-discourse' ), array(
+			$this,
+			'external_login_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_link_to_discourse_text', __( 'Link account to Discourse text', 'wp-discourse' ), array(
+			$this,
+			'link_to_discourse_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
+		add_settings_field( 'discourse_linked_to_discourse_text', __( 'Account is linked to Discourse text', 'wp-discourse' ), array(
+		        $this,
+			'linked_to_discourse_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
+
 		register_setting( 'discourse_configurable_text', 'discourse_configurable_text', array(
 			$this->form_helper,
 			'validate_options',
@@ -182,7 +197,31 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the more-replies-more-text input.
 	 */
 	public function more_replies_more_text() {
-		$this->form_helper->input( 'more-replies-more-text', 'discourse_configurable_text', __( 'Text used when there are more replies.', 'wp-discourse' ) );
+		$this->form_helper->input( 'more-replies-more-text', 'discourse_configurable_text', __( "Text used when there are more replies on Discourse than are being shown on WordPress.
+		For example, if there are 10 replies on Discourse and 5 replies on WordPress, the text '5 more replies' will be shown underneath the comments section.", 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs the markup for the external-login-text input.
+	 */
+	public function external_login_text() {
+		$this->form_helper->input( 'external-login-text', 'discourse_configurable_text', __( 'Text for the login page login link when Discourse is used as the SSO provider.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs the markup for the link-to-discourse-text input.
+	 */
+	public function link_to_discourse_text() {
+		$this->form_helper->input( 'link-to-discourse-text', 'discourse_configurable_text', __( 'Text added to the login and profile pages when Discourse is used as the
+	    SSO provider. Used for linking existing accounts between Discourse and WordPress.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs the markup for the linked-to-discourse-text input.
+	 */
+	public function linked_to_discourse_text() {
+	    $this->form_helper->input( 'linked-to-discourse-text', 'discourse_configurable_text', __( "Text added to the user's profile page when Discourse is used as the
+	    SSO proveder. Used to indicate that the user's account is linked to Discourse.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -222,7 +261,7 @@ class ConfigurableTextSettings {
 	 */
 	public function process_text_options_reset() {
 		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
 		) {
 
 			exit;
