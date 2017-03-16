@@ -122,7 +122,7 @@ class DiscourseSSO {
 		) {
 
 			wp_logout();
-			wp_redirect( $this->options['url'] );
+			wp_safe_redirect( $this->options['url'] );
 
 			exit;
 		}
@@ -145,7 +145,7 @@ class DiscourseSSO {
 				$login = wp_login_url( esc_url_raw( $redirect ) );
 
 				// Redirect to login.
-				wp_redirect( $login );
+				wp_safe_redirect( $login );
 
 				exit;
 			} else {
@@ -201,7 +201,7 @@ class DiscourseSSO {
 				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse.
-				wp_redirect( $this->options['url'] . '/session/sso_login?' . $q );
+				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
 				exit;
 			}

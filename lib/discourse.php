@@ -112,6 +112,7 @@ class Discourse {
 	public function __construct() {
 		add_action( 'init', array( $this, 'initialize_plugin_configuration' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 	}
 
 	/**
@@ -128,6 +129,19 @@ class Discourse {
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
+
+		// Set the Discourse domain name option.
+		$discourse_url = ! empty( get_option('discourse_connect')['url']) ? get_option( 'discourse_connect' )['url'] : null;
+		$domain_name = parse_url( $discourse_url )['host'];
+		update_option( 'wpdc_discourse_domain', $domain_name );
+	}
+
+	public function allow_discourse_redirect( $hosts ) {
+		if ( $discourse_domain = get_option( 'wpdc_discourse_domain', true ) ) {
+			$hosts[] = $discourse_domain;
+		}
+
+		return $hosts;
 	}
 
 	/**

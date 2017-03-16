@@ -279,7 +279,7 @@ class ConfigurableTextSettings {
 			'tab'  => 'text_content_options',
 		), admin_url( 'admin.php' ) );
 
-		wp_redirect( esc_url_raw( $configurable_text_url ) );
+		wp_safe_redirect( esc_url_raw( $configurable_text_url ) );
 
 		exit;
 	}
