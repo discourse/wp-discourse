@@ -126,6 +126,9 @@ class FormHelper {
 
 		?>
 		<label>
+            <input name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+                   type='hidden'
+                   value='0' />
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
 				   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 				   type='checkbox'
