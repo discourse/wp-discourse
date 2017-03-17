@@ -131,11 +131,18 @@ class Discourse {
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
 
 		// Set the Discourse domain name option.
-		$discourse_url = ! empty( get_option('discourse_connect')['url']) ? get_option( 'discourse_connect' )['url'] : null;
-		$domain_name = parse_url( $discourse_url )['host'];
+		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 	}
 
+	/**
+	 * Adds the Discourse forum domain name to the allowed hosts for wp_safe_redirect().
+	 *
+	 * @param array $hosts The array of allowed hosts.
+	 *
+	 * @return array
+	 */
 	public function allow_discourse_redirect( $hosts ) {
 		if ( $discourse_domain = get_option( 'wpdc_discourse_domain', true ) ) {
 			$hosts[] = $discourse_domain;
