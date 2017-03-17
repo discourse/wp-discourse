@@ -110,8 +110,8 @@ class Discourse {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'initialize_plugin_configuration' ) );
-		add_action( 'admin_init', array( $this, 'initialize_plugin_options' ) );
+		add_action( 'init', array( $this, 'initialize_plugin' ) );
+		add_action( 'admin_init', array( $this, 'set_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 	}
@@ -119,9 +119,8 @@ class Discourse {
 	/**
 	 * Initializes the plugin configuration, loads the text domain etc.
 	 */
-	public function initialize_plugin_configuration() {
+	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
-
 
 		// Set the Discourse domain name option.
 		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
@@ -129,17 +128,30 @@ class Discourse {
 		update_option( 'wpdc_discourse_domain', $domain_name );
 	}
 
-	// See: https://codex.wordpress.org/Function_Reference/register_activation_hook
-	public function initialize_plugin_options() {
+	/**
+	 * Initialize plugin options on activation.
+	 *
+	 * The code in this function will only run once - while the option 'wpdc_plugin_activated' is set.
+	 * The 'wpdc_plugin_activated' option is set in the plugins activation hook function.
+	 *
+	 * See: https://codex.wordpress.org/Function_Reference/register_activation_hook
+	 */
+	public function set_plugin_options() {
 		if ( is_admin() && 'wpdc-activated' === get_option( 'wpdc_plugin_activated' ) ) {
 			delete_option( 'wpdc_plugin_activated' );
-			add_option( 'discourse_option_groups', $this->discourse_option_groups );
+
+			update_option( 'discourse_option_groups', $this->discourse_option_groups );
 			update_option( 'discourse_version', WPDISCOURSE_VERSION );
 
 			foreach ( $this->discourse_option_groups as $group_name ) {
-				$saved_option    = get_option( $group_name );
 				$option_defaults = $this->$group_name;
-				$option          = $saved_option ? array_merge( $option_defaults, $saved_option ) : $option_defaults;
+				$saved_option    = get_option( $group_name );
+				if ( $saved_option ) {
+					$option = 'configurable_text_options' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
+				} else {
+					$option = $saved_option;
+				}
+
 				update_option( $group_name, $option );
 			}
 		}
