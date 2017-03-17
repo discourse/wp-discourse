@@ -98,5 +98,4 @@ function wpdc_check_requirements() {
 	}
 
 	add_option( 'wpdc_plugin_activated', 'wpdc-activated' );
-//	update_option( 'discourse_version', WPDISCOURSE_VERSION );
 }
