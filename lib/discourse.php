@@ -76,7 +76,7 @@ class Discourse {
 		'more-replies-more-text'      => 'more',
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
-		'linked-to-discourse-text' => "You're already linked to Discourse!",
+		'linked-to-discourse-text'    => "You're already linked to Discourse!",
 	);
 
 	/**
@@ -111,6 +111,7 @@ class Discourse {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'initialize_plugin_configuration' ) );
+		add_action( 'admin_init', array( $this, 'initialize_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 	}
@@ -121,22 +122,30 @@ class Discourse {
 	public function initialize_plugin_configuration() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		add_option( 'discourse_option_groups', $this->discourse_option_groups );
 
-		foreach ( $this->discourse_option_groups as $group_name ) {
-			$saved_option = get_option( $group_name );
-			$option_defaults = $this->$group_name;
-			$option = $saved_option ? array_merge( $option_defaults, $saved_option ) : $option_defaults;
-			update_option( $group_name, $option );
+		// Set the Discourse domain name option.
+		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		update_option( 'wpdc_discourse_domain', $domain_name );
+	}
+
+	// See: https://codex.wordpress.org/Function_Reference/register_activation_hook
+	public function initialize_plugin_options() {
+		if ( is_admin() && 'wpdc-activated' === get_option( 'wpdc_plugin_activated' ) ) {
+			delete_option( 'wpdc_plugin_activated' );
+			add_option( 'discourse_option_groups', $this->discourse_option_groups );
+			update_option( 'discourse_version', WPDISCOURSE_VERSION );
+
+			foreach ( $this->discourse_option_groups as $group_name ) {
+				$saved_option    = get_option( $group_name );
+				$option_defaults = $this->$group_name;
+				$option          = $saved_option ? array_merge( $option_defaults, $saved_option ) : $option_defaults;
+				update_option( $group_name, $option );
+			}
 		}
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
-
-		// Set the Discourse domain name option.
-		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
-		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
-		update_option( 'wpdc_discourse_domain', $domain_name );
 	}
 
 	/**

@@ -97,5 +97,6 @@ function wpdc_check_requirements() {
 		wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
 	}
 
-	update_option( 'discourse_version', WPDISCOURSE_VERSION );
+	add_option( 'wpdc_plugin_activated', 'wpdc-activated' );
+//	update_option( 'discourse_version', WPDISCOURSE_VERSION );
 }
