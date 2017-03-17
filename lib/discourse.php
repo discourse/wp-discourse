@@ -124,7 +124,10 @@ class Discourse {
 		add_option( 'discourse_option_groups', $this->discourse_option_groups );
 
 		foreach ( $this->discourse_option_groups as $group_name ) {
-			add_option( $group_name, $this->$group_name );
+			$saved_option = get_option( $group_name );
+			$option_defaults = $this->$group_name;
+			$option = $saved_option ? array_merge( $option_defaults, $saved_option ) : $option_defaults;
+			update_option( $group_name, $option );
 		}
 
 		// Create a backup for the discourse_configurable_text option.
