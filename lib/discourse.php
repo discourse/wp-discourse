@@ -129,7 +129,9 @@ class Discourse {
 	}
 
 	/**
-	 * Initialize plugin options on activation.
+	 * Sets the plugin options on activation.
+	 *
+	 * Merges the default values of the 'configurable_text_options' with the saved values.
 	 *
 	 * The code in this function will only run once - while the option 'wpdc_plugin_activated' is set.
 	 * The 'wpdc_plugin_activated' option is set in the plugins activation hook function.
@@ -147,9 +149,12 @@ class Discourse {
 				$option_defaults = $this->$group_name;
 				$saved_option    = get_option( $group_name );
 				if ( $saved_option ) {
+					// For now, only the configurable_text_options are being merged. In the future it will
+					// be possible to merge the values of all option groups. Previously, unset checkboxes weren't
+					// being set, so merging option groups that contain checkboxes could end up changing a site's settings.
 					$option = 'configurable_text_options' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
 				} else {
-					$option = $saved_option;
+					$option = $option_defaults;
 				}
 
 				update_option( $group_name, $option );
