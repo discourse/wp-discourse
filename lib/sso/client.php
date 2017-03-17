@@ -145,7 +145,7 @@ class Client {
 
 			switch ( $err ) {
 				case 'existing_user_email':
-					$message = __( 'The email address supplied by Discourse doesn not match your account. Probably a user other than yourself is logged into Discourse on your device. Please try visiting the Discourse forum and logging that user out. You should then be able to sync your account with Discourse.', 'wp-discourse' );
+					$message = __( "There is an exiting account with the email address you are attempting to login with. If you are trying to log in through Discourse, you need to first login through WordPress, visit your profile page, and click on the 'sync accounts' link.", 'wp-discourse' );
 					$errors->add( 'discourse_sso_existing_user', $message );
 					break;
 
