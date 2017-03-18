@@ -283,10 +283,10 @@ class WordPressEmailVerification {
 		if ( 1 === intval( $this->get_email_flag_status( $user_id ) ) ||
 		     1 === intval( $this->get_email_changed_status( $user_id ) ) ) {
 
-			return false;
+			return apply_filters( 'wpdc_email_verification_not_verified', false, $user_id );
 		} else {
 
-			return true;
+			return apply_filters( 'wpdc_email_verification_verified', true, $user_id );
 		}
 	}
 
