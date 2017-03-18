@@ -87,8 +87,11 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=text_content_options"
 				   class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
 				</a>
+
+                <?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
+
 				<a href="?page=wp_discourse_options&tab=sso_options"
-				   class="nav-tab <?php echo 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
+				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
 				</a>
 
 				<?php
