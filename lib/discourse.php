@@ -138,6 +138,16 @@ class Discourse {
 		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
 		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
+		update_option( 'discourse_option_groups', $this->discourse_option_groups );
+
+		if ( get_option( 'discourse_sso' ) ) {
+			$this->transfer_options( 'discourse_sso', array(
+				'discourse_sso_common',
+				'discourse_sso_provider',
+				'discourse_sso_client',
+			) );
+			delete_option( 'discourse_sso' );
+		}
 	}
 
 	/**
@@ -225,5 +235,34 @@ class Discourse {
 		);
 
 		return $allowedposttags;
+	}
+
+	/**
+	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
+	 */
+	protected function transfer_options( $old_option, $transferable_option_groups ) {
+		$discourse_options          = get_option( $old_option );
+
+		foreach ( $transferable_option_groups as $group_name ) {
+			$this->transfer_option_group( $discourse_options, $group_name );
+		}
+	}
+
+	/**
+	 * Transfers saved option values to the new options group.
+	 *
+	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param string $group_name The name of the current options group.
+	 */
+	protected function transfer_option_group( $existing_options, $group_name ) {
+		$transferred_options = array();
+
+		foreach ( $this->$group_name as $key => $value ) {
+			if ( isset( $existing_options[ $key ] ) ) {
+				$transferred_options[ $key ] = $existing_options[ $key ];
+			}
+		}
+
+		add_option( $group_name, $transferred_options );
 	}
 }
