@@ -44,6 +44,7 @@ class SSOSettings {
 	}
 
 	public function sso_settings_fields( $tab ) {
+	    write_log('tab', $tab);
 		if ( 'sso_common' === $tab || 'sso_options' === $tab ) {
 			settings_fields( 'discourse_sso_common' );
 			do_settings_sections( 'discourse_sso_common' );
