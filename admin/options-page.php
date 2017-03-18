@@ -138,8 +138,8 @@ class OptionsPage {
 					}
 
 					if ( 'sso_options' === $tab ) {
-						settings_fields( 'discourse_sso' );
-						do_settings_sections( 'discourse_sso' );
+//						settings_fields( 'discourse_sso' );
+//						do_settings_sections( 'discourse_sso' );
 					}
 
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );

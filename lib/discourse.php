@@ -79,21 +79,27 @@ class Discourse {
 		'linked-to-discourse-text'    => "You're already linked to Discourse!",
 	);
 
-	/**
-	 * The SSO options array.
-	 *
-	 * @var array
-	 */
-	protected $discourse_sso = array(
+	protected $discourse_sso_common = array(
+		'sso-secret'                   => '',
+	);
+
+	protected $discourse_sso_provider = array(
 		'enable-sso'                   => 0,
 		'auto-create-sso-user'         => 0,
 		'auto-create-login-redirect' => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
+	);
+
+	/**
+	 * The SSO options array.
+	 *
+	 * @var array
+	 */
+	protected $discourse_sso_client = array(
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
 		'sso-client-sync-by-email'     => 0,
-		'sso-secret'                   => '',
 	);
 
 	/**
@@ -106,7 +112,9 @@ class Discourse {
 		'discourse_publish',
 		'discourse_comment',
 		'discourse_configurable_text',
-		'discourse_sso',
+		'discourse_sso_common',
+		'discourse_sso_provider',
+		'discourse_sso_client',
 	);
 
 	/**
