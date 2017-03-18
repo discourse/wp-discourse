@@ -42,10 +42,10 @@ class DiscourseSSO {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
-		add_action( 'wp_login', array( $this, 'maybe_create_and_login_user' ), 10, 2 );
+		add_action( 'wp_login', array( $this, 'auto_login_discourse_user' ), 10, 2 );
 	}
 
-	public function maybe_create_and_login_user( $user_login, $user ) {
+	public function auto_login_discourse_user( $user_login, $user ) {
 		if ( ( ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ) &&
 		     ! empty( $this->options['auto-create-sso-user'] ) && 1 === intval( $this->options['auto-create-sso-user'] )
 		) {
@@ -53,7 +53,7 @@ class DiscourseSSO {
 			$redirect = ! empty( $this->options['auto-create-login-redirect'] ) ? $this->options['auto-create-login-redirect'] : home_url( '/' );
 			$sso_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/session/sso?return_path=' . $redirect : '';
 			$referer_query = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
-//			write_log('referer_query', $referer_query );
+			write_log('referer_query', $referer_query );
 			$query_params = [];
 			parse_str( $referer_query, $query_params );
 			$sso_referer = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
@@ -163,6 +163,7 @@ class DiscourseSSO {
 
 				// Change %0A to %0B so it's not stripped out in wp_sanitize_redirect.
 				$redirect = str_replace( '%0A', '%0B', $redirect );
+
 				// Build login URL.
 				$login = wp_login_url( esc_url_raw( $redirect ) );
 
