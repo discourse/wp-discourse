@@ -77,6 +77,8 @@ class SSOSettings {
 			'wordpress_login_path',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
+		add_settings_field( 'discourse_setting_separator', '<h3>SSO Client Settings</h3>', array( $this, 'discourse_settings_separator' ), 'discourse_sso', 'discourse_sso_settings_section');
+
 		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_client_checkbox',
@@ -107,6 +109,15 @@ class SSOSettings {
 			'validate_options',
 		) );
 	}
+
+	public function discourse_settings_separator() {
+        ?>
+        <hr>
+        <p>
+            Enabling your site to function as an SSO <em>client</em> lets you use your Discourse as your SSO <em>provider</em>.
+        </p>
+        <?php
+    }
 
 	/**
 	 * Outputs markup for the enable-sso checkbox.
