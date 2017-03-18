@@ -81,6 +81,8 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'wpdc_validate_auto_create_sso_user', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_auto_create_login_redirect', array( $this, 'validate_auto_create_login_redirect' ) );
+		add_filter( 'wpdc_validate_auto_create_welcome_redirect', array( $this, 'validate_auto_create_welcome_redirect' ) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
@@ -353,6 +355,42 @@ class SettingsValidator {
 			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
+
+				return $this->sanitize_text( $input );
+			}
+
+			// It's valid.
+			return $this->sanitize_text( $input );
+		}
+
+		// Sanitize, but don't validate. SSO is not enabled.
+		return $this->sanitize_text( $input );
+	}
+
+	public function validate_auto_create_login_redirect( $input ) {
+		if ( $this->sso_enabled && $input ) {
+
+			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
+			if ( ! preg_match( $regex, $input ) ) {
+				add_settings_error( 'discourse', 'auto_create_login_redirect', __( 'The path to the login redirect page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
+
+				return $this->sanitize_text( $input );
+			}
+
+			// It's valid.
+			return $this->sanitize_text( $input );
+		}
+
+		// Sanitize, but don't validate. SSO is not enabled.
+		return $this->sanitize_text( $input );
+	}
+
+	public function validate_auto_create_welcome_redirect( $input ) {
+		if ( $this->sso_enabled && $input ) {
+
+			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
+			if ( ! preg_match( $regex, $input ) ) {
+				add_settings_error( 'discourse', 'auto_create_welcome_redirect', __( 'The path to the welcome page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
 
 				return $this->sanitize_text( $input );
 			}

@@ -86,7 +86,9 @@ class Discourse {
 	 */
 	protected $discourse_sso = array(
 		'enable-sso'                   => 0,
-		'auto-create-sso-user' => 0,
+		'auto-create-sso-user'         => 0,
+		'auto-create-login-redirect' => '',
+		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
@@ -165,6 +167,11 @@ class Discourse {
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
+
+		// Set the Discourse domain name option.
+		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		update_option( 'wpdc_discourse_domain', $domain_name );
 	}
 
 	/**

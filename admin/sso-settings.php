@@ -62,6 +62,16 @@ class SSOSettings {
 			'auto_create_sso_user_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
+		add_settings_field( 'auto_create_login_redirect', __( 'Redirect After Discourse Login', 'wp-discourse' ), array(
+			$this,
+			'auto_create_login_redirect_input',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
+		add_settings_field( 'auto_create_welcome_redirect', __( 'Path to the New User Welcome Page', 'wp-discourse' ), array(
+		        $this,
+            'auto_create_welcome_redirect',
+        ), 'discourse_sso', 'discourse_sso_settings_section' );
+
 		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
 			$this,
 			'wordpress_login_path',
@@ -111,9 +121,26 @@ class SSOSettings {
 	 * Outputs markup for the auto-create-sso-user checkbox.
 	 */
 	public function auto_create_sso_user_checkbox() {
-	    $description = __( "Automatically login users to Discourse when then login to WordPress. If the user does not yet
+		$description = __( "Automatically login users to Discourse when then login to WordPress. If the user does not yet
 	    exist on Discourse, create the user. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
-	    $this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso', __( 'Auto Create user.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso', __( 'Auto Create user.', 'wp-discourse' ), $description );
+	}
+
+	/**
+	 * Outputs markup for the auto-create-login-redirect input.
+	 */
+	public function auto_create_login_redirect_input() {
+	    $description = __( "Where users will be redirected to after being logged in to Discourse. Note: to have users redirected
+	    back to your WordPress site after being logged in to Discourse, you must enable the 'enable all return paths' setting on your Discourse forum", 'wp-discourse' );
+	    $this->form_helper->input( 'auto-create-login-redirect', 'discourse_sso', $description );
+    }
+
+	/**
+	 * Outputs markup for the auto-create-welcome-redirect input.
+	 */
+	public function auto_create_welcome_redirect() {
+	    $description = __( "An optional path to redirect users on when their Discourse account if first created.", 'wp-discourse' );
+	    $this->form_helper->input( 'auto-create-welcome-redirect', 'discourse_sso', $description );
     }
 
 	/**
