@@ -57,6 +57,11 @@ class SSOSettings {
 			'enable_sso_provider_checkbox',
 		), 'discourse_sso', 'discourse_sso_settings_section' );
 
+		add_settings_field( 'auto_create_sso_user', __( 'Create Discourse User on Login', 'wp-discourse' ), array(
+			$this,
+			'auto_create_sso_user_checkbox',
+		), 'discourse_sso', 'discourse_sso_settings_section' );
+
 		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
 			$this,
 			'wordpress_login_path',
@@ -103,6 +108,15 @@ class SSOSettings {
 	}
 
 	/**
+	 * Outputs markup for the auto-create-sso-user checkbox.
+	 */
+	public function auto_create_sso_user_checkbox() {
+	    $description = __( "Automatically login users to Discourse when then login to WordPress. If the user does not yet
+	    exist on Discourse, create the user. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
+	    $this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso', __( 'Auto Create user.', 'wp-discourse' ), $description );
+    }
+
+	/**
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
@@ -123,7 +137,7 @@ class SSOSettings {
 	 * Outputs markup for sso-client-sync-by-email checkbox.
 	 */
 	public function sso_client_sync_by_email_checkbox() {
-	    $this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso', __( 'Sync existing users.', 'wp-discourse' ), __( "When using Discourse as the SSO provider for your site,
+		$this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso', __( 'Sync existing users.', 'wp-discourse' ), __( "When using Discourse as the SSO provider for your site,
 	    enabling this setting will sync existing accounts based on the user's email address.", 'wp-discourse' ) );
 	}
 
@@ -159,14 +173,14 @@ class SSOSettings {
 	 */
 	function sso_settings_tab_details() {
 		?>
-		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
+        <p class="documentation-link">
+            <em><?php esc_html_e( 'This section is for configuring WordPress as either the Single Sign On provider, 
             or a Single Sign On client, for your Discourse forum. Unless you have a need to manage your forum\'s users
             through your WordPress site, or to log users into your WordPress site through Discourse, you can leave this setting alone. 
             For more information, see the ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-		</p>
+            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+        </p>
 		<?php
 	}
 }

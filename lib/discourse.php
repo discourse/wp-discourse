@@ -86,11 +86,12 @@ class Discourse {
 	 */
 	protected $discourse_sso = array(
 		'enable-sso'                   => 0,
+		'auto-create-sso-user' => 0,
+		'login-path'                   => '',
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
 		'sso-client-sync-by-email'     => 0,
 		'sso-secret'                   => '',
-		'login-path'                   => '',
 	);
 
 	/**
