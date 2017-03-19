@@ -13,42 +13,47 @@
 #setting-error-sso_client_enabled ~ form #discourse-enable-sso,
 #setting-error-sso_secret ~ form #discourse-sso-secret,
 #setting-error-login_path ~ form #discourse-login-path {
-	border-color: #dc3232;
-	border-width: 1px;
+    border-color: #dc3232;
+    border-width: 1px;
 }
 
 .wp-discourse-options-form {
-	max-width: 800px;
+    max-width: 800px;
 }
 
 .discourse-logo {
-	vertical-align: bottom;
+    vertical-align: bottom;
 }
 
-.wrap>h2:first-child {
-	line-height: 24px;
-	margin-bottom: 6px;
+.wrap > h2:first-child {
+    line-height: 24px;
+    margin-bottom: 6px;
 }
 
 #discourse-allowed-post-types {
-	min-width: 160px;
+    min-width: 160px;
 }
 
 #discourse-publish-meta-box .warning {
-	padding: 0 8px;
+    padding: 0 8px;
 }
 
 /* Menu logo */
 #adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
-	padding-top: 5px;
+    padding-top: 5px;
 }
 
 .discourse-options-page-wrap {
-	position: relative;
+    position: relative;
 }
 
 input#discourse_reset_options {
-	position: relative;
-	left: 115px;
-	bottom: 27px;
+    position: relative;
+    left: 115px;
+    bottom: 27px;
+}
+
+ul.wpdc-documentation-list {
+    list-style: disc;
+    margin-left: 40px;
 }
