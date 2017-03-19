@@ -367,10 +367,16 @@ class SettingsValidator {
 		return $this->sanitize_text( $input );
 	}
 
+	/**
+	 * Todo: allow '.' in path for other path validations. (has been added here.)
+	 * @param $input
+	 *
+	 * @return string
+	 */
 	public function validate_auto_create_login_redirect( $input ) {
 		if ( $this->sso_enabled && $input ) {
 
-			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
+			$regex = '/^\/([a-z0-9\-\.]+)*(\/[a-z0-9\-\.]+)*(\/)?$/';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'auto_create_login_redirect', __( 'The path to the login redirect page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
 
