@@ -67,7 +67,7 @@ class SSOSettings {
             <h3 class="nav-tab-wrapper nav-tab-second-level">
                 <a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
                    class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'Common Options', 'wpdc' ); ?>
+					<?php esc_html_e( 'SSO Secret Key', 'wpdc' ); ?>
                 </a>
                 <a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
                    class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
@@ -91,7 +91,7 @@ class SSOSettings {
 
 		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
 
-		add_settings_section( 'discourse_sso_common_settings_section', __( 'Common Settings', 'wp-discourse' ), array(
+		add_settings_section( 'discourse_sso_common_settings_section', __( 'WP Discourse SSO', 'wp-discourse' ), array(
 			$this,
 			'common_settings_details',
 		), 'discourse_sso_common' );
@@ -156,7 +156,7 @@ class SSOSettings {
 			'enable_sso_client_checkbox',
 		), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
 
-		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add "Login with Discourse" to the Login Form', 'wp-discourse' ), array(
+		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add Login Link', 'wp-discourse' ), array(
 			$this,
 			'enable_discourse_sso_login_form_change_checkbox',
 		), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
@@ -211,7 +211,7 @@ class SSOSettings {
 	 * Outputs markup for the auto-create-sso-user checkbox.
 	 */
 	public function auto_create_sso_user_checkbox() {
-		$description = __( "Automatically login users to Discourse when they login to your WordPress site. If the user does not yet
+		$description = __( "Automatically login users to Discourse after they login to your WordPress site. If the user does not yet
 	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
 		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create and login users.', 'wp-discourse' ), $description );
 	}
@@ -251,8 +251,8 @@ class SSOSettings {
 	 * Outputs markup for the redirect-without-login checkbox.
 	 */
 	public function redirect_without_login_checkbox() {
-	    $description = __( "By default, when using WordPress as the SSO provider, the links to the Discourse comments automatically log
-	    the user into Discourse. Select this setting to link to Discourse without loggin in the user.");
+		$description = __( "By default, when using WordPress as the SSO provider, the links to the Discourse comments automatically log
+	    the user into Discourse. Select this setting to link to Discourse without loggin in the user." );
 		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso_provider', __( 'Do not force login for link to Discourse comments.' ), $description );
 	}
 
@@ -264,25 +264,27 @@ class SSOSettings {
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
-		$description = __( 'Use your Discourse instance as an SSO provider for your WordPress site.
-		To use this functionality, you must fill SSO Secret key field. (Currently, not working with multisite installations.)', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Enable SSO client.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for sso-client-login-form-change
 	 */
 	public function enable_discourse_sso_login_form_change_checkbox() {
-		$this->form_helper->checkbox_input( 'sso-client-login-form-change', 'discourse_sso_client', __( 'Add login link.', 'wp-discourse' ), __( 'When using Discourse as the SSO provider for your site, 
-		enabling this setting will add a "Login with Discourse" link to your WordPress login form.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'sso-client-login-form-change', 'discourse_sso_client', __( "Add a 'Login with Discourse' link to the WordPress login page.", 'wp-discourse' ),
+			__( "Clicking on this link will allow users to authenticate themselves through Discourse, instead of through the
+            WordPress login process. The text for this link can be customized on the 'Text Content' settings tab.", 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for sso-client-sync-by-email checkbox.
 	 */
 	public function sso_client_sync_by_email_checkbox() {
-		$this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso_client', __( 'Sync existing users.', 'wp-discourse' ), __( "When using Discourse as the SSO provider for your site,
-	    enabling this setting will sync existing accounts based on the user's email address.", 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'sso-client-sync-by-email', 'discourse_sso_client', __( 'Sync existing users by matching their Discourse email to their WordPress email.', 'wp-discourse' ),
+			__( "This is used for syncing a WordPress account created through the WordPress registration process, with
+            an account created by the same user on Discourse. If this setting is not enabled, accounts can be synced by clicking on the
+            'Link account with Discourse' link on the user's profile page. Accounts created through the SSO login process
+             are automaticaly synced. Note: WordPress email address can be changed without requiring confirmation.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -304,6 +306,15 @@ class SSOSettings {
                 and your website. Set the secret key both on this page and on your forum before enabling SSO.", 'wp-discourse' ); ?>
             </em>
         </p>
+		<?php if ( $this->discourse_sso_settings_url ) : ?>
+            <p class="documentation-link">
+                <em>
+					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
+                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a>
+                </em>
+            </p>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -312,7 +323,7 @@ class SSOSettings {
         <p class="documentation-link">
             <em>
 				<?php esc_html_e( "Enabling your site to function as the SSO provider transfers all user management from
-				Discourse to WordPress. To use this functionality requires some configuration. On your forum, you need to:", 'wp-discourse' ); ?>
+				Discourse to WordPress. Use of this setting requires some configuration. On your forum, you need to:", 'wp-discourse' ); ?>
             </em>
         </p>
         <ul class="wpdc-documentation-list">
@@ -342,10 +353,39 @@ class SSOSettings {
 		?>
         <p class="documentation-link">
             <em>
-				<?php esc_html_e( "Enabling your site to function as an SSO client allows user authentication to be handled
-                through either your Discourse forum, or your WordPress site.", 'wp-discourse' ); ?>
+				<?php esc_html_e( "Enabling your site to function as an SSO client allows WordPress user authentication to be handled
+                through either your Discourse forum, or your WordPress site. If a Discourse user logs into WordPress through an SSO link,
+                they will be authenticated based on their Discourse credentials. If that user doesn't yet exist on your WordPress site, a new
+                user will be created.", 'wp-discourse' ); ?>
             </em>
         </p>
+        <p class="documentation-link">
+            <em>
+                <strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( "this setting does not yet work with multisite installations.", 'wp-discourse' ); ?>
+            </em>
+        </p>
+        <p class="documentation-link">
+            <em>
+				<?php esc_html_e( "Use of this setting requires some configuration. On your forum you need to:" ) ?>
+            </em>
+        </p>
+        <ul class="wpdc-documentation-list">
+            <li>
+				<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
+            </li>
+            <li>
+				<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
+            </li>
+        </ul>
+		<?php if ( $this->discourse_sso_settings_url ) : ?>
+            <p class="documentation-link">
+                <em>
+					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
+                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a>
+                </em>
+            </p>
+		<?php endif; ?>
 		<?php
 	}
 }
