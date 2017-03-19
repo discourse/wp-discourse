@@ -30,6 +30,8 @@ class SSOSettings {
 	 */
 	protected $options;
 
+	protected $discourse_sso_settings_url;
+
 	/**
 	 * SSOSettings constructor.
 	 *
@@ -44,7 +46,6 @@ class SSOSettings {
 	}
 
 	public function sso_settings_fields( $tab ) {
-		write_log( 'tab', $tab );
 		if ( 'sso_common' === $tab || 'sso_options' === $tab ) {
 			settings_fields( 'discourse_sso_common' );
 			do_settings_sections( 'discourse_sso_common' );
@@ -88,6 +89,8 @@ class SSOSettings {
 	public function register_sso_settings() {
 		$this->options = DiscourseUtilities::get_options();
 
+		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
+
 		add_settings_section( 'discourse_sso_common_settings_section', __( 'Common Settings', 'wp-discourse' ), array(
 			$this,
 			'common_settings_details',
@@ -123,7 +126,7 @@ class SSOSettings {
 			'auto_create_login_redirect_input',
 		), 'discourse_sso_provider', 'discourse_sso_provider_settings_section' );
 
-		add_settings_field( 'auto_create_welcome_redirect', __( 'Path to the New User Welcome Page', 'wp-discourse' ), array(
+		add_settings_field( 'auto_create_welcome_redirect', __( 'New User Redirect', 'wp-discourse' ), array(
 			$this,
 			'auto_create_welcome_redirect',
 		), 'discourse_sso_provider', 'discourse_sso_provider_settings_section' );
@@ -182,11 +185,13 @@ class SSOSettings {
 	 * Outputs markup for the sso-secret input.
 	 */
 	public function sso_secret_input() {
-		$options = $this->options;
-		if ( isset( $options['url'] ) && ! empty( $options['url'] ) ) {
-			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . '/admin/site_settings/category/login</a>' );
+		if ( ! empty( $this->discourse_sso_settings_url ) ) {
+			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text, at least 10 characters long. Set the same key on your forum at ", 'wp-discourse' ) .
+			                                                                 '<a href="' . esc_url( $this->discourse_sso_settings_url ) . '" target="_blank">' . esc_url( $this->discourse_sso_settings_url ) . '</a>' );
 		} else {
-			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
+			$forum_url = 'http://discourse.example.com/admin/site_settings/category/login';
+			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text, at least 10 characters long. Set the same key on your forum at ", 'wp-discourse' ) .
+			                                                                 esc_url( $forum_url ) );
 		}
 	}
 
@@ -198,26 +203,26 @@ class SSOSettings {
 	 * Outputs markup for the enable-sso checkbox.
 	 */
 	public function enable_sso_provider_checkbox() {
-		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum. 
-		To use this functionality, you must fill SSO Secret key field.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', __( 'Enable SSO provider.', 'wp-discourse' ), $description );
+		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
 	}
 
 	/**
 	 * Outputs markup for the auto-create-sso-user checkbox.
 	 */
 	public function auto_create_sso_user_checkbox() {
-		$description = __( "Automatically login users to Discourse when then login to WordPress. If the user does not yet
-	    exist on Discourse, create the user. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Auto Create user.', 'wp-discourse' ), $description );
+		$description = __( "Automatically login users to Discourse when they login to your WordPress site. If the user does not yet
+	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
+		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create and login users.', 'wp-discourse' ), $description );
 	}
 
 	/**
 	 * Outputs markup for the auto-create-login-redirect input.
 	 */
 	public function auto_create_login_redirect_input() {
-		$description = __( "Where users will be redirected to after being logged in to Discourse. Note: to have users redirected
-	    back to your WordPress site after being logged in to Discourse, you must enable the 'enable all return paths' setting on your Discourse forum", 'wp-discourse' );
+		$description = __( "This setting is only used when 'Create Discourse User on Login' is enabled. It sets the WordPress page
+		to which users will be redirected after they are logged into Discourse. Enter a path on your site starting with '/'.
+		If this setting is left blank, users will be redirected back to your homepage.", 'wp-discourse' );
 		$this->form_helper->input( 'auto-create-login-redirect', 'discourse_sso_provider', $description );
 	}
 
@@ -225,7 +230,10 @@ class SSOSettings {
 	 * Outputs markup for the auto-create-welcome-redirect input.
 	 */
 	public function auto_create_welcome_redirect() {
-		$description = __( "An optional path to redirect users on when their Discourse account if first created.", 'wp-discourse' );
+		$description = __( "This setting is only used when 'Create Discourse User on Login' is enabled. It sets an optional
+		page on your WordPress site to which users will be redirected when their Discourse account if first created.
+		Enter a path on your site starting with '/'. If this setting is left blank, users will be redirected to the
+		'Redirect After Discourse Login' path.", 'wp-discourse' );
 		$this->form_helper->input( 'auto-create-welcome-redirect', 'discourse_sso_provider', $description );
 	}
 
@@ -233,8 +241,9 @@ class SSOSettings {
 	 * Outputs markup for the login-path input.
 	 */
 	public function wordpress_login_path() {
-		$this->form_helper->input( 'login-path', 'discourse_sso_provider', __( '(Optional) When using WordPress as the SSO provider, you can set the path to your login page here. 
-		It should start with \'/\'. Leave blank to use the default WordPress login page.', 'wp-discourse' ) );
+		$this->form_helper->input( 'login-path', 'discourse_sso_provider', __( "(Optional) If your site doesn't use the
+		default WordPress login page at '/wp-login.php', you can set the path to your login page here. 
+		It should start with '/'. Leave blank to use the default WordPress login page.", 'wp-discourse' ) );
 	}
 
 
@@ -242,7 +251,9 @@ class SSOSettings {
 	 * Outputs markup for the redirect-without-login checkbox.
 	 */
 	public function redirect_without_login_checkbox() {
-		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso_provider', __( 'Do not force login for link to Discourse comments thread.' ) );
+	    $description = __( "By default, when using WordPress as the SSO provider, the links to the Discourse comments automatically log
+	    the user into Discourse. Select this setting to link to Discourse without loggin in the user.");
+		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso_provider', __( 'Do not force login for link to Discourse comments.' ), $description );
 	}
 
 	/**
@@ -282,18 +293,15 @@ class SSOSettings {
 		?>
         <p class="documentation-link">
             <em>
-				<?php esc_html_e( "Your WordPress site can be used as either the SSO provider for your Discourse forum,
-                or as an SSO client from your Discourse forum. When used as the SSO provider, all user management for your
-                forum will be hendled through WordPress. When used as an SSO client, your WordPress site's users will be
-                able to login through your forum. See the ", 'wp-discourse' ); ?>
-                <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-                <em><?php esc_html_e( ' section of the WP Discourse wiki for more details.', 'wp-discourse' ); ?></em>
+				<?php esc_html_e( "Your WordPress site can be used as either the SSO provider, or as an SSO client with your
+				Discourse forum. When used as the SSO provider, all user management for your forum will be handled through WordPress.
+				When used as an SSO client, user management for your WordPress site will be able to be handled through your forum.", 'wp-discourse' ); ?>
             </em>
         </p>
-        <p>
+        <p class="documentation-link">
             <em>
-				<?php esc_html_e( "Both uses of SSO require a secred key that is shared between your WordPress site and your
-                forum.", 'wp-discourse' ); ?>
+				<?php esc_html_e( "All SSO functionality requires you to create a secret key that is shared between your forum
+                and your website. Set the secret key both on this page and on your forum before enabling SSO.", 'wp-discourse' ); ?>
             </em>
         </p>
 		<?php
@@ -303,12 +311,30 @@ class SSOSettings {
 		?>
         <p class="documentation-link">
             <em>
-				<?php esc_html_e( "Enabling your site to function as the SSO provider transfers all user
-                management from Discourse to WordPress. To use this functionality requires some configuration on your forum -
-                you need to select the 'enable sso' setting, add the URL of your WordPress site to the 'sso url' setting,
-                and add the same secret key to the 'sso secret' setting that is added to the 'sso secret' field on this site.", 'wp-discourse' ); ?>
+				<?php esc_html_e( "Enabling your site to function as the SSO provider transfers all user management from
+				Discourse to WordPress. To use this functionality requires some configuration. On your forum, you need to:", 'wp-discourse' ); ?>
             </em>
         </p>
+        <ul class="wpdc-documentation-list">
+            <li>
+				<?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?>
+            </li>
+            <li>
+				<?php esc_html_e( "add the base URL of your site (for example 'http://mysite.com') to the 'sso url' setting", 'wp-discourse' ); ?>
+            </li>
+            <li>
+				<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
+            </li>
+        </ul>
+		<?php if ( $this->discourse_sso_settings_url ) : ?>
+            <p class="documentation-link">
+                <em>
+					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
+                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a>
+                </em>
+            </p>
+		<?php endif; ?>
 		<?php
 	}
 
@@ -316,7 +342,7 @@ class SSOSettings {
 		?>
         <p class="documentation-link">
             <em>
-                <?php esc_html_e( "Enabling your site to function as an SSO client allows user authentication to be handled
+				<?php esc_html_e( "Enabling your site to function as an SSO client allows user authentication to be handled
                 through either your Discourse forum, or your WordPress site.", 'wp-discourse' ); ?>
             </em>
         </p>
