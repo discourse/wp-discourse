@@ -24,14 +24,6 @@ class SettingsValidator {
 	protected $sso_enabled = false;
 
 	/**
-	 * Indicates whether or not the SSO client is enabled.
-	 *
-	 * @access protected
-	 * @var bool
-	 */
-	protected $sso_client_enabled = false;
-
-	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
 	 *
 	 * @access protected
