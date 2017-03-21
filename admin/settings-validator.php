@@ -354,7 +354,6 @@ class SettingsValidator {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
 
 				return $this->sanitize_text( $input );
-
 			}
 
 			// It's valid.
