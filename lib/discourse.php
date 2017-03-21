@@ -187,7 +187,7 @@ class Discourse {
 	 *
 	 * @return mixed
 	 */
-	function extend_user_profile( $fields ) {
+	public function extend_user_profile( $fields ) {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
