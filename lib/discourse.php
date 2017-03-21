@@ -114,6 +114,7 @@ class Discourse {
 		add_action( 'admin_init', array( $this, 'set_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
+		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
 	}
 
 	/**
@@ -173,7 +174,9 @@ class Discourse {
 	 * @return array
 	 */
 	public function allow_discourse_redirect( $hosts ) {
-		if ( $discourse_domain = get_option( 'wpdc_discourse_domain', true ) ) {
+		$discourse_domain = get_option( 'wpdc_discourse_domain', true );
+
+		if ( $discourse_domain ) {
 			$hosts[] = $discourse_domain;
 		}
 
@@ -191,5 +194,20 @@ class Discourse {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
+	}
+
+	/**
+	 * Allow the time tag - used in Discourse comments.
+	 *
+	 * @param array $allowedposttags The array of allowed html tags.
+	 *
+	 * @return array
+	 */
+	public function allow_time_tag( $allowedposttags ) {
+		$allowedposttags['time'] = array(
+			'datetime' => array(),
+		);
+
+		return $allowedposttags;
 	}
 }

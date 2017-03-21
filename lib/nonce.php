@@ -129,7 +129,10 @@ class Nonce {
 	public function create( $action = -1 ) {
 		$nonce = wp_hash( uniqid( $action, true ), 'nonce' );
 
-		$this->wpdb->insert( $this->get_table_name(), array( 'nonce' => $nonce, 'action' => $action ), array( '%s', '%s' ) );
+		$this->wpdb->insert( $this->get_table_name(), array(
+			'nonce' => $nonce,
+			'action' => $action,
+		), array( '%s', '%s' ) );
 
 		return $nonce;
 	}
@@ -166,6 +169,8 @@ class Nonce {
 	 * @return boolean
 	 */
 	private function invalidate_nonce( $id ) {
-		return $this->wpdb->delete( $this->get_table_name(), array( 'id' => $id ), array( '%d' ) );
+		return $this->wpdb->delete( $this->get_table_name(), array(
+			'id' => $id,
+		), array( '%d' ) );
 	}
 }

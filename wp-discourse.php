@@ -94,7 +94,10 @@ function wpdc_check_requirements() {
 
 		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
 
-		wp_die( esc_html( $message ), 'Plugin Activation Error', array( 'response' => 200, 'back_link' => true ) );
+		wp_die( esc_html( $message ), 'Plugin Activation Error', array(
+			'response' => 200,
+			'back_link' => true,
+		) );
 	}
 
 	add_option( 'wpdc_plugin_activated', 'wpdc-activated' );

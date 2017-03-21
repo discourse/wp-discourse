@@ -460,7 +460,9 @@ class SettingsValidator {
 			$options['max_range'] = $max;
 		}
 
-		$input = filter_var( $input, FILTER_VALIDATE_INT, array( 'options' => $options ) );
+		$input = filter_var( $input, FILTER_VALIDATE_INT, array(
+			'options' => $options,
+		) );
 
 		if ( false === $input ) {
 			if ( $add_error ) {

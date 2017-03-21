@@ -87,6 +87,9 @@ class SSO {
 		$payload = base64_encode( http_build_query( $params ) );
 		$sig     = hash_hmac( 'sha256', $payload, $this->sso_secret );
 
-		return http_build_query( array( 'sso' => $payload, 'sig' => $sig ) );
+		return http_build_query( array(
+			'sso' => $payload,
+			'sig' => $sig,
+		) );
 	}
 }

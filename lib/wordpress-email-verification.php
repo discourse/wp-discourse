@@ -243,10 +243,14 @@ class WordPressEmailVerification {
 		$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 
 		if ( $admin ) {
+			// translators: Admin email sent when an existing user verifies their email address. Placeholder: blogname.
 			$message = sprintf( __( 'An existing user is verifying their email address on your site %s:', 'wp-email-verification' ), $blogname ) . "\r\n\r\n";
+			// translators: Existing user email verification message continued. Placeholder: username.
 			$message .= sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
+			// translators: Existing user email verification message continued. Placeholder: email address.
 			$message .= sprintf( __( 'Email: %s', 'wp-email-verification' ), $user->user_email ) . "\r\n";
 
+			// translators: Admin email. Placeholders: blogname, message.
 			wp_mail( get_option( 'admin_email' ), sprintf( __( '[%s] Existing User Email Verification', 'wp-email-verification' ), $blogname ), $message );
 		}
 
@@ -256,12 +260,14 @@ class WordPressEmailVerification {
 
 		$redirect = rawurlencode( home_url( '/' ) );
 
+		// translators: Existing user email verification message. Placeholder: username.
 		$message = sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
 		$message .= __( 'To verify your email address, visit the following address:', 'wp-email-verification' ) . "\r\n\r\n";
 		$message .= '<' . network_site_url( "wp-login.php?action=login&mail_key=$email_verification_sig&error=emailnotverified&redirect_to=$redirect&login=" . rawurlencode( $user->user_login ), 'login' ) . ">\r\n\r\n";
 
 		$message .= wp_login_url() . "\r\n";
 
+		// translators: Existing user email verification message. Placeholders: blogname, message.
 		wp_mail( $user->user_email, sprintf( __( '[%s] Verify your email address', 'wp-email-verification' ), $blogname ), $message );
 	}
 

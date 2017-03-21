@@ -242,7 +242,7 @@ class Client {
 			}
 
 			if ( empty( $user_query_results ) ) {
-				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
+				$user_password = wp_generate_password( 12, true );
 
 				$user_id = wp_create_user(
 					$this->get_sso_response( 'username' ),
@@ -256,7 +256,7 @@ class Client {
 			}
 
 			return $user_query_results{0}->ID;
-		}
+		}// End if().
 	}
 
 	/**

@@ -204,8 +204,8 @@ class DiscourseSSO {
 				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
 				exit;
-			}
-		}
+			}// End if().
+		}// End if().
 	}
 
 	/**
@@ -267,7 +267,9 @@ class DiscourseSSO {
 	 * @return false|null|string
 	 */
 	protected function get_avatar_url( $user_id ) {
-		$avatar_url = get_avatar_url( $user_id, array( 'default' => '404' ) );
+		$avatar_url = get_avatar_url( $user_id, array(
+			'default' => '404',
+		) );
 
 		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}

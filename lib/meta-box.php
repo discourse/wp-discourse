@@ -110,6 +110,7 @@ class MetaBox {
 		<?php elseif ( $published ) : ?>
 			<hr>
 			<?php
+			// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
 			$allowed = array(
 				'strong' => array(),

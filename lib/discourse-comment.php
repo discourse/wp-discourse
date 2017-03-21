@@ -142,7 +142,9 @@ class DiscourseComment {
 					}
 					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-					if ( ! $discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true ) ) {
+					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
+					if ( ! $discourse_permalink ) {
+
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
@@ -164,11 +166,11 @@ class DiscourseComment {
 							update_post_meta( $postid, 'discourse_last_sync', $time );
 						}
 					}
-				}
+				}// End if().
 
 				wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
-			}
-		}
+			}// End if().
+		}// End if().
 	}
 
 	/**
