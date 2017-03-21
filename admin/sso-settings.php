@@ -143,7 +143,7 @@ class SSOSettings {
 		if ( isset( $options['url'] ) && ! empty( $options['url'] ) ) {
 			$this->form_helper->input( 'sso-secret', 'discourse_sso', __( 'Found at ', 'wp-discourse' ) . '<a href="' . esc_url( $options['url'] ) . '/admin/site_settings/category/login" target="_blank">' . esc_url( $options['url'] ) . '/admin/site_settings/category/login</a>' );
 		} else {
-			$this->form_helper->input( 'sso-secret', 'discourse_connect', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
+			$this->form_helper->input( 'sso-secret', 'discourse_sso', __( 'Found at http://discourse.example.com/admin/site_settings/category/login', 'wp-discourse' ) );
 		}
 	}
 
