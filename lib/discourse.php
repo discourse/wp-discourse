@@ -136,7 +136,7 @@ class Discourse {
 	 * The code in this function will only run once - while the option 'wpdc_plugin_activated' is set.
 	 * The 'wpdc_plugin_activated' option is set in the plugins activation hook function.
 	 *
-	 * See: https://codex.wordpress.org/Function_Reference/register_activation_hook
+	 * See: https://codex.wordpress.org/Function_Reference/register_activation_hook under the 'Process Flow' heading.
 	 */
 	public function set_plugin_options() {
 		if ( is_admin() && 'wpdc-activated' === get_option( 'wpdc_plugin_activated' ) ) {
@@ -152,7 +152,7 @@ class Discourse {
 					// For now, only the configurable_text_options are being merged. In the future it will
 					// be possible to merge the values of all option groups. Previously, unset checkboxes weren't
 					// being set, so merging option groups that contain checkboxes could end up changing a site's settings.
-					$option = 'configurable_text_options' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
+					$option = 'discourse_configurable_text' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
 				} else {
 					$option = $option_defaults;
 				}
