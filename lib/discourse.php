@@ -140,7 +140,6 @@ class Discourse {
 		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
-
 	}
 
 	/**
@@ -160,6 +159,8 @@ class Discourse {
 			update_option( 'discourse_option_groups', $this->discourse_option_groups );
 			update_option( 'discourse_version', WPDISCOURSE_VERSION );
 
+			// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
+			// from a previous version, transfer the 'discourse_sso' options into the new arrays.
 			if ( get_option( 'discourse_sso' ) ) {
 				$this->transfer_options( 'discourse_sso', array(
 					'discourse_sso_common',
