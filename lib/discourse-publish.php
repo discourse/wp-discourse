@@ -232,7 +232,7 @@ class DiscoursePublish {
 					add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
 				}
 			}
-		}
+		}// End if().
 
 		if ( isset( $json->topic_slug ) ) {
 			delete_post_meta( $postid, 'discourse_permalink' );

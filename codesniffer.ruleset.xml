@@ -16,6 +16,7 @@
         <exclude name="WordPress.VIP.SlowDBQuery" />
         <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
         <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->

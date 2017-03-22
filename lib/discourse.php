@@ -76,7 +76,7 @@ class Discourse {
 		'more-replies-more-text'      => 'more',
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
-		'linked-to-discourse-text' => "You're already linked to Discourse!",
+		'linked-to-discourse-text'    => "You're already linked to Discourse!",
 	);
 
 	/**
@@ -110,24 +110,77 @@ class Discourse {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'initialize_plugin_configuration' ) );
+		add_action( 'init', array( $this, 'initialize_plugin' ) );
+		add_action( 'admin_init', array( $this, 'set_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
+		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
 	}
 
 	/**
 	 * Initializes the plugin configuration, loads the text domain etc.
 	 */
-	public function initialize_plugin_configuration() {
+	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
-		add_option( 'discourse_option_groups', $this->discourse_option_groups );
+		// Set the Discourse domain name option.
+		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		update_option( 'wpdc_discourse_domain', $domain_name );
+	}
 
-		foreach ( $this->discourse_option_groups as $group_name ) {
-			add_option( $group_name, $this->$group_name );
+	/**
+	 * Sets the plugin options on activation.
+	 *
+	 * Merges the default values of the 'configurable_text_options' with the saved values.
+	 *
+	 * The code in this function will only run once - while the option 'wpdc_plugin_activated' is set.
+	 * The 'wpdc_plugin_activated' option is set in the plugins activation hook function.
+	 *
+	 * See: https://codex.wordpress.org/Function_Reference/register_activation_hook under the 'Process Flow' heading.
+	 */
+	public function set_plugin_options() {
+		if ( is_admin() && 'wpdc-activated' === get_option( 'wpdc_plugin_activated' ) ) {
+			delete_option( 'wpdc_plugin_activated' );
+
+			update_option( 'discourse_option_groups', $this->discourse_option_groups );
+			update_option( 'discourse_version', WPDISCOURSE_VERSION );
+
+			foreach ( $this->discourse_option_groups as $group_name ) {
+				$option_defaults = $this->$group_name;
+				$saved_option    = get_option( $group_name );
+				if ( $saved_option ) {
+					// For now, only the configurable_text_options are being merged. In the future it will
+					// be possible to merge the values of all option groups. Previously, unset checkboxes weren't
+					// being set, so merging option groups that contain checkboxes could end up changing a site's settings.
+					$option = 'discourse_configurable_text' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
+				} else {
+					$option = $option_defaults;
+				}
+
+				update_option( $group_name, $option );
+			}
 		}
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
+	}
+
+	/**
+	 * Adds the Discourse forum domain name to the allowed hosts for wp_safe_redirect().
+	 *
+	 * @param array $hosts The array of allowed hosts.
+	 *
+	 * @return array
+	 */
+	public function allow_discourse_redirect( $hosts ) {
+		$discourse_domain = get_option( 'wpdc_discourse_domain', true );
+
+		if ( $discourse_domain ) {
+			$hosts[] = $discourse_domain;
+		}
+
+		return $hosts;
 	}
 
 	/**
@@ -137,9 +190,24 @@ class Discourse {
 	 *
 	 * @return mixed
 	 */
-	function extend_user_profile( $fields ) {
+	public function extend_user_profile( $fields ) {
 		$fields['discourse_username'] = 'Discourse Username';
 
 		return $fields;
+	}
+
+	/**
+	 * Allow the time tag - used in Discourse comments.
+	 *
+	 * @param array $allowedposttags The array of allowed html tags.
+	 *
+	 * @return array
+	 */
+	public function allow_time_tag( $allowedposttags ) {
+		$allowedposttags['time'] = array(
+			'datetime' => array(),
+		);
+
+		return $allowedposttags;
 	}
 }

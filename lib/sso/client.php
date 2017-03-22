@@ -127,7 +127,7 @@ class Client {
 
 		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
 
-		wp_redirect( $redirect_to );
+		wp_safe_redirect( $redirect_to );
 		exit;
 	}
 
@@ -145,7 +145,7 @@ class Client {
 
 			switch ( $err ) {
 				case 'existing_user_email':
-					$message = __( 'The email address supplied by Discourse doesn not match your account. Probably a user other than yourself is logged into Discourse on your device. Please try visiting the Discourse forum and logging that user out. You should then be able to sync your account with Discourse.', 'wp-discourse' );
+					$message = __( "There is an exiting account with the email address you are attempting to login with. If you are trying to log in through Discourse, you need to first login through WordPress, visit your profile page, and click on the 'sync accounts' link.", 'wp-discourse' );
 					$errors->add( 'discourse_sso_existing_user', $message );
 					break;
 
@@ -193,7 +193,7 @@ class Client {
 
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
-		wp_redirect( $redirect_to );
+		wp_safe_redirect( $redirect_to );
 		exit;
 	}
 
@@ -218,7 +218,7 @@ class Client {
 
 				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
 				$redirect = $this->get_sso_response( 'return_sso_url' );
-				wp_redirect( $redirect );
+				wp_safe_redirect( $redirect );
 
 				exit;
 			}
@@ -242,7 +242,7 @@ class Client {
 			}
 
 			if ( empty( $user_query_results ) ) {
-				$user_password = wp_generate_password( $length = 12, $include_standard_special_chars = true );
+				$user_password = wp_generate_password( 12, true );
 
 				$user_id = wp_create_user(
 					$this->get_sso_response( 'username' ),
@@ -256,7 +256,7 @@ class Client {
 			}
 
 			return $user_query_results{0}->ID;
-		}
+		}// End if().
 	}
 
 	/**

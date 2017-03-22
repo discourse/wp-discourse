@@ -24,14 +24,6 @@ class SettingsValidator {
 	protected $sso_enabled = false;
 
 	/**
-	 * Indicates whether or not the SSO client is enabled.
-	 *
-	 * @access protected
-	 * @var bool
-	 */
-	protected $sso_client_enabled = false;
-
-	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
 	 *
 	 * @access protected
@@ -193,16 +185,15 @@ class SettingsValidator {
 	/**
 	 * Validates the 'use_discourse_comments' checkbox.
 	 *
-	 * This function is only called if the checkbox is checked. It sets the property `use_discourse_comments` to true.
-	 *
 	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */
 	public function validate_use_discourse_comments( $input ) {
-		$this->use_discourse_comments = true;
+		$new_value = $this->sanitize_checkbox( $input );
+		$this->use_discourse_comments = 1 === $new_value ? true : false;
 
-		return $this->sanitize_checkbox( $input );
+		return $new_value;
 	}
 
 	/**
@@ -297,36 +288,33 @@ class SettingsValidator {
 	/**
 	 * Validates the 'enable_sso'checkbox.
 	 *
-	 * This function is only called if the checkbox is checked. It sets the `sso_enabled` property to true.
-	 * This allows sso validation notices to only be displayed if sso is enabled.
-	 *
 	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */
 	public function validate_enable_sso( $input ) {
-		$this->sso_enabled = true;
+		$new_value = $this->sanitize_checkbox( $input );
+		$this->sso_enabled = 1 === $new_value ? true : false;
 
-		return $this->sanitize_checkbox( $input );
+		return $new_value;
 	}
 
 	/**
 	 * Validates the 'sso_client_enabled' checkbox.
-	 *
-	 * This function is only called if the checkbox is checked. It sets the 'sso_client_enabled ' property to true.
 	 *
 	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */
 	public function validate_sso_client_enabled( $input ) {
-		if ( $this->sso_enabled ) {
+		$new_value = $this->sanitize_checkbox( $input );
+		if ( $this->sso_enabled && 1 === $new_value ) {
 			add_settings_error( 'discourse', 'sso_client_enabled', __( 'You can not enable both the sso client and the sso provider functionality.', 'wp-discourse' ) );
 
 			return 0;
 		}
 
-		return $this->sanitize_checkbox( $input );
+		return $new_value;
 	}
 
 	/**
@@ -361,12 +349,11 @@ class SettingsValidator {
 	public function validate_login_path( $input ) {
 		if ( $this->sso_enabled && $input ) {
 
-			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
+			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
 
 				return $this->sanitize_text( $input );
-
 			}
 
 			// It's valid.
@@ -473,7 +460,9 @@ class SettingsValidator {
 			$options['max_range'] = $max;
 		}
 
-		$input = filter_var( $input, FILTER_VALIDATE_INT, array( 'options' => $options ) );
+		$input = filter_var( $input, FILTER_VALIDATE_INT, array(
+			'options' => $options,
+		) );
 
 		if ( false === $input ) {
 			if ( $add_error ) {

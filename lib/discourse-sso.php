@@ -122,7 +122,7 @@ class DiscourseSSO {
 		) {
 
 			wp_logout();
-			wp_redirect( $this->options['url'] );
+			wp_safe_redirect( $this->options['url'] );
 
 			exit;
 		}
@@ -145,7 +145,7 @@ class DiscourseSSO {
 				$login = wp_login_url( esc_url_raw( $redirect ) );
 
 				// Redirect to login.
-				wp_redirect( $login );
+				wp_safe_redirect( $login );
 
 				exit;
 			} else {
@@ -201,11 +201,11 @@ class DiscourseSSO {
 				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse.
-				wp_redirect( $this->options['url'] . '/session/sso_login?' . $q );
+				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
 				exit;
-			}
-		}
+			}// End if().
+		}// End if().
 	}
 
 	/**
@@ -267,7 +267,9 @@ class DiscourseSSO {
 	 * @return false|null|string
 	 */
 	protected function get_avatar_url( $user_id ) {
-		$avatar_url = get_avatar_url( $user_id, array( 'default' => '404' ) );
+		$avatar_url = get_avatar_url( $user_id, array(
+			'default' => '404',
+		) );
 
 		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}

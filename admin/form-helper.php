@@ -126,6 +126,9 @@ class FormHelper {
 
 		?>
 		<label>
+			<input name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+				   type='hidden'
+				   value='0' />
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
 				   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 				   type='checkbox'
@@ -153,7 +156,7 @@ class FormHelper {
 
 		foreach ( $post_types as $post_type ) {
 
-			if ( array_key_exists( $option, $options ) and in_array( $post_type, $options[ $option ], true ) ) {
+			if ( array_key_exists( $option, $options ) && in_array( $post_type, $options[ $option ], true ) ) {
 				$value = 'selected';
 			} else {
 				$value = '';
@@ -245,7 +248,9 @@ class FormHelper {
 	 * @return array
 	 */
 	public function post_types_to_publish( $excluded_types = array() ) {
-		$post_types = get_post_types( array( 'public' => true ) );
+		$post_types = get_post_types( array(
+			'public' => true,
+		) );
 		foreach ( $excluded_types as $excluded ) {
 			unset( $post_types[ $excluded ] );
 		}

@@ -53,6 +53,7 @@ class AdminNotice {
 
 				if ( empty( $discourse_username ) ) {
 				    $username_not_set_notice = sprintf(
+				    	// translators: Discourse username_not_set notice. Placeholder: discourse_username.
 					__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ), $publish_username, $profile_page_link );
 
 				    echo wp_kses_post( $username_not_set_notice );
