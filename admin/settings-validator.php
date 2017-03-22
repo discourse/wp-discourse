@@ -18,6 +18,13 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 class SettingsValidator {
 
 	/**
+	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
+	 * @access protected
+	 * @var bool|void
+	 */
+	protected $sso_secret_set;
+
+	/**
 	 * Indicates whether or not the "discourse_sso_provider['enable-sso']" option is enabled.
 	 *
 	 * @access protected
@@ -118,6 +125,7 @@ class SettingsValidator {
 
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
+		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
 	}
 
 	/**
@@ -182,7 +190,7 @@ class SettingsValidator {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
-			add_settings_error( 'discourse', 'publish_username', __( 'You must provide a Discourse username with which to publish the posts', 'wp-discourse' ) );
+			add_settings_error( 'discourse', 'publish_username', __( 'You need to provide a Discourse username.', 'wp-discourse' ) );
 
 			return '';
 		}
@@ -315,6 +323,7 @@ class SettingsValidator {
 	 * @return mixed
 	 */
 	public function validate_custom_excerpt_length( $input ) {
+
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 			true );
@@ -328,18 +337,23 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_enable_sso( $input ) {
-//		$new_value                  = $this->sanitize_checkbox( $input );
-//		$this->sso_provider_enabled = 1 === $new_value ? true : false;
+		$new_value = $this->sanitize_checkbox( $input );
 
-//		return $new_value;
-		if ( $this->sso_client_enabled ) {
-			add_settings_error( 'discourse', 'sso_client_enabled', __( "You have the 'sso client' option enabled. Visit the 'SSO Client' settings tab
+		if ( 1 === $new_value && $this->sso_client_enabled ) {
+			add_settings_error( 'discourse', 'sso_client_enabled', __( "You have the 'SSO Client' option enabled. Visit the 'SSO Client' settings tab
 			to disable it before enabling your site to function as the SSO provider.", 'wp-discourse' ) );
 
 			return 0;
 		}
 
-		return $this->sanitize_checkbox( $input );
+		if ( 1 === $new_value && ! $this->sso_secret_set ) {
+			add_settings_error( 'discourse', 'sso_provider_no_secret', __( "Before enabling your site to function as the SSO provider,
+			you need to set the SSO Secret Key.", 'wp-discourse' ) );
+
+			return 0;
+		}
+
+		return $new_value;
 	}
 
 	/**
@@ -350,9 +364,18 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_sso_client_enabled( $input ) {
-		if ( $this->sso_provider_enabled ) {
-			add_settings_error( 'discourse', 'sso_provider_enabled', __( "You have the 'sso provider' option enabled. Click on the 'SSO Provider' settings tab
+		$new_value = $this->sanitize_checkbox( $input );
+
+		if ( 1 === $new_value && $this->sso_provider_enabled ) {
+			add_settings_error( 'discourse', 'sso_provider_enabled', __( "You have the 'SSO Provider' option enabled. Click on the 'SSO Provider' settings tab
 			to disable it before enabling your site to function as an SSO client.", 'wp-discourse' ) );
+
+			return 0;
+		}
+
+		if ( 1 === $new_value && ! $this->sso_secret_set ) {
+			add_settings_error( 'discourse', 'sso_client_no_secret', __( "Before enabling your site to function as an SSO client,
+			you need to set the SSO Secret Key.", 'wp-discourse' ) );
 
 			return 0;
 		}
@@ -368,18 +391,8 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
-		if ( strlen( sanitize_text_field( $input ) ) >= 10 ) {
-			return sanitize_text_field( $input );
 
-			// Only add a settings error if sso is enabled, otherwise just sanitize the input.
-		} elseif ( $this->sso_provider_enabled ) {
-			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key setting must be at least 10 characters long.', 'wp-discourse' ) );
-
-			return sanitize_text_field( $input );
-
-		} else {
-			return sanitize_text_field( $input );
-		}
+		return sanitize_text_field( $input );
 	}
 
 	/**
@@ -395,8 +408,6 @@ class SettingsValidator {
 			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
-
-				return $this->sanitize_text( $input );
 			}
 
 			// It's valid.
@@ -408,20 +419,18 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Todo: allow '.' in path for other path validations. (has been added here.)
+	 * Validates the 'auto-create-login-redirect' field.
 	 *
-	 * @param $input
+	 * @param string $input The input to be validated.
 	 *
 	 * @return string
 	 */
 	public function validate_auto_create_login_redirect( $input ) {
 		if ( $this->sso_provider_enabled && $input ) {
 
-			$regex = '/^\/([a-z0-9\-\.]+)*(\/[a-z0-9\-\.]+)*(\/)?$/';
+			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'auto_create_login_redirect', __( 'The path to the login redirect page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
-
-				return $this->sanitize_text( $input );
 			}
 
 			// It's valid.
@@ -435,11 +444,9 @@ class SettingsValidator {
 	public function validate_auto_create_welcome_redirect( $input ) {
 		if ( $this->sso_provider_enabled && $input ) {
 
-			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
+			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'auto_create_welcome_redirect', __( 'The path to the welcome page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
-
-				return $this->sanitize_text( $input );
 			}
 
 			// It's valid.
