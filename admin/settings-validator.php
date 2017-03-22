@@ -21,7 +21,7 @@ class SettingsValidator {
 	 * @access protected
 	 * @var bool
 	 */
-	protected $sso_enabled = false;
+	protected $sso_provider_enabled = false;
 
 	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
@@ -297,7 +297,7 @@ class SettingsValidator {
 	 */
 	public function validate_enable_sso( $input ) {
 		$new_value = $this->sanitize_checkbox( $input );
-		$this->sso_enabled = 1 === $new_value ? true : false;
+		$this->sso_provider_enabled = 1 === $new_value ? true : false;
 
 		return $new_value;
 	}
@@ -311,7 +311,7 @@ class SettingsValidator {
 	 */
 	public function validate_sso_client_enabled( $input ) {
 		$new_value = $this->sanitize_checkbox( $input );
-		if ( $this->sso_enabled && 1 === $new_value ) {
+		if ( $this->sso_provider_enabled && 1 === $new_value ) {
 			add_settings_error( 'discourse', 'sso_client_enabled', __( 'You can not enable both the sso client and the sso provider functionality.', 'wp-discourse' ) );
 
 			return 0;
@@ -332,7 +332,7 @@ class SettingsValidator {
 			return sanitize_text_field( $input );
 
 			// Only add a settings error if sso is enabled, otherwise just sanitize the input.
-		} elseif ( $this->sso_enabled ) {
+		} elseif ( $this->sso_provider_enabled ) {
 			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key setting must be at least 10 characters long.', 'wp-discourse' ) );
 
 			return sanitize_text_field( $input );
@@ -350,7 +350,7 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_login_path( $input ) {
-		if ( $this->sso_enabled && $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
 
 			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
@@ -374,7 +374,7 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_auto_create_login_redirect( $input ) {
-		if ( $this->sso_enabled && $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
 
 			$regex = '/^\/([a-z0-9\-\.]+)*(\/[a-z0-9\-\.]+)*(\/)?$/';
 			if ( ! preg_match( $regex, $input ) ) {
@@ -392,7 +392,7 @@ class SettingsValidator {
 	}
 
 	public function validate_auto_create_welcome_redirect( $input ) {
-		if ( $this->sso_enabled && $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
 
 			$regex = '/^\/([a-z0-9\-]+)*(\/[a-z0-9\-]+)*(\/)?$/';
 			if ( ! preg_match( $regex, $input ) ) {
