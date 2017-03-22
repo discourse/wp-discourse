@@ -123,6 +123,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
+#### 1.3.2 21/03/2017
+
+- Always use `wp_safe_redirect`. Add the Discourse forum URL to the 'allowed_redirect_hosts' array
+- Merge default options with saved options on plugin activation
+
 #### 1.3.0 13/03/2017
 
 - Fix SSO avatar issues
