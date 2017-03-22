@@ -89,6 +89,7 @@ class Discourse {
 		'auto-create-login-redirect'   => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
+		'redirect-without-login' => 0,
 	);
 
 	/**
