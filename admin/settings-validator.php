@@ -8,6 +8,8 @@
 
 namespace WPDiscourse\Admin;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class SettingsValidator
  *
@@ -16,12 +18,19 @@ namespace WPDiscourse\Admin;
 class SettingsValidator {
 
 	/**
-	 * Indicates whether or not SSO is enabled.
+	 * Indicates whether or not the "discourse_sso_provider['enable-sso']" option is enabled.
 	 *
 	 * @access protected
-	 * @var bool
+	 * @var bool|void
 	 */
-	protected $sso_provider_enabled = false;
+	protected $sso_provider_enabled;
+
+	/**
+	 * Indicates whether or not the "discourse_sso_client['sso-client-enabled']" option is enabled.
+	 * @access protected
+	 * @var bool|void
+	 */
+	protected $sso_client_enabled;
 
 	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
@@ -32,12 +41,22 @@ class SettingsValidator {
 	protected $use_discourse_comments = false;
 
 	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var array|void
+	 */
+	protected $options;
+
+	/**
 	 * SettingsValidator constructor.
 	 *
 	 * Adds the callback function for each of the validator filters that are applied
 	 * in `admin.php`.
 	 */
 	public function __construct() {
+		add_action( 'admin_init', array( $this, 'setup_options' ) );
+
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
@@ -82,10 +101,23 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'wpdc_validate_auto_create_sso_user', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_create_login_redirect', array( $this, 'validate_auto_create_login_redirect' ) );
-		add_filter( 'wpdc_validate_auto_create_welcome_redirect', array( $this, 'validate_auto_create_welcome_redirect' ) );
+		add_filter( 'wpdc_validate_auto_create_welcome_redirect', array(
+			$this,
+			'validate_auto_create_welcome_redirect'
+		) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
+
+		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
+		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
 	}
 
 	/**
@@ -193,7 +225,7 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_use_discourse_comments( $input ) {
-		$new_value = $this->sanitize_checkbox( $input );
+		$new_value                    = $this->sanitize_checkbox( $input );
 		$this->use_discourse_comments = 1 === $new_value ? true : false;
 
 		return $new_value;
@@ -220,7 +252,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -233,7 +265,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -246,7 +278,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -259,7 +291,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -272,7 +304,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -285,7 +317,7 @@ class SettingsValidator {
 	public function validate_custom_excerpt_length( $input ) {
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-		true );
+			true );
 	}
 
 	/**
@@ -296,10 +328,18 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_enable_sso( $input ) {
-		$new_value = $this->sanitize_checkbox( $input );
-		$this->sso_provider_enabled = 1 === $new_value ? true : false;
+//		$new_value                  = $this->sanitize_checkbox( $input );
+//		$this->sso_provider_enabled = 1 === $new_value ? true : false;
 
-		return $new_value;
+//		return $new_value;
+		if ( $this->sso_client_enabled ) {
+			add_settings_error( 'discourse', 'sso_client_enabled', __( "You have the 'sso client' option enabled. Visit the 'SSO Client' settings tab
+			to disable it before enabling your site to function as the SSO provider.", 'wp-discourse' ) );
+
+			return 0;
+		}
+
+		return $this->sanitize_checkbox( $input );
 	}
 
 	/**
@@ -310,14 +350,14 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_sso_client_enabled( $input ) {
-		$new_value = $this->sanitize_checkbox( $input );
-		if ( $this->sso_provider_enabled && 1 === $new_value ) {
-			add_settings_error( 'discourse', 'sso_client_enabled', __( 'You can not enable both the sso client and the sso provider functionality.', 'wp-discourse' ) );
+		if ( $this->sso_provider_enabled ) {
+			add_settings_error( 'discourse', 'sso_provider_enabled', __( "You have the 'sso provider' option enabled. Click on the 'SSO Provider' settings tab
+			to disable it before enabling your site to function as an SSO client.", 'wp-discourse' ) );
 
 			return 0;
 		}
 
-		return $new_value;
+		return $this->sanitize_checkbox( $input );
 	}
 
 	/**
@@ -369,6 +409,7 @@ class SettingsValidator {
 
 	/**
 	 * Todo: allow '.' in path for other path validations. (has been added here.)
+	 *
 	 * @param $input
 	 *
 	 * @return string
@@ -486,12 +527,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int    $input The input to be validated.
+	 * @param int $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null   $min The minimum allowed value.
-	 * @param null   $max The maximum allowed value.
+	 * @param null $min The minimum allowed value.
+	 * @param null $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool   $add_error Whether or not to add a setting error.
+	 * @param bool $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */
