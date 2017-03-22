@@ -26,10 +26,16 @@ class SSOSettings {
 	 * Gives access to the plugin options.
 	 *
 	 * @access protected
-	 * @var mixed|void
+	 * @var array|void
 	 */
 	protected $options;
 
+	/**
+     * The URL on Discourse for the SSO settings section.
+     *
+     * @access protected
+	 * @var string|void
+	 */
 	protected $discourse_sso_settings_url;
 
 	/**
@@ -43,44 +49,6 @@ class SSOSettings {
 		add_action( 'admin_init', array( $this, 'register_sso_settings' ) );
 		add_action( 'wpdc_options_page_append_settings_tabs', array( $this, 'sso_settings_secondary_tabs' ), 10, 2 );
 		add_action( 'wpdc_options_page_after_tab_switch', array( $this, 'sso_settings_fields' ) );
-	}
-
-	public function sso_settings_fields( $tab ) {
-		if ( 'sso_common' === $tab || 'sso_options' === $tab ) {
-			settings_fields( 'discourse_sso_common' );
-			do_settings_sections( 'discourse_sso_common' );
-		}
-		if ( 'sso_provider' === $tab ) {
-			settings_fields( 'discourse_sso_provider' );
-			do_settings_sections( 'discourse_sso_provider' );
-		}
-		if ( 'sso_client' === $tab ) {
-			settings_fields( 'discourse_sso_client' );
-			do_settings_sections( 'discourse_sso_client' );
-		}
-	}
-
-
-	public function sso_settings_secondary_tabs( $tab, $parent_tab ) {
-		if ( 'sso_options' === $tab || 'sso_options' === $parent_tab ) {
-			?>
-            <h3 class="nav-tab-wrapper nav-tab-second-level">
-                <a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Secret Key', 'wpdc' ); ?>
-                </a>
-                <a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Provider', 'wpdc' ); ?>
-                </a>
-                <a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
-                </a>
-            </h3>
-			<?php
-
-		}
 	}
 
 	/**
@@ -170,16 +138,64 @@ class SSOSettings {
 			$this->form_helper,
 			'validate_options'
 		) );
-
-//		register_setting( 'discourse_sso', 'discourse_sso', array(
-//			$this->form_helper,
-//			'validate_options',
-//		) );
 	}
 
 	/**
-	 * Common SSO settings fields.
+     * Outputs settings sections for the current tab.
+     *
+     * Hooked into 'wpdc_options_page_after_tab_switch'.
+     *
+	 * @param string|null $tab The current tab.
 	 */
+	public function sso_settings_fields( $tab ) {
+		if ( 'sso_common' === $tab || 'sso_options' === $tab ) {
+			settings_fields( 'discourse_sso_common' );
+			do_settings_sections( 'discourse_sso_common' );
+		}
+		if ( 'sso_provider' === $tab ) {
+			settings_fields( 'discourse_sso_provider' );
+			do_settings_sections( 'discourse_sso_provider' );
+		}
+		if ( 'sso_client' === $tab ) {
+			settings_fields( 'discourse_sso_client' );
+			do_settings_sections( 'discourse_sso_client' );
+		}
+	}
+
+	/**
+     * Outputs the tab-menu for the sso_options page.
+     *
+     * Hooked into 'wpdc_options_page_append_settings_tabs'.
+	 * @param string|null $tab The current tab.
+	 * @param string|null $parent_tab The current parent tab.
+	 */
+	public function sso_settings_secondary_tabs( $tab, $parent_tab ) {
+		if ( 'sso_options' === $tab || 'sso_options' === $parent_tab ) {
+			?>
+            <h3 class="nav-tab-wrapper nav-tab-second-level">
+                <a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
+                   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'SSO Secret Key', 'wpdc' ); ?>
+                </a>
+                <a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
+                   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'SSO Provider', 'wpdc' ); ?>
+                </a>
+                <a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
+                   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
+					<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
+                </a>
+            </h3>
+			<?php
+
+		}
+	}
+
+	/*****************************
+     *
+	 * Common SSO settings fields.
+     *
+	 *****************************/
 
 	/**
 	 * Outputs markup for the sso-secret input.
@@ -189,9 +205,11 @@ class SSOSettings {
 			to guess, at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
 	}
 
-	/**
+	/*******************************
+     *
 	 * SSO Provider settings fields.
-	 */
+     *
+	 *******************************/
 
 	/**
 	 * Outputs markup for the enable-sso checkbox.
@@ -250,9 +268,11 @@ class SSOSettings {
 		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso_provider', __( 'Do not force login for links to Discourse comments.' ), $description );
 	}
 
-	/**
+	/*****************************
+     *
 	 * SSO Client settings fields.
-	 */
+     *
+	 *****************************/
 
 	/**
 	 * Outputs markup for sso-client-enabled checkbox.
@@ -282,9 +302,8 @@ class SSOSettings {
 	}
 
 	/**
-	 * Details for the 'sso_options' tab.
+	 * Outputs the markup for the sso_common tab details.
 	 */
-
 	public function common_settings_details() {
 		?>
         <p class="documentation-link">
@@ -312,6 +331,9 @@ class SSOSettings {
 		<?php
 	}
 
+	/**
+	 * Outputs the markup for the sso_provider tab details.
+	 */
 	public function sso_provider_settings_details() {
 		?>
         <p class="documentation-link">
@@ -350,6 +372,9 @@ class SSOSettings {
 		<?php
 	}
 
+	/**
+	 * Outputs the markup for the sso_client tab details.
+	 */
 	public function sso_client_settings_details() {
 		?>
         <p class="documentation-link">
