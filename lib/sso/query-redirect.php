@@ -74,7 +74,7 @@ class QueryRedirect {
 		 */
 		if ( isset( $_GET['request'] ) && 'logout' === $_GET['request'] ) { // Input var okay.
 			wp_logout();
-			wp_redirect( $this->options['url'] );
+			wp_safe_redirect( $this->options['url'] );
 
 			exit;
 		}
@@ -103,7 +103,7 @@ class QueryRedirect {
 
 		$sso_login_url = $this->options['url'] . '/session/sso_provider?' . http_build_query( $request );
 
-		wp_redirect( $sso_login_url );
+		wp_safe_redirect( $sso_login_url );
 
 		exit;
 	}

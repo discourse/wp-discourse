@@ -43,10 +43,6 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 		'participants' => array(),
 	);
 
-	// Add <time> tag to WP allowed html tags.
-	global $allowedposttags;
-	$allowedposttags['time'] = array( 'datetime' => array() );
-
 	// Use custom datetime format string if provided, else global date format.
 	$datetime_format = empty( $options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
@@ -105,7 +101,7 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 		$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 	} else {
 		$discourse_html = wp_kses_post( Templates::no_replies_html() );
-	}
+	}// End if().
 	$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 	$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
 	$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
@@ -114,4 +110,4 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 	echo wp_kses_post( $discourse_html );
 
 	do_action( 'wp_discourse_after_comments', $topic_id );
-}
+}// End if().
