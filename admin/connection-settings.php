@@ -104,7 +104,7 @@ class ConnectionSettings {
 	 */
 	function connection_settings_tab_details() {
 		?>
-		<p class="documentation-link">
+		<p class="wpdc-options-documentation">
 			<em><?php esc_html_e( 'This section is for configuring your site\'s connection to your Discourse forum. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
 			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
 			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
