@@ -316,8 +316,8 @@ class FormHelper {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
-				Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( "You are not connected to Discourse. This notice should go away
+				after completing the form on this page.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
