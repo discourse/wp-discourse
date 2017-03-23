@@ -407,10 +407,10 @@ class SSOSettings {
 		</ul>
 		<h3>SSO Client Shortcode</h3>
 		<p class="wpdc-options-documentation">
-			<?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?>
+            <em><?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?></em>
 			<code><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
-			<?php esc_html_e( 'shortcode to your WordPress posts to create a Discourse login link on the front end of your site.
-            The shortcode has two optional attributes: ', 'wp-discourse' ); ?>
+			<em><?php esc_html_e( 'shortcode to your WordPress posts to create a Discourse login link on the front end of your site.
+            The shortcode has two optional attributes: ', 'wp-discourse' ); ?></em>
 		</p>
 		<ul class="wpdc-documentation-list">
 			<li>
@@ -422,7 +422,7 @@ class SSOSettings {
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
-			<?php esc_html_e( 'Example: ', 'wp-discourse' ); ?><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum']", 'wp-discourse' ); ?></code>
+            <em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum']", 'wp-discourse' ); ?></code>
 		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
 			<p class="wpdc-options-documentation">
