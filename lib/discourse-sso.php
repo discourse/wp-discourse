@@ -48,7 +48,7 @@ class DiscourseSSO {
 	/**
 	 * Automatically login users to Discourse after they have logged in to WordPress.
 	 *
-	 * @param int $user_login The user ID.
+	 * @param int      $user_login The user ID.
 	 * @param \WP_User $user The user who has logged in.
 	 */
 	public function auto_login_discourse_user( $user_login, $user ) {

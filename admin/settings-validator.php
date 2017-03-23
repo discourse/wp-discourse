@@ -19,6 +19,7 @@ class SettingsValidator {
 
 	/**
 	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
+	 *
 	 * @access protected
 	 * @var bool|void
 	 */
@@ -34,6 +35,7 @@ class SettingsValidator {
 
 	/**
 	 * Indicates whether or not the "discourse_sso_client['sso-client-enabled']" option is enabled.
+	 *
 	 * @access protected
 	 * @var bool|void
 	 */
@@ -110,7 +112,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_auto_create_login_redirect', array( $this, 'validate_auto_create_login_redirect' ) );
 		add_filter( 'wpdc_validate_auto_create_welcome_redirect', array(
 			$this,
-			'validate_auto_create_welcome_redirect'
+			'validate_auto_create_welcome_redirect',
 		) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
@@ -260,7 +262,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -273,7 +275,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -286,7 +288,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -299,7 +301,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -312,7 +314,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -326,7 +328,7 @@ class SettingsValidator {
 
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-			true );
+		true );
 	}
 
 	/**
@@ -347,8 +349,8 @@ class SettingsValidator {
 		}
 
 		if ( 1 === $new_value && ! $this->sso_secret_set ) {
-			add_settings_error( 'discourse', 'sso_provider_no_secret', __( "Before enabling your site to function as the SSO provider,
-			you need to set the SSO Secret Key.", 'wp-discourse' ) );
+			add_settings_error( 'discourse', 'sso_provider_no_secret', __( 'Before enabling your site to function as the SSO provider,
+            you need to set the SSO Secret Key.', 'wp-discourse' ) );
 
 			return 0;
 		}
@@ -374,8 +376,8 @@ class SettingsValidator {
 		}
 
 		if ( 1 === $new_value && ! $this->sso_secret_set ) {
-			add_settings_error( 'discourse', 'sso_client_no_secret', __( "Before enabling your site to function as an SSO client,
-			you need to set the SSO Secret Key.", 'wp-discourse' ) );
+			add_settings_error( 'discourse', 'sso_client_no_secret', __( 'Before enabling your site to function as an SSO client,
+            you need to set the SSO Secret Key.', 'wp-discourse' ) );
 
 			return 0;
 		}
@@ -441,6 +443,13 @@ class SettingsValidator {
 		return $this->sanitize_text( $input );
 	}
 
+	/**
+	 * Validates the 'auto-create-welcome-redirect' field.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_auto_create_welcome_redirect( $input ) {
 		if ( $this->sso_provider_enabled && $input ) {
 
@@ -534,12 +543,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int $input The input to be validated.
+	 * @param int    $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null $min The minimum allowed value.
-	 * @param null $max The maximum allowed value.
+	 * @param null   $min The minimum allowed value.
+	 * @param null   $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool $add_error Whether or not to add a setting error.
+	 * @param bool   $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */

@@ -15,6 +15,7 @@ class Discourse {
 	/**
 	 * The connection options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_connect = array(
@@ -26,6 +27,7 @@ class Discourse {
 	/**
 	 * The publishing options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_publish = array(
@@ -42,6 +44,7 @@ class Discourse {
 	/**
 	 * The commenting options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_comment = array(
@@ -61,6 +64,7 @@ class Discourse {
 	/**
 	 * The configurable text options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_configurable_text = array(
@@ -79,10 +83,22 @@ class Discourse {
 		'linked-to-discourse-text'    => "You're already linked to Discourse!",
 	);
 
+	/**
+	 * The sso_common options array.
+	 *
+	 * @access protected
+	 * @var array
+	 */
 	protected $discourse_sso_common = array(
 		'sso-secret' => '',
 	);
 
+	/**
+	 * The sso_provider options.
+	 *
+	 * @access protected
+	 * @var array
+	 */
 	protected $discourse_sso_provider = array(
 		'enable-sso'                   => 0,
 		'auto-create-sso-user'         => 0,
@@ -93,7 +109,7 @@ class Discourse {
 	);
 
 	/**
-	 * The SSO options array.
+	 * The sso_client options.
 	 *
 	 * @var array
 	 */
@@ -242,6 +258,9 @@ class Discourse {
 
 	/**
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
+	 *
+	 * @param string $old_option The name of the old option_group.
+	 * @param array  $transferable_option_groups The array of transferable_option_group names.
 	 */
 	protected function transfer_options( $old_option, $transferable_option_groups ) {
 		$discourse_options = get_option( $old_option );
@@ -254,7 +273,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array $existing_options The old 'discourse' options array.
+	 * @param array  $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {
