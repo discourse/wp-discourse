@@ -19,6 +19,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/settings-validator.php' );
 	require_once( __DIR__ . '/sso-settings.php' );
 	require_once( __DIR__ . '/admin-notice.php' );
+	require_once( __DIR__ . '/meta-box.php' );
 
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();
@@ -30,6 +31,7 @@ if ( is_admin() ) {
 	new SSOSettings( $form_helper );
 	new SettingsValidator();
 	new AdminNotice();
+	new MetaBox();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 }

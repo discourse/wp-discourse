@@ -42,7 +42,6 @@ require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
-require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
@@ -66,7 +65,6 @@ new WPDiscourse\DiscoursePublish\DiscoursePublish();
 new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
-new WPDiscourse\MetaBox\MetaBox();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
 

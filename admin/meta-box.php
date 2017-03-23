@@ -5,7 +5,7 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\MetaBox;
+namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -26,7 +26,7 @@ class MetaBox {
 	 * MetaBox constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'admin_init', array( $this, 'setup_options' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
 	}
