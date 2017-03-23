@@ -88,7 +88,7 @@ class OptionsPage {
 				   class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
 				</a>
 
-                <?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
+				<?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
 
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
@@ -138,11 +138,6 @@ class OptionsPage {
 					if ( 'text_content_options' === $tab ) {
 						settings_fields( 'discourse_configurable_text' );
 						do_settings_sections( 'discourse_configurable_text' );
-					}
-
-					if ( 'sso_options' === $tab ) {
-//						settings_fields( 'discourse_sso' );
-//						do_settings_sections( 'discourse_sso' );
 					}
 
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );
