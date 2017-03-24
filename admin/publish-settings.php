@@ -145,9 +145,9 @@ class PublishSettings {
 	 * Outputs markup for the custom-excerpt-length input.
 	 */
 	public function custom_excerpt_length() {
-		$this->form_helper->input( 'custom-excerpt-length', 'discourse_publish', __( "Custom excerpt length in words.
-		<strong>Note:</strong> if you set an excerpt in the new-post excerpt metabox, that excerpt will be given
-		priority over the length set here.", 'wp-discourse' ), 'number', 0 );
+		$description = __( "Custom excerpt length in words. If you set an excerpt in the new-post excerpt
+        metabox, that excerpt will be given priority over the length set here.", 'wp-discourse' );
+		$this->form_helper->input( 'custom-excerpt-length', 'discourse_publish', $description, 'number', 0 );
 	}
 
 	/**
@@ -155,7 +155,7 @@ class PublishSettings {
 	 */
 	public function auto_publish_checkbox() {
 		$this->form_helper->checkbox_input( 'auto-publish', 'discourse_publish', __( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-            __( "This setting can be overridden on the new-post screen."));
+			__( "This setting can be overridden on the new-post screen." ) );
 	}
 
 	/**
