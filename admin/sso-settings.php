@@ -202,8 +202,7 @@ class SSOSettings {
 	 * Outputs markup for the sso-secret input.
 	 */
 	public function sso_secret_input() {
-		$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text, make it something that's hard
-			to guess, at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
+		$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text (numbers, letters, and symbols) at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
 	}
 
 	/**
