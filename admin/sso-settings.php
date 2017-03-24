@@ -243,7 +243,7 @@ class SSOSettings {
 	 */
 	public function auto_create_welcome_redirect() {
 		$description = __( "This setting is only used when 'Create Discourse User on Login' is enabled. It sets an optional
-		page on your WordPress site to which users will be redirected when their Discourse account if first created.
+		page on your WordPress site to which users will be redirected when their Discourse account is first created.
 		Enter a path on your site starting with '/'. If this setting is left blank, users will be redirected to the
 		'Redirect After Discourse Login' path.", 'wp-discourse' );
 		$this->form_helper->input( 'auto-create-welcome-redirect', 'discourse_sso_provider', $description );
