@@ -344,15 +344,15 @@ class SSOSettings {
 		</p>
 		<ul class="wpdc-documentation-list">
 			<li>
-				<?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?>
+                <em><?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
-				<?php esc_html_e( 'add the home URL of your site (', 'wp-discourse' ); ?>
+                <em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
 				<code><?php echo esc_url( home_url() ); ?></code>
-				<?php esc_html_e( ") to the 'sso url' setting", 'wp-discourse' ); ?>
+                <em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
-				<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
+                <em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
@@ -397,12 +397,14 @@ class SSOSettings {
 			</em>
 		</p>
 		<ul class="wpdc-documentation-list">
-			<li>
-				<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
-			</li>
-			<li>
-				<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
-			</li>
+            <em>
+			    <li>
+			    	<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
+			    </li>
+			    <li>
+			    	<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
+		    	</li>
+            </em>
 		</ul>
 		<h3>SSO Client Shortcode</h3>
 		<p class="wpdc-options-documentation">
@@ -413,11 +415,11 @@ class SSOSettings {
 		</p>
 		<ul class="wpdc-documentation-list">
 			<li>
-				<code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><?php esc_html_e( "- sets the link text for non-logged in users.
-                (Defaults to 'Link your account to Discourse'.)", 'wp-discourse' ); ?>
+                <code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><em><?php esc_html_e( "- sets the link text for non-logged in users.
+                (Defaults to 'Link your account to Discourse'.)", 'wp-discourse' ); ?></em>
 			</li>
-			<li><code><?php esc_html_e( 'link' ) ?></code><?php esc_html_e( "- sets the link text for logged in users who have not
-            yet linked their WordPress account to their Discourse account. (Defaults to 'Log in with Discourse'.)", 'wp-discourse' ); ?>
+			<li><code><?php esc_html_e( 'link' ) ?></code><em><?php esc_html_e( "- sets the link text for logged in users who have not
+            yet linked their WordPress account to their Discourse account. (Defaults to 'Log in with Discourse'.)", 'wp-discourse' ); ?></em>
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
