@@ -106,16 +106,6 @@ class ConnectionSettings {
 	/**
 	 * Details for the connection_options tab.
 	 */
-	public function connection_settings_tab_details_bak() {
-		?>
-		<p class="wpdc-options-documentation">
-			<em><?php esc_html_e( 'This section is for configuring your site\'s connection to your Discourse forum. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-		</p>
-		<?php
-	}
-
 	public function connection_settings_tab_details() {
 		$self_install_url          = 'https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md';
 		$community_install_url     = 'https://www.literatecomputing.com/product/discourse-install/';
