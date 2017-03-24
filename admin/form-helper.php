@@ -297,16 +297,16 @@ class FormHelper {
 			$current_page = null;
 		}
 
-		if ( $current_page && ! DiscourseUtilities::check_connection_status() ) {
+		// Only check the connection status on the main settings tab.
+		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 
-			if ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
-			} else {
-				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
-			}
-		} elseif ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
-			add_action( 'admin_notices', array( $this, 'connected' ) );
-		}
+		    if ( ! DiscourseUtilities::check_connection_status() ) {
+		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
+
+            } else {
+		        add_action( 'admin_notices', array( $this, 'connected' ) );
+            }
+        }
 	}
 
 	/**
