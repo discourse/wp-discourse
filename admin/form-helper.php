@@ -316,8 +316,8 @@ class FormHelper {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( "You are not connected to Discourse. This notice should go away
-				after completing the form on this page.", 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( "You are not connected to Discourse. If you are setting up the plugin, this
+				notice should go away after completing the form on this page.", 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
