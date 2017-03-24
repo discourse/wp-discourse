@@ -54,67 +54,67 @@ class ConfigurableTextSettings {
 			'configurable_text_tab_details',
 		), 'discourse_configurable_text' );
 
-		add_settings_field( 'discourse_link_text', __( 'Discourse link text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_link_text', __( 'Discourse Link Text', 'wp-discourse' ), array(
 			$this,
 			'discourse_link_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_start_discussion_text', __( '\'Start discussion\' text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_start_discussion_text', __( 'Start Discussion Text', 'wp-discourse' ), array(
 			$this,
 			'start_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_continue_discussion_text', __( '\'Continue discussion\' text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_continue_discussion_text', __( 'Continue Discussion Text', 'wp-discourse' ), array(
 			$this,
 			'continue_discussion_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_notable_replies_text', __( 'Top level comments heading', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_notable_replies_text', __( 'Top Level Comments Heading', 'wp-discourse' ), array(
 			$this,
 			'notable_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_comments_not_available_text', __( 'Comments not available', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_comments_not_available_text', __( 'Comments Not Available', 'wp-discourse' ), array(
 			$this,
 			'comments_not_available_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_participants_text', __( 'Heading for the \'participants\' section', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_participants_text', __( 'Participants Heading', 'wp-discourse' ), array(
 			$this,
 			'participants_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_published_at_text', __( '\'Published at\' text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_published_at_text', __( 'Published at Text', 'wp-discourse' ), array(
 			$this,
 			'published_at_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_single_reply_text', __( 'Single reply', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_single_reply_text', __( 'Single Reply', 'wp-discourse' ), array(
 			$this,
 			'single_reply_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_many_replies_text', __( 'Many replies', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_many_replies_text', __( 'Many Replies', 'wp-discourse' ), array(
 			$this,
 			'many_replies_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_more_replies_text', __( 'More replies \'more\' text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_more_replies_text', __( 'More Replies', 'wp-discourse' ), array(
 			$this,
 			'more_replies_more_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_external_login_text', __( 'External login text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_external_login_text', __( 'External Login Text', 'wp-discourse' ), array(
 			$this,
 			'external_login_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_link_to_discourse_text', __( 'Link account to Discourse text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_link_to_discourse_text', __( 'Link Accounts Text', 'wp-discourse' ), array(
 			$this,
 			'link_to_discourse_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
 
-		add_settings_field( 'discourse_linked_to_discourse_text', __( 'Account is linked to Discourse text', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_linked_to_discourse_text', __( 'Account is Linked Text', 'wp-discourse' ), array(
 		        $this,
 			'linked_to_discourse_text',
 		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section' );
@@ -230,9 +230,7 @@ class ConfigurableTextSettings {
 	public function configurable_text_tab_details() {
 		?>
 		<p class="wpdc-options-documentation">
-			<em><?php esc_html_e( 'This section is for configuring the plugin\'s user facing text. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+			<em><?php esc_html_e( "This section is for configuring the plugin's user facing text.", 'wp-discourse' ); ?></em>
 		</p>
 		<?php
 	}
