@@ -123,11 +123,12 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
-#### 1.3.3 22/03/2017
+#### 1.3.3 24/03/2017
 
 - Add SSO provider option to automatically create and log in Discourse users when a user logs into WordPress
 - Move the SSO Client and SSO Provider options onto separate options tabs
-- Add inline documentation to SSO options
+- Add inline documentation for plugin options
+- Fix test for minimum php version requirements
 
 #### 1.3.2 21/03/2017
 
