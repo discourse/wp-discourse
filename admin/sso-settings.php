@@ -344,15 +344,15 @@ class SSOSettings {
 		</p>
 		<ul class="wpdc-documentation-list">
 			<li>
-                <em><?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
-                <em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
 				<code><?php echo esc_url( home_url() ); ?></code>
-                <em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
-                <em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
@@ -397,14 +397,14 @@ class SSOSettings {
 			</em>
 		</p>
 		<ul class="wpdc-documentation-list">
-            <em>
+			<em>
 			    <li>
 			    	<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
 			    </li>
 			    <li>
 			    	<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
 		    	</li>
-            </em>
+			</em>
 		</ul>
 		<h3>SSO Client Shortcode</h3>
 		<p class="wpdc-options-documentation">
@@ -415,7 +415,7 @@ class SSOSettings {
 		</p>
 		<ul class="wpdc-documentation-list">
 			<li>
-                <code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><em><?php esc_html_e( "- sets the link text for non-logged in users.
+				<code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><em><?php esc_html_e( "- sets the link text for non-logged in users.
                 (Defaults to 'Link your account to Discourse'.)", 'wp-discourse' ); ?></em>
 			</li>
 			<li><code><?php esc_html_e( 'link' ) ?></code><em><?php esc_html_e( "- sets the link text for logged in users who have not

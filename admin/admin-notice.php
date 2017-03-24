@@ -44,7 +44,7 @@ class AdminNotice {
 		global $pagenow, $post;
 
 		if ( 'post.php' === $pagenow || 'post-new.php' === $pagenow ) {
-			$allowed_post_types = ! empty( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : [];
+			$allowed_post_types = ! empty( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : array();
 
 			if ( in_array( $post->post_type, $allowed_post_types, true ) ) {
 				$discourse_username = get_user_meta( get_current_user_id(), 'discourse_username', true );

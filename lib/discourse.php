@@ -152,7 +152,14 @@ class Discourse {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		// Set the Discourse domain name option.
-		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$connection_options = get_option( 'discourse_connect' );
+		if ( $connection_options && ! empty( $connection_options['url'] ) ) {
+
+			$discourse_url = $connection_options['url'];
+		} else {
+
+			$discourse_url = null;
+		}
 		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
@@ -204,11 +211,6 @@ class Discourse {
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
-
-		// Set the Discourse domain name option.
-		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
-		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
-		update_option( 'wpdc_discourse_domain', $domain_name );
 	}
 
 	/**

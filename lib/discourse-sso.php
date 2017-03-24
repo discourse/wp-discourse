@@ -65,7 +65,7 @@ class DiscourseSSO {
 			$redirect = ! empty( $welcome_redirect ) ? $welcome_redirect : apply_filters( 'wpdc_auto_create_login_redirect', $redirect, $user_login, $user );
 			$sso_url       = ! empty( $this->options['url'] ) ? $this->options['url'] . '/session/sso?return_path=' . $redirect : null;
 			$referer_query = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
-			$query_params  = [];
+			$query_params  = array();
 
 			parse_str( $referer_query, $query_params );
 
