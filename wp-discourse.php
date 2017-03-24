@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.3.2
+ * Version: 1.3.3
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.4' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.3.2' );
+define( 'WPDISCOURSE_VERSION', '1.3.3' );
 
 register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
@@ -42,7 +42,6 @@ require_once( __DIR__ . '/lib/discourse.php' );
 require_once( __DIR__ . '/lib/discourse-comment.php' );
 require_once( __DIR__ . '/lib/discourse-publish.php' );
 require_once( __DIR__ . '/lib/discourse-sso.php' );
-require_once( __DIR__ . '/lib/meta-box.php' );
 require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
@@ -66,7 +65,6 @@ new WPDiscourse\DiscoursePublish\DiscoursePublish();
 new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
-new WPDiscourse\MetaBox\MetaBox();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
 

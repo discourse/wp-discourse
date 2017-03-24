@@ -42,6 +42,45 @@ class DiscourseSSO {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
+		add_action( 'wp_login', array( $this, 'auto_login_discourse_user' ), 10, 2 );
+	}
+
+	/**
+	 * Automatically login users to Discourse after they have logged in to WordPress.
+	 *
+	 * @param int      $user_login The user ID.
+	 * @param \WP_User $user The user who has logged in.
+	 */
+	public function auto_login_discourse_user( $user_login, $user ) {
+		if ( ( ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ) &&
+		     ! empty( $this->options['auto-create-sso-user'] ) && 1 === intval( $this->options['auto-create-sso-user'] )
+		) {
+			$welcome_redirect = null;
+
+			if ( 'user_created' !== get_user_meta( $user->ID, 'wpdc_sso_user_created', true ) ) {
+				$welcome_redirect = ! empty( $this->options['auto-create-welcome-redirect'] ) ? home_url( $this->options['auto-create-welcome-redirect'] ) : null;
+			}
+
+			$redirect = ! empty( $this->options['auto-create-login-redirect'] ) ? home_url( $this->options['auto-create-login-redirect'] ) : home_url( '/' );
+			$redirect = ! empty( $welcome_redirect ) ? $welcome_redirect : apply_filters( 'wpdc_auto_create_login_redirect', $redirect, $user_login, $user );
+			$sso_url       = ! empty( $this->options['url'] ) ? $this->options['url'] . '/session/sso?return_path=' . $redirect : null;
+			$referer_query = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
+			$query_params  = array();
+
+			parse_str( $referer_query, $query_params );
+
+			$sso_referer    = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
+			$email_verified = ! get_user_meta( $user->ID, 'discourse_email_not_verified', true );
+			$email_verified = apply_filters( 'wpdc_auto_create_login_email_verification', $email_verified, $user_login, $user );
+
+			if ( $email_verified && ! $sso_referer && $sso_url ) {
+				update_user_meta( $user->ID, 'wpdc_sso_user_created', 'user_created' );
+
+				wp_safe_redirect( esc_url( $sso_url ) );
+
+				exit;
+			}
+		}
 	}
 
 	/**
@@ -172,7 +211,7 @@ class DiscourseSSO {
 				$sig     = $wp->query_vars['sig'];
 
 				// Change %0B back to %0A.
-				$payload = urldecode( str_replace( '%0B', '%0A', rawurlencode( $payload ) ) );
+				$payload = rawurldecode( str_replace( '%0B', '%0A', rawurlencode( $payload ) ) );
 
 				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];

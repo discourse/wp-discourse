@@ -8,6 +8,8 @@
 
 namespace WPDiscourse\Admin;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class SettingsValidator
  *
@@ -16,12 +18,28 @@ namespace WPDiscourse\Admin;
 class SettingsValidator {
 
 	/**
-	 * Indicates whether or not SSO is enabled.
+	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
 	 *
 	 * @access protected
-	 * @var bool
+	 * @var bool|void
 	 */
-	protected $sso_enabled = false;
+	protected $sso_secret_set;
+
+	/**
+	 * Indicates whether or not the "discourse_sso_provider['enable-sso']" option is enabled.
+	 *
+	 * @access protected
+	 * @var bool|void
+	 */
+	protected $sso_provider_enabled;
+
+	/**
+	 * Indicates whether or not the "discourse_sso_client['sso-client-enabled']" option is enabled.
+	 *
+	 * @access protected
+	 * @var bool|void
+	 */
+	protected $sso_client_enabled;
 
 	/**
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
@@ -32,12 +50,22 @@ class SettingsValidator {
 	protected $use_discourse_comments = false;
 
 	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var array|void
+	 */
+	protected $options;
+
+	/**
 	 * SettingsValidator constructor.
 	 *
 	 * Adds the callback function for each of the validator filters that are applied
 	 * in `admin.php`.
 	 */
 	public function __construct() {
+		add_action( 'admin_init', array( $this, 'setup_options' ) );
+
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
@@ -80,9 +108,26 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_sso_client_sync_by_email', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
+		add_filter( 'wpdc_validate_auto_create_sso_user', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_auto_create_login_redirect', array( $this, 'validate_auto_create_login_redirect' ) );
+		add_filter( 'wpdc_validate_auto_create_welcome_redirect', array(
+			$this,
+			'validate_auto_create_welcome_redirect',
+		) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
+	}
+
+	/**
+	 * Setup options.
+	 */
+	public function setup_options() {
+		$this->options = DiscourseUtilities::get_options();
+
+		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
+		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
+		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
 	}
 
 	/**
@@ -147,7 +192,7 @@ class SettingsValidator {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
-			add_settings_error( 'discourse', 'publish_username', __( 'You must provide a Discourse username with which to publish the posts', 'wp-discourse' ) );
+			add_settings_error( 'discourse', 'publish_username', __( 'You need to provide a Discourse username.', 'wp-discourse' ) );
 
 			return '';
 		}
@@ -190,7 +235,7 @@ class SettingsValidator {
 	 * @return int
 	 */
 	public function validate_use_discourse_comments( $input ) {
-		$new_value = $this->sanitize_checkbox( $input );
+		$new_value                    = $this->sanitize_checkbox( $input );
 		$this->use_discourse_comments = 1 === $new_value ? true : false;
 
 		return $new_value;
@@ -280,6 +325,7 @@ class SettingsValidator {
 	 * @return mixed
 	 */
 	public function validate_custom_excerpt_length( $input ) {
+
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 		true );
@@ -294,7 +340,20 @@ class SettingsValidator {
 	 */
 	public function validate_enable_sso( $input ) {
 		$new_value = $this->sanitize_checkbox( $input );
-		$this->sso_enabled = 1 === $new_value ? true : false;
+
+		if ( 1 === $new_value && $this->sso_client_enabled ) {
+			add_settings_error( 'discourse', 'sso_client_enabled', __( "You have the 'SSO Client' option enabled. Visit the 'SSO Client' settings tab
+			to disable it before enabling your site to function as the SSO provider.", 'wp-discourse' ) );
+
+			return 0;
+		}
+
+		if ( 1 === $new_value && ! $this->sso_secret_set ) {
+			add_settings_error( 'discourse', 'sso_provider_no_secret', __( 'Before enabling your site to function as the SSO provider,
+            you need to set the SSO Secret Key.', 'wp-discourse' ) );
+
+			return 0;
+		}
 
 		return $new_value;
 	}
@@ -308,13 +367,22 @@ class SettingsValidator {
 	 */
 	public function validate_sso_client_enabled( $input ) {
 		$new_value = $this->sanitize_checkbox( $input );
-		if ( $this->sso_enabled && 1 === $new_value ) {
-			add_settings_error( 'discourse', 'sso_client_enabled', __( 'You can not enable both the sso client and the sso provider functionality.', 'wp-discourse' ) );
+
+		if ( 1 === $new_value && $this->sso_provider_enabled ) {
+			add_settings_error( 'discourse', 'sso_provider_enabled', __( "You have the 'SSO Provider' option enabled. Click on the 'SSO Provider' settings tab
+			to disable it before enabling your site to function as an SSO client.", 'wp-discourse' ) );
 
 			return 0;
 		}
 
-		return $new_value;
+		if ( 1 === $new_value && ! $this->sso_secret_set ) {
+			add_settings_error( 'discourse', 'sso_client_no_secret', __( 'Before enabling your site to function as an SSO client,
+            you need to set the SSO Secret Key.', 'wp-discourse' ) );
+
+			return 0;
+		}
+
+		return $this->sanitize_checkbox( $input );
 	}
 
 	/**
@@ -325,18 +393,8 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
-		if ( strlen( sanitize_text_field( $input ) ) >= 10 ) {
-			return sanitize_text_field( $input );
 
-			// Only add a settings error if sso is enabled, otherwise just sanitize the input.
-		} elseif ( $this->sso_enabled ) {
-			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key setting must be at least 10 characters long.', 'wp-discourse' ) );
-
-			return sanitize_text_field( $input );
-
-		} else {
-			return sanitize_text_field( $input );
-		}
+		return sanitize_text_field( $input );
 	}
 
 	/**
@@ -347,13 +405,57 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_login_path( $input ) {
-		if ( $this->sso_enabled && $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
 
 			$regex = '/^\//';
 			if ( ! preg_match( $regex, $input ) ) {
 				add_settings_error( 'discourse', 'login_path', __( 'The path to login page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
+			}
 
-				return $this->sanitize_text( $input );
+			// It's valid.
+			return $this->sanitize_text( $input );
+		}
+
+		// Sanitize, but don't validate. SSO is not enabled.
+		return $this->sanitize_text( $input );
+	}
+
+	/**
+	 * Validates the 'auto-create-login-redirect' field.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_auto_create_login_redirect( $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
+
+			$regex = '/^\//';
+			if ( ! preg_match( $regex, $input ) ) {
+				add_settings_error( 'discourse', 'auto_create_login_redirect', __( 'The path to the login redirect page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
+			}
+
+			// It's valid.
+			return $this->sanitize_text( $input );
+		}
+
+		// Sanitize, but don't validate. SSO is not enabled.
+		return $this->sanitize_text( $input );
+	}
+
+	/**
+	 * Validates the 'auto-create-welcome-redirect' field.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_auto_create_welcome_redirect( $input ) {
+		if ( $this->sso_provider_enabled && $input ) {
+
+			$regex = '/^\//';
+			if ( ! preg_match( $regex, $input ) ) {
+				add_settings_error( 'discourse', 'auto_create_welcome_redirect', __( 'The path to the welcome page setting needs to be a valid file path, starting with \'/\'.', 'wp-discourse' ) );
 			}
 
 			// It's valid.

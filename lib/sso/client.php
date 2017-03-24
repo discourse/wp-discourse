@@ -226,10 +226,10 @@ class Client {
 			return $user_id;
 
 		} else {
-			$user_query = new \WP_User_Query( [
+			$user_query = new \WP_User_Query( array(
 				'meta_key'   => $this->sso_meta_key,
 				'meta_value' => $this->get_sso_response( 'external_id' ),
-			] );
+			) );
 
 			$user_query_results = $user_query->get_results();
 
