@@ -122,14 +122,14 @@ class CommentSettings {
 	 * Outputs markup for the existing-comments-heading input.
 	 */
 	public function existing_comments_heading_input() {
-		$this->form_helper->input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive".)', 'wp-discourse' ) );
+		$this->form_helper->input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (for example, "Historical Comment Archive".)', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->form_helper->input( 'max-comments', 'discourse_comment', __( "Maximum number of comments to display. To display the link to the Discourse
+		$this->form_helper->input( 'max-comments', 'discourse_comment', __( "Maximum number of comments to display. To display a link to the Discourse
 		topic, without displaying comments on WordPress, set 'max visible comments' to 0.", 'wp-discourse' ), 'number', 0 );
 	}
 
