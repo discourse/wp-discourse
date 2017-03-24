@@ -77,7 +77,7 @@ class ConnectionSettings {
 	 * Outputs markup for the Discourse-url input.
 	 */
 	public function url_input() {
-		$this->form_helper->input( 'url', 'discourse_connect', __( "The base URL of your forum, for example http://discourse.example.com", 'wp-discourse' ), 'url' );
+		$this->form_helper->input( 'url', 'discourse_connect', __( 'The base URL of your forum, for example http://discourse.example.com', 'wp-discourse' ), 'url' );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class ConnectionSettings {
 		if ( ! empty( $discourse_options['url'] ) ) {
 			$this->form_helper->input( 'api-key', 'discourse_connect', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
 			                                                           '/admin/api/keys" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
-			                                                           "If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
+			"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
 		} else {
 			$this->form_helper->input( 'api-key', 'discourse_connect', __( "Found on your forum at /admin/api/keys.
 			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' ) );
@@ -108,11 +108,11 @@ class ConnectionSettings {
 	 */
 	public function connection_settings_tab_details_bak() {
 		?>
-        <p class="wpdc-options-documentation">
-            <em><?php esc_html_e( 'This section is for configuring your site\'s connection to your Discourse forum. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
-            <a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-            <em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-        </p>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( 'This section is for configuring your site\'s connection to your Discourse forum. For detailed instructions, see the ', 'wp-discourse' ); ?></em>
+			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
+			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
+		</p>
 		<?php
 	}
 
@@ -123,43 +123,43 @@ class ConnectionSettings {
 		$setup_howto_url           = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url        = 'https://meta.discourse.org/';
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( "The WP Discourse plugin is used to connect an existing Discourse forum with your WordPress site.
                 If you don't already have a Discourse forum, here are some options for setting one up:", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <ul class="wpdc-documentation-list">
-            <em>
-                <li>
-                    <a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank">install it yourself for
-                        free</a>
-                </li>
-                <li>
-                    <a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank">self-supported community
-                        installation</a>
-                </li>
-                <li>
-                    <a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank">discourse.org
-                        hosting</a>
-                </li>
-            </em>
-        </ul>
-        <p class="wpdc-options-documentation">
-            <em>
-				<?php esc_html_e( "For detailed instructions on setting up the plugin, please see the ", 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $setup_howto_url ); ?>"
-                   target="_blank"><?php esc_html_e( "WP Discourse plugin installation and setup", 'wp-discourse' ); ?></a>
-				<?php esc_html_e( "topic on the ", 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
-				<?php esc_html_e( "forum.", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
-                <strong><?php esc_html_e( "The following settings are used to establish a connection between your site and your forum:", 'wp-discourse' ); ?></strong>
-            </em>
-        </p>
+			</em>
+		</p>
+		<ul class="wpdc-documentation-list">
+			<em>
+				<li>
+					<a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank">install it yourself for
+						free</a>
+				</li>
+				<li>
+					<a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank">self-supported community
+						installation</a>
+				</li>
+				<li>
+					<a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank">discourse.org
+						hosting</a>
+				</li>
+			</em>
+		</ul>
+		<p class="wpdc-options-documentation">
+			<em>
+				<?php esc_html_e( 'For detailed instructions on setting up the plugin, please see the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
+			</em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
+				<strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
+			</em>
+		</p>
 
 		<?php
 	}

@@ -108,7 +108,7 @@ class CommentSettings {
 	 */
 	public function use_discourse_comments_checkbox() {
 		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
-			__( "For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.", 'wp-discourse' ) );
+		__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -168,7 +168,7 @@ class CommentSettings {
 		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
 		                                                                          get_option( 'date_format' ) . '").' .
 		                                                                          __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		                                                                          __( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' ) );
+		__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -193,22 +193,22 @@ class CommentSettings {
 		$discourse_meta_url         = 'https://meta.discourse.org/';
 		$template_customization_url = 'https://meta.discourse.org/t/wp-discourse-template-customization/50754';
 		?>
-        <p class="wpdc-options-documentation">
-            <em><?php esc_html_e( 'This section is for configuring how Discourse comments are displayed on your WordPress site.', 'wp-discourse' ); ?></em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
-				<?php esc_html_e( "For detailed instructions, see the ", 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $setup_howto_url ); ?>"
-                   target="_blank"><?php esc_html_e( "WP Discourse plugin installation and setup", 'wp-discourse' ); ?></a>
-				<?php esc_html_e( "and", 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $template_customization_url ); ?>"
-                   target="_blank"><?php esc_html_e( "WP Discourse template customization", 'wp-discourse' ); ?></a>
-				<?php esc_html_e( "topics on the ", 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
-				<?php esc_html_e( "forum.", 'wp-discourse' ); ?>
-            </em>
-        </p>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( 'This section is for configuring how Discourse comments are displayed on your WordPress site.', 'wp-discourse' ); ?></em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
+				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				<?php esc_html_e( 'and', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $template_customization_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
+				<?php esc_html_e( 'topics on the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
+			</em>
+		</p>
 		<?php
 	}
 }
