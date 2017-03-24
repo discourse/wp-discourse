@@ -337,21 +337,6 @@ class FormHelper {
 	}
 
 	/**
-	 * Outputs the markup for the 'establish_connection' notice that is displayed when a connection is
-	 * not established on all tabs except 'connection_options'.
-	 */
-	public function establish_connection() {
-		?>
-		<div class="notice notice-warning is-dismissible">
-			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
-				navigate back to the \'Connection\' tab and check your settings.', 'wp-discourse' ); ?></strong>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
 	 * Creates the full option name for the form `name` fields.
 	 *
 	 * @param string $option The name of the option.
