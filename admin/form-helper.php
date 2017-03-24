@@ -303,10 +303,10 @@ class FormHelper {
 		    if ( ! DiscourseUtilities::check_connection_status() ) {
 		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
 
-            } else {
+			} else {
 		        add_action( 'admin_notices', array( $this, 'connected' ) );
-            }
-        }
+			}
+		}
 	}
 
 	/**
