@@ -129,7 +129,8 @@ class CommentSettings {
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->form_helper->input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'max-comments', 'discourse_comment', __( "Maximum number of comments to display. To display the link to the Discourse
+		topic, without displaying comments on WordPress, set 'max visible comments' to 0.", 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
