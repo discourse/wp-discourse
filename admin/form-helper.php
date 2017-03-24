@@ -297,15 +297,15 @@ class FormHelper {
 			$current_page = null;
 		}
 
-		if ( $current_page && ! DiscourseUtilities::check_connection_status() ) {
+		// Only check the connection status on the main settings tab.
+		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 
-			if ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
+		    if ( ! DiscourseUtilities::check_connection_status() ) {
+		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
+
 			} else {
-				add_action( 'admin_notices', array( $this, 'establish_connection' ) );
+		        add_action( 'admin_notices', array( $this, 'connected' ) );
 			}
-		} elseif ( 'connection_options' === $current_page || 'wp_discourse_options' === $current_page ) {
-			add_action( 'admin_notices', array( $this, 'connected' ) );
 		}
 	}
 
@@ -316,8 +316,8 @@ class FormHelper {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. Please check your settings for \'Discourse URL\', \'API Key\', and \'Publishing username\'
-				Also, make sure that your Discourse forum is online.', 'wp-discourse' ); ?></strong>
+				<strong><?php esc_html_e( 'You are not connected to Discourse. If you are setting up the plugin, this
+                notice should go away after completing the form on this page.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php
@@ -331,21 +331,6 @@ class FormHelper {
 		<div class="notice notice-success is-dismissible">
 			<p>
 				<strong><?php esc_html_e( 'You are connected to Discourse!', 'wp-discourse' ); ?></strong>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Outputs the markup for the 'establish_connection' notice that is displayed when a connection is
-	 * not established on all tabs except 'connection_options'.
-	 */
-	public function establish_connection() {
-		?>
-		<div class="notice notice-warning is-dismissible">
-			<p>
-				<strong><?php esc_html_e( 'You are not connected to a Discourse forum. To establish a connection
-				navigate back to the \'Connection\' tab and check your settings.', 'wp-discourse' ); ?></strong>
 			</p>
 		</div>
 		<?php

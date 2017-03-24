@@ -15,6 +15,7 @@ class Discourse {
 	/**
 	 * The connection options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_connect = array(
@@ -26,6 +27,7 @@ class Discourse {
 	/**
 	 * The publishing options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_publish = array(
@@ -42,6 +44,7 @@ class Discourse {
 	/**
 	 * The commenting options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_comment = array(
@@ -61,6 +64,7 @@ class Discourse {
 	/**
 	 * The configurable text options array.
 	 *
+	 * @access protected
 	 * @var array
 	 */
 	protected $discourse_configurable_text = array(
@@ -80,17 +84,39 @@ class Discourse {
 	);
 
 	/**
-	 * The SSO options array.
+	 * The sso_common options array.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_sso_common = array(
+		'sso-secret' => '',
+	);
+
+	/**
+	 * The sso_provider options.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_sso_provider = array(
+		'enable-sso'                   => 0,
+		'auto-create-sso-user'         => 0,
+		'auto-create-login-redirect'   => '',
+		'auto-create-welcome-redirect' => '',
+		'login-path'                   => '',
+		'redirect-without-login' => 0,
+	);
+
+	/**
+	 * The sso_client options.
 	 *
 	 * @var array
 	 */
-	protected $discourse_sso = array(
-		'enable-sso'                   => 0,
+	protected $discourse_sso_client = array(
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
 		'sso-client-sync-by-email'     => 0,
-		'sso-secret'                   => '',
-		'login-path'                   => '',
 	);
 
 	/**
@@ -103,7 +129,9 @@ class Discourse {
 		'discourse_publish',
 		'discourse_comment',
 		'discourse_configurable_text',
-		'discourse_sso',
+		'discourse_sso_common',
+		'discourse_sso_provider',
+		'discourse_sso_client',
 	);
 
 	/**
@@ -124,9 +152,17 @@ class Discourse {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		// Set the Discourse domain name option.
-		$discourse_url = ! empty( get_option( 'discourse_connect' )['url'] ) ? get_option( 'discourse_connect' )['url'] : null;
+		$connection_options = get_option( 'discourse_connect' );
+		if ( $connection_options && ! empty( $connection_options['url'] ) ) {
+
+			$discourse_url = $connection_options['url'];
+		} else {
+
+			$discourse_url = null;
+		}
 		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
+		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 	}
 
 	/**
@@ -145,6 +181,17 @@ class Discourse {
 
 			update_option( 'discourse_option_groups', $this->discourse_option_groups );
 			update_option( 'discourse_version', WPDISCOURSE_VERSION );
+
+			// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
+			// from a previous version, transfer the 'discourse_sso' options into the new arrays.
+			if ( get_option( 'discourse_sso' ) ) {
+				$this->transfer_options( 'discourse_sso', array(
+					'discourse_sso_common',
+					'discourse_sso_provider',
+					'discourse_sso_client',
+				) );
+				delete_option( 'discourse_sso' );
+			}
 
 			foreach ( $this->discourse_option_groups as $group_name ) {
 				$option_defaults = $this->$group_name;
@@ -209,5 +256,37 @@ class Discourse {
 		);
 
 		return $allowedposttags;
+	}
+
+	/**
+	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
+	 *
+	 * @param string $old_option The name of the old option_group.
+	 * @param array  $transferable_option_groups The array of transferable_option_group names.
+	 */
+	protected function transfer_options( $old_option, $transferable_option_groups ) {
+		$discourse_options = get_option( $old_option );
+
+		foreach ( $transferable_option_groups as $group_name ) {
+			$this->transfer_option_group( $discourse_options, $group_name );
+		}
+	}
+
+	/**
+	 * Transfers saved option values to the new options group.
+	 *
+	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param string $group_name The name of the current options group.
+	 */
+	protected function transfer_option_group( $existing_options, $group_name ) {
+		$transferred_options = array();
+
+		foreach ( $this->$group_name as $key => $value ) {
+			if ( isset( $existing_options[ $key ] ) ) {
+				$transferred_options[ $key ] = $existing_options[ $key ];
+			}
+		}
+
+		add_option( $group_name, $transferred_options );
 	}
 }

@@ -20,7 +20,7 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_options() {
-		static $options = [];
+		static $options = array();
 
 		if ( empty( $options ) ) {
 			$discourse_option_groups = get_option( 'discourse_option_groups' );

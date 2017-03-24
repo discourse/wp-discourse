@@ -57,27 +57,27 @@ class CommentSettings {
 			'existing_comments_heading_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_max_comments', __( 'Max visible comments', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_max_comments', __( 'Max Visible Comments', 'wp-discourse' ), array(
 			$this,
 			'max_comments_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_min_replies', __( 'Min number of replies', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_min_replies', __( 'Min Number of Replies', 'wp-discourse' ), array(
 			$this,
 			'min_replies_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_min_score', __( 'Min score of posts', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_min_score', __( 'Min Score of Posts', 'wp-discourse' ), array(
 			$this,
 			'min_score_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_min_trust_level', __( 'Min trust level', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_min_trust_level', __( 'Min Trust Level', 'wp-discourse' ), array(
 			$this,
 			'min_trust_level_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass trust level score', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass Trust Level Score', 'wp-discourse' ), array(
 			$this,
 			'bypass_trust_level_input',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
@@ -87,12 +87,12 @@ class CommentSettings {
 			'custom_datetime_format',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_only_show_moderator_liked', __( 'Only import comments liked by a moderator', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_only_show_moderator_liked', __( 'Only Import Moderator-Liked', 'wp-discourse' ), array(
 			$this,
 			'only_show_moderator_liked_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_debug_mode', __( 'Debug mode', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_debug_mode', __( 'Debug Mode', 'wp-discourse' ), array(
 			$this,
 			'debug_mode_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
@@ -107,7 +107,8 @@ class CommentSettings {
 	 * Outputs markup for the use-discourse-comments checkbox.
 	 */
 	public function use_discourse_comments_checkbox() {
-		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
+		__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -121,14 +122,15 @@ class CommentSettings {
 	 * Outputs markup for the existing-comments-heading input.
 	 */
 	public function existing_comments_heading_input() {
-		$this->form_helper->input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (e.g. "Historical Comment Archive".)', 'wp-discourse' ) );
+		$this->form_helper->input( 'existing-comments-heading', 'discourse_comment', __( 'Heading for existing WordPress comments (for example, "Historical Comment Archive".)', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->form_helper->input( 'max-comments', 'discourse_comment', __( 'Maximum number of comments to display.', 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input( 'max-comments', 'discourse_comment', __( "Maximum number of comments to display. To display a link to the Discourse
+		topic, without displaying comments on WordPress, set 'max visible comments' to 0.", 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
@@ -149,7 +151,8 @@ class CommentSettings {
 	 * Outputs markup for the min-trust-level input.
 	 */
 	public function min_trust_level_input() {
-		$this->form_helper->input( 'min-trust-level', 'discourse_comment', __( 'Minimum trust level required prior to pulling comments across (0-5).', 'wp-discourse' ), 'number', 0, 5 );
+		$this->form_helper->input( 'min-trust-level', 'discourse_comment', __( 'Minimum Discourse user trust level required
+		for comments that are pulled to WordPress. (Trust levels range between 0 and 5.)', 'wp-discourse' ), 'number', 0, 5 );
 	}
 
 	/**
@@ -164,16 +167,16 @@ class CommentSettings {
 	 */
 	public function custom_datetime_format() {
 		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
-																				  get_option( 'date_format' ) . '").' .
-																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this', 'wp-discourse' ) . '</a>' . __( ' for more info.', 'wp-discourse' ) );
+		                                                                          get_option( 'date_format' ) . '").' .
+		                                                                          __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+		__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' ) );
 	}
 
 	/**
 	 * Outputs markup for the only-show-moderator-liked checkbox.
 	 */
 	public function only_show_moderator_liked_checkbox() {
-		$this->form_helper->checkbox_input( 'only-show-moderator-liked', 'discourse_comment' );
+		$this->form_helper->checkbox_input( 'only-show-moderator-liked', 'discourse_comment', __( "Only import comments 'liked' by a Discourse moderator.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -187,15 +190,25 @@ class CommentSettings {
 	 * Details for the 'commenting_options' tab.
 	 */
 	function commenting_settings_tab_details() {
+		$setup_howto_url            = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
+		$discourse_meta_url         = 'https://meta.discourse.org/';
+		$template_customization_url = 'https://meta.discourse.org/t/wp-discourse-template-customization/50754';
 		?>
-		<p class="documentation-link">
-			<em><?php esc_html_e( 'This section is for configuring how comments are published on your WordPress site. For detailed instructions, see the  ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Setup">Setup</a>
-			<em><?php esc_html_e( ' section of the WP Discourse wiki.', 'wp-discourse' ); ?></em>
-			<em><?php esc_html_e( ' For documentation on customizing the html templates that are used for comments, see the ', 'wp-discourse' ); ?></em>
-			<a href="https://github.com/discourse/wp-discourse/wiki/Template-Customization">Template
-				Customization</a>
-			<em><?php esc_html_e( ' section of the wiki.', 'wp-discourse' ); ?></em>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( 'This section is for configuring how Discourse comments are displayed on your WordPress site.', 'wp-discourse' ); ?></em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
+				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				<?php esc_html_e( 'and', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $template_customization_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
+				<?php esc_html_e( 'topics on the ', 'wp-discourse' ); ?>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
+			</em>
 		</p>
 		<?php
 	}
