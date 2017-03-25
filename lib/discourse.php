@@ -105,7 +105,7 @@ class Discourse {
 		'auto-create-login-redirect'   => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
-		'redirect-without-login' => 0,
+		'redirect-without-login'       => 0,
 	);
 
 	/**
@@ -139,7 +139,6 @@ class Discourse {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
-		add_action( 'admin_init', array( $this, 'set_plugin_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
@@ -160,57 +159,24 @@ class Discourse {
 
 			$discourse_url = null;
 		}
-		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
-	}
 
-	/**
-	 * Sets the plugin options on activation.
-	 *
-	 * Merges the default values of the 'configurable_text_options' with the saved values.
-	 *
-	 * The code in this function will only run once - while the option 'wpdc_plugin_activated' is set.
-	 * The 'wpdc_plugin_activated' option is set in the plugins activation hook function.
-	 *
-	 * See: https://codex.wordpress.org/Function_Reference/register_activation_hook under the 'Process Flow' heading.
-	 */
-	public function set_plugin_options() {
-		if ( is_admin() && 'wpdc-activated' === get_option( 'wpdc_plugin_activated' ) ) {
-			delete_option( 'wpdc_plugin_activated' );
-
-			update_option( 'discourse_option_groups', $this->discourse_option_groups );
-			update_option( 'discourse_version', WPDISCOURSE_VERSION );
-
-			// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
-			// from a previous version, transfer the 'discourse_sso' options into the new arrays.
-			if ( get_option( 'discourse_sso' ) ) {
-				$this->transfer_options( 'discourse_sso', array(
-					'discourse_sso_common',
-					'discourse_sso_provider',
-					'discourse_sso_client',
-				) );
-				delete_option( 'discourse_sso' );
-			}
-
-			foreach ( $this->discourse_option_groups as $group_name ) {
-				$option_defaults = $this->$group_name;
-				$saved_option    = get_option( $group_name );
-				if ( $saved_option ) {
-					// For now, only the configurable_text_options are being merged. In the future it will
-					// be possible to merge the values of all option groups. Previously, unset checkboxes weren't
-					// being set, so merging option groups that contain checkboxes could end up changing a site's settings.
-					$option = 'discourse_configurable_text' === $group_name ? array_merge( $option_defaults, $saved_option ) : $saved_option;
-				} else {
-					$option = $option_defaults;
-				}
-
-				update_option( $group_name, $option );
-			}
+		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
+		// from a previous version, transfer the 'discourse_sso' options into the new arrays.
+		if ( get_option( 'discourse_sso' ) ) {
+			$this->transfer_options( 'discourse_sso', array(
+				'discourse_sso_common',
+				'discourse_sso_provider',
+				'discourse_sso_client',
+			) );
+			delete_option( 'discourse_sso' );
 		}
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
+		update_option( 'discourse_version', WPDISCOURSE_VERSION );
 	}
 
 	/**
@@ -262,7 +228,7 @@ class Discourse {
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
 	 *
 	 * @param string $old_option The name of the old option_group.
-	 * @param array  $transferable_option_groups The array of transferable_option_group names.
+	 * @param array $transferable_option_groups The array of transferable_option_group names.
 	 */
 	protected function transfer_options( $old_option, $transferable_option_groups ) {
 		$discourse_options = get_option( $old_option );
@@ -275,7 +241,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param array $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {

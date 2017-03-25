@@ -97,6 +97,4 @@ function wpdc_check_requirements() {
 			'back_link' => true,
 		) );
 	}
-
-	add_option( 'wpdc_plugin_activated', 'wpdc-activated' );
 }
