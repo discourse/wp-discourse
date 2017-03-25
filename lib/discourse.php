@@ -179,7 +179,7 @@ class Discourse {
 				$saved_values = get_option( 'discourse_configurable_text' );
 				$default_values = $this->discourse_configurable_text;
 				$merged_values = array_merge( $default_values, $saved_values );
-				update_option( $merged_values );
+				update_option( $group_name, $merged_values );
 			} else {
 				add_option( $group_name, $this->$group_name );
 			}
