@@ -28,7 +28,6 @@ matrix:
           env: SNIFF=1
         # aliased to a recent 7.x version
         - php: '7.0'
-          env: SNIFF=1
         # aliased to a recent hhvm version
         - php: 'hhvm'
 
