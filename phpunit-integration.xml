@@ -1,5 +1,5 @@
 <!--PHPUnit integration tests. -->
-<!--Can also be run by calling vendor/bin/phpunit &#45;&#45;configuration phpunit-integration.xml-->
+<!--Run by calling vendor/bin/phpunit &#45;&#45;configuration phpunit-integration.xml-->
 <!--See: http://stackoverflow.com/questions/9535078/phpunit-different-bootstrap-for-all-testsuites -->
 <!--See: https://www.bountysource.com/issues/26548046-trouble-getting-a-simple-check-to-work comment by johnpbloch-->
 <phpunit
