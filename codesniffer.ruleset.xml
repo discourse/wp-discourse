@@ -17,6 +17,7 @@
         <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
         <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->
