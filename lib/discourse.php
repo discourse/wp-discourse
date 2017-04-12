@@ -138,20 +138,10 @@ class Discourse {
 	 * Discourse constructor.
 	 */
 	public function __construct() {
-	}
-
-	/**
-	 * Initialize the class.
-	 *
-	 * Moving hooks from the constructor to this function makes the class easier to test.
-	 */
-	public static function init() {
-		$self = new self();
-
-		add_action( 'init', array( $self, 'initialize_plugin' ) );
-		add_filter( 'user_contactmethods', array( $self, 'extend_user_profile' ), 10, 1 );
-		add_filter( 'allowed_redirect_hosts', array( $self, 'allow_discourse_redirect' ) );
-		add_filter( 'wp_kses_allowed_html', array( $self, 'allow_time_tag' ) );
+		add_action( 'init', array( $this, 'initialize_plugin' ) );
+		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
+		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
+		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
 	}
 
 	/**
