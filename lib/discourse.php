@@ -140,6 +140,11 @@ class Discourse {
 	public function __construct() {
 	}
 
+	/**
+	 * Initialize the class.
+	 *
+	 * Moving hooks from the constructor to this function makes the class easier to test.
+	 */
 	public static function init() {
 		$self = new self();
 
