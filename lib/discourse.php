@@ -198,7 +198,7 @@ class Discourse {
 	 * @return array
 	 */
 	public function allow_discourse_redirect( $hosts ) {
-		$discourse_domain = get_option( 'wpdc_discourse_domain', true );
+		$discourse_domain = get_option( 'wpdc_discourse_domain' );
 
 		if ( $discourse_domain ) {
 			$hosts[] = $discourse_domain;
