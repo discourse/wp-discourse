@@ -3,6 +3,9 @@
 # JetBrains IDEs
 .idea/*
 
+# Tests
+tests/integrations/config.php
+
 vendor/*
 
 wpcs/*

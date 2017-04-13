@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.7.3
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -98,7 +98,8 @@ In fact, we strongly recommend hosting the two applications separately, since th
 Yes, the html templates used for publishing posts on Discourse and for displaying comments on WordPress can be customized in your theme.
 This is done by hooking into the filters that are applied to each template.
 
-For more details on template customization, take a look at this section of our wiki: [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
+For more details on template customization, take a look at the [Template Customization](https://meta.discourse.org/t/wp-discourse-template-customization/50754) topic
+on the [Discourse Meta](https://meta.discourse.org/) forum.
 
 = Can my Discourse theme inherit the styling of my WordPress theme? =
 
@@ -107,13 +108,21 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Screenshots ==
 
-1. Select whether a post is to be published to Discourse, and what category it is to be published into.
+1. Publishing a post to Discourse.
 
-2. A WordPress posts with no comments.
+2. A WordPress posts with comments being managed through a Discourse forum.
 
-3. Adding a comment on the Discourse forum.
+3. Configuring the plugin: the Connection settings tab.
 
-4. The comment appears on WordPress.
+4. Configuring the plugin: the Publishing settings tab.
+
+5. Configuring the plugin: the Commenting settings tab.
+
+6. Configuring the plugin: the Text Content settings tab.
+
+7. Configuring the plugin: the SSO settings tab.
+
+8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
 
@@ -122,6 +131,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 **Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+
+#### 1.3.5 12/04/2017
+
+- Add unit and integration tests
 
 #### 1.3.4 25/03/2017
 
@@ -205,8 +218,7 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
 #### 1.0.0 26/09/16
 
-- Move WooCommerce support into a separate plugin, see the wiki page [WooCommerce Support](https://github.com/discourse/wp-discourse/wiki/WooCommerce-Support)
-for more details
+- Move WooCommerce support into a separate plugin
 - Break settings page into tabbed sections
 - Add a settings section for customizing all user facing text
 - Display the Discourse username instead of the fullname in the default comments template
@@ -292,3 +304,9 @@ for more details
 - Allow choosing Discourse category per post
 - Replace avatar URL function
 - Fix timezone for custom timestamp
+
+== Upgrade Notice ==
+
+= 1.3.5 =
+
+Minor bug fix.
