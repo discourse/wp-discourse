@@ -64,7 +64,7 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 	$discourse_html    = '';
 	$comments_html     = '';
 	$participants_html = '';
-	$topic_id          = ! empty ( $discourse_info->id ) ? $discourse_info->id : null;
+	$topic_id          = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {
