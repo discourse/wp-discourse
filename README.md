@@ -20,7 +20,7 @@ based on post score and commenter "trust level" -- see docs.
 - [boingboing.net](http://boingboing.net/)
 - [howtogeek.com](http://www.howtogeek.com/)
 
-###Single Sign On
+### Single Sign On
 
 The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
 Single Sign On provider for your Discourse forum.
@@ -28,7 +28,7 @@ Single Sign On provider for your Discourse forum.
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
 
-###Contact
+### Contact
 
 - The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
 
