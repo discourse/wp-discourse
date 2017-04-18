@@ -4,7 +4,7 @@
 .idea/*
 
 # Tests
-tests/integrations/config.php
+tests/integration/config.php
 
 vendor/*
 
