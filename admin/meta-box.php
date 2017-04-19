@@ -66,6 +66,7 @@ class MetaBox {
 		$categories             = DiscourseUtilities::get_discourse_categories();
 		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$selected_category_name = '';
+		$existing_topic_id      = (0 == (get_post_meta( $post_id, 'existing_topic_id', true )) ? null : get_post_meta( $post_id, 'existing_topic_id', true ) );
 
 		if ( is_wp_error( $categories ) ) {
 			$selected_category    = null;
@@ -134,6 +135,10 @@ class MetaBox {
 
 		<?php endif; ?>
 		</label>
+		<hr>
+		<label for="existing_topic_id"><?php esc_html_e( 'Existing Topic ID', 'wp-discourse' ); ?>
+    <input class="widefat" type="text" name="existing_topic_id" id="existing_topic_id" value="<?php echo esc_attr( $existing_topic_id ); ?>" size="30" />
+    </label>
 		<?php
 	}
 
@@ -165,6 +170,12 @@ class MetaBox {
 			update_post_meta( $post_id, 'publish_to_discourse', intval( wp_unslash( $_POST['publish_to_discourse'] ) ) ); // Input var okay.
 		} else {
 			update_post_meta( $post_id, 'publish_to_discourse', 0 );
+		}
+
+		if ( isset( $_POST['existing_topic_id'] ) ) {
+			update_post_meta( $post_id, 'existing_topic_id', intval( $_POST['existing_topic_id'] ) );
+		} else {
+			update_post_meta( $post_id, 'existing_topic_id', 0 );
 		}
 
 		return $post_id;

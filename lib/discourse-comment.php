@@ -103,6 +103,11 @@ class DiscourseComment {
 			return 0;
 		}
 
+		$existing_topic_id = get_post_meta( $postid, 'existing_topic_id', true );
+		if ( ! empty( $existing_topic_id ) ) {
+			return 1;
+		}
+
 		$setting = get_post_meta( $postid, 'publish_to_discourse', true );
 
 		return 1 === intval( $setting );
@@ -142,7 +147,12 @@ class DiscourseComment {
 					}
 					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
+					if ( get_post_meta( $postid, 'existing_topic_id', true ) === 0 ) {
+						$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
+					} else {
+						$discourse_permalink = esc_url( $discourse_options['url'] ) . '/t/' . get_post_meta( $postid, 'existing_topic_id', true );
+					}
+
 					if ( ! $discourse_permalink ) {
 
 						return 0;
