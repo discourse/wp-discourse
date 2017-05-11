@@ -172,11 +172,13 @@ class DiscoursePublish {
 		$publish_post_category = get_post_meta( $discourse_post->ID, 'publish_post_category', true );
 		$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category              = isset( $publish_post_category ) ? $publish_post_category : $default_category;
+		$http_method           = 'PUT';
 
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
 				'wp-id'            => $postid,
 				'embed_url'        => get_permalink( $postid ),
+				'featured_link'    => get_permalink( $postid ),
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
 				'title'            => $title,
@@ -185,26 +187,10 @@ class DiscoursePublish {
 				'skip_validations' => 'true',
 				'auto_track'       => ( isset( $options['auto-track'] ) && 1 === intval( $options['auto-track'] ) ? 'true' : 'false' ),
 			);
-			$url  = $options['url'] . '/posts';
+			$url = $options['url'] . '/posts';
 			// Use key 'http' even if you send the request to https://.
-			$post_options = array(
-				'timeout' => 30,
-				'method'  => 'POST',
-				'body'    => http_build_query( $data ),
-			);
-			$result       = wp_remote_post( $url, $post_options );
+			$http_method = 'POST';
 
-			if ( DiscourseUtilities::validate( $result ) ) {
-				$json = json_decode( $result['body'] );
-
-				if ( property_exists( $json, 'id' ) ) {
-					$discourse_id = (int) $json->id;
-				}
-
-				if ( isset( $discourse_id ) && $discourse_id > 0 ) {
-					add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
-				}
-			}
 		} else {
 			$data         = array(
 				'api_key'          => $options['api-key'],
@@ -213,26 +199,31 @@ class DiscoursePublish {
 				'post[raw]'        => $baked,
 				'skip_validations' => 'true',
 			);
-			$url          = $options['url'] . '/posts/' . $discourse_id;
-			$post_options = array(
-				'timeout' => 30,
-				'method'  => 'PUT',
-				'body'    => http_build_query( $data ),
-			);
-			$result       = wp_remote_post( $url, $post_options );
+			$url = $options['url'] . '/posts/' . $discourse_id;
 
-			if ( DiscourseUtilities::validate( $result ) ) {
-				$json = json_decode( $result['body'] );
-
-				if ( property_exists( $json, 'id' ) ) {
-					$discourse_id = (int) $json->id;
-				}
-
-				if ( isset( $discourse_id ) && $discourse_id > 0 ) {
-					add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
-				}
-			}
 		}// End if().
+
+		$data = apply_filters( 'wpdc_sync_to_discourse_data', $data, $discourse_id );
+
+		$post_options = array(
+			'timeout' => 30,
+			'method'  => $http_method,
+			'body'    => http_build_query( $data ),
+		);
+
+		$result = wp_remote_post( $url, $post_options );
+
+		if ( DiscourseUtilities::validate( $result ) ) {
+			$json = json_decode( $result['body'] );
+
+			if ( property_exists( $json, 'id' ) ) {
+				$discourse_id = (int) $json->id;
+			}
+
+			if ( isset( $discourse_id ) && $discourse_id > 0 ) {
+				add_post_meta( $postid, 'discourse_post_id', $discourse_id, true );
+			}
+		}
 
 		if ( isset( $json->topic_slug ) ) {
 			delete_post_meta( $postid, 'discourse_permalink' );
