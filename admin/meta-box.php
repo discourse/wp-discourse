@@ -44,14 +44,27 @@ class MetaBox {
 	 * @param string $post_type The post_type of the current post.
 	 */
 	public function add_meta_box( $post_type ) {
-		if ( isset( $this->options['allowed_post_types'] ) &&
-		     in_array( $post_type, $this->options['allowed_post_types'], true )
-		) {
+		if ( $this->should_display_metabox( $post_type ) ) {
 			add_meta_box( 'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
 				$this,
 				'render_meta_box',
 			), null, 'side', 'high', null );
 		}
+	}
+
+	/**
+	 * Verify metabox display rights.
+	 *
+	 * @method should_display_metabox
+	 *
+	 * @param  string $post_type current post type.
+	 *
+	 * @return boolean
+	 */
+	private function should_display_metabox( $post_type ) {
+		 return isset( $this->options['allowed_post_types'] ) &&
+		 	in_array( $post_type, $this->options['allowed_post_types'], true ) &&
+		 	current_user_can( 'publish_posts' );
 	}
 
 	/**
