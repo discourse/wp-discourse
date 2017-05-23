@@ -12,14 +12,19 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 $custom = get_post_custom();
 
 // If a post is published to Discourse when there is no connection to the forum the `discourse_permalink` key will not be set.
-if ( empty( $custom['discourse_permalink'] ) ) {
+if ( empty( $custom['discourse_permalink'] ) && empty( $custom['existing_topic_id'] ) ) {
 	echo wp_kses_post( Templates::bad_response_html() );
 
 } else {
 	$options                = DiscourseUtilities::get_options();
 	$is_enable_sso          = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 	$redirect_without_login = isset( $options['redirect-without-login'] ) && 1 === intval( $options['redirect-without-login'] );
-	$permalink              = (string) $custom['discourse_permalink'][0];
+
+	if ( empty( $custom['existing_topic_id'] ) ) {
+		$permalink = (string) $custom['discourse_permalink'][0];
+	} else {
+		$permalink = esc_url( $options['url'] ) . '/t/' . $custom['existing_topic_id'][0];
+	}
 
 	if ( $is_enable_sso && ! $redirect_without_login ) {
 		$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
