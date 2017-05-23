@@ -132,6 +132,12 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
+#### 1.3.6 22/05/2015
+
+- Test against WordPress 4.7.5
+- Add filter to SSO parameters
+- Fix Travis CI configuration file
+
 #### 1.3.5 12/04/2017
 
 - Add unit and integration tests
