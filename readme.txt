@@ -137,6 +137,8 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 - Test against WordPress 4.7.5
 - Add filter to SSO parameters
 - Fix Travis CI configuration file
+- Save Discourse categories as an option, instead of as a transient
+- Only update Discourse category list when 'Force Category Update' option is selected, (automatically deselected after a single request)
 
 #### 1.3.5 12/04/2017
 
