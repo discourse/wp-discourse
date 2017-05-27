@@ -118,8 +118,14 @@ class PublishSettings {
 	 * Outputs markup for the publish-category-update input.
 	 */
 	public function publish_category_input_update() {
+	    // Only set the force_update option for a single request.
+        $discourse_publish = get_option( 'discourse_publish' );
+        $discourse_publish['publish-category-update'] = 0;
+        update_option( 'discourse_publish', $discourse_publish );
+
 		$this->form_helper->checkbox_input( 'publish-category-update', 'discourse_publish', __( 'Update the discourse publish category list.', 'wp-discourse' ),
-		__( 'This is normally set to refresh every hour.', 'wp-discourse' ) );
+		__( "Check this box if you've added new categories to your forum and would like them to be available on WordPress. The check box
+		will be reset to 'unchecked' after a single request.", 'wp-discourse' ) );
 	}
 
 	/**
