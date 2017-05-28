@@ -43,7 +43,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int $post_id The id of the post that has been saved.
+	 * @param int    $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -101,7 +101,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -120,7 +120,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -298,7 +298,7 @@ class DiscoursePublish {
 	 * Sends a notification email to a site admin if a post fails to publish on Discourse.
 	 *
 	 * @param object $post $discourse_post The post where the failure occurred.
-	 * @param array $args Optional arguments for the function. The 'location' argument can be used to indicate where the failure occurred.
+	 * @param array  $args Optional arguments for the function. The 'location' argument can be used to indicate where the failure occurred.
 	 */
 	protected function notify_admin( $post, $args ) {
 		$post_id  = $post->ID;
