@@ -75,6 +75,8 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
+		add_filter( 'wpdc_validate_publish_failure_notice', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
@@ -488,6 +490,23 @@ class SettingsValidator {
 		if ( ! empty( $input ) ) {
 			return $this->sanitize_text( $input );
 		} else {
+			return '';
+		}
+	}
+
+	/**
+	 * Validates an email input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_email( $input ) {
+		if ( ! empty( $input ) ) {
+
+			return sanitize_email( $input );
+		} else {
+
 			return '';
 		}
 	}

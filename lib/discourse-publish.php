@@ -43,7 +43,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
+	 * @param int $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -59,6 +59,14 @@ class DiscoursePublish {
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
 			$title = $this->sanitize_title( $post->post_title );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+
+		} elseif ( $post_is_published && $this->is_valid_sync_post_type( $post_id ) && isset( $this->options['auto-publish'] ) &&
+		           1 === intval( $this->options['auto-publish'] )
+		) {
+			// The post should have been published.
+			$this->notify_admin( $post, array(
+				'location' => 'after_save',
+			) );
 		}
 	}
 
@@ -75,20 +83,25 @@ class DiscoursePublish {
 	 */
 	public function xmlrpc_publish_post_to_discourse( $post_id ) {
 		$post                 = get_post( $post_id );
+		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
 
-		if ( $publish_to_discourse && 'publish' === get_post_status( $post_id ) && $this->is_valid_sync_post_type( $post_id ) ) {
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 			$title = $this->sanitize_title( $post->post_title );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+		} elseif ( $post_is_published && isset( $this->options['auto-publish'] ) && 1 === intval( $this->options['auto-publish'] ) ) {
+			$this->notify_admin( $post, array(
+				'location' => 'after_xmlrpc_publish',
+			) );
 		}
 	}
 
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -107,7 +120,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -156,7 +169,7 @@ class DiscoursePublish {
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
-				'wp-id' => $post_id,
+				'wp-id'            => $post_id,
 				'embed_url'        => get_permalink( $post_id ),
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
@@ -195,6 +208,9 @@ class DiscoursePublish {
 
 		if ( ! DiscourseUtilities::validate( $result ) ) {
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+			$this->notify_admin( $current_post, array(
+				'location' => 'after_bad_response',
+			) );
 
 			return null;
 		}
@@ -212,6 +228,9 @@ class DiscoursePublish {
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+				$this->notify_admin( $current_post, array(
+					'location' => 'after_bad_response',
+				) );
 
 				return null;
 			}
@@ -224,6 +243,9 @@ class DiscoursePublish {
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+				$this->notify_admin( $current_post, array(
+					'location' => 'after_bad_response',
+				) );
 
 				return null;
 			}
@@ -270,5 +292,70 @@ class DiscoursePublish {
 	 */
 	protected function sanitize_title( $title ) {
 		return wp_strip_all_tags( $title );
+	}
+
+	/**
+	 * Sends a notification email to a site admin if a post fails to publish on Discourse.
+	 *
+	 * @param object $post $discourse_post The post where the failure occurred.
+	 * @param array $args Optional arguments for the function. The 'location' argument can be used to indicate where the failure occurred.
+	 */
+	protected function notify_admin( $post, $args ) {
+		$post_id  = $post->ID;
+		$location = ! empty( $args['location'] ) ? $args['location'] : '';
+
+		// This is to avoid sending two emails when a post is published through XML-RPC.
+		if ( 'after_save' === $location && 1 === intval( get_post_meta( $post_id, 'wpdc_xmlrpc_failure_sent', true ) ) ) {
+			delete_post_meta( $post_id, 'wpdc_xmlrpc_failure_sent' );
+
+			return;
+		}
+
+		if ( isset( $this->options['publish-failure-notice'] ) && 1 === intval( $this->options['publish-failure-notice'] ) ) {
+			$publish_failure_email = ! empty( $this->options['publish-failure-email'] ) ? $this->options['publish-failure-email'] : get_option( 'admin_email' );
+			$blogname              = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
+			$post_title            = $post->post_title;
+			$post_date             = $post->post_date;
+			$post_author           = get_user_by( 'id', $post->post_author )->user_login;
+			$permalink             = get_permalink( $post_id );
+			$support_url           = 'https://meta.discourse.org/c/support/wordpress';
+
+			// translators: Discourse publishing email. Placeholder: blogname.
+			$message = sprintf( __( 'A post has failed to publish on Discourse from your site [%1$s].', 'wp-discourse' ), $blogname ) . "\r\n\r\n";
+			// translators: Discourse publishing email. Placeholder: post title.
+			$message .= sprintf( __( 'The post \'%1$s\' was published on WordPress', 'wp-discourse' ), $post_title ) . "\r\n";
+			// translators: Discourse publishing email. Placeholder: post author, post date.
+			$message .= sprintf( __( 'by %1$s, on %2$s.', 'wp-discourse' ), $post_author, $post_date ) . "\r\n\r\n";
+			// translators: Discourse publishing email. Placeholder: permalink.
+			$message .= sprintf( __( '<%1$s>', 'wp-discourse' ), esc_url( $permalink ) ) . "\r\n\r\n";
+			$message .= __( 'Reason for failure:', 'wp-discourse' ) . "\r\n";
+
+			switch ( $location ) {
+				case 'after_save':
+					$message .= __( 'The \'Publish to Discourse\' checkbox wasn\'t checked.', 'wp-discourse' ) . "\r\n";
+					$message .= __( 'You are being notified because you have the \'Auto Publish\' setting enabled.', 'wp-discourse' ) . "\r\n\r\n";
+					break;
+				case 'after_xmlrpc_publish':
+					add_post_meta( $post->ID, 'wpdc_xmlrpc_failure_sent', 1 );
+					$message .= __( 'The post was published through XML-RPC.', 'wp-discourse' ) . "\r\n\r\n";
+					break;
+				case 'after_bad_response':
+					$discourse_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+					$category_name         = DiscourseUtilities::get_discourse_category_name( $discourse_category_id );
+
+					$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n\r\n";
+					$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
+					$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n";
+					// translators: Discourse publishing email. Placeholder: Discourse category name.
+					$message .= sprintf( __( '- the author is has permission to publish in the %1$s Discourse category', 'wp-discourse' ), esc_attr( $category_name ) ) . "\r\n\r\n";
+					break;
+			}
+
+			$message .= __( 'If you\'re having trouble with the WP Discourse plugin, you can find help at:', 'wp-discourse' ) . "\r\n";
+			// translators: Discourse publishing email. Placeholder: Discourse support URL.
+			$message .= sprintf( __( '<%1$s>', 'wp-discourse' ), esc_url( $support_url ) ) . "\r\n";
+			// translators: Discourse publishing email. Placeholder: blogname, email message.
+			wp_mail( $publish_failure_email, sprintf( __( '[%s] Discourse Publishing Failure' ), $blogname ), $message );
+		}// End if().
 	}
 }

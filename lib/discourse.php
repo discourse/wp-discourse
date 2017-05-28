@@ -37,6 +37,8 @@ class Discourse {
 		'full-post-content'       => 0,
 		'custom-excerpt-length'   => 55,
 		'auto-publish'            => 0,
+		'publish-failure-notice' => 0,
+		'publish-failure-email' => '',
 		'auto-track'              => 1,
 		'allowed_post_types'      => array( 'post' ),
 	);
