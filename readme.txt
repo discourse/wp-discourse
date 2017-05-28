@@ -141,6 +141,7 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 - Only update Discourse category list when 'Force Category Update' option is selected, (automatically deselected after a single request)
 - Publish to correct category if an error is returned when fetching categories from Discourse
 - Add success/failure notices to the post edit page after publishing Discourse post
+- Add email notification option for when a post fails to publish to Discourse
 
 #### 1.3.5 12/04/2017
 
