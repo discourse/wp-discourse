@@ -118,7 +118,7 @@ class MetaBox {
                 </p>
             </div>
 			<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-            <input type="hidden" name="publish_post_category" value="<?php echo $selected_category; ?>">
+            <input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
 
 		<?php else : ?>
             <label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
