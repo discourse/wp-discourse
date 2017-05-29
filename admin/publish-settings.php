@@ -113,7 +113,7 @@ class PublishSettings {
 	 */
 	public function display_subcategories() {
 		$this->form_helper->checkbox_input( 'display-subcategories', 'discourse_publish', __( 'Include subcategories in the list of available categories.', 'wp-discourse' ),
-		__( 'You need to save this setting before subcategories will be available in the category list.', 'wp-discourse' ) );
+		__( "You need to select and save both this setting and the 'Force Category Update' setting before subcategories will be available in the category list.", 'wp-discourse' ) );
 	}
 
 	/**
