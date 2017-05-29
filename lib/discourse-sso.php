@@ -237,6 +237,8 @@ class DiscourseSSO {
 					'avatar_url'         => $avatar_url,
 				);
 
+				$params = apply_filters( 'wpdc_sso_params', $params, $current_user );
+
 				$q = $sso->build_login_string( $params );
 
 				// Redirect back to Discourse.
