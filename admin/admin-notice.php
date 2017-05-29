@@ -66,7 +66,7 @@ class AdminNotice {
 							// translators: Discourse post-published success message. Placeholder: discourse_permalink.
 						__( '<div class="notice notice-success is-dismissible"><p>You\'re post has been published to Discourse. %1$s on Discourse.</p></div>', 'wp-discourse' ), $discourse_link );
 
-						update_post_meta( $post_id, 'wpdc_publishing_response', 'success_displayed' );
+						delete_post_meta( $post_id, 'wpdc_publishing_response' );
 
 						echo wp_kses_post( $success_message );
 					}
