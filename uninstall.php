@@ -24,4 +24,4 @@ foreach ( $discourse_options as $option ) {
 global $wpdb;
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}discourse_nonce" );
 
-delete_transient( 'discourse_settings_categories_cache' );
+delete_option( 'wpdc_discourse_categories' );
