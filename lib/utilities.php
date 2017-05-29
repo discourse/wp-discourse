@@ -130,26 +130,6 @@ class Utilities {
 	}
 
 	/**
-	 * Gets the Discourse category name from it's id.
-	 *
-	 * @param int $category_id The category id.
-	 *
-	 * @return string
-	 */
-	public static function get_discourse_category_name( $category_id ) {
-		$categories = self::get_discourse_categories();
-		$category_name = '';
-		foreach ( $categories as $category ) {
-			if ( intval( $category_id ) === $category['id'] ) {
-				$category_name = $category['name'];
-				break;
-			}
-		}
-
-		return $category_name;
-	}
-
-	/**
 	 * Check if an user is linked to a discourse instance
 	 *
 	 * @return boolean
