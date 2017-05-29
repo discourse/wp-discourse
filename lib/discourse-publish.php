@@ -340,14 +340,9 @@ class DiscoursePublish {
 					$message .= __( 'The post was published through XML-RPC.', 'wp-discourse' ) . "\r\n\r\n";
 					break;
 				case 'after_bad_response':
-					$discourse_category_id = get_post_meta( $post_id, 'publish_post_category', true );
-					$category_name         = DiscourseUtilities::get_discourse_category_name( $discourse_category_id );
-
 					$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n\r\n";
 					$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
-					$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n";
-					// translators: Discourse publishing email. Placeholder: Discourse category name.
-					$message .= sprintf( __( '- the author is has permission to publish in the %1$s Discourse category', 'wp-discourse' ), esc_attr( $category_name ) ) . "\r\n\r\n";
+					$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n\r\n";
 					break;
 			}
 
