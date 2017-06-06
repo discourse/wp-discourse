@@ -133,6 +133,8 @@ admin, They must be customized with filters. see the [Template Customization](ht
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
 #### 1.3.7 06/06/2017
+- Add force-avatar-update option to SSO Provider options
+- Add use-real-name-as-discourse-name option to SSO Provider options
 
 #### 1.3.6 22/05/2017
 

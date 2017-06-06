@@ -37,8 +37,8 @@ class Discourse {
 		'full-post-content'       => 0,
 		'custom-excerpt-length'   => 55,
 		'auto-publish'            => 0,
-		'publish-failure-notice' => 0,
-		'publish-failure-email' => '',
+		'publish-failure-notice'  => 0,
+		'publish-failure-email'   => '',
 		'auto-track'              => 1,
 		'allowed_post_types'      => array( 'post' ),
 	);
@@ -107,7 +107,8 @@ class Discourse {
 		'auto-create-login-redirect'   => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
-		'force-avatar-update' => 0,
+		'real-name-as-discourse-name'  => 0,
+		'force-avatar-update'          => 0,
 		'redirect-without-login'       => 0,
 	);
 
@@ -179,9 +180,9 @@ class Discourse {
 
 		foreach ( $this->discourse_option_groups as $group_name ) {
 			if ( 'discourse_configurable_text' === $group_name && get_option( 'discourse_configurable_text' ) ) {
-				$saved_values = get_option( 'discourse_configurable_text' );
+				$saved_values   = get_option( 'discourse_configurable_text' );
 				$default_values = $this->discourse_configurable_text;
-				$merged_values = array_merge( $default_values, $saved_values );
+				$merged_values  = array_merge( $default_values, $saved_values );
 				update_option( $group_name, $merged_values );
 			} else {
 				add_option( $group_name, $this->$group_name );
@@ -242,7 +243,7 @@ class Discourse {
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
 	 *
 	 * @param string $old_option The name of the old option_group.
-	 * @param array  $transferable_option_groups The array of transferable_option_group names.
+	 * @param array $transferable_option_groups The array of transferable_option_group names.
 	 */
 	protected function transfer_options( $old_option, $transferable_option_groups ) {
 		$discourse_options = get_option( $old_option );
@@ -255,7 +256,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param array $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {

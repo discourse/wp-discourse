@@ -99,9 +99,14 @@ class SSOSettings {
 			'auto_create_welcome_redirect',
 		), 'discourse_sso_provider', 'discourse_sso_provider_settings_section' );
 
-		add_settings_field( 'discourse_wp_login_path', __( 'Path to your login page', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_wp_login_path', __( 'Path to your Login Page', 'wp-discourse' ), array(
 			$this,
 			'wordpress_login_path',
+		), 'discourse_sso_provider', 'discourse_sso_provider_settings_section' );
+
+		add_settings_field( 'discourse_real_name_as_discourse_name', __( 'Use Real Name for Discourse Name', 'wp-discourse' ), array(
+			$this,
+			'use_real_name_checkbox',
 		), 'discourse_sso_provider', 'discourse_sso_provider_settings_section' );
 
 		add_settings_field( 'discourse_force_avatar_update', __( 'Force Avatar Update', 'wp-discourse' ), array(
@@ -264,12 +269,21 @@ class SSOSettings {
 	}
 
 	/**
+	 * Outputs the markup for the 'real-name-as-discourse-name' checkbox.
+	 */
+	public function use_real_name_checkbox() {
+		$this->form_helper->checkbox_input( 'real-name-as-discourse-name', 'discourse_sso_provider', __( "Set the Discourse
+		name field to the WordPress user's real name.", 'wp-discourse' ), __( "If neither a first or last name has been set on WordPress,
+	    the user's Display Name will be used instead.", 'wp-discourse' ) );
+	}
+
+	/**
 	 * Outputs markup for the force-avatar-update checkbox.
 	 */
 	public function force_avatar_update_checkbox() {
-	    $this->form_helper->checkbox_input( 'force-avatar-update', 'discourse_sso_provider', __( 'Update Discourse avatars from the WordPress avatar_url on each login request.', 'wp-discourse' ),
-            __( 'Enabling this setting will keep the user avatars on Discourse in sync with the avatars on WordPress.', 'wp-discourse' ) );
-    }
+		$this->form_helper->checkbox_input( 'force-avatar-update', 'discourse_sso_provider', __( 'Update Discourse avatars from the WordPress avatar_url on each login request.', 'wp-discourse' ),
+			__( 'Enabling this setting will keep the user avatars on Discourse in sync with the avatars on WordPress.', 'wp-discourse' ) );
+	}
 
 	/**
 	 * Outputs markup for the redirect-without-login checkbox.
