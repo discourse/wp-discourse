@@ -107,6 +107,7 @@ class Discourse {
 		'auto-create-login-redirect'   => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
+		'force-avatar-update' => 0,
 		'redirect-without-login'       => 0,
 	);
 
