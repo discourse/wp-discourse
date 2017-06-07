@@ -48,7 +48,7 @@ class DiscourseSSO {
 	/**
 	 * Automatically login users to Discourse after they have logged in to WordPress.
 	 *
-	 * @param int $user_login The user ID.
+	 * @param int      $user_login The user ID.
 	 * @param \WP_User $user The user who has logged in.
 	 */
 	public function auto_login_discourse_user( $user_login, $user ) {
@@ -213,7 +213,7 @@ class DiscourseSSO {
 					$last_name = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
 
 					if ( $first_name || $last_name ) {
-						$name = trim( $first_name . " " . $last_name );
+						$name = trim( $first_name . ' ' . $last_name );
 					}
 				}
 
@@ -236,7 +236,6 @@ class DiscourseSSO {
 					echo( 'Invalid request.' );
 					exit;
 				}
-
 
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
