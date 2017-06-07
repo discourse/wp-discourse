@@ -118,6 +118,8 @@ class SettingsValidator {
 		) );
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
+		add_filter( 'wpdc_validate_real_name_as_discourse_name', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_force_avatar_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 	}
 

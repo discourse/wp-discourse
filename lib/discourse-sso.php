@@ -61,8 +61,8 @@ class DiscourseSSO {
 				$welcome_redirect = ! empty( $this->options['auto-create-welcome-redirect'] ) ? home_url( $this->options['auto-create-welcome-redirect'] ) : null;
 			}
 
-			$redirect = ! empty( $this->options['auto-create-login-redirect'] ) ? home_url( $this->options['auto-create-login-redirect'] ) : home_url( '/' );
-			$redirect = ! empty( $welcome_redirect ) ? $welcome_redirect : apply_filters( 'wpdc_auto_create_login_redirect', $redirect, $user_login, $user );
+			$redirect      = ! empty( $this->options['auto-create-login-redirect'] ) ? home_url( $this->options['auto-create-login-redirect'] ) : home_url( '/' );
+			$redirect      = ! empty( $welcome_redirect ) ? $welcome_redirect : apply_filters( 'wpdc_auto_create_login_redirect', $redirect, $user_login, $user );
 			$sso_url       = ! empty( $this->options['url'] ) ? $this->options['url'] . '/session/sso?return_path=' . $redirect : null;
 			$referer_query = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
 			$query_params  = array();
@@ -204,7 +204,22 @@ class DiscourseSSO {
 					$require_activation = true;
 				}
 
-				$require_activation = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
+				$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
+				$force_avatar_update = ! empty( $this->options['force-avatar-update'] ) && 1 === intval( $this->options['force-avatar-update'] );
+				$avatar_url          = $this->get_avatar_url( $user_id );
+
+				if ( ! empty( $this->options['real-name-as-discourse-name'] ) && 1 === intval( $this->options['real-name-as-discourse-name'] ) ) {
+					$first_name = ! empty( $current_user->first_name ) ? $current_user->first_name : '';
+					$last_name = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
+
+					if ( $first_name || $last_name ) {
+						$name = trim( $first_name . ' ' . $last_name );
+					}
+				}
+
+				if ( empty( $name ) ) {
+					$name = $current_user->display_name;
+				}
 
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
@@ -222,19 +237,18 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$avatar_url = $this->get_avatar_url( $user_id );
-
 				$nonce  = $sso->get_nonce( $payload );
 				$params = array(
-					'nonce'              => $nonce,
-					'name'               => $current_user->display_name,
-					'username'           => $current_user->user_login,
-					'email'              => $current_user->user_email,
+					'nonce'               => $nonce,
+					'name'                => $name,
+					'username'            => $current_user->user_login,
+					'email'               => $current_user->user_email,
 					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
-					'require_activation' => $require_activation ? 'true' : 'false',
-					'about_me'           => $current_user->description,
-					'external_id'        => $user_id,
-					'avatar_url'         => $avatar_url,
+					'require_activation'  => $require_activation ? 'true' : 'false',
+					'about_me'            => $current_user->description,
+					'external_id'         => $user_id,
+					'avatar_url'          => $avatar_url,
+					'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
 				);
 
 				$params = apply_filters( 'wpdc_sso_params', $params, $current_user );

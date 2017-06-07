@@ -37,8 +37,8 @@ class Discourse {
 		'full-post-content'       => 0,
 		'custom-excerpt-length'   => 55,
 		'auto-publish'            => 0,
-		'publish-failure-notice' => 0,
-		'publish-failure-email' => '',
+		'publish-failure-notice'  => 0,
+		'publish-failure-email'   => '',
 		'auto-track'              => 1,
 		'allowed_post_types'      => array( 'post' ),
 	);
@@ -107,6 +107,8 @@ class Discourse {
 		'auto-create-login-redirect'   => '',
 		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
+		'real-name-as-discourse-name'  => 0,
+		'force-avatar-update'          => 0,
 		'redirect-without-login'       => 0,
 	);
 
@@ -178,9 +180,9 @@ class Discourse {
 
 		foreach ( $this->discourse_option_groups as $group_name ) {
 			if ( 'discourse_configurable_text' === $group_name && get_option( 'discourse_configurable_text' ) ) {
-				$saved_values = get_option( 'discourse_configurable_text' );
+				$saved_values   = get_option( 'discourse_configurable_text' );
 				$default_values = $this->discourse_configurable_text;
-				$merged_values = array_merge( $default_values, $saved_values );
+				$merged_values  = array_merge( $default_values, $saved_values );
 				update_option( $group_name, $merged_values );
 			} else {
 				add_option( $group_name, $this->$group_name );
