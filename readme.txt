@@ -135,6 +135,8 @@ section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 #### 1.3.7 06/06/2017
 - Add force-avatar-update option to SSO Provider options
 - Add use-real-name-as-discourse-name option to SSO Provider options
+- Add 'wpdc_single_page_comment_number_sync' filter, to be used for setting which posts and pages use the longer 'discourse_archive_page_sync_period'
+for syncing comment numbers on archive pages
 
 #### 1.3.6 22/05/2017
 

@@ -273,7 +273,7 @@ class SSOSettings {
 	 */
 	public function use_real_name_checkbox() {
 		$this->form_helper->checkbox_input( 'real-name-as-discourse-name', 'discourse_sso_provider', __( "Set the Discourse
-		name field to the WordPress user's real name.", 'wp-discourse' ), __( "If neither a first or last name has been set on WordPress,
+		name field to the WordPress user's real name.", 'wp-discourse' ), __( "If neither first or last name have been set on WordPress,
 	    the user's Display Name will be used instead.", 'wp-discourse' ) );
 	}
 
