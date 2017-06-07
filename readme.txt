@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.7.5
-Stable tag: 1.3.6
+Stable tag: 1.3.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -132,7 +132,13 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
 section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
 
-#### 1.3.6 22/05/2015
+#### 1.3.7 06/06/2017
+- Add force-avatar-update option to SSO Provider options
+- Add use-real-name-as-discourse-name option to SSO Provider options
+- Add 'wpdc_single_page_comment_number_sync' filter, to be used for setting which posts and pages use the longer 'discourse_archive_page_sync_period'
+for syncing comment numbers on archive pages
+
+#### 1.3.6 22/05/2017
 
 - Test against WordPress 4.7.5
 - Add filter to SSO parameters
