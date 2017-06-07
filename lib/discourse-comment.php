@@ -221,8 +221,11 @@ class DiscourseComment {
 	function get_comments_number( $count, $post_id ) {
 		if ( $this->use_discourse_comments( $post_id ) ) {
 
+			$single_page = is_single( $post_id ) || is_page( $post_id );
+			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
+
 			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
-			if ( is_single( $post_id ) || is_page( $post_id ) ) {
+			if ( $single_page ) {
 				$this->sync_comments( $post_id );
 			} else {
 				// For archive pages, check $last_sync against $archive_page_sync_period.
