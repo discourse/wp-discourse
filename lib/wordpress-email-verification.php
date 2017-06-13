@@ -62,18 +62,6 @@ class WordPressEmailVerification {
 		$this->verification_signature_key_name = $verification_signature_key_name;
 		$this->site_prefix                     = $site_prefix;
 
-		add_action( 'init', array( $this, 'initialize' ) );
-	}
-
-	/**
-	 * Initializes the class.
-	 *
-	 * This function hooks into the 'user_register' action to flag all newly registered user's emails as unverified.
-	 * The 'resetpass_form' and 'login_form' hooks are used to add a hidden 'mail_key' field to the reset password and
-	 * login forms.
-	 */
-	public function initialize() {
-
 		add_action( 'user_register', array( $this, 'flag_email' ) );
 		add_action( 'resetpass_form', array( $this, 'mail_key_field' ) );
 		add_action( 'login_form', array( $this, 'mail_key_field' ) );

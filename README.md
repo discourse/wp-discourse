@@ -7,7 +7,7 @@
 The WP Discourse plugin acts as an interface between your WordPress site and your
 [Discourse](http://www.discourse.org/) community.
 
-###Use Discourse for comments:
+### Use Discourse for comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
 - Associates WP author accounts with their respective Discourse accounts. Does not require SSO.

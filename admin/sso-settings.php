@@ -234,7 +234,7 @@ class SSOSettings {
 	 */
 	public function auto_create_sso_user_checkbox() {
 		$description = __( "Automatically login users to Discourse after they login to your WordPress site. If the user does not yet
-	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
+	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'sso allows all return paths.'", 'wp-discourse' );
 		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create and login users.', 'wp-discourse' ), $description );
 	}
 
