@@ -171,6 +171,7 @@ class DiscoursePublish {
 			$data = array(
 				'wp-id'            => $post_id,
 				'embed_url'        => get_permalink( $post_id ),
+				'featured_link'    => get_permalink( $post_id ),
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
 				'title'            => $title,
