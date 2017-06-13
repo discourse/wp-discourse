@@ -99,8 +99,8 @@ class ConnectionSettings {
 	 * Outputs markup for the publish-username input.
 	 */
 	public function publish_username_input() {
-		$this->form_helper->input( 'publish-username', 'discourse_connect', __( "The default Discourse username under which WordPress posts will be published on your forum.
-		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.", 'wp-discourse' ) );
+		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default Discourse username under which WordPress posts will be published on your forum.
+		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
 	}
 
 	/**
