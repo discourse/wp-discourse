@@ -97,6 +97,16 @@ class PublishSettings {
 			'auto_track_checkbox',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
+		add_settings_field( 'discourse_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
+		        $this,
+            'hide_discourse_name_field_checkbox',
+        ), 'discourse_publish', 'discourse_publishing_settings_section' );
+
+		add_settings_field( 'discourse_username_as_discourse_name', __( 'Set Discourse Name to WordPress Username', 'wp-discourse' ), array(
+		        $this,
+            'username_as_discourse_name_checkbox',
+        ), 'discourse_publish', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_allowed_post_types', __( 'Post Types to Publish', 'wp-discourse' ), array(
 			$this,
 			'post_types_select',
@@ -195,6 +205,16 @@ class PublishSettings {
 	public function auto_track_checkbox() {
 		$this->form_helper->checkbox_input( 'auto-track', 'discourse_publish', __( 'Author automatically tracks their published Discourse topics.', 'wp-discourse' ) );
 	}
+
+	public function hide_discourse_name_field_checkbox() {
+	    $this->form_helper->checkbox_input( 'hide-discourse-name-field', 'discourse_publish', __( "Don't display Discourse Name field
+	    on user's profile page.", 'wp-discourse' ) );
+    }
+
+    public function username_as_discourse_name_checkbox() {
+	    $this->form_helper->checkbox_input( 'username-as-discourse-name', 'discourse_publish', __( "Automatically set user's Discourse Name
+	    to their WordPress username.", 'wp-discourse' ) );
+    }
 
 	/**
 	 * Outputs markup for the post-types select input.
