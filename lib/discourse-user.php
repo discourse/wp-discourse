@@ -33,7 +33,10 @@ class DiscourseUser {
 	 * @return mixed
 	 */
 	public function extend_user_profile( $fields ) {
-		if ( empty( $this->options['hide-discourse-name-field'] ) ) {
+		if ( ! empty( $this->options['hide-discourse-name-field'] ) || ! empty( $this->options['username-as-discourse-name'])) {
+
+			return $fields;
+		} else {
 			$fields['discourse_username'] = 'Discourse Username';
 		}
 
