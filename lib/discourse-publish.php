@@ -127,9 +127,10 @@ class DiscoursePublish {
 	 * @return null
 	 */
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
-		$discourse_id  = get_post_meta( $post_id, 'discourse_post_id', true );
 		$options       = $this->options;
+		$discourse_id  = get_post_meta( $post_id, 'discourse_post_id', true );
 		$current_post  = get_post( $post_id );
+		$author_id = $current_post->post_author;
 		$use_full_post = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
 
 		if ( $use_full_post ) {
@@ -148,7 +149,6 @@ class DiscoursePublish {
 		$baked     = trim( Templates::publish_format_html() );
 		$baked     = str_replace( '{excerpt}', $excerpt, $baked );
 		$baked     = str_replace( '{blogurl}', get_permalink( $post_id ), $baked );
-		$author_id = $current_post->post_author;
 		$author    = get_the_author_meta( 'display_name', $author_id );
 		$baked     = str_replace( '{author}', $author, $baked );
 		$thumb     = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
@@ -157,9 +157,9 @@ class DiscoursePublish {
 		$baked     = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 
 		if ( ! empty( $this->options['username-as-discourse-name'] ) && 1 === intval( $this->options['username-as-discourse-name'] ) ) {
-			$username = wp_get_current_user()->user_login;
+			$username = get_user_by( 'id', $author_id )->user_login;
 		} else {
-			$username = get_the_author_meta( 'discourse_username', $current_post->post_author );
+			$username = get_the_author_meta( 'discourse_username', $author_id );
 		}
 		if ( ! $username || strlen( $username ) < 2 ) {
 			$username = $options['publish-username'];
