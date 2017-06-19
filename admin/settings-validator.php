@@ -77,6 +77,9 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
 		add_filter( 'wpdc_validate_publish_failure_notice', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
+		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_username_as_discourse_name', array( $this, 'validate_checkbox' ) );
+
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
