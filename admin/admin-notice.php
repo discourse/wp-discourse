@@ -75,11 +75,12 @@ class AdminNotice {
 				$discourse_username = get_user_meta( get_current_user_id(), 'discourse_username', true );
 				$current_username   = wp_get_current_user()->user_login;
 				$publish_username   = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : '';
+				$use_discourse_name_field = empty( $this->options['username-as-discourse-name']) && empty( $this->options['hide-discourse-name-field']);
 
 				$profile_page_link = '<a href="' . esc_url( admin_url( '/profile.php' ) ) . '">' . __( 'profile page', 'wp-discourse' ) . '</a>';
 
 				if ( empty( $discourse_username ) &&
-				     empty( $this->options['username-as-discourse-name'] ) &&
+				     $use_discourse_name_field &&
 				     $current_username !== $publish_username
 				) {
 					$username_not_set_notice = sprintf(
