@@ -67,6 +67,16 @@ class ConnectionSettings {
 			'publish_username_input',
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
+		add_settings_field( 'discourse_comment_sync_period', __( 'Comment Sync Period', 'wp-discourse' ), array(
+			$this,
+			'comment_sync_period_input'
+		), 'discourse_connect', 'discourse_connection_settings_section' );
+
+		add_settings_field( 'discourse_use_discourse_plugin', __( 'Use Discourse WordPress Plugin', 'wp-discourse' ), array(
+			$this,
+			'use_discourse_plugin_checkbox',
+		), 'discourse_connect', 'discourse_connection_settings_section' );
+
 		register_setting( 'discourse_connect', 'discourse_connect', array(
 			$this->form_helper,
 			'validate_options',
@@ -101,6 +111,18 @@ class ConnectionSettings {
 	public function publish_username_input() {
 		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
+	}
+
+	// Todo: change the min value to 10!!!
+	public function comment_sync_period_input() {
+		$this->form_helper->input( 'comment-sync-period', 'discourse_connect', __( 'Sets how often you would like to sync
+	    comment data between WordPress and your forum. (Defaults to 10 minutes if the field is left empty.)', 'wp-discourse'), 'number', 0 );
+	}
+
+	public function use_discourse_plugin_checkbox() {
+		$this->form_helper->checkbox_input( 'use-discourse-plugin', 'discourse_connect', __( 'Use the Discourse WordPress
+	    plugin to sync comments between WordPress and Discourse', 'wp-discourse'), __( "The Discourse WordPress plugin
+	    can be used to increase the effeciency of syncing comments between WordPress and your Discourse forum.", 'wp-discourse' ) );
 	}
 
 	/**

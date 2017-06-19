@@ -69,6 +69,9 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
+		add_filter( 'wpdc_validate_use_discourse_plugin', array( $this, 'validate_use_discourse_plugin' ) );
+		add_filter( 'wpdc_validate_comment_sync_period', array( $this, 'validate_comment_sync_period' ) );
+
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
@@ -205,6 +208,41 @@ class SettingsValidator {
 		}
 	}
 
+	public function validate_use_discourse_plugin( $input ) {
+		$enabled = $this->validate_checkbox( $input );
+
+		if ( $enabled ) {
+			$config_test = DiscourseUtilities::get_updated_topic_data( 1 );
+			if ( is_wp_error( $config_test ) ) {
+				add_settings_error( 'discourse', 'use_discourse_plugin', __( 'An invalid response was returned from Discourse
+				when attempting to connect with the Discourse WordPress plugin. Before enabling this setting, please ensure that
+				the Discourse WordPress plugin is installed on your forum.', 'wp-discourse' ) );
+
+				$enabled = 0;
+			} else {
+				update_option( 'wpdc_last_sync', time() );
+			}
+		}
+
+		return $enabled;
+	}
+
+	public function validate_comment_sync_period( $input ) {
+		$previous_sync_period = ! empty( $this->options['comment-sync-period'] ) ? $this->options['comment-sync-period'] : 10;
+		// Todo: change the min value to 10.
+		$new_sync_period = $this->validate_int( $input, 'comment_sync_period', 0, null,
+			__( 'The comment sync period must be set to at least 10 minutes.', 'wp-discourse' ),
+			true );
+
+		if ( $previous_sync_period !== $new_sync_period ) {
+			update_option( 'wpdc_sync_period_changed', 1 );
+		} else {
+			update_option( 'wpdc_sync_period_changed', 0 );
+		}
+
+		return $new_sync_period;
+	}
+
 	/**
 	 * Validates the 'publish_category' select input.
 	 *
@@ -269,7 +307,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -282,7 +320,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -295,7 +333,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -308,7 +346,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -321,7 +359,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -335,7 +373,7 @@ class SettingsValidator {
 
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-		true );
+			true );
 	}
 
 	/**
@@ -567,12 +605,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int    $input The input to be validated.
+	 * @param int $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null   $min The minimum allowed value.
-	 * @param null   $max The maximum allowed value.
+	 * @param null $min The minimum allowed value.
+	 * @param null $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool   $add_error Whether or not to add a setting error.
+	 * @param bool $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */
