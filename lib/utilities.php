@@ -129,6 +129,45 @@ class Utilities {
 		return $categories;
 	}
 
+	public static function get_updated_topic_data( $sync_period ) {
+		$options      = self::get_options();
+		$api_key      = $options['api-key'];
+		$api_username = $options['publish-username'];
+		$base_url     = $options['url'];
+
+		if ( empty( $base_url ) || empty( $api_key ) || empty( $api_username ) ) {
+
+			return new \WP_Error( 'discourse_connection_settings_not_configured',
+				_( 'You need to configure the wp-discourse connection settings.', 'wp-discourse' ) );
+		}
+
+		$site_url           = urlencode( site_url() );
+		$discourse_date_url = esc_url( $base_url . "/discourse-updated-topics/topic-data/$sync_period.json" );
+		$discourse_date_url = add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+			'site_url'     => $site_url,
+		), $discourse_date_url );
+
+		$response = wp_remote_get( $discourse_date_url );
+
+		if ( ! self::validate( $response ) ) {
+			return new \WP_Error( 'discourse_invalid_response',
+				__( 'An invalid response was returned from Discourse while attempting to sync the data.', 'wp-discourse' ) );
+		}
+
+		$response = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( property_exists( $response, 'updated_topics' ) ) {
+
+			return $response->updated_topics;
+		} else {
+
+			return new \WP_Error( 'discourse_invalid_response',
+				__( 'An invalid response was returned from Discourse while attempting to sync the updated_topics data', 'wp-discourse' ) );
+		}
+	}
+
 	/**
 	 * Check if an user is linked to a discourse instance
 	 *
