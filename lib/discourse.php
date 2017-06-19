@@ -22,6 +22,9 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
+		'comment-sync-period'       => 10,
+		'use-discourse-plugin'      => 0,
+		'multisite-configuration' => 0,
 	);
 
 	/**
@@ -40,6 +43,8 @@ class Discourse {
 		'publish-failure-notice'  => 0,
 		'publish-failure-email'   => '',
 		'auto-track'              => 1,
+		'hide-discourse-name-field' => 0,
+		'username-as-discourse-name' => 0,
 		'allowed_post_types'      => array( 'post' ),
 	);
 
@@ -143,7 +148,6 @@ class Discourse {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
-		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
 	}
@@ -163,6 +167,7 @@ class Discourse {
 
 			$discourse_url = null;
 		}
+
 		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
@@ -212,19 +217,6 @@ class Discourse {
 	}
 
 	/**
-	 * Adds 'discourse_username' to the user_contactmethods array.
-	 *
-	 * @param array $fields The array of contact methods.
-	 *
-	 * @return mixed
-	 */
-	public function extend_user_profile( $fields ) {
-		$fields['discourse_username'] = 'Discourse Username';
-
-		return $fields;
-	}
-
-	/**
 	 * Allow the time tag - used in Discourse comments.
 	 *
 	 * @param array $allowedposttags The array of allowed html tags.
@@ -243,7 +235,7 @@ class Discourse {
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
 	 *
 	 * @param string $old_option The name of the old option_group.
-	 * @param array  $transferable_option_groups The array of transferable_option_group names.
+	 * @param array $transferable_option_groups The array of transferable_option_group names.
 	 */
 	protected function transfer_options( $old_option, $transferable_option_groups ) {
 		$discourse_options = get_option( $old_option );
@@ -256,7 +248,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param array $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {
