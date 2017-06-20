@@ -22,7 +22,6 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
-		'comment-sync-period'       => 10,
 		'use-discourse-plugin'      => 0,
 		'multisite-configuration' => 0,
 	);
@@ -56,6 +55,7 @@ class Discourse {
 	 */
 	protected $discourse_comment = array(
 		'use-discourse-comments'    => 0,
+		'comment-sync-period'       => 10,
 		'show-existing-comments'    => 0,
 		'existing-comments-heading' => '',
 		'max-comments'              => 5,

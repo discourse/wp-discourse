@@ -70,7 +70,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_plugin', array( $this, 'validate_use_discourse_plugin' ) );
-		add_filter( 'wpdc_validate_comment_sync_period', array( $this, 'validate_comment_sync_period' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
@@ -84,6 +83,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_username_as_discourse_name', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
+		add_filter( 'wpdc_validate_comment_sync_period', array( $this, 'validate_comment_sync_period' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
 		add_filter( 'wpdc_validate_max_comments', array( $this, 'validate_max_comments' ) );
@@ -212,36 +212,12 @@ class SettingsValidator {
 		$enabled = $this->validate_checkbox( $input );
 
 		if ( $enabled ) {
-			$config_test = DiscourseUtilities::get_updated_topic_data( 1 );
-			if ( is_wp_error( $config_test ) ) {
-				add_settings_error( 'discourse', 'use_discourse_plugin', __( 'An invalid response was returned from Discourse
-				when attempting to connect with the Discourse WordPress plugin. Before enabling this setting, please ensure that
-				the Discourse WordPress plugin is installed on your forum.', 'wp-discourse' ) );
-
-				$enabled = 0;
-			} else {
-				update_option( 'wpdc_last_sync', time() );
-			}
+			update_option( 'wpdc_last_sync', time() );
 		}
 
 		return $enabled;
 	}
 
-	public function validate_comment_sync_period( $input ) {
-		$previous_sync_period = ! empty( $this->options['comment-sync-period'] ) ? $this->options['comment-sync-period'] : 10;
-		// Todo: change the min value to 10.
-		$new_sync_period = $this->validate_int( $input, 'comment_sync_period', 0, null,
-			__( 'The comment sync period must be set to at least 10 minutes.', 'wp-discourse' ),
-			true );
-
-		if ( $previous_sync_period !== $new_sync_period ) {
-			update_option( 'wpdc_sync_period_changed', 1 );
-		} else {
-			update_option( 'wpdc_sync_period_changed', 0 );
-		}
-
-		return $new_sync_period;
-	}
 
 	/**
 	 * Validates the 'publish_category' select input.
@@ -284,6 +260,22 @@ class SettingsValidator {
 		$this->use_discourse_comments = 1 === $new_value ? true : false;
 
 		return $new_value;
+	}
+
+	public function validate_comment_sync_period( $input ) {
+		$previous_sync_period = ! empty( $this->options['comment-sync-period'] ) ? $this->options['comment-sync-period'] : 10;
+		// Todo: change the min value to 10.
+		$new_sync_period = $this->validate_int( $input, 'comment_sync_period', 0, null,
+			__( 'The comment sync period must be set to at least 10 minutes.', 'wp-discourse' ),
+			true );
+
+		if ( $previous_sync_period !== $new_sync_period ) {
+			update_option( 'wpdc_sync_period_changed', 1 );
+		} else {
+			update_option( 'wpdc_sync_period_changed', 0 );
+		}
+
+		return $new_sync_period;
 	}
 
 	/**

@@ -47,6 +47,11 @@ class CommentSettings {
 			'use_discourse_comments_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
+		add_settings_field( 'discourse_comment_sync_period', __( 'Comment Sync Period', 'wp-discourse' ), array(
+			$this,
+			'comment_sync_period_input'
+		), 'discourse_comment', 'discourse_commenting_settings_section' );
+
 		add_settings_field( 'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
 			$this,
 			'show_existing_comments_checkbox',
@@ -109,6 +114,12 @@ class CommentSettings {
 	public function use_discourse_comments_checkbox() {
 		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
 		__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' ) );
+	}
+
+	// Todo: change the min value to 10!!!
+	public function comment_sync_period_input() {
+		$this->form_helper->input( 'comment-sync-period', 'discourse_comment', __( 'Sets how often you would like to sync
+	    comment data between WordPress and your forum. (Defaults to 10 minutes if the field is left empty.)', 'wp-discourse'), 'number', 0 );
 	}
 
 	/**
