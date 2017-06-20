@@ -64,9 +64,14 @@ class DiscourseComment {
 		if ( ! empty( $updated_topics ) ) {
 			$skipped_topics = array();
 			foreach ( $updated_topics as $updated_topic ) {
+				$topic_id = $updated_topic->id;
 				$title         = $updated_topic->title;
 				$comment_count = $updated_topic->comment_count;
 				$external_url  = $updated_topic->embed_url;
+
+				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+
+				write_log('post id from topic id', $post_id );
 
 				$post_id = url_to_postid( $external_url );
 

@@ -43,6 +43,7 @@ class Utilities {
 	 * @return int
 	 */
 	public static function check_connection_status() {
+		// Todo: don't run the function before the options have been set. Don't use array_key_exists.
 		$options = self::get_options();
 		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
 		$url     = add_query_arg( array(
@@ -166,6 +167,15 @@ class Utilities {
 			return new \WP_Error( 'discourse_invalid_response',
 				__( 'An invalid response was returned from Discourse while attempting to sync the updated_topics data', 'wp-discourse' ) );
 		}
+	}
+
+	public static function get_post_id_by_topic_id( $topic_id ) {
+		global $wpdb;
+		$query = $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_value = %d", $topic_id );
+
+		$post_id = $wpdb->get_var( $query );
+
+		return $post_id;
 	}
 
 	/**
