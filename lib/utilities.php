@@ -171,7 +171,7 @@ class Utilities {
 
 	public static function get_post_id_by_topic_id( $topic_id ) {
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_value = %d", $topic_id );
+		$query = $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id );
 
 		$post_id = $wpdb->get_var( $query );
 

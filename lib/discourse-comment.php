@@ -27,7 +27,7 @@ class DiscourseComment {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-		add_action( 'sync_discourse_data', array( $this, 'sync_discourse_data' ) );
+//		add_action( 'sync_discourse_data', array( $this, 'sync_discourse_data' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
@@ -108,16 +108,16 @@ class DiscourseComment {
 
 		// Setup the sync_discourse_data scheduled event. It's added here, instead of in the activation hook so that
 		// it will be available for sites when they update the plugin.
-		if ( ! empty( $this->options['use-discourse-plugin'] ) && 1 === intval( $this->options['use-discourse-plugin'] ) ) {
-			$already_scheduled = 1 === intval( get_option( 'wpdc_discourse_sync_scheduled' ) );
-			$schedule_changed  = 1 === intval( get_option( 'wpdc_sync_period_changed' ) );
-			if ( ! $already_scheduled || $schedule_changed ) {
-				wp_clear_scheduled_hook( 'sync_discourse_data' );
-				wp_schedule_event( time(), 'discourse_sync_period', 'sync_discourse_data' );
+//		if ( ! empty( $this->options['use-discourse-plugin'] ) && 1 === intval( $this->options['use-discourse-plugin'] ) ) {
+//			$already_scheduled = 1 === intval( get_option( 'wpdc_discourse_sync_scheduled' ) );
+//			$schedule_changed  = 1 === intval( get_option( 'wpdc_sync_period_changed' ) );
+//			if ( ! $already_scheduled || $schedule_changed ) {
+//				wp_clear_scheduled_hook( 'sync_discourse_data' );
+//				wp_schedule_event( time(), 'discourse_sync_period', 'sync_discourse_data' );
 
-				update_option( 'wpdc_discourse_sync_scheduled', 1 );
-			}
-		}
+//				update_option( 'wpdc_discourse_sync_scheduled', 1 );
+//			}
+//		}
 	}
 
 	/**

@@ -42,35 +42,39 @@ class DiscourseWebhook {
 		}
 
 
-		$json        = $data->get_json_params();
+		$json = $data->get_json_params();
 		write_log( 'json data', $json );
-		$comment_number = $data['post']['post_number'] - 1;
-		$topic_id    = $data['post']['topic_id'];
+		if ( ! empty( $json['post'] ) && ! empty( $json['post']['embed_url'] ) ) {
+			$post_data = $json['post'];
+			$topic_id  = $post_data['topic_id'];
+			$post_number = $post_data['post_number'] - 1;
 
-		// Try to find a post that matches the topic.
-		$query_args = array(
-			'meta_key'       => 'discourse_topic_id',
-			'meta_value_num' => $topic_id,
-			'posts_per_page' => 1,
-		);
+			if ( is_multisite() ) {
+				$embed_url = parse_url( $post_data['embed_url'], PHP_URL_HOST );
+				$blog_id   = get_blog_id_from_url( $embed_url );
+				switch_to_blog( $blog_id );
+				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
 
-		$query = new \WP_Query( $query_args );
+				if ( $post_id ) {
+					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+					if ( $current_comment_count && $current_comment_count < $post_number - 1 ) {
+						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+					}
 
-		$post_id = $query->posts[0]->ID;
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+				}
+				restore_current_blog();
+			} else {
+				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+				if ( $post_id ) {
+					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+					if ( $current_comment_count && $current_comment_count < $post_number - 1 ) {
+						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+					}
 
-		$backup_comments_number = get_post_meta( $post_id, 'discourse_comments_count', true );
-
-		$synced_comments_count = get_post_meta( $post_id, 'wpdc_synced_comments_count', true );
-
-		// Also check if it's greater than the 'discourse_comment_count', to be sure a number created before
-		// the webhooks were enabled on the site isn't being overwritten.
-		if ( $comment_number > $synced_comments_count ) {
-			update_post_meta( $post_id, 'wpdc_synced_comments_count', $comment_number ); // Todo: do the subtraction here?
-		}
-
-		if ( true ) { // Todo: add some sort of condition, there still might not be a good reason to update comments.
-			update_post_meta( $post_id, 'wpdc_webhook_enabled', 1 );
-			update_post_meta( $post_id, 'wpdc_comments_synced', 0 );
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+				}
+			}
 		}
 	}
 
@@ -87,7 +91,8 @@ class DiscourseWebhook {
 		if ( $sig = substr( $data->get_header( 'X-Discourse-Event-Signature' ), 7 ) ) {
 			$payload = $data->get_body();
 			// Key used for verifying the request - a matching key needs to be set on the Discourse webhook.
-			$secret = ! empty( $this->options['webhook-secret-key'] ) ? $this->options['webhook-secret-key'] : '';
+//			$secret = ! empty( $this->options['webhook-secret-key'] ) ? $this->options['webhook-secret-key'] : '';
+			$secret = 'thisisfortesting';
 
 			if ( ! $secret ) {
 				return new \WP_Error( 'discourse_webhook_configuration_error', 'The webhook secret key has not been set.' );

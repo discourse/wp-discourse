@@ -227,6 +227,7 @@ class DiscoursePublish {
 			if ( ( isset( $discourse_id ) && $discourse_id > 0 ) && isset( $body->topic_slug ) && isset( $body->topic_id ) ) {
 
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
+				add_post_meta( $post_id, 'discourse_topic_id', $body->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $body->topic_slug . '/' . $body->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
@@ -242,6 +243,7 @@ class DiscoursePublish {
 			$discourse_post = $body->post;
 
 			if ( isset( $discourse_post->topic_slug ) && isset( $discourse_post->topic_id ) ) {
+				update_post_meta( $post_id, 'discourse_topic_id', (int) $discourse_post->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
