@@ -55,7 +55,11 @@ class SettingsValidator {
 	 * @access protected
 	 * @var bool
 	 */
-	protected $use_discourse_webhook = false;
+	protected $use_discourse_webhook;
+	protected $use_multisite_configuration;
+	protected $url;
+	protected $api_key;
+	protected $publish_username;
 
 	/**
 	 * Gives access to the plugin options.
@@ -79,7 +83,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
-		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_multisite_configuration' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
@@ -144,9 +148,11 @@ class SettingsValidator {
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 
+		// Todo: the true :false ternary is redundant.
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
 		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
+		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration']) && 1 === intval( $this->options['multisite-configuration']);
 	}
 
 	/**
@@ -163,16 +169,16 @@ class SettingsValidator {
 		if ( ! preg_match( $regex, $input ) ) {
 			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL needs to be set to a valid URL that begins with either \'http:\' or \'https:\'.', 'wp-discourse' ) );
 
-			return '';
-		}
-
-		if ( filter_var( $input, FILTER_VALIDATE_URL ) ) {
-			return untrailingslashit( esc_url_raw( $input ) );
+			$this->url = '';
 		} else {
-			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
+			$this->url = untrailingslashit( esc_url_raw( $input ) );
 
-			return untrailingslashit( esc_url_raw( $input ) );
+			if ( ! filter_var( $this->url, FILTER_VALIDATE_URL ) ) {
+			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
+			}
 		}
+
+		return $this->url;
 	}
 
 	/**
@@ -188,16 +194,16 @@ class SettingsValidator {
 		if ( empty( $input ) ) {
 			add_settings_error( 'discourse', 'api_key', __( 'You must provide an API key.', 'wp-discourse' ) );
 
-			return '';
-
-		} elseif ( preg_match( $regex, $input ) ) {
-			return trim( $input );
-
+			$this->api_key = '';
 		} else {
-			add_settings_error( 'discourse', 'api_key', __( 'The API key you provided is not valid.', 'wp-discourse' ) );
+			$this->api_key = trim( $input );
 
-			return $this->sanitize_text( $input );
+			if ( ! preg_match( $regex, $input ) ) {
+			add_settings_error( 'discourse', 'api_key', __( 'The API key you provided is not valid.', 'wp-discourse' ) );
+			}
 		}
+
+		return $this->api_key;
 	}
 
 	/**
@@ -209,22 +215,20 @@ class SettingsValidator {
 	 */
 	public function validate_publish_username( $input ) {
 		if ( ! empty( $input ) ) {
-			return $this->sanitize_text( $input );
+			$this->publish_username =  $this->sanitize_text( $input );
 		} else {
 			add_settings_error( 'discourse', 'publish_username', __( 'You need to provide a Discourse username.', 'wp-discourse' ) );
 
-			return '';
+			$this->publish_username =  '';
 		}
+
+		return $this->publish_username;
 	}
 
 	public function validate_use_discourse_webhook( $input ) {
-		$enabled = $this->validate_checkbox( $input );
+		$this->use_discourse_webhook = $this->validate_checkbox( $input );
 
-		if ( $enabled ) {
-			$this->use_discourse_webhook = true;
-		}
-
-		return $enabled;
+		return $this->use_discourse_webhook;
 	}
 
 	public function validate_webhook_secret( $input ) {
@@ -234,6 +238,20 @@ class SettingsValidator {
 		}
 
 		return $secret;
+	}
+
+	public function validate_multisite_configuration( $input ) {
+		$this->use_multisite_configuration = $this->validate_checkbox( $input );
+
+		if ( is_main_site() && 1 === intval( $this->use_multisite_configuration ) ) {
+			update_site_option( 'wpdc_site_url', $this->url );
+			update_site_option( 'wpdc_site_api_key', $this->api_key );
+			update_site_option( 'wpdc_site_publish_username', $this->publish_username );
+			update_site_option( 'wpdc_site_use_webhook', $this->use_discourse_webhook );
+			update_site_option('wpdc_multisite_configuration', 1 );
+		}
+
+		return $this->use_multisite_configuration;
 	}
 
 	/**

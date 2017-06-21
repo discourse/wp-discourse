@@ -31,6 +31,16 @@ class Utilities {
 						$options = array_merge( $options, $option );
 					}
 				}
+
+				if ( ! is_main_site() &&
+				! empty( get_site_option( 'wpdc_multisite_configuration' ) ) ) {
+					$options['url'] = get_site_option('wpdc_site_url');
+					$options['api-key'] = get_site_option( 'wpdc_site_api_key');
+					$options['publish-username'] = get_site_option('wpdc_site_publish_username');
+					$options['use-discourse-webhook'] = get_site_option('wpdc_site_use_webhook');
+					$options['multisite-configuration'] = get_site_option('wpdc_multisite_configuration');
+
+				}
 			}
 		}
 
