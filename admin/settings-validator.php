@@ -79,6 +79,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );

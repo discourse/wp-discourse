@@ -77,6 +77,13 @@ class ConnectionSettings {
 			'webhook_secret_input',
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
+		if ( is_multisite() ) {
+			add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
+				$this,
+				'multisite_configuration_checkbox',
+			), 'discourse_connect', 'discourse_connection_settings_section' );
+		}
+
 		register_setting( 'discourse_connect', 'discourse_connect', array(
 			$this->form_helper,
 			'validate_options',
@@ -140,12 +147,18 @@ class ConnectionSettings {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
 		$description = sprintf(
-		        __('The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
+			__( 'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
-        );
+		);
 
 		$this->form_helper->input( 'webhook-secret', 'discourse_connect', $description );
-    }
+	}
+
+	public function multisite_configuration_checkbox() {
+		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
+	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum
+	    is connected to a network of WordPress sites. Enabling it will remove the following settings from your network's subsites:", 'wp-discourse' ) );
+	}
 
 	/**
 	 * Details for the connection_options tab.
