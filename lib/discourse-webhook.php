@@ -45,6 +45,7 @@ class DiscourseWebhook {
 			$post_number = $post_data['post_number'] - 1;
 
 			if ( is_multisite() ) {
+				// Todo: this is assuming a subdomain URL, make work for subdirectory install (if (defined( 'SUBDOMAIN_INSTALL'))...)
 				$embed_url = parse_url( $post_data['embed_url'], PHP_URL_HOST );
 				$blog_id   = get_blog_id_from_url( $embed_url );
 				switch_to_blog( $blog_id );
