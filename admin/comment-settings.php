@@ -47,11 +47,6 @@ class CommentSettings {
 			'use_discourse_comments_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_comment_sync_period', __( 'Comment Sync Period', 'wp-discourse' ), array(
-			$this,
-			'comment_sync_period_input'
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
-
 		add_settings_field( 'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
 			$this,
 			'show_existing_comments_checkbox',

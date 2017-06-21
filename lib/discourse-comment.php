@@ -203,7 +203,8 @@ class DiscourseComment {
 			// Every 10 minutes do a json call to sync comment count and top comments.
 			$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
 			$time      = date_create()->format( 'U' );
-			$sync_post = $last_sync + 60 * 10 < $time;
+			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
+			$sync_post = $last_sync + $sync_period < $time;
 		} else {
 			$sync_post = 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) );
 		}

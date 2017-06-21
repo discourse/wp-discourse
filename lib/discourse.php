@@ -23,6 +23,7 @@ class Discourse {
 		'api-key'          => '',
 		'publish-username' => 'system',
 		'use-discourse-webhook'      => 0,
+		'webhook-secret' => '',
 		'multisite-configuration' => 0,
 	);
 

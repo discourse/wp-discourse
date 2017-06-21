@@ -67,11 +67,6 @@ class ConnectionSettings {
 			'publish_username_input',
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
-//		add_settings_field( 'discourse_comment_sync_period', __( 'Comment Sync Period', 'wp-discourse' ), array(
-//			$this,
-//			'comment_sync_period_input'
-//		), 'discourse_connect', 'discourse_connection_settings_section' );
-
 		add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Discourse Webhook', 'wp-discourse' ), array(
 			$this,
 			'use_discourse_webhook_checkbox',
@@ -114,13 +109,6 @@ class ConnectionSettings {
 	}
 
 	public function use_discourse_webhook_checkbox() {
-//		$allowed = array(
-//			'a' => array(
-//				'href'   => array(),
-//				'target' => array(),
-//			),
-//            'code' => array(),
-//		);
 		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
 		if ( ! empty( $this->options['url'] ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '" target="_blank">' .
