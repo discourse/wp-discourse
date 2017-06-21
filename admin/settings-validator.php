@@ -50,6 +50,14 @@ class SettingsValidator {
 	protected $use_discourse_comments = false;
 
 	/**
+	 * Indicates whether or not 'use_discourse_webhook' is enabled.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $use_discourse_webhook = false;
+
+	/**
 	 * Gives access to the plugin options.
 	 *
 	 * @access protected
@@ -69,7 +77,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
-		add_filter( 'wpdc_validate_use_discourse_plugin', array( $this, 'validate_use_discourse_plugin' ) );
+		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
@@ -208,11 +216,11 @@ class SettingsValidator {
 		}
 	}
 
-	public function validate_use_discourse_plugin( $input ) {
+	public function validate_use_discourse_webhook( $input ) {
 		$enabled = $this->validate_checkbox( $input );
 
 		if ( $enabled ) {
-			update_option( 'wpdc_last_sync', time() );
+			$this->use_discourse_webhook = true;
 		}
 
 		return $enabled;

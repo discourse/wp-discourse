@@ -23,17 +23,17 @@ class DiscourseWebhook {
 
 	public function initialize_comment_route() {
 		// Use the use-discourse-plugin option for now.
-		if ( ! empty( $this->options['use-discourse-plugin'] ) && 1 === intval( $this->options['use-discourse-plugin'] ) ) {
-			register_rest_route( 'wp-discourse/v1', 'discourse-comment', array(
+		if ( ! empty( $this->options['use-discourse-webhook'] ) && 1 === intval( $this->options['use-discourse-webhook'] ) ) {
+			register_rest_route( 'wp-discourse/v1', 'update-topic-content', array(
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'refresh_discourse_comments' ),
+					'callback' => array( $this, 'update_topic_content' ),
 				),
 			) );
 		}
 	}
 
-	public function refresh_discourse_comments( $data ) {
+	public function update_topic_content( $data ) {
 		$data = $this->verify_discourse_request( $data );
 
 		if ( is_wp_error( $data ) ) {

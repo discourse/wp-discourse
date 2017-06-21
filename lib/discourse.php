@@ -22,7 +22,7 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
-		'use-discourse-plugin'      => 0,
+		'use-discourse-webhook'      => 0,
 		'multisite-configuration' => 0,
 	);
 

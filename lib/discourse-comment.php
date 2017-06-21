@@ -196,10 +196,10 @@ class DiscourseComment {
 	function sync_comments( $postid ) {
 		global $wpdb;
 		$discourse_options       = $this->options;
-		$use_discourse_wp_plugin = ! empty( $discourse_options['use-discourse-plugin'] ) && 1 === intval( $discourse_options['use-discourse-plugin'] );
+		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] ) && 1 === intval( $discourse_options['use-discourse-webhook'] );
 		$debug = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 
-		if ( ! $use_discourse_wp_plugin ) {
+		if ( ! $use_discourse_webhook ) {
 			// Every 10 minutes do a json call to sync comment count and top comments.
 			$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
 			$time      = date_create()->format( 'U' );
