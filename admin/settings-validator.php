@@ -78,6 +78,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
+		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
@@ -225,6 +226,14 @@ class SettingsValidator {
 		return $enabled;
 	}
 
+	public function validate_webhook_secret( $input ) {
+		$secret = $this->validate_text_input( $input );
+		if ( $this->use_discourse_webhook && iconv_strlen( $secret ) < 12 ) {
+			add_settings_error( 'discourse', 'webhook_secret', __( 'The webhook secret key needs to be at least 12 characters long', 'wp-discourse' ) );
+		}
+
+		return $secret;
+	}
 
 	/**
 	 * Validates the 'publish_category' select input.

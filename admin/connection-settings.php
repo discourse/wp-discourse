@@ -72,6 +72,11 @@ class ConnectionSettings {
 			'use_discourse_webhook_checkbox',
 		), 'discourse_connect', 'discourse_connection_settings_section' );
 
+		add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
+			$this,
+			'webhook_secret_input',
+		), 'discourse_connect', 'discourse_connection_settings_section' );
+
 		register_setting( 'discourse_connect', 'discourse_connect', array(
 			$this->form_helper,
 			'validate_options',
@@ -126,6 +131,21 @@ class ConnectionSettings {
 		$this->form_helper->checkbox_input( 'use-discourse-webhook', 'discourse_connect', __( 'Use a webhook
 		for syncing data between Discourse and WordPress.', 'wp-discourse' ), $description );
 	}
+
+	public function webhook_secret_input() {
+		if ( ! empty( $this->options['url'] ) ) {
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '" target="_blank">' .
+			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '</a>';
+		} else {
+			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
+		}
+		$description = sprintf(
+		        __('The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
+		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
+        );
+
+		$this->form_helper->input( 'webhook-secret', 'discourse_connect', $description );
+    }
 
 	/**
 	 * Details for the connection_options tab.

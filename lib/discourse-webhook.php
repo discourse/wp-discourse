@@ -8,8 +8,6 @@ class DiscourseWebhook {
 
 	protected $options;
 
-	protected $wpdc_topics_posts;
-
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
@@ -17,12 +15,9 @@ class DiscourseWebhook {
 
 	public function setup_options() {
 		$this->options                        = DiscourseUtilities::get_options();
-		$this->options['wpdc_webhook_secret'] = 'thisisfortesting';
-		$this->wpdc_topics_posts              = get_option( 'wpdc_topics_posts' );
 	}
 
 	public function initialize_comment_route() {
-		// Use the use-discourse-plugin option for now.
 		if ( ! empty( $this->options['use-discourse-webhook'] ) && 1 === intval( $this->options['use-discourse-webhook'] ) ) {
 			register_rest_route( 'wp-discourse/v1', 'update-topic-content', array(
 				array(
@@ -38,7 +33,7 @@ class DiscourseWebhook {
 
 		if ( is_wp_error( $data ) ) {
 
-			return null;
+			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse webhook.', 'wp-discourse' ) );
 		}
 
 
@@ -91,8 +86,7 @@ class DiscourseWebhook {
 		if ( $sig = substr( $data->get_header( 'X-Discourse-Event-Signature' ), 7 ) ) {
 			$payload = $data->get_body();
 			// Key used for verifying the request - a matching key needs to be set on the Discourse webhook.
-//			$secret = ! empty( $this->options['webhook-secret-key'] ) ? $this->options['webhook-secret-key'] : '';
-			$secret = 'thisisfortesting';
+			$secret = ! empty( $this->options['webhook-secret'] ) ? $this->options['webhook-secret'] : '';
 
 			if ( ! $secret ) {
 				return new \WP_Error( 'discourse_webhook_configuration_error', 'The webhook secret key has not been set.' );
