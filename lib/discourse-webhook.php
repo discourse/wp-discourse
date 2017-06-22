@@ -54,7 +54,7 @@ class DiscourseWebhook {
 				if ( $post_id ) {
 					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
 					if ( $current_comment_count < $post_number - 1 ) {
-						update_post_meta( $post_id, 'discourse_comments_count', $post_number );
+						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
 					}
 
 					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
