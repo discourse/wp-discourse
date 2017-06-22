@@ -25,12 +25,15 @@ class DiscourseWebhook {
 			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
 
 			if ( $use_multisite_configuration && $webhook_enabled && $create_or_update_db ) {
-				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+				$table_name      = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$charset_collate = $wpdb->get_charset_collate();
+
 				$sql = "CREATE TABLE $table_name (
+                  id mediumint(9) NOT NULL AUTO_INCREMENT,
                   topic_id mediumint(9) NOT NULL,
                   blog_id mediumint(9) NOT NULL,
-                  PRIMARY KEY  (topic_id),
+                  PRIMARY KEY  (id),
+                  KEY  topic_id (topic_id)
 	             ) $charset_collate;";
 
 				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -64,30 +67,38 @@ class DiscourseWebhook {
 			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse webhook.', 'wp-discourse' ) );
 		}
 
-
 		$json = $data->get_json_params();
-		write_log( 'json data', $json );
-		if ( ! empty( $json['post'] ) && ! empty( $json['post']['embed_url'] ) ) {
+
+		if ( ! empty( $json['post'] ) ) {
 			$post_data   = $json['post'];
 			$topic_id    = $post_data['topic_id'];
 			$post_number = $post_data['post_number'];
 
-			if ( is_multisite() ) {
+			if ( is_multisite() ) { // && 1 === get_site_option( 'wpdc_site_multisite_configuration')
 				// Todo: this is assuming a subdomain URL, make work for subdirectory install (if (defined( 'SUBDOMAIN_INSTALL'))...)
-				$embed_url = parse_url( $post_data['embed_url'], PHP_URL_HOST );
-				$blog_id   = get_blog_id_from_url( $embed_url );
-				switch_to_blog( $blog_id );
-				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+//				$embed_url = parse_url( $post_data['embed_url'], PHP_URL_HOST );
+//				$blog_id   = get_blog_id_from_url( $embed_url );
+				global $wpdb;
+				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 
-				if ( $post_id ) {
-					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-					if ( $current_comment_count < $post_number - 1 ) {
-						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+				$query   = $wpdb->prepare( "SELECT blog_id FROM $table_name WHERE topic_id = %d", $topic_id );
+				write_log( 'query', $query );
+				$blog_id = $wpdb->get_var( $query );
+
+				if ( $blog_id ) {
+					switch_to_blog( $blog_id );
+					$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+
+					if ( $post_id ) {
+						$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+						if ( $current_comment_count < $post_number - 1 ) {
+							update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+						}
+
+						update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 					}
-
-					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+					restore_current_blog();
 				}
-				restore_current_blog();
 			} else {
 				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
 				if ( $post_id ) {

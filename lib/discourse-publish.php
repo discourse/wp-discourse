@@ -230,6 +230,23 @@ class DiscoursePublish {
 				add_post_meta( $post_id, 'discourse_topic_id', $body->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $body->topic_slug . '/' . $body->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+				if ( is_multisite() ) {
+					global $wpdb;
+					$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+					$current_blog = get_current_blog_id();
+					$wpdb->insert(
+						$table_name,
+						array(
+							'topic_id' => $body->topic_id,
+							'blog_id' => $current_blog,
+						),
+						array(
+							'%d',
+							'%d'
+						)
+					);
+
+				}
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
