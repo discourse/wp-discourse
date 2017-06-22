@@ -152,7 +152,7 @@ class SettingsValidator {
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
 		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
-		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration']) && 1 === intval( $this->options['multisite-configuration']);
+		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration']) && 1 === intval( $this->options['multisite-configuration']) ? 1 : 0;
 	}
 
 	/**
@@ -243,13 +243,11 @@ class SettingsValidator {
 	public function validate_multisite_configuration( $input ) {
 		$this->use_multisite_configuration = $this->validate_checkbox( $input );
 
-		if ( is_main_site() && 1 === intval( $this->use_multisite_configuration ) ) {
-			update_site_option( 'wpdc_site_url', $this->url );
-			update_site_option( 'wpdc_site_api_key', $this->api_key );
-			update_site_option( 'wpdc_site_publish_username', $this->publish_username );
-			update_site_option( 'wpdc_site_use_webhook', $this->use_discourse_webhook );
-			update_site_option('wpdc_multisite_configuration', 1 );
-		}
+		$this->maybe_update_site_option( 'multisite_configuration', $this->use_multisite_configuration );
+		$this->maybe_update_site_option( 'url', $this->url );
+		$this->maybe_update_site_option( 'api_key', $this->api_key );
+		$this->maybe_update_site_option( 'publish_username', $this->publish_username );
+		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
 
 		return $this->use_multisite_configuration;
 	}
@@ -411,6 +409,8 @@ class SettingsValidator {
 			return 0;
 		}
 
+		$this->maybe_update_site_option( 'enable_sso', $new_value );
+
 		return $new_value;
 	}
 
@@ -438,6 +438,8 @@ class SettingsValidator {
 			return 0;
 		}
 
+		$this->maybe_update_site_option( 'sso_client_enabled', $new_value );
+
 		return $this->sanitize_checkbox( $input );
 	}
 
@@ -449,8 +451,10 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
+		$sso_secret = sanitize_text_field( $input );
+		$this->maybe_update_site_option( 'sso_secret', $sso_secret );
 
-		return sanitize_text_field( $input );
+		return $sso_secret;
 	}
 
 	/**
@@ -649,6 +653,13 @@ class SettingsValidator {
 		} else {
 			// Valid input.
 			return $input;
+		}
+	}
+
+	protected function maybe_update_site_option( $option_name, $value ) {
+		if ( is_main_site() &&  1 === $this->use_multisite_configuration ) {
+			$site_option_name = 'wpdc_site_' . $option_name;
+			update_site_option( $site_option_name, $value );
 		}
 	}
 }

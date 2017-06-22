@@ -38,6 +38,8 @@ class SSOSettings {
 	 */
 	protected $discourse_sso_settings_url;
 
+	protected $use_network_sso_settings;
+
 	/**
 	 * SSOSettings constructor.
 	 *
@@ -55,7 +57,8 @@ class SSOSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_sso_settings() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options                  = DiscourseUtilities::get_options();
+		$this->use_network_sso_settings = ! is_main_site() && ! empty( $this->options['multisite-configuration'] );
 
 		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
 
@@ -212,7 +215,19 @@ class SSOSettings {
 	 * Outputs markup for the sso-secret input.
 	 */
 	public function sso_secret_input() {
-		$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text (numbers, letters, and symbols) at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
+		if ( $this->use_network_sso_settings ) {
+			?>
+            <p>
+                <em>
+					<?php esc_html_e( 'The SSO Secret Key for your site has been set on the main site in the network.', 'wp-discourse' ); ?>
+                </em>
+            </p>
+
+			<?php
+		} else {
+			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text (numbers, letters, and symbols)
+		at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
+		}
 	}
 
 	/**
@@ -225,8 +240,32 @@ class SSOSettings {
 	 * Outputs markup for the enable-sso checkbox.
 	 */
 	public function enable_sso_provider_checkbox() {
-		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
+		if ( $this->use_network_sso_settings ) {
+			$sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] );
+			?>
+			<?php if ( $sso_provider_enabled ) : ?>
+                <p>
+                    <em>
+						<?php esc_html_e( "Your site has been enabled as the SSO provider for your Discourse forum through the main
+                        site on this network. You can configure your site's SSO settings on this tab.", 'wp-discourse' ); ?>
+                    </em>
+                </p>
+			<?php else : ?>
+                <p>
+                    <em>
+						<?php esc_html_e( 'The use of all sites on this network as SSO providers for your Discourse forum
+                        has been disabled by the main site on this network. Enabling any of thethe settings on this tab will
+                        have no effect.', 'wp-discourse' ); ?>
+                    </em>
+                </p>
+
+			<?php endif; ?>
+
+			<?php
+		} else {
+			$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+			$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
+		}
 	}
 
 	/**
@@ -304,7 +343,30 @@ class SSOSettings {
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
-		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		if ( $this->use_network_sso_settings ) {
+			$sso_client_enabled = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] );
+			if ( $sso_client_enabled ) {
+				?>
+                <p>
+                    <em>
+						<?php esc_html_e( "The use of your site as an SSO client for Discourse has been enabled by the main site on this network.", 'wp-discourse' ); ?>
+                    </em>
+                </p>
+				<?php
+			} else {
+				?>
+                <p>
+                    <em>
+                        <?php esc_html_e( 'The use of all sites on this network to function as an SSO client for Discourse has been
+                        disabled by the main site on this network. Enabling any of the setting on this tab will have no effect.', 'wp-discourse' ); ?>
+                    </em>
+                </p>
+
+				<?php
+			}
+		} else {
+			$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		}
 	}
 
 	/**
