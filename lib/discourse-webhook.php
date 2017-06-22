@@ -42,7 +42,7 @@ class DiscourseWebhook {
 		if ( ! empty( $json['post'] ) && ! empty( $json['post']['embed_url'] ) ) {
 			$post_data = $json['post'];
 			$topic_id  = $post_data['topic_id'];
-			$post_number = $post_data['post_number'] - 1;
+			$post_number = $post_data['post_number'];
 
 			if ( is_multisite() ) {
 				// Todo: this is assuming a subdomain URL, make work for subdirectory install (if (defined( 'SUBDOMAIN_INSTALL'))...)
@@ -53,8 +53,8 @@ class DiscourseWebhook {
 
 				if ( $post_id ) {
 					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-					if ( $current_comment_count && $current_comment_count < $post_number - 1 ) {
-						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+					if ( $current_comment_count < $post_number - 1 ) {
+						update_post_meta( $post_id, 'discourse_comments_count', $post_number );
 					}
 
 					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
