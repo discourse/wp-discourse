@@ -8,13 +8,41 @@ class DiscourseWebhook {
 
 	protected $options;
 
+	protected $db_version = '1.0';
+
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
+		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
+
+	}
+
+	public function maybe_create_db() {
+		global $wpdb;
+		if ( is_multisite() ) {
+			$webhook_enabled             = 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) );
+			$use_multisite_configuration = 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) );
+			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
+
+			if ( $use_multisite_configuration && $webhook_enabled && $create_or_update_db ) {
+				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+				$charset_collate = $wpdb->get_charset_collate();
+				$sql = "CREATE TABLE $table_name (
+                  topic_id mediumint(9) NOT NULL,
+                  blog_id mediumint(9) NOT NULL,
+                  PRIMARY KEY  (topic_id),
+	             ) $charset_collate;";
+
+				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+				dbDelta( $sql );
+
+				update_site_option( 'wpdc_topic_blog_db_version', $this->db_version );
+			}
+		}
 	}
 
 	public function setup_options() {
-		$this->options                        = DiscourseUtilities::get_options();
+		$this->options = DiscourseUtilities::get_options();
 	}
 
 	public function initialize_comment_route() {
@@ -40,8 +68,8 @@ class DiscourseWebhook {
 		$json = $data->get_json_params();
 		write_log( 'json data', $json );
 		if ( ! empty( $json['post'] ) && ! empty( $json['post']['embed_url'] ) ) {
-			$post_data = $json['post'];
-			$topic_id  = $post_data['topic_id'];
+			$post_data   = $json['post'];
+			$topic_id    = $post_data['topic_id'];
 			$post_number = $post_data['post_number'];
 
 			if ( is_multisite() ) {
