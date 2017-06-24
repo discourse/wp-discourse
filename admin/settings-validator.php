@@ -55,11 +55,12 @@ class SettingsValidator {
 	 * @access protected
 	 * @var bool
 	 */
-	protected $use_discourse_webhook;
-	protected $use_multisite_configuration;
 	protected $url;
 	protected $api_key;
 	protected $publish_username;
+	protected $use_discourse_webhook;
+	protected $webhook_sync_notification;
+	protected $use_multisite_configuration;
 
 	/**
 	 * Gives access to the plugin options.
@@ -83,6 +84,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+		add_filter( 'wpdc_validate_webhook_sync_notification', array( $this, 'validate_webhook_sync_notification' ) );
 		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_multisite_configuration' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
@@ -244,6 +246,12 @@ class SettingsValidator {
 		return $secret;
 	}
 
+	public function validate_webhook_sync_notification( $input ) {
+		$this->webhook_sync_notification = $this->validate_checkbox( $input );
+
+		return $this->webhook_sync_notification;
+	}
+
 	public function validate_multisite_configuration( $input ) {
 		$this->use_multisite_configuration = $this->validate_checkbox( $input );
 
@@ -252,6 +260,7 @@ class SettingsValidator {
 		$this->maybe_update_site_option( 'api_key', $this->api_key );
 		$this->maybe_update_site_option( 'publish_username', $this->publish_username );
 		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
+		$this->maybe_update_site_option( 'webhook_sync_notificatioin', $this->webhook_sync_notification );
 
 		return $this->use_multisite_configuration;
 	}

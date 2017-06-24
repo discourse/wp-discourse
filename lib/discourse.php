@@ -24,6 +24,7 @@ class Discourse {
 		'publish-username' => 'system',
 		'use-discourse-webhook'      => 0,
 		'webhook-secret' => '',
+		'webhook-sync-notification' => 0,
 		'multisite-configuration' => 0,
 	);
 

@@ -69,7 +69,7 @@ class DiscourseWebhook {
 		$json = $data->get_json_params();
 
 		if ( ! empty( $json['post'] ) ) {
-			$post_data = $json['post'];
+			$post_data                   = $json['post'];
 			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration'] ) && 1 === intval( $this->options['multisite-configuration'] );
 
 			if ( $use_multisite_configuration ) {
@@ -106,14 +106,14 @@ class DiscourseWebhook {
 				update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
 				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 			}
-		} else {
+		} elseif ( ! empty( $this->options['webhook-sync-notification'] ) ) {
 			add_option( 'wpdc_webhook_sync_failures', array() );
 			$failures                    = get_option( 'wpdc_webhook_sync_failures' );
 			$failure_message             = array();
 			$failure_message['title']    = $post_title;
 			$failure_message['topic_id'] = $topic_id;
-			$failure_message['time']     = date('l F jS h:i A');;
-			$failures[]                  = $failure_message;
+			$failure_message['time']     = date( 'l F jS h:i A' );;
+			$failures[] = $failure_message;
 
 			update_option( 'wpdc_webhook_sync_failures', $failures );
 
