@@ -28,12 +28,11 @@ class DiscourseWebhook {
 				$table_name      = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$charset_collate = $wpdb->get_charset_collate();
 
+				// Todo: don't create the table if it already exists!
 				$sql = "CREATE TABLE $table_name (
-                  id mediumint(9) NOT NULL AUTO_INCREMENT,
                   topic_id mediumint(9) NOT NULL,
                   blog_id mediumint(9) NOT NULL,
-                  PRIMARY KEY  (id),
-                  KEY  topic_id (topic_id)
+                  PRIMARY KEY  (topic_id)
 	             ) $charset_collate;";
 
 				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -70,10 +69,11 @@ class DiscourseWebhook {
 		$json = $data->get_json_params();
 
 		if ( ! empty( $json['post'] ) ) {
-			$post_data   = $json['post'];
-			$topic_id    = $post_data['topic_id'];
-			$post_number = $post_data['post_number'];
-			$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration']) && 1 === intval( $options['multisite-configuration']);
+			$post_data                   = $json['post'];
+			$topic_id                    = $post_data['topic_id'];
+			$post_number                 = $post_data['post_number'];
+			$post_title                  = $post_data['topic_title'];
+			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration'] ) && 1 === intval( $this->options['multisite-configuration'] );
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
@@ -84,30 +84,50 @@ class DiscourseWebhook {
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
-					$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-
-					if ( $post_id ) {
-						$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-						if ( $current_comment_count < $post_number - 1 ) {
-							update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
-						}
-
-						update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
-					}
+					$this->update_post_metadata( $topic_id, $post_title, $post_number );
 					restore_current_blog();
 				}
 			} else {
-				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-				if ( $post_id ) {
-					$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-					if ( $current_comment_count && $current_comment_count < $post_number - 1 ) {
-						update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
-					}
-
-					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
-				}
+				$this->update_post_metadata( $topic_id, $post_title, $post_number );
 			}
 		}
+	}
+
+	protected function update_post_metadata( $topic_id, $post_title, $post_number ) {
+		$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+		if ( ! $post_id ) {
+			$this->get_post_id_by_title( $post_title );
+		}
+		if ( $post_id ) {
+			$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+			if ( $current_comment_count < $post_number - 1 ) {
+				update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+			}
+		} else {
+			add_option( 'wpdc_webhook_sync_failures', array() );
+			$failures = get_option( 'wpdc_webhook_sync_failures' );
+			$failure_message = array();
+			$failure_message['title'] = $post_title;
+			$failure_message['time'] = date('l F jS h:i:s A');
+			$failures[] = $failure_message;
+
+			update_option('wpdc_webhook_sync_failures', $failures );
+		}
+	}
+
+	protected function get_post_id_by_title( $title ) {
+		$id = null;
+		$title     = strtolower( $title );
+		$post_type = apply_filters( 'wpdc_webhook_get_page_by_title_post_type', 'post' );
+		$post        = get_page_by_title( $title, 'OBJECT', $post_type );
+		if ( $post && ! is_wp_error( $post ) ) {
+			$id = $post->ID;
+		}
+
+		do_action( 'wpdc_webhook_after_get_page_by_title', $title );
+
+		return $id;
 	}
 
 	/**
