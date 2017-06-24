@@ -95,6 +95,10 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_username_as_discourse_name', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_discourse_min_username_length', array(
+			$this,
+			'validate_discourse_min_username_length'
+		) );
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
@@ -279,6 +283,16 @@ class SettingsValidator {
 		}
 
 		return $output;
+	}
+
+	public function validate_discourse_min_username_length( $input ) {
+		$length = $this->sanitize_int( $input );
+
+		if( empty( $length ) || 0 === $length ) {
+			$length = 3;
+		}
+
+		return $length;
 	}
 
 	/**

@@ -127,11 +127,12 @@ class DiscoursePublish {
 	 * @return null
 	 */
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
-		$options       = $this->options;
-		$discourse_id  = get_post_meta( $post_id, 'discourse_post_id', true );
-		$current_post  = get_post( $post_id );
-		$author_id = $current_post->post_author;
-		$use_full_post = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
+		$options                   = $this->options;
+		$discourse_id              = get_post_meta( $post_id, 'discourse_post_id', true );
+		$current_post              = get_post( $post_id );
+		$author_id                 = $current_post->post_author;
+		$use_full_post             = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
+		$discourse_username_length = ! empty( $this->options['discourse-min-username-length'] ) ? $this->options['discourse-min-username-length'] : 3;
 
 		if ( $use_full_post ) {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
@@ -161,7 +162,7 @@ class DiscoursePublish {
 		} else {
 			$username = get_the_author_meta( 'discourse_username', $author_id );
 		}
-		if ( ! $username || strlen( $username ) < 2 ) {
+		if ( ! $username || strlen( $username ) < $discourse_username_length ) {
 			$username = $options['publish-username'];
 		}
 

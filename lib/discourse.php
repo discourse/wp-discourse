@@ -43,9 +43,10 @@ class Discourse {
 		'publish-failure-notice'  => 0,
 		'publish-failure-email'   => '',
 		'auto-track'              => 1,
+		'allowed_post_types'      => array( 'post' ),
 		'hide-discourse-name-field' => 0,
 		'username-as-discourse-name' => 0,
-		'allowed_post_types'      => array( 'post' ),
+		'discourse-min-username-length' => 3,
 	);
 
 	/**
