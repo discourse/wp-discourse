@@ -20,7 +20,8 @@ class DiscourseWebhook {
 	public function maybe_create_db() {
 		global $wpdb;
 		if ( is_multisite() ) {
-			$webhook_enabled             = 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) );
+			write_log( 'options', $this->options );
+			$webhook_enabled             = 1 === intval( get_site_option( 'wpdc_site_use_discourse_webhook' ) );
 			$use_multisite_configuration = 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) );
 			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
 
