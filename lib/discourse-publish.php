@@ -7,6 +7,7 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
+use WPDiscourse\DiscourseUser\DiscourseUser;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -133,6 +134,7 @@ class DiscoursePublish {
 		$author_id                 = $current_post->post_author;
 		$use_full_post             = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
 		$discourse_username_length = ! empty( $this->options['discourse-min-username-length'] ) ? $this->options['discourse-min-username-length'] : 3;
+		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration']) && 1 === intval( $options['multisite-configuration']);
 
 		if ( $use_full_post ) {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
@@ -231,22 +233,9 @@ class DiscoursePublish {
 				add_post_meta( $post_id, 'discourse_topic_id', $body->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $body->topic_slug . '/' . $body->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
-				if ( is_multisite() ) {
-					global $wpdb;
-					$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-					$current_blog = get_current_blog_id();
-					$wpdb->insert(
-						$table_name,
-						array(
-							'topic_id' => $body->topic_id,
-							'blog_id' => $current_blog,
-						),
-						array(
-							'%d',
-							'%d'
-						)
-					);
-
+				if ( $use_multisite_configuration ) {
+					$blog_id = get_current_blog_id();
+					$this->save_topic_blog_id( $body->topic_id, $blog_id );
 				}
 
 			} else {
@@ -264,6 +253,14 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'discourse_topic_id', (int) $discourse_post->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+				write_log('published post id', $post_id );
+
+				if ( $use_multisite_configuration ) {
+					if ( ! $this->topic_blog_id_exists( $discourse_post->topic_id ) ) {
+						$blog_id = get_current_blog_id();
+						$this->save_topic_blog_id( $discourse_post->topic_id, $blog_id );
+					}
+				}
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
@@ -377,4 +374,30 @@ class DiscoursePublish {
 			wp_mail( $publish_failure_email, sprintf( __( '[%s] Discourse Publishing Failure' ), $blogname ), $message );
 		}// End if().
 	}
+
+	protected function save_topic_blog_id( $topic_id, $blog_id ) {
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+		$wpdb->insert(
+			$table_name,
+			array(
+				'topic_id' => $topic_id,
+				'blog_id' => $blog_id,
+			),
+			array(
+				'%d',
+				'%d'
+			)
+		);
+	}
+
+	protected function topic_blog_id_exists( $topic_id ) {
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+		$query = $wpdb->prepare( "SELECT * FROM $table_name WHERE topic_id = %d", $topic_id );
+
+		return $wpdb->get_row( $query ) ? true : false;
+	}
+
+
 }

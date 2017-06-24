@@ -73,16 +73,13 @@ class DiscourseWebhook {
 			$post_data   = $json['post'];
 			$topic_id    = $post_data['topic_id'];
 			$post_number = $post_data['post_number'];
+			$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration']) && 1 === intval( $options['multisite-configuration']);
 
-			if ( is_multisite() ) { // && 1 === get_site_option( 'wpdc_site_multisite_configuration')
-				// Todo: this is assuming a subdomain URL, make work for subdirectory install (if (defined( 'SUBDOMAIN_INSTALL'))...)
-//				$embed_url = parse_url( $post_data['embed_url'], PHP_URL_HOST );
-//				$blog_id   = get_blog_id_from_url( $embed_url );
+			if ( $use_multisite_configuration ) {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 
 				$query   = $wpdb->prepare( "SELECT blog_id FROM $table_name WHERE topic_id = %d", $topic_id );
-				write_log( 'query', $query );
 				$blog_id = $wpdb->get_var( $query );
 
 				if ( $blog_id ) {
