@@ -46,6 +46,7 @@ require_once( __DIR__ . '/lib/discourse-user.php' );
 require_once( __DIR__ . '/lib/nonce.php' );
 require_once( __DIR__ . '/lib/sso.php' );
 require_once( __DIR__ . '/lib/discourse-webhook.php' );
+require_once( __DIR__ . '/lib/email-notification.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
@@ -69,6 +70,7 @@ $wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPress
 new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 new WPDiscourse\DiscourseUser\DiscourseUser();
 new WPDiscourse\DiscourseWebhook\DiscourseWebhook();
+new WPDiscourse\EmailNotification\EmailNotification();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
 
