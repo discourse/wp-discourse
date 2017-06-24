@@ -253,7 +253,6 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'discourse_topic_id', (int) $discourse_post->topic_id );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
-				write_log('published post id', $post_id );
 
 				if ( $use_multisite_configuration ) {
 					if ( ! $this->topic_blog_id_exists( $discourse_post->topic_id ) ) {
@@ -398,6 +397,4 @@ class DiscoursePublish {
 
 		return $wpdb->get_row( $query ) ? true : false;
 	}
-
-
 }

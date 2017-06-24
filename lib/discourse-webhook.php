@@ -107,7 +107,6 @@ class DiscourseWebhook {
 				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 			}
 		} else {
-			write_log( 'webhook sync failure' );
 			add_option( 'wpdc_webhook_sync_failures', array() );
 			$failures                    = get_option( 'wpdc_webhook_sync_failures' );
 			$failure_message             = array();

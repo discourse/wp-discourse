@@ -27,77 +27,10 @@ class DiscourseComment {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-//		add_action( 'sync_discourse_data', array( $this, 'sync_discourse_data' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
-		add_filter( 'cron_schedules', array( $this, 'discourse_sync_schedule' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
-	}
-
-	public function discourse_sync_schedule( $schedules ) {
-		$sync_period_in_minutes = ! empty( $this->options['comment-sync-period'] ) ? $this->options['comment-sync-period'] : 10;
-		if ( ! isset( $schedules['discourse_sync_period'] ) || 1 === intval( get_option( 'wpdc_sync_period_changed' ) ) ) {
-			$schedules['discourse_sync_period'] = array(
-				'interval' => $sync_period_in_minutes * 60,
-				'display'  => __( 'Discourse Sync Period', 'wp-discourse' ),
-			);
-
-			update_option( 'wpdc_sync_period_changed', 0 );
-		}
-
-		return $schedules;
-	}
-
-	// Todo: if plugin returns a bad response, revert to syncing comments with old method.
-	public function sync_discourse_data() {
-		$last_sync   = get_option( 'wpdc_last_sync' );
-		$sync_period = ceil( ( time() - $last_sync ) / 60 );
-
-		$updated_topics = DiscourseUtilities::get_updated_topic_data( $sync_period );
-
-		if ( is_wp_error( $updated_topics ) ) {
-
-			return null;
-		}
-
-		if ( ! empty( $updated_topics ) ) {
-			$skipped_topics = array();
-			foreach ( $updated_topics as $updated_topic ) {
-				$topic_id = $updated_topic->id;
-				$title         = $updated_topic->title;
-				$comment_count = $updated_topic->comment_count;
-				$external_url  = $updated_topic->embed_url;
-
-				$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-
-				write_log('post id from topic id', $post_id );
-
-				$post_id = url_to_postid( $external_url );
-
-				// The post's permalink has been updated and doesn't match the Discourse embed_url.
-				if ( ! $post_id ) {
-					$post = get_page_by_title( $title, 'OBJECT', 'post' );
-
-					$post_id = $post ? $post->ID : null;
-				}
-
-				if ( $post_id ) {
-					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
-					update_post_meta( $post_id, 'discourse_comments_count', $comment_count );
-				} else {
-					$skipped_topics[] = $title;
-				}
-
-				if ( $skipped_topics ) {
-					// This is used for adding an admin notice.
-					update_option( 'wpdc_sync_skipped_topics', $skipped_topics );
-				}
-			}
-
-			// Set the start for the next sync period.
-			update_option( 'wpdc_last_sync', time() );
-		}
 	}
 
 	/**
@@ -105,19 +38,6 @@ class DiscourseComment {
 	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
-
-		// Setup the sync_discourse_data scheduled event. It's added here, instead of in the activation hook so that
-		// it will be available for sites when they update the plugin.
-//		if ( ! empty( $this->options['use-discourse-plugin'] ) && 1 === intval( $this->options['use-discourse-plugin'] ) ) {
-//			$already_scheduled = 1 === intval( get_option( 'wpdc_discourse_sync_scheduled' ) );
-//			$schedule_changed  = 1 === intval( get_option( 'wpdc_sync_period_changed' ) );
-//			if ( ! $already_scheduled || $schedule_changed ) {
-//				wp_clear_scheduled_hook( 'sync_discourse_data' );
-//				wp_schedule_event( time(), 'discourse_sync_period', 'sync_discourse_data' );
-
-//				update_option( 'wpdc_discourse_sync_scheduled', 1 );
-//			}
-//		}
 	}
 
 	/**
