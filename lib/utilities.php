@@ -33,16 +33,17 @@ class Utilities {
 				}
 
 				if ( ! is_main_site() &&
-				! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
-					$options['url'] = get_site_option('wpdc_site_url');
-					$options['api-key'] = get_site_option( 'wpdc_site_api_key');
-					$options['publish-username'] = get_site_option('wpdc_site_publish_username');
-					$options['use-discourse-webhook'] = get_site_option('wpdc_site_use_discourse_webhook');
-					$options['multisite-configuration'] = get_site_option('wpdc_site_multisite_configuration');
+				     ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) )
+				) {
+					$options['url']                     = get_site_option( 'wpdc_site_url' );
+					$options['api-key']                 = get_site_option( 'wpdc_site_api_key' );
+					$options['publish-username']        = get_site_option( 'wpdc_site_publish_username' );
+					$options['use-discourse-webhook']   = get_site_option( 'wpdc_site_use_discourse_webhook' );
+					$options['multisite-configuration'] = get_site_option( 'wpdc_site_multisite_configuration' );
 
-					$options['sso-secret'] = get_site_option('wpdc_site_sso_secret' );
-					$options['enable-sso'] = get_site_option('wpdc_site_enable_sso');
-					$options['sso-client-enabled'] = get_site_option('wpdc_site_sso_client_enabled');
+					$options['sso-secret']         = get_site_option( 'wpdc_site_sso_secret' );
+					$options['enable-sso']         = get_site_option( 'wpdc_site_enable_sso' );
+					$options['sso-client-enabled'] = get_site_option( 'wpdc_site_sso_client_enabled' );
 				}
 			}
 		}
@@ -141,45 +142,6 @@ class Utilities {
 		}
 
 		return $categories;
-	}
-
-	public static function get_updated_topic_data( $sync_period ) {
-		$options      = self::get_options();
-		$api_key      = $options['api-key'];
-		$api_username = $options['publish-username'];
-		$base_url     = $options['url'];
-
-		if ( empty( $base_url ) || empty( $api_key ) || empty( $api_username ) ) {
-
-			return new \WP_Error( 'discourse_connection_settings_not_configured',
-				_( 'You need to configure the wp-discourse connection settings.', 'wp-discourse' ) );
-		}
-
-		$site_url           = urlencode( site_url() );
-		$discourse_date_url = esc_url( $base_url . "/discourse-updated-topics/topic-data/$sync_period.json" );
-		$discourse_date_url = add_query_arg( array(
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-			'site_url'     => $site_url,
-		), $discourse_date_url );
-
-		$response = wp_remote_get( $discourse_date_url );
-
-		if ( ! self::validate( $response ) ) {
-			return new \WP_Error( 'discourse_invalid_response',
-				__( 'An invalid response was returned from Discourse while attempting to sync the data.', 'wp-discourse' ) );
-		}
-
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( property_exists( $response, 'updated_topics' ) ) {
-
-			return $response->updated_topics;
-		} else {
-
-			return new \WP_Error( 'discourse_invalid_response',
-				__( 'An invalid response was returned from Discourse while attempting to sync the updated_topics data', 'wp-discourse' ) );
-		}
 	}
 
 	public static function get_post_id_by_topic_id( $topic_id ) {
