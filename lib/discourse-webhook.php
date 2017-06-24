@@ -20,7 +20,6 @@ class DiscourseWebhook {
 	public function maybe_create_db() {
 		global $wpdb;
 		if ( is_multisite() ) {
-			write_log( 'options', $this->options );
 			$webhook_enabled             = 1 === intval( get_site_option( 'wpdc_site_use_discourse_webhook' ) );
 			$use_multisite_configuration = 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) );
 			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
@@ -48,6 +47,7 @@ class DiscourseWebhook {
 		$this->options = DiscourseUtilities::get_options();
 	}
 
+	// Todo: this should only need to be initialized on the main_site in a multisite network.
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['use-discourse-webhook'] ) && 1 === intval( $this->options['use-discourse-webhook'] ) ) {
 			register_rest_route( 'wp-discourse/v1', 'update-topic-content', array(
