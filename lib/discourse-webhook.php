@@ -113,6 +113,10 @@ class DiscourseWebhook {
 			$failures[] = $failure_message;
 
 			update_option('wpdc_webhook_sync_failures', $failures );
+
+			if ( ! wp_next_scheduled( 'wpdc_topic_sync_failure_notification' ) ) {
+				wp_schedule_single_event( time() + 300, 'wpdc_topic_sync_failure_notification' );
+			}
 		}
 	}
 

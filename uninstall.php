@@ -27,4 +27,4 @@ $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}discourse_nonce" );
 
 delete_option( 'wpdc_discourse_categories' );
 
-// Todo: delete email notification scheduled event
+// Todo: delete email notification scheduled event -- do this in a deactivation hook somewhere else.
