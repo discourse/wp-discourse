@@ -1,10 +1,10 @@
 <?php
 
-namespace WPDiscourse\DiscourseWebhook;
+namespace WPDiscourse\DiscourseWebhookRefresh;
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
-class DiscourseWebhook {
+class DiscourseWebhookRefresh {
 
 	protected $options;
 
@@ -28,7 +28,6 @@ class DiscourseWebhook {
 				$table_name      = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$charset_collate = $wpdb->get_charset_collate();
 
-				// Todo: don't create the table if it already exists!
 				$sql = "CREATE TABLE $table_name (
                   topic_id mediumint(9) NOT NULL,
                   blog_id mediumint(9) NOT NULL,
@@ -47,7 +46,6 @@ class DiscourseWebhook {
 		$this->options = DiscourseUtilities::get_options();
 	}
 
-	// Todo: this should only need to be initialized on the main_site in a multisite network.
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['use-discourse-webhook'] ) && 1 === intval( $this->options['use-discourse-webhook'] ) ) {
 			register_rest_route( 'wp-discourse/v1', 'update-topic-content', array(
