@@ -23,5 +23,8 @@ foreach ( $discourse_options as $option ) {
 
 global $wpdb;
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}discourse_nonce" );
+// Todo: delete multisite database table
 
 delete_option( 'wpdc_discourse_categories' );
+
+// Todo: delete email notification scheduled event
