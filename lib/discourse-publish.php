@@ -24,10 +24,13 @@ class DiscoursePublish {
 	 */
 	protected $options;
 
+	protected $email_notifier;
+
 	/**
 	 * DiscoursePublish constructor.
 	 */
-	public function __construct() {
+	public function __construct( $email_notifier ) {
+		$this->email_notifier = $email_notifier;
 		add_action( 'init', array( $this, 'setup_options' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
@@ -65,7 +68,7 @@ class DiscoursePublish {
 		           1 === intval( $this->options['auto-publish'] )
 		) {
 			// The post should have been published.
-			$this->notify_admin( $post, array(
+			$this->email_notifier->publish_failure_notification( $post, array(
 				'location' => 'after_save',
 			) );
 		}
@@ -93,7 +96,7 @@ class DiscoursePublish {
 			$title = $this->sanitize_title( $post->post_title );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && isset( $this->options['auto-publish'] ) && 1 === intval( $this->options['auto-publish'] ) ) {
-			$this->notify_admin( $post, array(
+			$this->email_notifier->publish_failure_notification( $post, array(
 				'location' => 'after_xmlrpc_publish',
 			) );
 		}
@@ -215,7 +218,7 @@ class DiscoursePublish {
 
 		if ( ! DiscourseUtilities::validate( $result ) ) {
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-			$this->notify_admin( $current_post, array(
+			$this->email_notifier->publish_failure_notification( $current_post, array(
 				'location' => 'after_bad_response',
 			) );
 
@@ -240,7 +243,7 @@ class DiscoursePublish {
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-				$this->notify_admin( $current_post, array(
+				$this->email_notifier->publish_failure_notification( $current_post, array(
 					'location' => 'after_bad_response',
 				) );
 
@@ -263,7 +266,7 @@ class DiscoursePublish {
 
 			} else {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-				$this->notify_admin( $current_post, array(
+				$this->email_notifier->publish_failure_notification( $current_post, array(
 					'location' => 'after_bad_response',
 				) );
 
@@ -312,66 +315,6 @@ class DiscoursePublish {
 	 */
 	protected function sanitize_title( $title ) {
 		return wp_strip_all_tags( $title );
-	}
-
-	/**
-	 * Sends a notification email to a site admin if a post fails to publish on Discourse.
-	 *
-	 * @param object $post $discourse_post The post where the failure occurred.
-	 * @param array  $args Optional arguments for the function. The 'location' argument can be used to indicate where the failure occurred.
-	 */
-	protected function notify_admin( $post, $args ) {
-		$post_id  = $post->ID;
-		$location = ! empty( $args['location'] ) ? $args['location'] : '';
-
-		// This is to avoid sending two emails when a post is published through XML-RPC.
-		if ( 'after_save' === $location && 1 === intval( get_post_meta( $post_id, 'wpdc_xmlrpc_failure_sent', true ) ) ) {
-			delete_post_meta( $post_id, 'wpdc_xmlrpc_failure_sent' );
-
-			return;
-		}
-
-		if ( isset( $this->options['publish-failure-notice'] ) && 1 === intval( $this->options['publish-failure-notice'] ) ) {
-			$publish_failure_email = ! empty( $this->options['publish-failure-email'] ) ? $this->options['publish-failure-email'] : get_option( 'admin_email' );
-			$blogname              = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
-			$post_title            = $post->post_title;
-			$post_date             = $post->post_date;
-			$post_author           = get_user_by( 'id', $post->post_author )->user_login;
-			$permalink             = get_permalink( $post_id );
-			$support_url           = 'https://meta.discourse.org/c/support/wordpress';
-
-			// translators: Discourse publishing email. Placeholder: blogname.
-			$message = sprintf( __( 'A post has failed to publish on Discourse from your site [%1$s].', 'wp-discourse' ), $blogname ) . "\r\n\r\n";
-			// translators: Discourse publishing email. Placeholder: post title.
-			$message .= sprintf( __( 'The post \'%1$s\' was published on WordPress', 'wp-discourse' ), $post_title ) . "\r\n";
-			// translators: Discourse publishing email. Placeholder: post author, post date.
-			$message .= sprintf( __( 'by %1$s, on %2$s.', 'wp-discourse' ), $post_author, $post_date ) . "\r\n\r\n";
-			// translators: Discourse publishing email. Placeholder: permalink.
-			$message .= sprintf( __( '<%1$s>', 'wp-discourse' ), esc_url( $permalink ) ) . "\r\n\r\n";
-			$message .= __( 'Reason for failure:', 'wp-discourse' ) . "\r\n";
-
-			switch ( $location ) {
-				case 'after_save':
-					$message .= __( 'The \'Publish to Discourse\' checkbox wasn\'t checked.', 'wp-discourse' ) . "\r\n";
-					$message .= __( 'You are being notified because you have the \'Auto Publish\' setting enabled.', 'wp-discourse' ) . "\r\n\r\n";
-					break;
-				case 'after_xmlrpc_publish':
-					add_post_meta( $post->ID, 'wpdc_xmlrpc_failure_sent', 1 );
-					$message .= __( 'The post was published through XML-RPC.', 'wp-discourse' ) . "\r\n\r\n";
-					break;
-				case 'after_bad_response':
-					$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n\r\n";
-					$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
-					$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n\r\n";
-					break;
-			}
-
-			$message .= __( 'If you\'re having trouble with the WP Discourse plugin, you can find help at:', 'wp-discourse' ) . "\r\n";
-			// translators: Discourse publishing email. Placeholder: Discourse support URL.
-			$message .= sprintf( __( '<%1$s>', 'wp-discourse' ), esc_url( $support_url ) ) . "\r\n";
-			// translators: Discourse publishing email. Placeholder: blogname, email message.
-			wp_mail( $publish_failure_email, sprintf( __( '[%s] Discourse Publishing Failure' ), $blogname ), $message );
-		}// End if().
 	}
 
 	protected function save_topic_blog_id( $topic_id, $blog_id ) {

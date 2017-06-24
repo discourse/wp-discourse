@@ -64,13 +64,13 @@ require_once( __DIR__ . '/lib/sso/sso-url.php' );
 require_once( __DIR__ . '/admin/admin.php' );
 
 $discourse = new WPDiscourse\Discourse\Discourse();
-new WPDiscourse\DiscoursePublish\DiscoursePublish();
+$discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();
+new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
 new WPDiscourse\DiscourseComment\DiscourseComment();
 $wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 new WPDiscourse\DiscourseUser\DiscourseUser();
 new WPDiscourse\DiscourseWebhook\DiscourseWebhook();
-new WPDiscourse\EmailNotification\EmailNotification();
 new WPDiscourse\sso\Client();
 new WPDiscourse\sso\QueryRedirect();
 
