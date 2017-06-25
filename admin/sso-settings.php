@@ -38,6 +38,12 @@ class SSOSettings {
 	 */
 	protected $discourse_sso_settings_url;
 
+	/**
+	 * Whether or not to use some network sso settings.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
 	protected $use_network_sso_settings;
 
 	/**

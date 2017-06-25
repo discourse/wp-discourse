@@ -50,16 +50,50 @@ class SettingsValidator {
 	protected $use_discourse_comments = false;
 
 	/**
+	 * The Discourse URL, used for setting site option when use_multisite_configuration is enabled.
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $url;
+
+	/**
+	 * The Discourse API key, used for setting site option when use_multisite_configuration is enabled.
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $api_key;
+
+	/**
+	 * The Discourse publish username, used for setting site option when use_multisite_configuration is enabled.
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $publish_username;
+	/**
 	 * Indicates whether or not 'use_discourse_webhook' is enabled.
 	 *
 	 * @access protected
 	 * @var bool
 	 */
-	protected $url;
-	protected $api_key;
-	protected $publish_username;
 	protected $use_discourse_webhook;
+
+	/**
+	 * Used for setting the webhook_sync_notification site option when use_multisite_configuration is enabled.
+	 *
+	 * @access protected
+	 * @var int
+	 */
 	protected $webhook_sync_notification;
+
+	/**
+	 * Used for setting the use_multisite_configuration site option.
+	 *
+	 * @access protected
+	 * @var int
+	 */
 	protected $use_multisite_configuration;
 
 	/**
@@ -231,12 +265,26 @@ class SettingsValidator {
 		return $this->publish_username;
 	}
 
+	/**
+	 * Validates use_discourse_webhook.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return bool|int
+	 */
 	public function validate_use_discourse_webhook( $input ) {
 		$this->use_discourse_webhook = $this->validate_checkbox( $input );
 
 		return $this->use_discourse_webhook;
 	}
 
+	/**
+	 * Validates the webhook_secret input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
 	public function validate_webhook_secret( $input ) {
 		$secret = $this->validate_text_input( $input );
 		if ( $this->use_discourse_webhook && iconv_strlen( $secret ) < 12 ) {
@@ -246,12 +294,28 @@ class SettingsValidator {
 		return $secret;
 	}
 
+	/**
+	 * Validates the webhook_sync_notification input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_webhook_sync_notification( $input ) {
 		$this->webhook_sync_notification = $this->validate_checkbox( $input );
 
 		return $this->webhook_sync_notification;
 	}
 
+	/**
+	 * Validates the use_multisite_configuration setting.
+	 *
+	 * Sets
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_multisite_configuration( $input ) {
 		$this->use_multisite_configuration = $this->validate_checkbox( $input );
 
@@ -294,6 +358,15 @@ class SettingsValidator {
 		return $output;
 	}
 
+	/**
+	 * Validates the discourse_min_username_length input.
+	 *
+	 * Added in version 1.4.0, if not set, set to 3 (the Discourse default value).
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return int
+	 */
 	public function validate_discourse_min_username_length( $input ) {
 		$length = $this->sanitize_int( $input );
 
@@ -679,6 +752,14 @@ class SettingsValidator {
 		}
 	}
 
+	/**
+	 * Sets site options based on option key when use_multisite_configuration is enabled.
+	 *
+	 * Allows for site options to be set for some options in multisite setups.
+	 *
+	 * @param string     $option_name The name of the option key.
+	 * @param int|string $value The value of the option.
+	 */
 	protected function maybe_update_site_option( $option_name, $value ) {
 		if ( is_main_site() &&  1 === $this->use_multisite_configuration ) {
 			$site_option_name = 'wpdc_site_' . $option_name;

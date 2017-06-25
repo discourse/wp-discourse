@@ -30,6 +30,12 @@ class ConnectionSettings {
 	 */
 	protected $options;
 
+	/**
+	 * Whether or not to display the connection_options fields.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
 	protected $display_connection_options;
 
 	/**
@@ -130,15 +136,19 @@ class ConnectionSettings {
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outpurs markup for use-discourse-webhook checkbox.
+	 */
 	public function use_discourse_webhook_checkbox() {
 		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
 		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '" target="_blank">' .
-			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '</a>';
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
 
+		// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 		$description = sprintf(
 			__( 'A Discourse webhook can be used to improve the efficiency of syncing comments between WordPress and your Discourse forum.
  To use this setting create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
@@ -149,13 +159,18 @@ class ConnectionSettings {
 		for syncing data between Discourse and WordPress.', 'wp-discourse' ), $description );
 	}
 
+	/**
+	 * Outputs markup for webhook-secret input.
+	 */
 	public function webhook_secret_input() {
 		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '" target="_blank">' .
-			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks' . '</a>';
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
+
+		// translators: Webhook secred input. Placeholder: discourse_webhooks_url.
 		$description = sprintf(
 			__( 'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
@@ -164,6 +179,9 @@ class ConnectionSettings {
 		$this->form_helper->input( 'webhook-secret', 'discourse_connect', $description );
 	}
 
+	/**
+	 * Outputs markup for webhook-sync-notification checkbox.
+	 */
 	public function webhook_sync_notification_checkbox() {
 	    $this->form_helper->checkbox_input( 'webhook-sync-notification', 'discourse_connect', __( 'Send email notification to
 	    site administrator if webhook sync fails.', 'wp-discourse' ), __( "For posts that have been published to Discourse before
@@ -172,6 +190,9 @@ class ConnectionSettings {
 	    once every 12 hours.)", 'wp-discourse' ) );
 	}
 
+	/**
+	 * Outputs markup for multisite-configuration-checkbox.
+	 */
 	public function multisite_configuration_checkbox() {
 		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
 	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum

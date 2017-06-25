@@ -34,7 +34,7 @@ class DiscoursePublish {
 	/**
 	 * DiscoursePublish constructor.
 	 *
-	 * @param \WPDiscourse\EmailNotification\EmailNotification  An object for sending an email verification notice.
+	 * @param object $email_notifier  An object for sending an email verification notice.
 	 */
 	public function __construct( $email_notifier ) {
 		$this->email_notifier = $email_notifier;
@@ -308,7 +308,7 @@ class DiscoursePublish {
 	/**
 	 * Checks if a post_type can be synced.
 	 *
-	 * @param null $post_id The ID of the post in question.
+	 * @param null| $post_id The ID of the post in question.
 	 *
 	 * @return bool
 	 */
@@ -383,8 +383,8 @@ class DiscoursePublish {
 	protected function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$query      = $wpdb->prepare( "SELECT * FROM $table_name WHERE topic_id = %d", $topic_id );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %s WHERE topic_id = %d', $table_name, $topic_id ) );
 
-		return $wpdb->get_row( $query ) ? true : false;
+		return $row ? true : false;
 	}
 }
