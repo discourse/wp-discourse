@@ -27,12 +27,13 @@ class EmailNotification {
 			$num_failures = count( $sync_failures );
 			if ( 1 === $num_failures ) {
 				$message = sprintf(
-					           __( 'The following Discourse topic has failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
-				           ) . "\r\n\r\n";
+					__( 'The following Discourse topic has failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
+				) . "\r\n\r\n";
 			} else {
 				$message = sprintf(
-					           __( 'The following Discourse topics have failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
-				           ) . "\r\n\r\n";;
+					__( 'The following Discourse topics have failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
+				) . "\r\n\r\n";
+				;
 			}
 
 			foreach ( $sync_failures as $topic ) {
@@ -40,8 +41,9 @@ class EmailNotification {
 				$topic_id = ! empty( $topic['topic_id'] ) ? $topic['topic_id'] : '';
 				$time     = ! empty( $topic['time'] ) ? $topic['time'] : '';
 				$message  .= sprintf(
-					             __( '%1$s (topic_id %2$s) updated on Discourse at %3$s', 'wp-discourse' ), $title, $topic_id, $time
-				             ) . "\r\n";;
+					__( '%1$s (topic_id %2$s) updated on Discourse at %3$s', 'wp-discourse' ), $title, $topic_id, $time
+				) . "\r\n";
+				;
 			}
 
 			$message .= "\r\n";
@@ -64,7 +66,7 @@ class EmailNotification {
 			delete_option( 'wpdc_webhook_sync_failures' );
 
 			wp_mail( $email, sprintf( __( '[%s] Discourse Webhook Sync Failure' ), $blogname ), $message );
-		}
+		}// End if().
 	}
 
 	/**

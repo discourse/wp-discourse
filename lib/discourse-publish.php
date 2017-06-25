@@ -54,7 +54,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int $post_id The id of the post that has been saved.
+	 * @param int    $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -114,7 +114,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -133,7 +133,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -259,7 +259,6 @@ class DiscoursePublish {
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
-			// The response when a topic is updated.
 		} elseif ( property_exists( $body, 'post' ) ) {
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
@@ -285,9 +284,9 @@ class DiscoursePublish {
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
-		}
+		}// End if().
 
-		//  Neither the 'id' or the 'post' property existed on the response body.
+		// Neither the 'id' or the 'post' property existed on the response body.
 		$this->create_bad_response_notifications( $current_post, $post_id );
 
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
@@ -367,7 +366,7 @@ class DiscoursePublish {
 			),
 			array(
 				'%d',
-				'%d'
+				'%d',
 			)
 		);
 	}

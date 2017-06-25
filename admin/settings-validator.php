@@ -99,7 +99,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_username_as_discourse_name', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_discourse_min_username_length', array(
 			$this,
-			'validate_discourse_min_username_length'
+			'validate_discourse_min_username_length',
 		) );
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
@@ -158,7 +158,7 @@ class SettingsValidator {
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
 		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
-		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration']) && 1 === intval( $this->options['multisite-configuration']) ? 1 : 0;
+		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration'] ) && 1 === intval( $this->options['multisite-configuration'] ) ? 1 : 0;
 	}
 
 	/**
@@ -180,7 +180,7 @@ class SettingsValidator {
 			$this->url = untrailingslashit( esc_url_raw( $input ) );
 
 			if ( ! filter_var( $this->url, FILTER_VALIDATE_URL ) ) {
-			add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
+				add_settings_error( 'discourse', 'discourse_url', __( 'The Discourse URL you provided is not a valid URL.', 'wp-discourse' ) );
 			}
 		}
 
@@ -205,7 +205,7 @@ class SettingsValidator {
 			$this->api_key = trim( $input );
 
 			if ( ! preg_match( $regex, $input ) ) {
-			add_settings_error( 'discourse', 'api_key', __( 'The API key you provided is not valid.', 'wp-discourse' ) );
+				add_settings_error( 'discourse', 'api_key', __( 'The API key you provided is not valid.', 'wp-discourse' ) );
 			}
 		}
 
@@ -221,11 +221,11 @@ class SettingsValidator {
 	 */
 	public function validate_publish_username( $input ) {
 		if ( ! empty( $input ) ) {
-			$this->publish_username =  $this->sanitize_text( $input );
+			$this->publish_username = $this->sanitize_text( $input );
 		} else {
 			add_settings_error( 'discourse', 'publish_username', __( 'You need to provide a Discourse username.', 'wp-discourse' ) );
 
-			$this->publish_username =  '';
+			$this->publish_username = '';
 		}
 
 		return $this->publish_username;
@@ -297,7 +297,7 @@ class SettingsValidator {
 	public function validate_discourse_min_username_length( $input ) {
 		$length = $this->sanitize_int( $input );
 
-		if( empty( $length ) || 0 === $length ) {
+		if ( empty( $length ) || 0 === $length ) {
 			$length = 3;
 		}
 
@@ -339,7 +339,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -352,7 +352,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -365,7 +365,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -378,7 +378,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -391,7 +391,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-			$this->use_discourse_comments );
+		$this->use_discourse_comments );
 	}
 
 	/**
@@ -405,7 +405,7 @@ class SettingsValidator {
 
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-			true );
+		true );
 	}
 
 	/**
@@ -643,12 +643,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int $input The input to be validated.
+	 * @param int    $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null $min The minimum allowed value.
-	 * @param null $max The maximum allowed value.
+	 * @param null   $min The minimum allowed value.
+	 * @param null   $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool $add_error Whether or not to add a setting error.
+	 * @param bool   $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */

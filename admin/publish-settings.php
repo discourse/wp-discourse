@@ -128,7 +128,7 @@ class PublishSettings {
 	 */
 	public function display_subcategories() {
 		$this->form_helper->checkbox_input( 'display-subcategories', 'discourse_publish', __( 'Include subcategories in the list of available categories.', 'wp-discourse' ),
-			__( "You need to select and save both this setting and the 'Force Category Update' setting before subcategories will be available in the category list.", 'wp-discourse' ) );
+		__( "You need to select and save both this setting and the 'Force Category Update' setting before subcategories will be available in the category list.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -185,7 +185,7 @@ class PublishSettings {
 	 */
 	public function auto_publish_checkbox() {
 		$this->form_helper->checkbox_input( 'auto-publish', 'discourse_publish', __( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-			__( 'This setting can be overridden on the new-post screen.' ) );
+		__( 'This setting can be overridden on the new-post screen.' ) );
 	}
 
 	/**
@@ -219,25 +219,25 @@ class PublishSettings {
 
 	public function username_as_discourse_name_checkbox() {
 		$this->form_helper->checkbox_input( 'username-as-discourse-name', 'discourse_publish', __( "Automatically set user's Discourse Name
-	    to their WordPress username.", 'wp-discourse' ), __( "Enabling this setting will remove the Discourse Name field
-	    from the WordPress user profile page and cause all posts published to Discourse to be published by the WordPress username.", 'wp-discourse' ) );
+	    to their WordPress username.", 'wp-discourse' ), __( 'Enabling this setting will remove the Discourse Name field
+        from the WordPress user profile page and cause all posts published to Discourse to be published by the WordPress username.', 'wp-discourse' ) );
 	}
 
 	public function discourse_min_username_length() {
-	    if ( ! empty( $this->options['url'])) {
-	        $discourse_setting_link = '<a href="' . esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length') . '" target="_blank">' .
-            esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length') . '</a>';
-        } else {
+	    if ( ! empty( $this->options['url'] ) ) {
+	        $discourse_setting_link = '<a href="' . esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length' ) . '" target="_blank">' .
+			esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length' ) . '</a>';
+		} else {
 	        $discourse_setting_link = 'http://forum.example.com/admin/site_settings/category/all_results?filter=min_username_length';
-        }
+		}
 
-        $description = sprintf(
-                __( 'To use the WordPress username as the Discourse publishing name, the username must meet the Discourse \'min username length\'
+		$description = sprintf(
+			__( 'To use the WordPress username as the Discourse publishing name, the username must meet the Discourse \'min username length\'
                 requirement. That setting can be found on your forum at: %1$s. If you leave this setting field empty, it will default to 3.', 'wp-discourse' ), $discourse_setting_link
-        );
+		);
 
 	    $this->form_helper->input( 'discourse-min-username-length', 'discourse_publish', $description, 'number', 0 );
-    }
+	}
 
 	/**
 	 * Outputs markup for the post-types select input.
@@ -245,7 +245,7 @@ class PublishSettings {
 	public function post_types_select() {
 		$this->form_helper->post_type_select_input( 'allowed_post_types',
 			$this->form_helper->post_types_to_publish( array( 'attachment' ) ),
-			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple post-types.', 'wp-discourse' ) );
+		__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple post-types.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -255,21 +255,21 @@ class PublishSettings {
 		$setup_howto_url    = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url = 'https://meta.discourse.org/';
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'This section is for configuring how the plugin publishes posts to Discourse.', 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
+			</em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $setup_howto_url ); ?>"
-                   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
-            </em>
-        </p>
+			</em>
+		</p>
 		<?php
 	}
 }

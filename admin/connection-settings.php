@@ -92,7 +92,7 @@ class ConnectionSettings {
 					'multisite_configuration_checkbox',
 				), 'discourse_connect', 'discourse_connection_settings_section' );
 			}
-		}
+		}// End if().
 
 		register_setting( 'discourse_connect', 'discourse_connect', array(
 			$this->form_helper,
@@ -115,7 +115,7 @@ class ConnectionSettings {
 		if ( ! empty( $discourse_options['url'] ) ) {
 			$this->form_helper->input( 'api-key', 'discourse_connect', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
 			                                                           '/admin/api/keys" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
-			                                                           "If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
+			"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
 		} else {
 			$this->form_helper->input( 'api-key', 'discourse_connect', __( "Found on your forum at /admin/api/keys.
 			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' ) );
@@ -170,7 +170,7 @@ class ConnectionSettings {
 	    WP Discourse version 1.4.0, posts are being matched with Discourse topics through their title. If a match can't be
 	    made between any topics and posts, a notification email will be sent to the site's administrator (no more often than
 	    once every 12 hours.)", 'wp-discourse' ) );
-    }
+	}
 
 	public function multisite_configuration_checkbox() {
 		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
@@ -188,52 +188,52 @@ class ConnectionSettings {
 		$setup_howto_url           = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url        = 'https://meta.discourse.org/';
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( "The WP Discourse plugin is used to connect an existing Discourse forum with your WordPress site.
                 If you don't already have a Discourse forum, here are some options for setting one up:", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <ul class="wpdc-documentation-list">
-            <em>
-                <li>
-                    <a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank">install it yourself for
-                        free</a>
-                </li>
-                <li>
-                    <a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank">self-supported community
-                        installation</a>
-                </li>
-                <li>
-                    <a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank">discourse.org
-                        hosting</a>
-                </li>
-            </em>
-        </ul>
-        <p class="wpdc-options-documentation">
-            <em>
+			</em>
+		</p>
+		<ul class="wpdc-documentation-list">
+			<em>
+				<li>
+					<a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank">install it yourself for
+						free</a>
+				</li>
+				<li>
+					<a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank">self-supported community
+						installation</a>
+				</li>
+				<li>
+					<a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank">discourse.org
+						hosting</a>
+				</li>
+			</em>
+		</ul>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'For detailed instructions on setting up the plugin, please see the ', 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $setup_howto_url ); ?>"
-                   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
+				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
-            </em>
-        </p>
+			</em>
+		</p>
 		<?php if ( $this->display_connection_options ) : ?>
-            <p class="wpdc-options-documentation">
-                <em>
-                    <strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
-                </em>
-            </p>
+			<p class="wpdc-options-documentation">
+				<em>
+					<strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
+				</em>
+			</p>
 		<?php else : ?>
-            <p class="wpdc-options-documentation wpdc-subsite-documentation">
-                <em>
-                    <strong><?php esc_html_e( "You are using the WP Discourse plugin in a subsite of a multisite installation.
+			<p class="wpdc-options-documentation wpdc-subsite-documentation">
+				<em>
+					<strong><?php esc_html_e( "You are using the WP Discourse plugin in a subsite of a multisite installation.
                     The plugin's API credentials are being managed through the installations main site. If you have difficulty
                     connecting to the Discourse forum. Please contact the network administrator.", 'wp-discourse' ); ?></strong>
-                </em>
-            </p>
+				</em>
+			</p>
 		<?php endif; ?>
 
 		<?php

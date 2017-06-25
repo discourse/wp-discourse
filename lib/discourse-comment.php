@@ -168,7 +168,7 @@ class DiscourseComment {
 						}
 
 						// Todo: comment this out for now for testing.
-//							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
+						// update_post_meta( $postid, 'discourse_comments_count', $posts_count );
 						update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
 					}
 				}
