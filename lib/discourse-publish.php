@@ -383,7 +383,7 @@ class DiscoursePublish {
 	protected function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %s WHERE topic_id = %d', $table_name, $topic_id ) );
+		$row = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM `$table_name` WHERE topic_id = %d", $topic_id ) );
 
 		return $row ? true : false;
 	}

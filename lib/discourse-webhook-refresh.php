@@ -85,7 +85,7 @@ class DiscourseWebhookRefresh {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$topic_id   = $post_data['topic_id'];
-				$blog_id = $wpdb->get_var( $wpdb->prepare( 'SELECT blog_id FROM %s WHERE topic_id = %d', $table_name, $topic_id ) );
+				$blog_id = $wpdb->get_var( $wpdb->prepare( "SELECT `blog_id` FROM `$table_name` WHERE `topic_id` = %d", $topic_id ) );
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
@@ -174,8 +174,8 @@ class DiscourseWebhookRefresh {
 			update_option( 'wpdc_webhook_sync_failures', $failures );
 
 			if ( ! wp_next_scheduled( 'wpdc_topic_sync_failure_notification' ) ) {
-				// Todo: increase this to a sane time period (12 hours?) and add a filter to it so it can be adjusted by a theme.
-				wp_schedule_single_event( time() + 600, 'wpdc_topic_sync_failure_notification' );
+				$sync_period = apply_filters( 'wpdc_topic_sync_failure_notification_period', 4 * HOUR_IN_SECONDS );
+				wp_schedule_single_event( time() + $sync_period, 'wpdc_topic_sync_failure_notification' );
 			}
 		}
 	}
