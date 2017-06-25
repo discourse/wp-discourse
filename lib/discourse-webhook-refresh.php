@@ -85,7 +85,7 @@ class DiscourseWebhookRefresh {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$topic_id   = $post_data['topic_id'];
-				$blog_id = $wpdb->get_var( $wpdb->prepare( "SELECT `blog_id` FROM `$table_name` WHERE `topic_id` = %d", $topic_id ) );
+				$blog_id = $wpdb->get_var( $wpdb->prepare( "SELECT blog_id FROM {$table_name} WHERE topic_id = %d", $topic_id ) );
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
