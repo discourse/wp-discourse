@@ -7,7 +7,6 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
-use WPDiscourse\DiscourseUser\DiscourseUser;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
@@ -24,10 +23,18 @@ class DiscoursePublish {
 	 */
 	protected $options;
 
+	/**
+	 * An email_notification object that has a publish_failure_notification method.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\EmailNotification\EmailNotification
+	 */
 	protected $email_notifier;
 
 	/**
 	 * DiscoursePublish constructor.
+	 *
+	 * @param \WPDiscourse\EmailNotification\EmailNotification  An object for sending an email verification notice.
 	 */
 	public function __construct( $email_notifier ) {
 		$this->email_notifier = $email_notifier;
@@ -47,7 +54,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
+	 * @param int $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -105,7 +112,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -124,20 +131,20 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
 	 * @return null
 	 */
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
-		$options                   = $this->options;
-		$discourse_id              = get_post_meta( $post_id, 'discourse_post_id', true );
-		$current_post              = get_post( $post_id );
-		$author_id                 = $current_post->post_author;
-		$use_full_post             = isset( $options['full-post-content'] ) && 1 === intval( $options['full-post-content'] );
-		$discourse_username_length = ! empty( $this->options['discourse-min-username-length'] ) ? $this->options['discourse-min-username-length'] : 3;
-		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration']) && 1 === intval( $options['multisite-configuration']);
+		$options                     = $this->options;
+		$discourse_id                = get_post_meta( $post_id, 'discourse_post_id', true );
+		$current_post                = get_post( $post_id );
+		$author_id                   = $current_post->post_author;
+		$use_full_post               = ! empty( $options['full-post-content'] );
+		$discourse_username_length   = ! empty( $options['discourse-min-username-length'] ) ? $options['discourse-min-username-length'] : 3;
+		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration'] );
 
 		if ( $use_full_post ) {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
@@ -152,17 +159,17 @@ class DiscoursePublish {
 		}
 
 		// Trim to keep the Discourse markdown parser from treating this as code.
-		$baked     = trim( Templates::publish_format_html() );
-		$baked     = str_replace( '{excerpt}', $excerpt, $baked );
-		$baked     = str_replace( '{blogurl}', get_permalink( $post_id ), $baked );
-		$author    = get_the_author_meta( 'display_name', $author_id );
-		$baked     = str_replace( '{author}', $author, $baked );
-		$thumb     = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
-		$baked     = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
-		$featured  = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'full' );
-		$baked     = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
+		$baked    = trim( Templates::publish_format_html() );
+		$baked    = str_replace( '{excerpt}', $excerpt, $baked );
+		$baked    = str_replace( '{blogurl}', get_permalink( $post_id ), $baked );
+		$author   = get_the_author_meta( 'display_name', $author_id );
+		$baked    = str_replace( '{author}', $author, $baked );
+		$thumb    = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
+		$baked    = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
+		$featured = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'full' );
+		$baked    = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 
-		if ( ! empty( $this->options['username-as-discourse-name'] ) && 1 === intval( $this->options['username-as-discourse-name'] ) ) {
+		if ( ! empty( $options['username-as-discourse-name'] ) ) {
 			$username = get_user_by( 'id', $author_id )->user_login;
 		} else {
 			$username = get_the_author_meta( 'discourse_username', $author_id );
@@ -173,8 +180,9 @@ class DiscoursePublish {
 
 		// Get publish category of a post.
 		$publish_post_category = get_post_meta( $post_id, 'publish_post_category', true );
-		$default_category      = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
-		$category              = isset( $publish_post_category ) ? $publish_post_category : $default_category;
+		// This would be used if a post is published through XML-RPC. I'm not sure what it should default to if it hasn't been set.
+		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
+		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
@@ -186,7 +194,7 @@ class DiscoursePublish {
 				'raw'              => $baked,
 				'category'         => $category,
 				'skip_validations' => 'true',
-				'auto_track'       => ( isset( $options['auto-track'] ) && 1 === intval( $options['auto-track'] ) ? 'true' : 'false' ),
+				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 			);
 			$url  = $options['url'] . '/posts';
 			// Use key 'http' even if you send the request to https://.
@@ -216,24 +224,26 @@ class DiscoursePublish {
 		$result = wp_remote_post( $url, $post_options );
 
 		if ( ! DiscourseUtilities::validate( $result ) ) {
-			update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-			$this->email_notifier->publish_failure_notification( $current_post, array(
-				'location' => 'after_bad_response',
-			) );
+			$this->create_bad_response_notifications( $current_post, $post_id );
 
-			return null;
+			return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $result ) );
 
+		// The response when a topic is first created.
 		if ( property_exists( $body, 'id' ) ) {
 			$discourse_id = (int) $body->id;
 
-			if ( ( isset( $discourse_id ) && $discourse_id > 0 ) && isset( $body->topic_slug ) && isset( $body->topic_id ) ) {
+			if ( ! empty( $discourse_id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
+				$topic_slug = $body->topic_slug;
+				$topic_id   = $body->topic_id;
 
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
-				add_post_meta( $post_id, 'discourse_topic_id', $body->topic_id );
-				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $body->topic_slug . '/' . $body->topic_id );
+				add_post_meta( $post_id, 'discourse_topic_id', $topic_id );
+				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+
+				// Used for resetting the error notification, if one was being displayed.
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 				if ( $use_multisite_configuration ) {
 					$blog_id = get_current_blog_id();
@@ -241,37 +251,53 @@ class DiscoursePublish {
 				}
 
 			} else {
-				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-				$this->email_notifier->publish_failure_notification( $current_post, array(
-					'location' => 'after_bad_response',
-				) );
+				$this->create_bad_response_notifications( $current_post, $post_id );
 
-				return null;
+				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
+			// The response when a topic is updated.
 		} elseif ( property_exists( $body, 'post' ) ) {
 			$discourse_post = $body->post;
+			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
+			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
 
-			if ( isset( $discourse_post->topic_slug ) && isset( $discourse_post->topic_id ) ) {
-				update_post_meta( $post_id, 'discourse_topic_id', (int) $discourse_post->topic_id );
-				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id );
+			if ( $topic_slug && $topic_id ) {
+				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
 				if ( $use_multisite_configuration ) {
-					if ( ! $this->topic_blog_id_exists( $discourse_post->topic_id ) ) {
+					// Used when use_multisite_configuration is enabled, if an existing post is not yet associated with a topic_id/blog_id.
+					if ( ! $this->topic_blog_id_exists( $topic_id ) ) {
 						$blog_id = get_current_blog_id();
-						$this->save_topic_blog_id( $discourse_post->topic_id, $blog_id );
+						$this->save_topic_blog_id( $topic_id, $blog_id );
 					}
 				}
 
 			} else {
-				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-				$this->email_notifier->publish_failure_notification( $current_post, array(
-					'location' => 'after_bad_response',
-				) );
+				$this->create_bad_response_notifications( $current_post, $post_id );
 
-				return null;
+				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
 		}
+
+		//  Neither the 'id' or the 'post' property existed on the response body.
+		$this->create_bad_response_notifications( $current_post, $post_id );
+
+		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+	}
+
+	/**
+	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
+	 *
+	 * @param \WP_Post $current_post The post for which the notifications are being created.
+	 * @param $post_id
+	 */
+	protected function create_bad_response_notifications( $current_post, $post_id ) {
+		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+		$this->email_notifier->publish_failure_notification( $current_post, array(
+			'location' => 'after_bad_response',
+		) );
 	}
 
 	/**
@@ -316,6 +342,14 @@ class DiscoursePublish {
 		return wp_strip_all_tags( $title );
 	}
 
+	/**
+	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
+	 *
+	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
+	 *
+	 * @param int $topic_id The topic_id to save to the database.
+	 * @param int $blog_id The blog_id to save to the database.
+	 */
 	protected function save_topic_blog_id( $topic_id, $blog_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
@@ -323,7 +357,7 @@ class DiscoursePublish {
 			$table_name,
 			array(
 				'topic_id' => $topic_id,
-				'blog_id' => $blog_id,
+				'blog_id'  => $blog_id,
 			),
 			array(
 				'%d',
@@ -332,10 +366,19 @@ class DiscoursePublish {
 		);
 	}
 
+	/**
+	 * Checks if a given topic_id already exists in the wpdc_topic_blog table.
+	 *
+	 * Only used for multisite installations.
+	 *
+	 * @param int $topic_id The topic_id to search for in the database.
+	 *
+	 * @return bool
+	 */
 	protected function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$query = $wpdb->prepare( "SELECT * FROM $table_name WHERE topic_id = %d", $topic_id );
+		$query      = $wpdb->prepare( "SELECT * FROM $table_name WHERE topic_id = %d", $topic_id );
 
 		return $wpdb->get_row( $query ) ? true : false;
 	}
