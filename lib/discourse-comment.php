@@ -47,7 +47,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array  $allowedposttags The array of allowed post tags.
+	 * @param array $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
@@ -115,16 +115,16 @@ class DiscourseComment {
 	 */
 	function sync_comments( $postid ) {
 		global $wpdb;
-		$discourse_options       = $this->options;
+		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] ) && 1 === intval( $discourse_options['use-discourse-webhook'] );
-		$debug = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
+		$debug                 = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 
 		if ( ! $use_discourse_webhook ) {
 			// Every 10 minutes do a json call to sync comment count and top comments.
-			$last_sync = (int) get_post_meta( $postid, 'discourse_last_sync', true );
-			$time      = date_create()->format( 'U' );
+			$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
+			$time        = date_create()->format( 'U' );
 			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
-			$sync_post = $last_sync + $sync_period < $time;
+			$sync_post   = $last_sync + $sync_period < $time;
 		} else {
 			$sync_post = ( 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) ) );
 		}
@@ -134,46 +134,52 @@ class DiscourseComment {
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
-				$comment_count            = intval( $discourse_options['max-comments'] );
-				$min_trust_level          = intval( $discourse_options['min-trust-level'] );
-				$min_score                = intval( $discourse_options['min-score'] );
-				$min_replies              = intval( $discourse_options['min-replies'] );
-				$bypass_trust_level_score = intval( $discourse_options['bypass-trust-level-score'] );
+				// Check post_status so comments numbers aren't synced for drafts on admin/edit.php.
+				if ( 'publish' === get_post_status( $postid ) ) {
 
-				$options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
-				$options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
+					$comment_count            = intval( $discourse_options['max-comments'] );
+					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
+					$min_score                = intval( $discourse_options['min-score'] );
+					$min_replies              = intval( $discourse_options['min-replies'] );
+					$bypass_trust_level_score = intval( $discourse_options['bypass-trust-level-score'] );
 
-				if ( isset( $discourse_options['only-show-moderator-liked'] ) && 1 === intval( $discourse_options['only-show-moderator-liked'] ) ) {
-					$options = $options . '&only_moderator_liked=true';
-				}
-				$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
+					$options = 'best=' . $comment_count . '&min_trust_level=' . $min_trust_level . '&min_score=' . $min_score;
+					$options = $options . '&min_replies=' . $min_replies . '&bypass_trust_level_score=' . $bypass_trust_level_score;
 
-				$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
-				if ( ! $discourse_permalink ) {
-
-					return 0;
-				}
-				$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
-
-				$result = wp_remote_get( $permalink );
-
-				if ( DiscourseUtilities::validate( $result ) ) {
-
-					$json = json_decode( $result['body'] );
-
-					if ( isset( $json->posts_count ) ) {
-						$posts_count = $json->posts_count - 1;
-						if ( $posts_count < 0 ) {
-							$posts_count = 0;
-						}
-
-						update_post_meta( $postid, 'discourse_comments_count', $posts_count );
-						update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
-						update_post_meta( $postid, 'discourse_last_sync', $time );
+					if ( isset( $discourse_options['only-show-moderator-liked'] ) && 1 === intval( $discourse_options['only-show-moderator-liked'] ) ) {
+						$options = $options . '&only_moderator_liked=true';
 					}
-				}
+					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-				update_post_meta( $postid, 'wpdc_sync_post_comments', 0 );
+					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
+					if ( ! $discourse_permalink ) {
+
+						return 0;
+					}
+					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
+
+					$result = wp_remote_get( $permalink );
+
+					// Todo: if there is a 404 response, delete the
+					if ( DiscourseUtilities::validate( $result ) ) {
+
+						$json = json_decode( $result['body'] );
+
+						if ( isset( $json->posts_count ) ) {
+							$posts_count = $json->posts_count - 1;
+							if ( $posts_count < 0 ) {
+								$posts_count = 0;
+							}
+
+							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
+							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+						}
+					}
+
+					// Todo: updating these here for now, but should be removing the 'publish_to_discourse' metadata if there's a 404 response.
+					update_post_meta( $postid, 'discourse_last_sync', $time );
+					update_post_meta( $postid, 'wpdc_sync_post_comments', 0 );
+				}// End if().
 			}// End if().
 
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
