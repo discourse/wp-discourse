@@ -17,6 +17,7 @@ class EmailNotification {
 		$this->options = DiscourseUtilities::get_options();
 	}
 
+	// Todo: indicate that notifications may be being sent for posts that have not been published through wordpress.
 	public function send_topic_sync_notification() {
 		$sync_failures = get_option( 'wpdc_webhook_sync_failures' );
 		if ( $sync_failures ) {
