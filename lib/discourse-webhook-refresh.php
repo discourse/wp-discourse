@@ -85,7 +85,8 @@ class DiscourseWebhookRefresh {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$topic_id   = $post_data['topic_id'];
-				$blog_id = $wpdb->get_var( $wpdb->prepare( "SELECT blog_id FROM {$table_name} WHERE topic_id = %d", $topic_id ) );
+				$query = "SELECT blog_id FROM $table_name WHERE topic_id = %d";
+				$blog_id = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
@@ -110,11 +111,10 @@ class DiscourseWebhookRefresh {
 	public function maybe_create_db() {
 		global $wpdb;
 		if ( is_multisite() ) {
-			$webhook_enabled             = ( 1 === intval( get_site_option( 'wpdc_site_use_discourse_webhook' ) ) );
 			$use_multisite_configuration = ( 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) ) );
 			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
 
-			if ( $use_multisite_configuration && $webhook_enabled && $create_or_update_db ) {
+			if ( $use_multisite_configuration && $create_or_update_db ) {
 				$table_name      = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$charset_collate = $wpdb->get_charset_collate();
 
