@@ -169,6 +169,7 @@ class DiscourseComment {
 
 						update_post_meta( $postid, 'discourse_comments_count', $posts_count );
 						update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+						update_post_meta( $postid, 'discourse_last_sync', $time );
 					}
 				}
 
