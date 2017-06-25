@@ -179,7 +179,6 @@ class DiscoursePublish {
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
-				'wp-id'            => $post_id,
 				'embed_url'        => get_permalink( $post_id ),
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
