@@ -145,11 +145,17 @@ class Utilities {
 		return $categories;
 	}
 
+	/**
+	 * Tries to find a WordPress post that's associated with a Discourse topic_id.
+	 *
+	 * @param int $topic_id The topic_id to lookup.
+	 *
+	 * @return null|string
+	 */
 	public static function get_post_id_by_topic_id( $topic_id ) {
 		global $wpdb;
-		$query = $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id );
 
-		$post_id = $wpdb->get_var( $query );
+		$post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
 
 		return $post_id;
 	}

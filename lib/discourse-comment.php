@@ -126,7 +126,7 @@ class DiscourseComment {
 			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
 			$sync_post = $last_sync + $sync_period < $time;
 		} else {
-			$sync_post = 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) );
+			$sync_post = ( 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) ) );
 		}
 
 		if ( $debug || $sync_post ) {
@@ -167,8 +167,7 @@ class DiscourseComment {
 							$posts_count = 0;
 						}
 
-						// Todo: comment this out for now for testing.
-//							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
+						update_post_meta( $postid, 'discourse_comments_count', $posts_count );
 						update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
 					}
 				}

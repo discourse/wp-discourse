@@ -34,7 +34,7 @@ class DiscoursePublish {
 	/**
 	 * DiscoursePublish constructor.
 	 *
-	 * @param \WPDiscourse\EmailNotification\EmailNotification  An object for sending an email verification notice.
+	 * @param object $email_notifier  An object for sending an email verification notice.
 	 */
 	public function __construct( $email_notifier ) {
 		$this->email_notifier = $email_notifier;
@@ -54,7 +54,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int $post_id The id of the post that has been saved.
+	 * @param int    $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -114,7 +114,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -133,7 +133,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -259,7 +259,6 @@ class DiscoursePublish {
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
-			// The response when a topic is updated.
 		} elseif ( property_exists( $body, 'post' ) ) {
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
@@ -285,9 +284,9 @@ class DiscoursePublish {
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
-		}
+		}// End if().
 
-		//  Neither the 'id' or the 'post' property existed on the response body.
+		// Neither the 'id' or the 'post' property existed on the response body.
 		$this->create_bad_response_notifications( $current_post, $post_id );
 
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
@@ -309,7 +308,7 @@ class DiscoursePublish {
 	/**
 	 * Checks if a post_type can be synced.
 	 *
-	 * @param null $post_id The ID of the post in question.
+	 * @param null| $post_id The ID of the post in question.
 	 *
 	 * @return bool
 	 */
@@ -367,7 +366,7 @@ class DiscoursePublish {
 			),
 			array(
 				'%d',
-				'%d'
+				'%d',
 			)
 		);
 	}
@@ -384,8 +383,8 @@ class DiscoursePublish {
 	protected function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$query      = $wpdb->prepare( "SELECT * FROM $table_name WHERE topic_id = %d", $topic_id );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %s WHERE topic_id = %d', $table_name, $topic_id ) );
 
-		return $wpdb->get_row( $query ) ? true : false;
+		return $row ? true : false;
 	}
 }

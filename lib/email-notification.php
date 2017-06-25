@@ -1,23 +1,47 @@
 <?php
+/**
+ * Sends email notifications.
+ *
+ * @package WPDiscourse\EmailNotification
+ */
 
 namespace WPDiscourse\EmailNotification;
 
 use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
+/**
+ * Class EmailNotification
+ */
 class EmailNotification {
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var array|void
+	 */
 	protected $options;
 
+	/**
+	 * EmailNotification constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'wpdc_topic_sync_failure_notification', array( $this, 'send_topic_sync_notification' ) );
 	}
 
+	/**
+	 * Setup the plugin options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 	}
 
-	// Todo: indicate that notifications may be being sent for posts that have not been published through wordpress.
+	/**
+	 * Sends a notification email that lists Discourse topics that have failed to sync with posts.
+	 *
+	 * The notification is only sent when the use-discourse-webhook and webhook-sync-notification options are enabled.
+	 */
 	public function send_topic_sync_notification() {
 		$sync_failures = get_option( 'wpdc_webhook_sync_failures' );
 		if ( $sync_failures ) {
@@ -26,30 +50,35 @@ class EmailNotification {
 			$support_url  = 'https://meta.discourse.org/c/support/wordpress';
 			$num_failures = count( $sync_failures );
 			if ( 1 === $num_failures ) {
+				// translators: Topic sync notification singular heading. Placeholder: blogname.
 				$message = sprintf(
-					           __( 'The following Discourse topic has failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
-				           ) . "\r\n\r\n";
+					__( 'The following Discourse topic has failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
+				) . "\r\n\r\n";
 			} else {
+				// translators: Topic sync notification plural heading. Placeholder: blogname.
 				$message = sprintf(
-					           __( 'The following Discourse topics have failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
-				           ) . "\r\n\r\n";;
+					__( 'The following Discourse topics have failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
+				) . "\r\n\r\n";
+				;
 			}
 
 			foreach ( $sync_failures as $topic ) {
 				$title    = ! empty( $topic['title'] ) ? $topic['title'] : '';
 				$topic_id = ! empty( $topic['topic_id'] ) ? $topic['topic_id'] : '';
 				$time     = ! empty( $topic['time'] ) ? $topic['time'] : '';
+				// translators: Topic sync notification skipped topic. Placeholder: title, topic_id, time of update.
 				$message  .= sprintf(
-					             __( '%1$s (topic_id %2$s) updated on Discourse at %3$s', 'wp-discourse' ), $title, $topic_id, $time
-				             ) . "\r\n";;
+					__( '%1$s (topic_id %2$s) updated on Discourse at %3$s', 'wp-discourse' ), $title, $topic_id, $time
+				) . "\r\n";
+				;
 			}
 
 			$message .= "\r\n";
 			if ( 1 === $num_failures ) {
-				$message .= __( 'To fix this problem, find the associated post on your WordPress site and either republish' ) . "\r\n";
+				$message .= __( 'If there is a post associated with this topic on your WordPress site either republish' ) . "\r\n";
 				$message .= __( 'it to Discourse, or manually add its topic_id as post metadata with the key \'discourse_topic_id.\'' ) . "\r\n\r\n";
 			} else {
-				$message .= __( 'To fix these problems, find the associated posts on your WordPress site and either republish' ) . "\r\n";
+				$message .= __( 'If there are posts associated with these topics on your WordPress site either republish' ) . "\r\n";
 				$message .= __( 'them to Discourse, or manually add their topic_ids as post metadata with the key \'discourse_topic_id\'.' ) . "\r\n\r\n";
 			}
 
@@ -63,8 +92,9 @@ class EmailNotification {
 			// The message has been created. Delete the option.
 			delete_option( 'wpdc_webhook_sync_failures' );
 
+			// translators: Topic sync notification emal. Placeholder: blogname.
 			wp_mail( $email, sprintf( __( '[%s] Discourse Webhook Sync Failure' ), $blogname ), $message );
-		}
+		}// End if().
 	}
 
 	/**

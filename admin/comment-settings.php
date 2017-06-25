@@ -111,12 +111,6 @@ class CommentSettings {
 		__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' ) );
 	}
 
-	// Todo: change the min value to 10!!!
-	public function comment_sync_period_input() {
-		$this->form_helper->input( 'comment-sync-period', 'discourse_comment', __( 'Sets how often you would like to sync
-	    comment data between WordPress and your forum. (Defaults to 10 minutes if the field is left empty.)', 'wp-discourse'), 'number', 0 );
-	}
-
 	/**
 	 * Outputs markup for the show-existing-comments checkbox.
 	 */

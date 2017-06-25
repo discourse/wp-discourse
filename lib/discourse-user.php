@@ -14,13 +14,25 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 class DiscourseUser {
 
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $options;
 
+	/**
+	 * DiscourseUser constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ) );
 	}
 
+	/**
+	 * Setup the plugin options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 	}
@@ -33,7 +45,7 @@ class DiscourseUser {
 	 * @return mixed
 	 */
 	public function extend_user_profile( $fields ) {
-		if ( ! empty( $this->options['hide-discourse-name-field'] ) || ! empty( $this->options['username-as-discourse-name'])) {
+		if ( ! empty( $this->options['hide-discourse-name-field'] ) || ! empty( $this->options['username-as-discourse-name'] ) ) {
 
 			return $fields;
 		} else {
