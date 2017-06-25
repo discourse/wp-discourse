@@ -288,7 +288,7 @@ class SettingsValidator {
 	public function validate_webhook_secret( $input ) {
 		$secret = $this->validate_text_input( $input );
 		if ( $this->use_discourse_webhook && iconv_strlen( $secret ) < 12 ) {
-			add_settings_error( 'discourse', 'webhook_secret', __( 'The webhook secret key needs to be at least 12 characters long', 'wp-discourse' ) );
+			add_settings_error( 'discourse', 'webhook_secret', __( 'To use a Discourse webhook, the secret must be set to a value at least 12 characters long.', 'wp-discourse' ) );
 		}
 
 		return $secret;

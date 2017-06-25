@@ -125,9 +125,11 @@ class DiscourseWebhookRefresh {
 	             ) $charset_collate;";
 
 				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-				dbDelta( $sql );
+				$result = dbDelta( $sql );
 
-				update_site_option( 'wpdc_topic_blog_db_version', $this->db_version );
+				if ( ! empty( $result[ $table_name ] ) ) {
+					update_site_option( 'wpdc_topic_blog_db_version', $this->db_version );
+				}
 			}
 		}
 	}
