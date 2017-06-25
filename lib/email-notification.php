@@ -50,13 +50,13 @@ class EmailNotification {
 			$support_url  = 'https://meta.discourse.org/c/support/wordpress';
 			$num_failures = count( $sync_failures );
 			if ( 1 === $num_failures ) {
-				// translators: Topic sync notification singular heading. Placeholder: blogname.
 				$message = sprintf(
+				// translators: Topic sync notification singular heading. Placeholder: blogname.
 					__( 'The following Discourse topic has failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
 				) . "\r\n\r\n";
 			} else {
-				// translators: Topic sync notification plural heading. Placeholder: blogname.
 				$message = sprintf(
+				// translators: Topic sync notification plural heading. Placeholder: blogname.
 					__( 'The following Discourse topics have failed to be synced with your blog %1$s.', 'wp-discourse' ), $blogname
 				) . "\r\n\r\n";
 				;
@@ -66,8 +66,8 @@ class EmailNotification {
 				$title    = ! empty( $topic['title'] ) ? $topic['title'] : '';
 				$topic_id = ! empty( $topic['topic_id'] ) ? $topic['topic_id'] : '';
 				$time     = ! empty( $topic['time'] ) ? $topic['time'] : '';
-				// translators: Topic sync notification skipped topic. Placeholder: title, topic_id, time of update.
 				$message  .= sprintf(
+				// translators: Topic sync notification skipped topic. Placeholder: title, topic_id, time of update.
 					__( '%1$s (topic_id %2$s) updated on Discourse at %3$s', 'wp-discourse' ), $title, $topic_id, $time
 				) . "\r\n";
 				;

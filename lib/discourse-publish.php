@@ -296,7 +296,7 @@ class DiscoursePublish {
 	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
 	 *
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
-	 * @param $post_id
+	 * @param int $post_id The current post id.
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );

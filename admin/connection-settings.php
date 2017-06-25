@@ -148,8 +148,8 @@ class ConnectionSettings {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
 
-		// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 		$description = sprintf(
+			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__( 'A Discourse webhook can be used to improve the efficiency of syncing comments between WordPress and your Discourse forum.
  To use this setting create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
  URL <code>%2$s</code>.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
@@ -170,8 +170,8 @@ class ConnectionSettings {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
 
-		// translators: Webhook secred input. Placeholder: discourse_webhooks_url.
 		$description = sprintf(
+			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
 			__( 'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
 		);
@@ -183,7 +183,7 @@ class ConnectionSettings {
 	 * Outputs markup for webhook-sync-notification checkbox.
 	 */
 	public function webhook_sync_notification_checkbox() {
-	    $this->form_helper->checkbox_input( 'webhook-sync-notification', 'discourse_connect', __( 'Send email notification to
+		$this->form_helper->checkbox_input( 'webhook-sync-notification', 'discourse_connect', __( 'Send email notification to
 	    site administrator if webhook sync fails.', 'wp-discourse' ), __( "For posts that have been published to Discourse before
 	    WP Discourse version 1.4.0, posts are being matched with Discourse topics through their title. If a match can't be
 	    made between any topics and posts, a notification email will be sent to the site's administrator (no more often than

@@ -240,8 +240,8 @@ class PublishSettings {
 	        $discourse_setting_link = 'http://forum.example.com/admin/site_settings/category/all_results?filter=min_username_length';
 		}
 
-		// translators: min_username_length description. Placeholder: discourse_settings_link.
 		$description = sprintf(
+		// translators: min_username_length description. Placeholder: discourse_settings_link.
 			__( 'To use the WordPress username as the Discourse publishing name, the username must meet the Discourse \'min username length\'
                 requirement. That setting can be found on your forum at: %1$s. If you leave this setting field empty, it will default to 3.', 'wp-discourse' ), $discourse_setting_link
 		);
