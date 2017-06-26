@@ -104,7 +104,7 @@ class DiscoursePublish {
 			$title = $this->sanitize_title( $post->post_title );
 			// Todo: if the title is empty, don't publish it to Discourse.
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
-		} elseif( $post_is_published && ! empty ( $this->options['auto-publish'] ) ) {
+		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
 			$this->email_notifier->publish_failure_notification( $post, array(
 				'location' => 'after_xmlrpc_publish',
 			) );
