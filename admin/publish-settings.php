@@ -107,16 +107,6 @@ class PublishSettings {
 			'hide_discourse_name_field_checkbox',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
-		add_settings_field( 'discourse_username_as_discourse_name', __( 'Set Discourse Name to WordPress Username', 'wp-discourse' ), array(
-			$this,
-			'username_as_discourse_name_checkbox',
-		), 'discourse_publish', 'discourse_publishing_settings_section' );
-
-		add_settings_field( 'discourse_min_username_length', __( 'Discourse Minimum Username Length', 'wp-discourse' ), array(
-			$this,
-			'discourse_min_username_length',
-		), 'discourse_publish', 'discourse_publishing_settings_section' );
-
 		register_setting( 'discourse_publish', 'discourse_publish', array(
 			$this->form_helper,
 			'validate_options',
@@ -218,35 +208,6 @@ class PublishSettings {
 		$this->form_helper->checkbox_input( 'hide-discourse-name-field', 'discourse_publish', __( 'Removes the Discourse Name field
 	    from the WordPress user profile page.', 'wp-discourse' ), __( "Unless the 'Set Discourse Name to WordPress Username' setting is enabled,
 	    this will cause all posts published to Discourse to be published by the 'Publishing Username.'", 'wp-discourse' ) );
-	}
-
-	/**
-	 * Outputs markup for username-as-discourse-name checkbox.
-	 */
-	public function username_as_discourse_name_checkbox() {
-		$this->form_helper->checkbox_input( 'username-as-discourse-name', 'discourse_publish', __( "Automatically set user's Discourse Name
-	    to their WordPress username.", 'wp-discourse' ), __( 'Enabling this setting will remove the Discourse Name field
-        from the WordPress user profile page and cause all posts published to Discourse to be published by the WordPress username.', 'wp-discourse' ) );
-	}
-
-	/**
-	 * Outputs markup for min-username-length checkbox.
-	 */
-	public function discourse_min_username_length() {
-	    if ( ! empty( $this->options['url'] ) ) {
-	        $discourse_setting_link = '<a href="' . esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length' ) . '" target="_blank">' .
-			esc_url( $this->options['url'] . '/admin/site_settings/category/all_results?filter=min_username_length' ) . '</a>';
-		} else {
-	        $discourse_setting_link = 'http://forum.example.com/admin/site_settings/category/all_results?filter=min_username_length';
-		}
-
-		$description = sprintf(
-		// translators: min_username_length description. Placeholder: discourse_settings_link.
-			__( 'To use the WordPress username as the Discourse publishing name, the username must meet the Discourse \'min username length\'
-                requirement. That setting can be found on your forum at: %1$s. If you leave this setting field empty, it will default to 3.', 'wp-discourse' ), $discourse_setting_link
-		);
-
-	    $this->form_helper->input( 'discourse-min-username-length', 'discourse_publish', $description, 'number', 0 );
 	}
 
 	/**

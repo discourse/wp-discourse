@@ -46,8 +46,6 @@ class Discourse {
 		'auto-track'              => 1,
 		'allowed_post_types'      => array( 'post' ),
 		'hide-discourse-name-field' => 0,
-		'username-as-discourse-name' => 0,
-		'discourse-min-username-length' => 3,
 	);
 
 	/**
