@@ -24,7 +24,6 @@ foreach ( $discourse_options as $option ) {
 delete_option( 'wpdc_discourse_categories' );
 
 // Todo: loop through blogs to delete options for each.
-
 delete_site_option( 'wpdc_site_url' );
 delete_site_option( 'wpdc_site_api_key' );
 delete_site_option( 'wpdc_site_publish_username' );
