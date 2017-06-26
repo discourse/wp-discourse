@@ -77,6 +77,11 @@ class PublishSettings {
 			'custom_excerpt_length',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
+		add_settings_field( 'discourse_add_featured_link', __( 'Add Featured Links', 'wp-discourse' ), array(
+            $this,
+            'add_featured_link_checkbox',
+        ), 'discourse_publish', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
 			$this,
 			'auto_publish_checkbox',
@@ -91,6 +96,7 @@ class PublishSettings {
 			$this,
 			'publish_failure_email_address',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
+
 
 		add_settings_field( 'discourse_auto_track', __( 'Auto Track Published Topics', 'wp-discourse' ), array(
 			$this,
@@ -169,6 +175,14 @@ class PublishSettings {
         metabox, that excerpt will be given priority over the length set here.', 'wp-discourse' );
 		$this->form_helper->input( 'custom-excerpt-length', 'discourse_publish', $description, 'number', 0 );
 	}
+
+	/**
+	 * Outputs markup for add-featired-link input.
+	 */
+	public function add_featured_link_checkbox() {
+	    $this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Add a link to the WordPress post
+	    to the Discourse topic list.', 'wp-discourse' ) );
+    }
 
 	/**
 	 * Outputs markup for the auto-publish checkbox.

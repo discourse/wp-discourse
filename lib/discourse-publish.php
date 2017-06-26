@@ -144,6 +144,8 @@ class DiscoursePublish {
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration'] );
+		$add_featured_link           = ! empty( $options['add-featured-link' ] );
+		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
@@ -160,7 +162,7 @@ class DiscoursePublish {
 		// Trim to keep the Discourse markdown parser from treating this as code.
 		$baked    = trim( Templates::publish_format_html() );
 		$baked    = str_replace( '{excerpt}', $excerpt, $baked );
-		$baked    = str_replace( '{blogurl}', get_permalink( $post_id ), $baked );
+		$baked    = str_replace( '{blogurl}', $permalink, $baked );
 		$author   = get_the_author_meta( 'display_name', $author_id );
 		$baked    = str_replace( '{author}', $author, $baked );
 		$thumb    = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
@@ -182,7 +184,8 @@ class DiscoursePublish {
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
-				'embed_url'        => get_permalink( $post_id ),
+				'embed_url'        => $permalink,
+				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
 				'title'            => $title,

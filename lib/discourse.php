@@ -40,6 +40,7 @@ class Discourse {
 		'publish-category-update' => 0,
 		'full-post-content'       => 0,
 		'custom-excerpt-length'   => 55,
+		'add-featured-link'       => 0,
 		'auto-publish'            => 0,
 		'publish-failure-notice'  => 0,
 		'publish-failure-email'   => '',
