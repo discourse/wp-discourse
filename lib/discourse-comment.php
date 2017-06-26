@@ -118,11 +118,11 @@ class DiscourseComment {
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] ) && 1 === intval( $discourse_options['use-discourse-webhook'] );
 		$debug                 = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
+		$time                  = date_create()->format( 'U' );
 
 		if ( ! $use_discourse_webhook ) {
 			// Every 10 minutes do a json call to sync comment count and top comments.
 			$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
-			$time        = date_create()->format( 'U' );
 			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
 			$sync_post   = $last_sync + $sync_period < $time;
 		} else {
@@ -134,7 +134,7 @@ class DiscourseComment {
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
-				// Check post_status so comments numbers aren't synced for drafts on admin/edit.php.
+				// Check post_status so comments numbers aren't synced on admin/edit.php.
 				if ( 'publish' === get_post_status( $postid ) ) {
 
 					$comment_count            = intval( $discourse_options['max-comments'] );
@@ -237,8 +237,8 @@ class DiscourseComment {
 			$single_page = is_single( $post_id ) || is_page( $post_id );
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
 
-			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
 			if ( empty( $this->options['use-discourse-webhook'] ) ) {
+			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
 				if ( $single_page ) {
 					$this->sync_comments( $post_id );
 				} else {
