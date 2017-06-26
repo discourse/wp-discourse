@@ -143,7 +143,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_custom_datetime_format', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_only_show_moderator_liked', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_display_subcategories', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_debug_mode', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_discourse_link_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_start_discussion_text', array( $this, 'validate_text_input' ) );

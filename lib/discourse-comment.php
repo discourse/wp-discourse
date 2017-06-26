@@ -117,7 +117,6 @@ class DiscourseComment {
 		global $wpdb;
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] ) && 1 === intval( $discourse_options['use-discourse-webhook'] );
-		$debug                 = isset( $discourse_options['debug-mode'] ) && 1 === intval( $discourse_options['debug-mode'] );
 		$time                  = date_create()->format( 'U' );
 
 		if ( ! $use_discourse_webhook ) {
@@ -129,7 +128,7 @@ class DiscourseComment {
 			$sync_post = ( 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) ) );
 		}
 
-		if ( $debug || $sync_post ) {
+		if ( $sync_post ) {
 			// Avoids a double sync.
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
