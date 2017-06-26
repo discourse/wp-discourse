@@ -104,7 +104,7 @@ class DiscoursePublish {
 			$title = $this->sanitize_title( $post->post_title );
 			// Todo: if the title is empty, don't publish it to Discourse.
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
-		} elseif ( $post_is_published && isset( $this->options['auto-publish'] ) && 1 === intval( $this->options['auto-publish'] ) ) {
+		} elseif( $post_is_published && ! empty ( $this->options['auto-publish'] ) ) {
 			$this->email_notifier->publish_failure_notification( $post, array(
 				'location' => 'after_xmlrpc_publish',
 			) );
@@ -145,7 +145,6 @@ class DiscoursePublish {
 		$current_post                = get_post( $post_id );
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
-		$discourse_username_length   = ! empty( $options['discourse-min-username-length'] ) ? $options['discourse-min-username-length'] : 3;
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration'] );
 
 		if ( $use_full_post ) {

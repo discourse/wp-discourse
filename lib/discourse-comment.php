@@ -73,6 +73,7 @@ class DiscourseComment {
 	 * Hooks into 'wp_enqueue_scripts'.
 	 */
 	function discourse_comments_js() {
+		// Is the query for an existing single post of any of the allowed_post_types?
 		if ( isset( $this->options['allowed_post_types'] ) && is_singular( $this->options['allowed_post_types'] ) ) {
 			if ( $this->use_discourse_comments( get_the_ID() ) ) {
 				wp_enqueue_script(
@@ -116,7 +117,7 @@ class DiscourseComment {
 	function sync_comments( $postid ) {
 		global $wpdb;
 		$discourse_options     = $this->options;
-		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] ) && 1 === intval( $discourse_options['use-discourse-webhook'] );
+		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );
 
 		if ( ! $use_discourse_webhook ) {
@@ -175,7 +176,6 @@ class DiscourseComment {
 						}
 					}
 
-					// Todo: updating these here for now, but should be removing the 'publish_to_discourse' metadata if there's a 404 response.
 					update_post_meta( $postid, 'discourse_last_sync', $time );
 					update_post_meta( $postid, 'wpdc_sync_post_comments', 0 );
 				}// End if().
@@ -203,7 +203,7 @@ class DiscourseComment {
 			// Use $post->comment_count because get_comments_number will return the Discourse comments
 			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
-			if ( ! isset( $options['show-existing-comments'] ) || 0 === intval( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+			if ( empty( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
 				return WPDISCOURSE_PATH . 'templates/comments.php';
 			} else {
@@ -254,7 +254,7 @@ class DiscourseComment {
 			$count = intval( get_post_meta( $post_id, 'discourse_comments_count', true ) );
 
 			// If WordPress comments are also being used, add them to the comment count.
-			if ( isset( $this->options['show-existing-comments'] ) && 1 === intval( $this->options['show-existing-comments'] ) ) {
+			if ( ! empty( $this->options['show-existing-comments'] ) ) {
 				$current_post     = get_post( $post_id );
 				$wp_comment_count = $current_post->comment_count;
 				$count            = $count + $wp_comment_count;

@@ -54,16 +54,23 @@ class Utilities {
 	/**
 	 * Checks the connection status to Discourse.
 	 *
-	 * @return int
+	 * @return int|\WP_Error
 	 */
 	public static function check_connection_status() {
-		// Todo: don't run the function before the options have been set. Don't use array_key_exists.
-		$options = self::get_options();
-		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
-		$url     = add_query_arg( array(
-			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
-			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : '',
-		), $url . '/users/' . $options['publish-username'] . '.json' );
+		$options      = self::get_options();
+		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
+
+		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
+
+			return 0;
+		}
+
+		$url = add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		), $url . '/users/' . $api_username . '.json' );
 
 		$url      = esc_url_raw( $url );
 		$response = wp_remote_get( $url );
@@ -107,9 +114,7 @@ class Utilities {
 
 		$categories = get_option( 'wpdc_discourse_categories' );
 
-		if ( isset( $options['publish-category-update'] ) && 1 === intval( $options['publish-category-update'] ) ||
-		     ! $categories
-		) {
+		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
 			$force_update = true;
 		}
 
@@ -128,7 +133,7 @@ class Utilities {
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
 				$categories = $remote['categories'];
-				if ( ! isset( $options['display-subcategories'] ) || 0 === intval( $options['display-subcategories'] ) ) {
+				if ( empty( $options['display-subcategories'] ) ) {
 					foreach ( $categories as $category => $values ) {
 						if ( array_key_exists( 'parent_category_id', $values ) ) {
 							unset( $categories[ $category ] );
@@ -137,6 +142,7 @@ class Utilities {
 				}
 				update_option( 'wpdc_discourse_categories', $categories );
 			} else {
+
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
 			}
 		}

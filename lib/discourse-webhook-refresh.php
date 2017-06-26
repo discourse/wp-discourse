@@ -79,7 +79,7 @@ class DiscourseWebhookRefresh {
 
 		if ( ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
-			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration'] ) && 1 === intval( $this->options['multisite-configuration'] );
+			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration'] );
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
@@ -147,35 +147,38 @@ class DiscourseWebhookRefresh {
 	 * @param array $post_data The post_data from the Discourse webhook request.
 	 */
 	protected function update_post_metadata( $post_data ) {
-		$topic_id    = $post_data['topic_id'];
-		$post_number = $post_data['post_number'];
-		$post_title  = $post_data['topic_title'];
+		$topic_id    = ! empty( $post_data['topic_id'] ) ? $post_data['topic_id'] : null;
+		$post_number = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
+		$post_title  = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
 
-		$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-		if ( ! $post_id ) {
-			$this->get_post_id_by_title( $post_title, $topic_id );
-		}
-		if ( $post_id ) {
-			$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-			if ( $current_comment_count < $post_number - 1 ) {
-				update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
-				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+		if ( $topic_id && $post_number && $post_title ) {
+
+			$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
+			if ( ! $post_id ) {
+				$this->get_post_id_by_title( $post_title, $topic_id );
 			}
-		} elseif ( ! empty( $this->options['webhook-sync-notification'] ) ) {
-			add_option( 'wpdc_webhook_sync_failures', array() );
-			$failures                    = get_option( 'wpdc_webhook_sync_failures' );
-			$failure_message             = array();
-			$failure_message['title']    = $post_title;
-			$failure_message['topic_id'] = $topic_id;
-			$failure_message['time']     = date( 'l F jS h:i A' );
-			$failures[] = $failure_message;
+			if ( $post_id ) {
+				$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+				if ( $current_comment_count < $post_number - 1 ) {
+					update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+				}
+			} elseif ( ! empty( $this->options['webhook-sync-notification'] ) ) {
+				add_option( 'wpdc_webhook_sync_failures', array() );
+				$failures                    = get_option( 'wpdc_webhook_sync_failures' );
+				$failure_message             = array();
+				$failure_message['title']    = $post_title;
+				$failure_message['topic_id'] = $topic_id;
+				$failure_message['time']     = date( 'l F jS h:i A' );
+				$failures[]                  = $failure_message;
 
-			// Used to create the content for the sync_failure notification - deleted after the notification is sent.
-			update_option( 'wpdc_webhook_sync_failures', $failures );
+				// Used to create the content for the sync_failure notification - deleted after the notification is sent.
+				update_option( 'wpdc_webhook_sync_failures', $failures );
 
-			if ( ! wp_next_scheduled( 'wpdc_topic_sync_failure_notification' ) ) {
-				$sync_period = apply_filters( 'wpdc_topic_sync_failure_notification_period', 4 * HOUR_IN_SECONDS );
-				wp_schedule_single_event( time() + $sync_period, 'wpdc_topic_sync_failure_notification' );
+				if ( ! wp_next_scheduled( 'wpdc_topic_sync_failure_notification' ) ) {
+					$sync_period = apply_filters( 'wpdc_topic_sync_failure_notification_period', 4 * HOUR_IN_SECONDS );
+					wp_schedule_single_event( time() + $sync_period, 'wpdc_topic_sync_failure_notification' );
+				}
 			}
 		}
 	}
@@ -226,6 +229,7 @@ class DiscourseWebhookRefresh {
 			$secret = ! empty( $this->options['webhook-secret'] ) ? $this->options['webhook-secret'] : '';
 
 			if ( ! $secret ) {
+
 				return new \WP_Error( 'discourse_webhook_configuration_error', 'The webhook secret key has not been set.' );
 			}
 
