@@ -47,7 +47,7 @@ class DiscourseComment {
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
 	 * stripping out that attribute.
 	 *
-	 * @param array $allowedposttags The array of allowed post tags.
+	 * @param array  $allowedposttags The array of allowed post tags.
 	 * @param string $context The current context ('post', 'data', etc.).
 	 *
 	 * @return mixed
@@ -160,7 +160,7 @@ class DiscourseComment {
 
 					$result = wp_remote_get( $permalink );
 
-					// Todo: if there is a 404 response, delete the
+					// Todo: if there is a 404 response, delete the post's Discourse metadata.
 					if ( DiscourseUtilities::validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
