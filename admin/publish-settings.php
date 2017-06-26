@@ -206,8 +206,8 @@ class PublishSettings {
 	 */
 	public function hide_discourse_name_field_checkbox() {
 		$this->form_helper->checkbox_input( 'hide-discourse-name-field', 'discourse_publish', __( 'Removes the Discourse Name field
-	    from the WordPress user profile page.', 'wp-discourse' ), __( "Unless the 'Set Discourse Name to WordPress Username' setting is enabled,
-	    this will cause all posts published to Discourse to be published by the 'Publishing Username.'", 'wp-discourse' ) );
+	    from the WordPress user profile page.', 'wp-discourse' ), __( "Enabling this setting will cause all posts published
+	    to Discourse to be published by the 'Publishing Username.'", 'wp-discourse' ) );
 	}
 
 	/**
