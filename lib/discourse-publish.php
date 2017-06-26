@@ -34,7 +34,7 @@ class DiscoursePublish {
 	/**
 	 * DiscoursePublish constructor.
 	 *
-	 * @param object $email_notifier  An object for sending an email verification notice.
+	 * @param object $email_notifier An object for sending an email verification notice.
 	 */
 	public function __construct( $email_notifier ) {
 		$this->email_notifier = $email_notifier;
@@ -54,7 +54,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
+	 * @param int $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -66,10 +66,9 @@ class DiscoursePublish {
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+		$title                = $this->sanitize_title( $post->post_title );
 
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
-			$title = $this->sanitize_title( $post->post_title );
-			// Todo: if the title is empty, don't publish it to Discourse.
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 
 		} elseif ( $post_is_published && $this->is_valid_sync_post_type( $post_id ) && isset( $this->options['auto-publish'] ) &&
@@ -98,11 +97,10 @@ class DiscoursePublish {
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
+		$title                = $this->sanitize_title( $post->post_title );
 
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) ) {
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
-			$title = $this->sanitize_title( $post->post_title );
-			// Todo: if the title is empty, don't publish it to Discourse.
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
 			$this->email_notifier->publish_failure_notification( $post, array(
@@ -114,7 +112,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_do_discourse_work` after getting the lock.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -133,7 +131,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -291,7 +289,7 @@ class DiscoursePublish {
 	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
 	 *
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
-	 * @param int      $post_id The current post id.
+	 * @param int $post_id The current post id.
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
@@ -378,8 +376,8 @@ class DiscoursePublish {
 	protected function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
 		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$query = "SELECT * FROM $table_name WHERE topic_id = %d";
-		$row = $wpdb->get_row( $wpdb->prepare( $query, $topic_id ) );
+		$query      = "SELECT * FROM $table_name WHERE topic_id = %d";
+		$row        = $wpdb->get_row( $wpdb->prepare( $query, $topic_id ) );
 
 		return $row ? true : false;
 	}
