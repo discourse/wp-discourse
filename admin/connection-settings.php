@@ -185,9 +185,9 @@ class ConnectionSettings {
 	public function webhook_sync_notification_checkbox() {
 		$this->form_helper->checkbox_input( 'webhook-sync-notification', 'discourse_connect', __( 'Send email notification to
 	    site administrator if webhook sync fails.', 'wp-discourse' ), __( "For posts that have been published to Discourse before
-	    WP Discourse version 1.4.0, posts are being matched with Discourse topics through their title. If a match can't be
+	    WP Discourse version 1.4.0, when Use Discourse Webhook is enabled, posts are being matched with Discourse topics through their title. If a match can't be
 	    made between any topics and posts, a notification email will be sent to the site's administrator (no more often than
-	    once every 12 hours.)", 'wp-discourse' ) );
+	    once every 4 hours.)", 'wp-discourse' ) );
 	}
 
 	/**
@@ -196,7 +196,9 @@ class ConnectionSettings {
 	public function multisite_configuration_checkbox() {
 		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
 	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum
-	    is connected to a network of WordPress sites. Enabling it will remove the following settings from your network's subsites:", 'wp-discourse' ) );
+	    is connected to a network of WordPress sites. Enabling it will  allow some of the plugin's settings to function for
+	    the entire network and remove them from the options tabs of the network's subsites. It will remove all of the settings
+	    found on the Connection options tab, as well as the SSO Secret Key, Enable SSO Provider, and Enable SSO Client settings. ", 'wp-discourse' ) );
 	}
 
 	/**
