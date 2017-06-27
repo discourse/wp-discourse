@@ -85,8 +85,8 @@ class DiscourseWebhookRefresh {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$topic_id   = $post_data['topic_id'];
-				$query = "SELECT blog_id FROM $table_name WHERE topic_id = %d";
-				$blog_id = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
+				$query      = "SELECT blog_id FROM $table_name WHERE topic_id = %d";
+				$blog_id    = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
@@ -154,7 +154,7 @@ class DiscourseWebhookRefresh {
 		if ( $topic_id && $post_number && $post_title ) {
 
 			$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-			if ( ! $post_id ) {
+			if ( ! $post_id && ! empty( $this->options['wehook-match-old-topics'] ) ) {
 				$this->get_post_id_by_title( $post_title, $topic_id );
 			}
 			if ( $post_id ) {
@@ -162,22 +162,6 @@ class DiscourseWebhookRefresh {
 				if ( $current_comment_count < $post_number - 1 ) {
 					update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
 					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
-				}
-			} elseif ( ! empty( $this->options['webhook-sync-notification'] ) ) {
-				add_option( 'wpdc_webhook_sync_failures', array() );
-				$failures                    = get_option( 'wpdc_webhook_sync_failures' );
-				$failure_message             = array();
-				$failure_message['title']    = $post_title;
-				$failure_message['topic_id'] = $topic_id;
-				$failure_message['time']     = date( 'l F jS h:i A' );
-				$failures[]                  = $failure_message;
-
-				// Used to create the content for the sync_failure notification - deleted after the notification is sent.
-				update_option( 'wpdc_webhook_sync_failures', $failures );
-
-				if ( ! wp_next_scheduled( 'wpdc_topic_sync_failure_notification' ) ) {
-					$sync_period = apply_filters( 'wpdc_topic_sync_failure_notification_period', 4 * HOUR_IN_SECONDS );
-					wp_schedule_single_event( time() + $sync_period, 'wpdc_topic_sync_failure_notification' );
 				}
 			}
 		}
@@ -192,7 +176,7 @@ class DiscourseWebhookRefresh {
 	 * more than one post type.
 	 *
 	 * @param string $title The topic_title returned from Discourse.
-	 * @param int    $topic_id The topic_id returned from Discourse.
+	 * @param int $topic_id The topic_id returned from Discourse.
 	 *
 	 * @return int|null
 	 */

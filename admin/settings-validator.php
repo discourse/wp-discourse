@@ -81,14 +81,6 @@ class SettingsValidator {
 	protected $use_discourse_webhook;
 
 	/**
-	 * Used for setting the webhook_sync_notification site option when use_multisite_configuration is enabled.
-	 *
-	 * @access protected
-	 * @var int
-	 */
-	protected $webhook_sync_notification;
-
-	/**
 	 * Used for setting the use_multisite_configuration site option.
 	 *
 	 * @access protected
@@ -118,7 +110,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
-		add_filter( 'wpdc_validate_webhook_sync_notification', array( $this, 'validate_webhook_sync_notification' ) );
+		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
 		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_multisite_configuration' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
@@ -184,9 +176,9 @@ class SettingsValidator {
 		$this->options = DiscourseUtilities::get_options();
 
 		// Todo: the true :false ternary is redundant.
-		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
-		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
-		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
+		$this->sso_provider_enabled        = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
+		$this->sso_client_enabled          = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
+		$this->sso_secret_set              = ! empty( $this->options['sso-secret'] ) ? true : false;
 		$this->use_multisite_configuration = ! empty( $this->options['multisite-configuration'] ) && 1 === intval( $this->options['multisite-configuration'] ) ? 1 : 0;
 	}
 
@@ -289,17 +281,11 @@ class SettingsValidator {
 		return $secret;
 	}
 
-	/**
-	 * Validates the webhook_sync_notification input.
-	 *
-	 * @param int $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_webhook_sync_notification( $input ) {
-		$this->webhook_sync_notification = $this->validate_checkbox( $input );
+	public function validate_webhook_match_old_topics( $input ) {
+		$match_old_topics = $this->validate_checkbox( $input );
+		$this->maybe_update_site_option( 'webhook_match_old_topics', $match_old_topics );
 
-		return $this->webhook_sync_notification;
+		return $match_old_topics;
 	}
 
 	/**
@@ -319,7 +305,6 @@ class SettingsValidator {
 		$this->maybe_update_site_option( 'api_key', $this->api_key );
 		$this->maybe_update_site_option( 'publish_username', $this->publish_username );
 		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
-		$this->maybe_update_site_option( 'webhook_sync_notificatioin', $this->webhook_sync_notification );
 
 		return $this->use_multisite_configuration;
 	}
@@ -388,7 +373,7 @@ class SettingsValidator {
 	public function validate_max_comments( $input ) {
 		return $this->validate_int( $input, 'max_comments', 0, null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -401,7 +386,7 @@ class SettingsValidator {
 	public function validate_min_replies( $input ) {
 		return $this->validate_int( $input, 'min_replies', 0, null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -414,7 +399,7 @@ class SettingsValidator {
 	public function validate_min_score( $input ) {
 		return $this->validate_int( $input, 'min_score', 0, null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -427,7 +412,7 @@ class SettingsValidator {
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int( $input, 'min_trust_level', 0, 5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -440,7 +425,7 @@ class SettingsValidator {
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int( $input, 'bypass_trust_level', 0, null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
-		$this->use_discourse_comments );
+			$this->use_discourse_comments );
 	}
 
 	/**
@@ -454,7 +439,7 @@ class SettingsValidator {
 
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
-		true );
+			true );
 	}
 
 	/**
@@ -692,12 +677,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int    $input The input to be validated.
+	 * @param int $input The input to be validated.
 	 * @param string $option_id The option being validated.
-	 * @param null   $min The minimum allowed value.
-	 * @param null   $max The maximum allowed value.
+	 * @param null $min The minimum allowed value.
+	 * @param null $max The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool   $add_error Whether or not to add a setting error.
+	 * @param bool $add_error Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */
@@ -733,11 +718,11 @@ class SettingsValidator {
 	 *
 	 * Allows for site options to be set for some options in multisite setups.
 	 *
-	 * @param string     $option_name The name of the option key.
+	 * @param string $option_name The name of the option key.
 	 * @param int|string $value The value of the option.
 	 */
 	protected function maybe_update_site_option( $option_name, $value ) {
-		if ( is_main_site() &&  1 === $this->use_multisite_configuration ) {
+		if ( is_main_site() && 1 === $this->use_multisite_configuration ) {
 			$site_option_name = 'wpdc_site_' . $option_name;
 			update_site_option( $site_option_name, $value );
 		}

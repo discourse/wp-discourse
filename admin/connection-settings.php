@@ -87,10 +87,10 @@ class ConnectionSettings {
 				'webhook_secret_input',
 			), 'discourse_connect', 'discourse_connection_settings_section' );
 
-			add_settings_field( 'discourse_webhook_sync_notification', __( 'Send Email Notification if Webhook Sync Fails', 'wp-discourse' ), array(
-				$this,
-				'webhook_sync_notification_checkbox',
-			), 'discourse_connect', 'discourse_connection_settings_section' );
+			add_settings_field( 'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
+                $this,
+                'webhook_match_old_topics_checkbox',
+            ), 'discourse_connect', 'discourse_connection_settings_section' );
 
 			if ( is_multisite() && is_main_site() ) {
 				add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
@@ -179,16 +179,13 @@ class ConnectionSettings {
 		$this->form_helper->input( 'webhook-secret', 'discourse_connect', $description );
 	}
 
-	/**
-	 * Outputs markup for webhook-sync-notification checkbox.
-	 */
-	public function webhook_sync_notification_checkbox() {
-		$this->form_helper->checkbox_input( 'webhook-sync-notification', 'discourse_connect', __( 'Send email notification to
-	    site administrator if webhook sync fails.', 'wp-discourse' ), __( "For posts that have been published to Discourse before
-	    WP Discourse version 1.4.0, when Use Discourse Webhook is enabled, posts are being matched with Discourse topics through their title. If a match can't be
-	    made between any topics and posts, a notification email will be sent to the site's administrator (no more often than
-	    once every 4 hours.)", 'wp-discourse' ) );
-	}
+	public function webhook_match_old_topics_checkbox() {
+	    $this->form_helper->checkbox_input( 'webhook-match-old-topics', 'discourse_connect', __( 'Match WordPress posts
+	    published prior to WP Discourse version 1.4.0 with Discourse topics.', 'wp-discourse' ), __( "By default, posts
+	    are matched to Discourse topics through their discourse_topic_id metadata. That value is't available for posts
+	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
+	    'post' to Discourse topics through their titles.", 'wp-discourse' ) );
+    }
 
 	/**
 	 * Outputs markup for multisite-configuration-checkbox.
