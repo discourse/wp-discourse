@@ -266,7 +266,7 @@ class SettingsValidator {
 	public function validate_multisite_configuration( $input ) {
 		$this->use_multisite_configuration = $this->validate_checkbox( $input );
 
-		$this->maybe_update_site_option( 'multisite_configuration', $this->use_multisite_configuration );
+		update_site_option( 'wpdc_site_multisite_configuration', $this->use_multisite_configuration );
 		$this->maybe_update_site_option( 'url', $this->url );
 		$this->maybe_update_site_option( 'api_key', $this->api_key );
 		$this->maybe_update_site_option( 'publish_username', $this->publish_username );
