@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.4
 Tested up to: 4.8
-Stable tag: 1.3.85
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -128,9 +128,14 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
 
-**Note:** Have you made changes to the HTML templates? The template changes are no longer handled from the plugin
-admin, They must be customized with filters. see the [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
-section of the [wiki](s://github.com/discourse/wp-discourse/wiki) for details.
+#### 1.4.0 27/06/2017
+
+- Add Discourse webhook endpoint for syncing Discourse topics with WordPress posts
+- Add a multisite configuration option for use when a single Discourse forum is connected to a network of WordPress sites
+- Add an option to create a featured_link on Discourse for posts that are published through the plugin
+- Add an option to not display the Discourse Name field on the WordPress user's profile page
+- Add wpdc_sso_before_login_redirect action hook
+- Remove the debug_mode option, add a wpdc_comment_sync_period filter that can be used in its place
 
 #### 1.3.85 13/06/2017
 
