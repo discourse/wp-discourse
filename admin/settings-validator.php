@@ -108,9 +108,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
-		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
-		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
-		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
 		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_multisite_configuration' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
@@ -150,6 +147,10 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_external_login_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_link_to_discourse_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_linked_to_discourse_text', array( $this, 'validate_text_input' ) );
+
+		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
+		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
@@ -252,41 +253,6 @@ class SettingsValidator {
 		return $this->publish_username;
 	}
 
-	/**
-	 * Validates use_discourse_webhook.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return bool|int
-	 */
-	public function validate_use_discourse_webhook( $input ) {
-		$this->use_discourse_webhook = $this->validate_checkbox( $input );
-
-		return $this->use_discourse_webhook;
-	}
-
-	/**
-	 * Validates the webhook_secret input.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return string
-	 */
-	public function validate_webhook_secret( $input ) {
-		$secret = $this->validate_text_input( $input );
-		if ( $this->use_discourse_webhook && iconv_strlen( $secret ) < 12 ) {
-			add_settings_error( 'discourse', 'webhook_secret', __( 'To use a Discourse webhook, the secret must be set to a value at least 12 characters long.', 'wp-discourse' ) );
-		}
-
-		return $secret;
-	}
-
-	public function validate_webhook_match_old_topics( $input ) {
-		$match_old_topics = $this->validate_checkbox( $input );
-		$this->maybe_update_site_option( 'webhook_match_old_topics', $match_old_topics );
-
-		return $match_old_topics;
-	}
 
 	/**
 	 * Validates the use_multisite_configuration setting.
@@ -304,7 +270,6 @@ class SettingsValidator {
 		$this->maybe_update_site_option( 'url', $this->url );
 		$this->maybe_update_site_option( 'api_key', $this->api_key );
 		$this->maybe_update_site_option( 'publish_username', $this->publish_username );
-		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
 
 		return $this->use_multisite_configuration;
 	}
@@ -440,6 +405,50 @@ class SettingsValidator {
 		return $this->validate_int( $input, 'excerpt_length', 0, null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 			true );
+	}
+
+	/**
+	 * Validates use_discourse_webhook.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return bool|int
+	 */
+	public function validate_use_discourse_webhook( $input ) {
+		$this->use_discourse_webhook = $this->validate_checkbox( $input );
+		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
+
+		return $this->use_discourse_webhook;
+	}
+
+	/**
+	 * Validates the webhook_secret input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_webhook_secret( $input ) {
+		$secret = $this->validate_text_input( $input );
+		if ( $this->use_discourse_webhook && iconv_strlen( $secret ) < 12 ) {
+			add_settings_error( 'discourse', 'webhook_secret', __( 'To use a Discourse webhook, the secret must be set to a value at least 12 characters long.', 'wp-discourse' ) );
+		}
+
+		return $secret;
+	}
+
+	/**
+	 * Validates the webhook_match_old_topics input.
+	 *
+	 * @param string $input The input to be validated
+	 *
+	 * @return int
+	 */
+	public function validate_webhook_match_old_topics( $input ) {
+		$match_old_topics = $this->validate_checkbox( $input );
+		$this->maybe_update_site_option( 'webhook_match_old_topics', $match_old_topics );
+
+		return $match_old_topics;
 	}
 
 	/**

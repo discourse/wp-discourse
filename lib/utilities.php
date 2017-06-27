@@ -38,7 +38,6 @@ class Utilities {
 					$options['api-key']                   = get_site_option( 'wpdc_site_api_key' );
 					$options['publish-username']          = get_site_option( 'wpdc_site_publish_username' );
 					$options['use-discourse-webhook']     = get_site_option( 'wpdc_site_use_discourse_webhook' );
-					$options['webhook-match-old-topics']  = get_site_option( 'wpdc_site_webhook_match_old_topics' );
 					$options['multisite-configuration']   = get_site_option( 'wpdc_site_multisite_configuration' );
 
 					$options['sso-secret']         = get_site_option( 'wpdc_site_sso_secret' );

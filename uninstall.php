@@ -28,7 +28,6 @@ delete_site_option( 'wpdc_site_url' );
 delete_site_option( 'wpdc_site_api_key' );
 delete_site_option( 'wpdc_site_publish_username' );
 delete_site_option( 'wpdc_site_use_discourse_webhook' );
-delete_site_option( 'wpdc_site_webhook_match_old_topics' );
 delete_site_option( 'wpdc_site_multisite_configuration' );
 delete_site_option( 'wpdc_site_sso_secret' );
 delete_site_option( 'wpdc_site_enable_sso' );

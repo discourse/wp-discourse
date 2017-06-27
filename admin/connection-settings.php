@@ -77,21 +77,6 @@ class ConnectionSettings {
 				'publish_username_input',
 			), 'discourse_connect', 'discourse_connection_settings_section' );
 
-//			add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Discourse Webhook', 'wp-discourse' ), array(
-//				$this,
-//				'use_discourse_webhook_checkbox',
-//			), 'discourse_connect', 'discourse_connection_settings_section' );
-//
-//			add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
-//				$this,
-//				'webhook_secret_input',
-//			), 'discourse_connect', 'discourse_connection_settings_section' );
-//
-//			add_settings_field( 'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
-//                $this,
-//                'webhook_match_old_topics_checkbox',
-//            ), 'discourse_connect', 'discourse_connection_settings_section' );
-
 			if ( is_multisite() && is_main_site() ) {
 				add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
 					$this,
@@ -199,7 +184,7 @@ class ConnectionSettings {
 			<p class="wpdc-options-documentation wpdc-subsite-documentation">
 				<em>
 					<strong><?php esc_html_e( "You are using the WP Discourse plugin in a subsite of a multisite installation.
-                    The plugin's API credentials are being managed through the installations main site. If you have difficulty
+                    The plugin's API credentials are being managed through the installation's main site. If you have difficulty
                     connecting to the Discourse forum. Please contact the network administrator.", 'wp-discourse' ); ?></strong>
 				</em>
 			</p>
