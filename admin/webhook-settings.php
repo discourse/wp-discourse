@@ -62,7 +62,7 @@ class WebhookSettings {
 		), 'discourse_webhook' );
 
 		if ( $this->display_webhook_options ) {
-			add_settings_field( 'discourse_use_discourse_webhook', __( 'Sync Comment Data', 'wp-discourse' ), array(
+			add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Sync Comment Data Webhook', 'wp-discourse' ), array(
 				$this,
 				'use_discourse_webhook_checkbox',
 			), 'discourse_webhook', 'discourse_webhook_settings_section' );
@@ -106,7 +106,9 @@ class WebhookSettings {
 		to sync comment data between Discourse and WordPress.', 'wp-discourse' ), $description );
 	}
 
-
+	/**
+	 * Outputs markup for webhook-match-old-topics input.
+	 */
 	public function webhook_match_old_topics_checkbox() {
 		$this->form_helper->checkbox_input( 'webhook-match-old-topics', 'discourse_webhook', __( 'Match WordPress posts
 	    published prior to WP Discourse version 1.4.0.', 'wp-discourse' ), __( "By default, posts

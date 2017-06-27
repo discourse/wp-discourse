@@ -150,9 +150,10 @@ class OptionsPage {
 
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );
 
+					$multisite_configuration = get_site_option( 'wpdc_site_multisite_configuration' );
 					$hide_submit_button = ! is_main_site() &&
 					                      ( 'connection_options' === $tab || 'webhook_options' === $tab ) &&
-					                      ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) );
+					                      ! empty( $multisite_configuration );
 
 					if ( ! $hide_submit_button ) {
 						submit_button( 'Save Options', 'primary', 'discourse_save_options', false );

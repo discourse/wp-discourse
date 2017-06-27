@@ -440,7 +440,7 @@ class SettingsValidator {
 	/**
 	 * Validates the webhook_match_old_topics input.
 	 *
-	 * @param string $input The input to be validated
+	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */
