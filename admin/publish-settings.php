@@ -77,6 +77,11 @@ class PublishSettings {
 			'custom_excerpt_length',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
+		add_settings_field( 'discourse_add_featured_link', __( 'Add Featured Links', 'wp-discourse' ), array(
+            $this,
+            'add_featured_link_checkbox',
+        ), 'discourse_publish', 'discourse_publishing_settings_section' );
+
 		add_settings_field( 'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
 			$this,
 			'auto_publish_checkbox',
@@ -92,6 +97,7 @@ class PublishSettings {
 			'publish_failure_email_address',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
+
 		add_settings_field( 'discourse_auto_track', __( 'Auto Track Published Topics', 'wp-discourse' ), array(
 			$this,
 			'auto_track_checkbox',
@@ -100,6 +106,11 @@ class PublishSettings {
 		add_settings_field( 'discourse_allowed_post_types', __( 'Post Types to Publish', 'wp-discourse' ), array(
 			$this,
 			'post_types_select',
+		), 'discourse_publish', 'discourse_publishing_settings_section' );
+
+		add_settings_field( 'discourse_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
+			$this,
+			'hide_discourse_name_field_checkbox',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
 		register_setting( 'discourse_publish', 'discourse_publish', array(
@@ -128,13 +139,13 @@ class PublishSettings {
 	 * Outputs markup for the publish-category-update input.
 	 */
 	public function publish_category_input_update() {
-	    // Only set the force_update option for a single request.
-        $discourse_publish = get_option( 'discourse_publish' );
-        $discourse_publish['publish-category-update'] = 0;
-        update_option( 'discourse_publish', $discourse_publish );
+		// Only set the force_update option for a single request.
+		$discourse_publish                            = get_option( 'discourse_publish' );
+		$discourse_publish['publish-category-update'] = 0;
+		update_option( 'discourse_publish', $discourse_publish );
 
 		$this->form_helper->checkbox_input( 'publish-category-update', 'discourse_publish', __( 'Update the discourse publish category list.', 'wp-discourse' ),
-		__( "Check this box if you've added new categories to your forum and would like them to be available on WordPress. The check box
+			__( "Check this box if you've added new categories to your forum and would like them to be available on WordPress. The check box
 		will be reset to 'unchecked' after a single request.", 'wp-discourse' ) );
 	}
 
@@ -166,6 +177,14 @@ class PublishSettings {
 	}
 
 	/**
+	 * Outputs markup for add-featired-link input.
+	 */
+	public function add_featured_link_checkbox() {
+	    $this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Add a link to the WordPress post
+	    to the Discourse topic list.', 'wp-discourse' ) );
+    }
+
+	/**
 	 * Outputs markup for the auto-publish checkbox.
 	 */
 	public function auto_publish_checkbox() {
@@ -177,23 +196,32 @@ class PublishSettings {
 	 * Outputs markup for the publish-failure-notice checkbox.
 	 */
 	public function publish_failure_notice_checkbox() {
-	    $this->form_helper->checkbox_input( 'publish-failure-notice', 'discourse_publish', __( 'Send an email notification if publishing to Discourse fails.', 'wp-discourse' ),
-            __( "If the 'auto publish' option is selected, this will send a notification for any posts that fail to publish to Discourse. If that setting is not enabled, it
+		$this->form_helper->checkbox_input( 'publish-failure-notice', 'discourse_publish', __( 'Send an email notification if publishing to Discourse fails.', 'wp-discourse' ),
+			__( "If the 'auto publish' option is selected, this will send a notification for any posts that fail to publish to Discourse. If that setting is not enabled, it
             will only send a notification if an error is returned from Discourse.", 'wp-discourse' ) );
-    }
+	}
 
 	/**
 	 * Outputs markup for the publish-failure-email-address checkbox.
 	 */
-    public function publish_failure_email_address() {
-	    $this->form_helper->input( 'publish-failure-email', 'discourse_publish', __( "Email address to notify on publishing failure (defaults to the site's admin email address.)", 'wp-discourse' ), 'email' );
-    }
+	public function publish_failure_email_address() {
+		$this->form_helper->input( 'publish-failure-email', 'discourse_publish', __( "Email address to notify on publishing failure (defaults to the site's admin email address.)", 'wp-discourse' ), 'email' );
+	}
 
 	/**
 	 * Outputs markup for the auto-track checkbox.
 	 */
 	public function auto_track_checkbox() {
 		$this->form_helper->checkbox_input( 'auto-track', 'discourse_publish', __( 'Author automatically tracks their published Discourse topics.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for hide-discourse-name-field checkbox.
+	 */
+	public function hide_discourse_name_field_checkbox() {
+		$this->form_helper->checkbox_input( 'hide-discourse-name-field', 'discourse_publish', __( 'Removes the Discourse Name field
+	    from the WordPress user profile page.', 'wp-discourse' ), __( "Enabling this setting will cause all posts published
+	    to Discourse to be published by the 'Publishing Username.'", 'wp-discourse' ) );
 	}
 
 	/**

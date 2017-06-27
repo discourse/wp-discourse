@@ -18,6 +18,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/publish-settings.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
 	require_once( __DIR__ . '/sso-settings.php' );
+	require_once( __DIR__ . '/webhook-settings.php' );
 	require_once( __DIR__ . '/admin-notice.php' );
 	require_once( __DIR__ . '/meta-box.php' );
 
@@ -29,6 +30,7 @@ if ( is_admin() ) {
 	new CommentSettings( $form_helper );
 	new ConfigurableTextSettings( $form_helper );
 	new SSOSettings( $form_helper );
+	new WebhookSettings( $form_helper );
 	new SettingsValidator();
 	new AdminNotice();
 	new MetaBox();

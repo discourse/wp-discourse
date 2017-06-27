@@ -18,6 +18,8 @@
         <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
+        <!-- Have to add this so that $table_name can be included in a prepare statment. -->
+        <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->

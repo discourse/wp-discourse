@@ -117,6 +117,7 @@ class FormHelper {
 				'target' => array(),
 			),
 			'strong' => array(),
+			'code'   => array(),
 		);
 		if ( ! empty( $options[ $option ] ) && 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';
@@ -128,7 +129,7 @@ class FormHelper {
 		<label>
 			<input name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 				   type='hidden'
-				   value='0' />
+				   value='0'/>
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
 				   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 				   type='checkbox'
@@ -273,7 +274,7 @@ class FormHelper {
 				$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
 
 				if ( ! has_filter( $filter ) ) {
-				    // It's safe to log errors here. This should never have to be called on a production site.
+					// It's safe to log errors here. This should never have to be called on a production site.
 					error_log( 'Missing validation filter: ' . $filter );
 				}
 				$output[ $key ] = apply_filters( $filter, $input );
@@ -300,11 +301,11 @@ class FormHelper {
 		// Only check the connection status on the main settings tab.
 		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 
-		    if ( ! DiscourseUtilities::check_connection_status() ) {
-		        add_action( 'admin_notices', array( $this, 'disconnected' ) );
+			if ( ! DiscourseUtilities::check_connection_status() ) {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 
 			} else {
-		        add_action( 'admin_notices', array( $this, 'connected' ) );
+				add_action( 'admin_notices', array( $this, 'connected' ) );
 			}
 		}
 	}

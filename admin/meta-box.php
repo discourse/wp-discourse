@@ -90,14 +90,14 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 		?>
 
-        <label
-                for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
-            <input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
+		<label
+				for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
-        </label>
-        <br>
+		</label>
+		<br>
 		<?php if ( $published ) : ?>
-            <hr>
+			<hr>
 			<?php
 			// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
@@ -108,30 +108,30 @@ class MetaBox {
 			?>
 
 		<?php elseif ( is_wp_error( $categories ) ) : ?>
-            <hr>
-            <div class="warning">
-                <p>
+			<hr>
+			<div class="warning">
+				<p>
 					<?php
 					esc_html_e( 'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
 					or try refreshing the page.', 'wp-discourse' );
 					?>
-                </p>
-            </div>
+				</p>
+			</div>
 			<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-            <input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
+			<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
 
 		<?php else : ?>
-            <label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
-                <select name="publish_post_category" id="publish_post_category">
+			<label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
+				<select name="publish_post_category" id="publish_post_category">
 					<?php foreach ( $categories as $category ) : ?>
-                        <option
-                                value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+						<option
+								value="<?php echo( esc_attr( $category['id'] ) ); ?>"
 							<?php selected( $selected_category, $category['id'] ); ?>>
 							<?php echo( esc_html( $category['name'] ) ); ?>
-                        </option>
+						</option>
 					<?php endforeach; ?>
-                </select>
-            </label>
+				</select>
+			</label>
 		<?php endif; ?>
 		<?php
 	}

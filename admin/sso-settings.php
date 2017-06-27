@@ -39,6 +39,14 @@ class SSOSettings {
 	protected $discourse_sso_settings_url;
 
 	/**
+	 * Whether or not to use some network sso settings.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $use_network_sso_settings;
+
+	/**
 	 * SSOSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -55,7 +63,8 @@ class SSOSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_sso_settings() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options                  = DiscourseUtilities::get_options();
+		$this->use_network_sso_settings = ! is_main_site() && ! empty( $this->options['multisite-configuration'] );
 
 		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
 
@@ -183,20 +192,20 @@ class SSOSettings {
 	public function sso_settings_secondary_tabs( $tab, $parent_tab ) {
 		if ( 'sso_options' === $tab || 'sso_options' === $parent_tab ) {
 			?>
-            <h3 class="nav-tab-wrapper nav-tab-second-level">
-                <a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
+			<h3 class="nav-tab-wrapper nav-tab-second-level">
+				<a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
+				   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'SSO Secret Key', 'wpdc' ); ?>
-                </a>
-                <a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
+				</a>
+				<a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
+				   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'SSO Provider', 'wpdc' ); ?>
-                </a>
-                <a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
-                   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
+				</a>
+				<a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
+				   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
-                </a>
-            </h3>
+				</a>
+			</h3>
 			<?php
 
 		}
@@ -212,7 +221,19 @@ class SSOSettings {
 	 * Outputs markup for the sso-secret input.
 	 */
 	public function sso_secret_input() {
-		$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text (numbers, letters, and symbols) at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
+		if ( $this->use_network_sso_settings ) {
+			?>
+			<p>
+				<em>
+					<?php esc_html_e( 'The SSO Secret Key for your site has been set on the main site in the network.', 'wp-discourse' ); ?>
+				</em>
+			</p>
+
+			<?php
+		} else {
+			$this->form_helper->input( 'sso-secret', 'discourse_sso_common', __( "A string of text (numbers, letters, and symbols)
+		at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
+		}
 	}
 
 	/**
@@ -225,8 +246,32 @@ class SSOSettings {
 	 * Outputs markup for the enable-sso checkbox.
 	 */
 	public function enable_sso_provider_checkbox() {
-		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
-		$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
+		if ( $this->use_network_sso_settings ) {
+			$sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] );
+			?>
+			<?php if ( $sso_provider_enabled ) : ?>
+				<p>
+					<em>
+						<?php esc_html_e( "Your site has been enabled as the SSO provider for your Discourse forum through the main
+                        site on this network. You can configure your site's SSO settings on this tab.", 'wp-discourse' ); ?>
+					</em>
+				</p>
+			<?php else : ?>
+				<p>
+					<em>
+						<?php esc_html_e( 'The use of all sites on this network as SSO providers for your Discourse forum
+                        has been disabled by the main site on this network. Enabling any of thethe settings on this tab will
+                        have no effect.', 'wp-discourse' ); ?>
+					</em>
+				</p>
+
+			<?php endif; ?>
+
+			<?php
+		} else {
+			$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+			$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
+		}
 	}
 
 	/**
@@ -234,7 +279,7 @@ class SSOSettings {
 	 */
 	public function auto_create_sso_user_checkbox() {
 		$description = __( "Automatically login users to Discourse after they login to your WordPress site. If the user does not yet
-	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'enable all return paths.'", 'wp-discourse' );
+	    exist on Discourse, a new user will be created using their WordPress credentials. For this setting to work, you must enable the Discourse setting 'sso allows all return paths.'", 'wp-discourse' );
 		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create and login users.', 'wp-discourse' ), $description );
 	}
 
@@ -282,7 +327,7 @@ class SSOSettings {
 	 */
 	public function force_avatar_update_checkbox() {
 		$this->form_helper->checkbox_input( 'force-avatar-update', 'discourse_sso_provider', __( 'Update Discourse avatars from the WordPress avatar_url on each login request.', 'wp-discourse' ),
-			__( 'Enabling this setting will keep the user avatars on Discourse in sync with the avatars on WordPress.', 'wp-discourse' ) );
+		__( 'Enabling this setting will keep the user avatars on Discourse in sync with the avatars on WordPress.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -304,7 +349,30 @@ class SSOSettings {
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
-		$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		if ( $this->use_network_sso_settings ) {
+			$sso_client_enabled = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] );
+			if ( $sso_client_enabled ) {
+				?>
+				<p>
+					<em>
+						<?php esc_html_e( 'The use of your site as an SSO client for Discourse has been enabled by the main site on this network.', 'wp-discourse' ); ?>
+					</em>
+				</p>
+				<?php
+			} else {
+				?>
+				<p>
+					<em>
+						<?php esc_html_e( 'The use of all sites on this network to function as an SSO client for Discourse has been
+                        disabled by the main site on this network. Enabling any of the setting on this tab will have no effect.', 'wp-discourse' ); ?>
+					</em>
+				</p>
+
+				<?php
+			}
+		} else {
+			$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		}
 	}
 
 	/**
@@ -332,27 +400,27 @@ class SSOSettings {
 	 */
 	public function common_settings_details() {
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'Your WordPress site can be used as either the SSO provider, or as an SSO client with your Discourse forum.
                 When used as the SSO provider, all user authentication for your forum will be handled through WordPress.
                 When used as an SSO client, user authentication for your WordPress site can either be handled through your forum or WordPress.', 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
+			</em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( "All SSO functionality requires you to create a secret key that's shared between your forum
                 and your website. Set the secret key on both before enabling SSO.", 'wp-discourse' ); ?>
-            </em>
-        </p>
+			</em>
+		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
-            <p class="wpdc-options-documentation">
-                <em>
+			<p class="wpdc-options-documentation">
+				<em>
 					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
-                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
-                </em>
-            </p>
+					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+				</em>
+			</p>
 		<?php endif; ?>
 		<?php
 	}
@@ -362,39 +430,39 @@ class SSOSettings {
 	 */
 	public function sso_provider_settings_details() {
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'Enabling your site to function as the SSO provider transfers all user authentication from
                 Discourse to WordPress. Use of this setting requires some configuration on Discourse:', 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <ul class="wpdc-documentation-list">
-            <li>
-                <em><?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?></em>
-            </li>
-            <li>
-                <em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
-                <code><?php echo esc_url( home_url() ); ?></code>
-                <em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
-            </li>
-            <li>
-                <em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
-            </li>
-        </ul>
-        <p class="wpdc-options-documentation">
-            <em>
-                <strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( "Discourse has a very good user management system.
+			</em>
+		</p>
+		<ul class="wpdc-documentation-list">
+			<li>
+				<em><?php esc_html_e( "select the 'enable sso' setting", 'wp-discourse' ); ?></em>
+			</li>
+			<li>
+				<em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
+				<code><?php echo esc_url( home_url() ); ?></code>
+				<em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
+			</li>
+			<li>
+				<em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
+			</li>
+		</ul>
+		<p class="wpdc-options-documentation">
+			<em>
+				<strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( "Discourse has a very good user management system.
                 Don't enable this setting unless you have a reason to manage your users through WordPress.", 'wp-discourse' ); ?>
-            </em>
-        </p>
+			</em>
+		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
-            <p class="wpdc-options-documentation">
-                <em>
+			<p class="wpdc-options-documentation">
+				<em>
 					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
-                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
-                </em>
-            </p>
+					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+				</em>
+			</p>
 		<?php endif; ?>
 		<?php
 	}
@@ -404,61 +472,61 @@ class SSOSettings {
 	 */
 	public function sso_client_settings_details() {
 		?>
-        <p class="wpdc-options-documentation">
-            <em>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( "Enabling your site to function as an SSO client allows WordPress user authentication to be handled
                 through either your Discourse forum, or your WordPress site. If a Discourse user logs into WordPress through an SSO link,
                 they will be authenticated based on their Discourse credentials. If that user doesn't yet exist on your WordPress site, a new
                 user will be created.", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
-                <strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( 'this setting does not yet work with multisite installations.', 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <p class="wpdc-options-documentation">
-            <em>
+			</em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
+				<strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( 'this setting does not yet work with multisite installations.', 'wp-discourse' ); ?>
+			</em>
+		</p>
+		<p class="wpdc-options-documentation">
+			<em>
 				<?php esc_html_e( 'Use of this setting requires some configuration on Discourse:' ) ?>
-            </em>
-        </p>
-        <ul class="wpdc-documentation-list">
-            <em>
-                <li>
+			</em>
+		</p>
+		<ul class="wpdc-documentation-list">
+			<em>
+				<li>
 					<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
-                </li>
-                <li>
+				</li>
+				<li>
 					<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
-                </li>
-            </em>
-        </ul>
-        <h3>SSO Client Shortcode</h3>
-        <p class="wpdc-options-documentation">
-            <em><?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?></em>
-            <code><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
-            <em><?php esc_html_e( 'shortcode to your WordPress posts to create a Discourse login link on the front end of your site.
+				</li>
+			</em>
+		</ul>
+		<h3>SSO Client Shortcode</h3>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?></em>
+			<code><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
+			<em><?php esc_html_e( 'shortcode to your WordPress posts to create a Discourse login link on the front end of your site.
             The shortcode has two optional attributes: ', 'wp-discourse' ); ?></em>
-        </p>
-        <ul class="wpdc-documentation-list">
-            <li>
-                <code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><em><?php esc_html_e( "- sets the link text for non-logged in users.
+		</p>
+		<ul class="wpdc-documentation-list">
+			<li>
+				<code><?php esc_html_e( 'login', 'wp-discourse' ); ?></code><em><?php esc_html_e( "- sets the link text for non-logged in users.
                 (Defaults to 'Link your account to Discourse'.)", 'wp-discourse' ); ?></em>
-            </li>
-            <li><code><?php esc_html_e( 'link' ) ?></code><em><?php esc_html_e( "- sets the link text for logged in users who have not
+			</li>
+			<li><code><?php esc_html_e( 'link' ) ?></code><em><?php esc_html_e( "- sets the link text for logged in users who have not
             yet linked their WordPress account to their Discourse account. (Defaults to 'Log in with Discourse'.)", 'wp-discourse' ); ?></em>
-            </li>
-        </ul>
-        <p class="wpdc-options-documentation">
-            <em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum']", 'wp-discourse' ); ?></code>
-        </p>
+			</li>
+		</ul>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum']", 'wp-discourse' ); ?></code>
+		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
-            <p class="wpdc-options-documentation">
-                <em>
+			<p class="wpdc-options-documentation">
+				<em>
 					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
-                    <a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-                       target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
-                </em>
-            </p>
+					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
+					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+				</em>
+			</p>
 		<?php endif; ?>
 		<?php
 	}
