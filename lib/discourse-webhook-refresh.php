@@ -176,7 +176,7 @@ class DiscourseWebhookRefresh {
 	 * more than one post type.
 	 *
 	 * @param string $title The topic_title returned from Discourse.
-	 * @param int $topic_id The topic_id returned from Discourse.
+	 * @param int    $topic_id The topic_id returned from Discourse.
 	 *
 	 * @return int|null
 	 */

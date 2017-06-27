@@ -237,7 +237,7 @@ class DiscourseComment {
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
 
 			if ( empty( $this->options['use-discourse-webhook'] ) ) {
-			// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
+				// Only automatically sync comments for individual posts, it's too inefficient to do this with an archive page.
 				if ( $single_page ) {
 					$this->sync_comments( $post_id );
 				} else {

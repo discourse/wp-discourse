@@ -144,7 +144,7 @@ class DiscoursePublish {
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration'] );
-		$add_featured_link           = ! empty( $options['add-featured-link' ] );
+		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
