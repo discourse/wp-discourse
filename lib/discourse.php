@@ -22,9 +22,6 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
-		'use-discourse-webhook'      => 0,
-		'webhook-secret' => '',
-		'webhook-match-old-topics' => 0,
 		'multisite-configuration' => 0,
 	);
 
@@ -92,6 +89,18 @@ class Discourse {
 	);
 
 	/**
+	 * The webhook options array.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_webhook = array(
+		'use-discourse-webhook'      => 0,
+		'webhook-secret' => '',
+		'webhook-match-old-topics' => 0,
+	);
+
+	/**
 	 * The sso_common options array.
 	 *
 	 * @access protected
@@ -139,6 +148,7 @@ class Discourse {
 		'discourse_publish',
 		'discourse_comment',
 		'discourse_configurable_text',
+		'discourse_webhook',
 		'discourse_sso_common',
 		'discourse_sso_provider',
 		'discourse_sso_client',

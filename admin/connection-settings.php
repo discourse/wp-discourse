@@ -77,20 +77,20 @@ class ConnectionSettings {
 				'publish_username_input',
 			), 'discourse_connect', 'discourse_connection_settings_section' );
 
-			add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Discourse Webhook', 'wp-discourse' ), array(
-				$this,
-				'use_discourse_webhook_checkbox',
-			), 'discourse_connect', 'discourse_connection_settings_section' );
-
-			add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
-				$this,
-				'webhook_secret_input',
-			), 'discourse_connect', 'discourse_connection_settings_section' );
-
-			add_settings_field( 'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
-                $this,
-                'webhook_match_old_topics_checkbox',
-            ), 'discourse_connect', 'discourse_connection_settings_section' );
+//			add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Discourse Webhook', 'wp-discourse' ), array(
+//				$this,
+//				'use_discourse_webhook_checkbox',
+//			), 'discourse_connect', 'discourse_connection_settings_section' );
+//
+//			add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
+//				$this,
+//				'webhook_secret_input',
+//			), 'discourse_connect', 'discourse_connection_settings_section' );
+//
+//			add_settings_field( 'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
+//                $this,
+//                'webhook_match_old_topics_checkbox',
+//            ), 'discourse_connect', 'discourse_connection_settings_section' );
 
 			if ( is_multisite() && is_main_site() ) {
 				add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
@@ -135,57 +135,6 @@ class ConnectionSettings {
 		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
 	}
-
-	/**
-	 * Outpurs markup for use-discourse-webhook checkbox.
-	 */
-	public function use_discourse_webhook_checkbox() {
-		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
-		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
-			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
-		} else {
-			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
-		}
-
-		$description = sprintf(
-			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
-			__( 'A Discourse webhook can be used to improve the efficiency of syncing comments between WordPress and your Discourse forum.
- To use this setting create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code>%2$s</code>.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
-		);
-
-		$this->form_helper->checkbox_input( 'use-discourse-webhook', 'discourse_connect', __( 'Use a webhook
-		for syncing data between Discourse and WordPress.', 'wp-discourse' ), $description );
-	}
-
-	/**
-	 * Outputs markup for webhook-secret input.
-	 */
-	public function webhook_secret_input() {
-		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
-			                          esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
-		} else {
-			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
-		}
-
-		$description = sprintf(
-			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
-			__( 'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
-		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
-		);
-
-		$this->form_helper->input( 'webhook-secret', 'discourse_connect', $description );
-	}
-
-	public function webhook_match_old_topics_checkbox() {
-	    $this->form_helper->checkbox_input( 'webhook-match-old-topics', 'discourse_connect', __( 'Match WordPress posts
-	    published prior to WP Discourse version 1.4.0 with Discourse topics.', 'wp-discourse' ), __( "By default, posts
-	    are matched to Discourse topics through their discourse_topic_id metadata. That value is't available for posts
-	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
-	    'post' to Discourse topics through their titles.", 'wp-discourse' ) );
-    }
 
 	/**
 	 * Outputs markup for multisite-configuration-checkbox.
