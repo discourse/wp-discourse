@@ -154,8 +154,8 @@ class DiscourseWebhookRefresh {
 		if ( $topic_id && $post_number && $post_title ) {
 
 			$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-			if ( ! $post_id && ! empty( $this->options['wehook-match-old-topics'] ) ) {
-				$this->get_post_id_by_title( $post_title, $topic_id );
+			if ( ! $post_id && ! empty( $this->options['webhook-match-old-topics'] ) ) {
+				$post_id =  $this->get_post_id_by_title( $post_title, $topic_id );
 			}
 			if ( $post_id ) {
 				$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );

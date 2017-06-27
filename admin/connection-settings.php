@@ -129,7 +129,8 @@ class ConnectionSettings {
 	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum
 	    is connected to a network of WordPress sites. Enabling it will  allow some of the plugin's settings to function for
 	    the entire network and remove them from the options tabs of the network's subsites. It will remove all of the settings
-	    found on the Connection options tab, as well as the SSO Secret Key, Enable SSO Provider, and Enable SSO Client settings. ", 'wp-discourse' ) );
+	    found on the Connection options tab, as well as the SSO Secret Key, Enable SSO Provider, and Enable SSO Client settings.
+	    This option must be enabled to use the Sync Comment Data webhook in a multisite environment.", 'wp-discourse' ) );
 	}
 
 	/**
