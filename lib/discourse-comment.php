@@ -134,7 +134,6 @@ class DiscourseComment {
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
-				// Check post_status so comments numbers aren't synced on admin/edit.php.
 				if ( 'publish' === get_post_status( $postid ) ) {
 
 					$comment_count            = intval( $discourse_options['max-comments'] );
