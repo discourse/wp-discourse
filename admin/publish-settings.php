@@ -179,8 +179,8 @@ class PublishSettings {
 	 * Outputs markup for add-featired-link input.
 	 */
 	public function add_featured_link_checkbox() {
-	    $this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Add a link to the WordPress post
-	    to the Discourse topic list.', 'wp-discourse' ) );
+	    $this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Adds a link to the WordPress post
+	    to the Discourse topic list and topic title.', 'wp-discourse' ) );
 	}
 
 	/**
