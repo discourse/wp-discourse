@@ -92,11 +92,6 @@ class CommentSettings {
 			'only_show_moderator_liked_checkbox',
 		), 'discourse_comment', 'discourse_commenting_settings_section' );
 
-		add_settings_field( 'discourse_debug_mode', __( 'Debug Mode', 'wp-discourse' ), array(
-			$this,
-			'debug_mode_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
-
 		register_setting( 'discourse_comment', 'discourse_comment', array(
 			$this->form_helper,
 			'validate_options',
@@ -177,13 +172,6 @@ class CommentSettings {
 	 */
 	public function only_show_moderator_liked_checkbox() {
 		$this->form_helper->checkbox_input( 'only-show-moderator-liked', 'discourse_comment', __( "Only import comments 'liked' by a Discourse moderator.", 'wp-discourse' ) );
-	}
-
-	/**
-	 * Outputs markup for the debug-mode checkbox.
-	 */
-	public function debug_mode_checkbox() {
-		$this->form_helper->checkbox_input( 'debug-mode', 'discourse_comment', __( 'Always refresh comments.', 'wp-discourse' ), __( 'This setting is not recommended for production, when this setting is not enabled comments will be cached for 10 minutes.', 'wp-discourse' ) );
 	}
 
 	/**

@@ -22,6 +22,7 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
+		'multisite-configuration' => 0,
 	);
 
 	/**
@@ -36,11 +37,13 @@ class Discourse {
 		'publish-category-update' => 0,
 		'full-post-content'       => 0,
 		'custom-excerpt-length'   => 55,
+		'add-featured-link'       => 0,
 		'auto-publish'            => 0,
 		'publish-failure-notice'  => 0,
 		'publish-failure-email'   => '',
 		'auto-track'              => 1,
 		'allowed_post_types'      => array( 'post' ),
+		'hide-discourse-name-field' => 0,
 	);
 
 	/**
@@ -51,6 +54,7 @@ class Discourse {
 	 */
 	protected $discourse_comment = array(
 		'use-discourse-comments'    => 0,
+		'comment-sync-period'       => 10,
 		'show-existing-comments'    => 0,
 		'existing-comments-heading' => '',
 		'max-comments'              => 5,
@@ -60,7 +64,6 @@ class Discourse {
 		'bypass-trust-level-score'  => 50,
 		'custom-datetime-format'    => '',
 		'only-show-moderator-liked' => 0,
-		'debug-mode'                => 0,
 	);
 
 	/**
@@ -83,6 +86,18 @@ class Discourse {
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
 		'linked-to-discourse-text'    => "You're already linked to Discourse!",
+	);
+
+	/**
+	 * The webhook options array.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_webhook = array(
+		'use-discourse-webhook'      => 0,
+		'webhook-secret' => '',
+		'webhook-match-old-topics' => 0,
 	);
 
 	/**
@@ -133,6 +148,7 @@ class Discourse {
 		'discourse_publish',
 		'discourse_comment',
 		'discourse_configurable_text',
+		'discourse_webhook',
 		'discourse_sso_common',
 		'discourse_sso_provider',
 		'discourse_sso_client',
@@ -143,7 +159,6 @@ class Discourse {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
-		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ), 10, 1 );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
 	}
@@ -163,6 +178,7 @@ class Discourse {
 
 			$discourse_url = null;
 		}
+
 		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
@@ -209,19 +225,6 @@ class Discourse {
 		}
 
 		return $hosts;
-	}
-
-	/**
-	 * Adds 'discourse_username' to the user_contactmethods array.
-	 *
-	 * @param array $fields The array of contact methods.
-	 *
-	 * @return mixed
-	 */
-	public function extend_user_profile( $fields ) {
-		$fields['discourse_username'] = 'Discourse Username';
-
-		return $fields;
 	}
 
 	/**

@@ -31,6 +31,14 @@ class ConnectionSettings {
 	protected $options;
 
 	/**
+	 * Whether or not to display the connection_options fields.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $display_connection_options;
+
+	/**
 	 * ConnectionSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -45,27 +53,37 @@ class ConnectionSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_connection_settings() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options                    = DiscourseUtilities::get_options();
+		$this->display_connection_options = is_main_site() || empty( $this->options['multisite-configuration'] );
 
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connecting With Discourse', 'wp-discourse' ), array(
 			$this,
 			'connection_settings_tab_details',
 		), 'discourse_connect' );
 
-		add_settings_field( 'discourse_url', __( 'Discourse URL', 'wp-discourse' ), array(
-			$this,
-			'url_input',
-		), 'discourse_connect', 'discourse_connection_settings_section' );
+		if ( $this->display_connection_options ) {
+			add_settings_field( 'discourse_url', __( 'Discourse URL', 'wp-discourse' ), array(
+				$this,
+				'url_input',
+			), 'discourse_connect', 'discourse_connection_settings_section' );
 
-		add_settings_field( 'discourse_api_key', __( 'API Key', 'wp-discourse' ), array(
-			$this,
-			'api_key_input',
-		), 'discourse_connect', 'discourse_connection_settings_section' );
+			add_settings_field( 'discourse_api_key', __( 'API Key', 'wp-discourse' ), array(
+				$this,
+				'api_key_input',
+			), 'discourse_connect', 'discourse_connection_settings_section' );
 
-		add_settings_field( 'discourse_publish_username', __( 'Publishing Username', 'wp-discourse' ), array(
-			$this,
-			'publish_username_input',
-		), 'discourse_connect', 'discourse_connection_settings_section' );
+			add_settings_field( 'discourse_publish_username', __( 'Publishing Username', 'wp-discourse' ), array(
+				$this,
+				'publish_username_input',
+			), 'discourse_connect', 'discourse_connection_settings_section' );
+
+			if ( is_multisite() && is_main_site() ) {
+				add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
+					$this,
+					'multisite_configuration_checkbox',
+				), 'discourse_connect', 'discourse_connection_settings_section' );
+			}
+		}// End if().
 
 		register_setting( 'discourse_connect', 'discourse_connect', array(
 			$this->form_helper,
@@ -101,6 +119,18 @@ class ConnectionSettings {
 	public function publish_username_input() {
 		$this->form_helper->input( 'publish-username', 'discourse_connect', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for multisite-configuration-checkbox.
+	 */
+	public function multisite_configuration_checkbox() {
+		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
+	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum
+	    is connected to a network of WordPress sites. Enabling it will  allow some of the plugin's settings to function for
+	    the entire network and remove them from the options tabs of the network's subsites. It will remove all of the settings
+	    found on the Connection options tab, as well as the SSO Secret Key, Enable SSO Provider, and Enable SSO Client settings.
+	    This option must be enabled to use the Sync Comment Data webhook in a multisite environment.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -145,11 +175,21 @@ class ConnectionSettings {
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 			</em>
 		</p>
-		<p class="wpdc-options-documentation">
-			<em>
-				<strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
-			</em>
-		</p>
+		<?php if ( $this->display_connection_options ) : ?>
+			<p class="wpdc-options-documentation">
+				<em>
+					<strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
+				</em>
+			</p>
+		<?php else : ?>
+			<p class="wpdc-options-documentation wpdc-subsite-documentation">
+				<em>
+					<strong><?php esc_html_e( "You are using the WP Discourse plugin in a subsite of a multisite installation.
+                    The plugin's API credentials are being managed through the installation's main site. If you have difficulty
+                    connecting to the Discourse forum. Please contact the network administrator.", 'wp-discourse' ); ?></strong>
+				</em>
+			</p>
+		<?php endif; ?>
 
 		<?php
 	}

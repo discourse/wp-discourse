@@ -87,6 +87,9 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=text_content_options"
 				   class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
 				</a>
+				<a href="?page=wp_discourse_options&tab=webhook_options"
+				   class="nav-tab <?php echo 'webhook_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?>
+				</a>
 
 				<?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
 
@@ -140,9 +143,21 @@ class OptionsPage {
 						do_settings_sections( 'discourse_configurable_text' );
 					}
 
+					if ( 'webhook_options' === $tab ) {
+						settings_fields( 'discourse_webhook' );
+						do_settings_sections( 'discourse_webhook' );
+					}
+
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );
 
-					submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
+					$multisite_configuration = get_site_option( 'wpdc_site_multisite_configuration' );
+					$hide_submit_button = ! is_main_site() &&
+					                      ( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
+					                      ! empty( $multisite_configuration );
+
+					if ( ! $hide_submit_button ) {
+						submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
+					}
 					?>
 				</form>
 				<?php
@@ -150,6 +165,7 @@ class OptionsPage {
 				 * Called after the setting-page form.
 				 *
 				 * @param string $tab The active tab.
+				 *
 				 * @hooked ConfigurableTextSettings::reset_options_form - 10
 				 */
 				do_action( 'wpdc_options_page_after_form', $tab );
