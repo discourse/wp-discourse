@@ -75,10 +75,14 @@ class AdminNotice {
 				$discourse_username = get_user_meta( get_current_user_id(), 'discourse_username', true );
 				$current_username   = wp_get_current_user()->user_login;
 				$publish_username   = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : '';
+				$use_discourse_name_field = empty( $this->options['username-as-discourse-name'] ) && empty( $this->options['hide-discourse-name-field'] );
 
 				$profile_page_link = '<a href="' . esc_url( admin_url( '/profile.php' ) ) . '">' . __( 'profile page', 'wp-discourse' ) . '</a>';
 
-				if ( empty( $discourse_username ) && $current_username !== $publish_username ) {
+				if ( empty( $discourse_username ) &&
+				     $use_discourse_name_field &&
+				     $current_username !== $publish_username
+				) {
 					$username_not_set_notice = sprintf(
 						// translators: Discourse username_not_set notice. Placeholder: discourse_username.
 					__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ), $publish_username, $profile_page_link );

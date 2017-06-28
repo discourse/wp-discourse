@@ -31,6 +31,20 @@ class Utilities {
 						$options = array_merge( $options, $option );
 					}
 				}
+
+				$use_multisite_configuration = get_site_option( 'wpdc_site_multisite_configuration' );
+				if ( ! is_main_site() && 1 === intval( $use_multisite_configuration ) ) {
+					$options['url']                       = get_site_option( 'wpdc_site_url' );
+					$options['api-key']                   = get_site_option( 'wpdc_site_api_key' );
+					$options['publish-username']          = get_site_option( 'wpdc_site_publish_username' );
+					$options['use-discourse-webhook']     = get_site_option( 'wpdc_site_use_discourse_webhook' );
+					$options['multisite-configuration']   = get_site_option( 'wpdc_site_multisite_configuration' );
+					$options['webhook-match-old-topics']  = get_site_option( 'wpdc_site_webhook_match_old_topics' );
+
+					$options['sso-secret']         = get_site_option( 'wpdc_site_sso_secret' );
+					$options['enable-sso']         = get_site_option( 'wpdc_site_enable_sso' );
+					$options['sso-client-enabled'] = get_site_option( 'wpdc_site_sso_client_enabled' );
+				}
 			}
 		}
 
@@ -40,15 +54,23 @@ class Utilities {
 	/**
 	 * Checks the connection status to Discourse.
 	 *
-	 * @return int
+	 * @return int|\WP_Error
 	 */
 	public static function check_connection_status() {
-		$options = self::get_options();
-		$url     = array_key_exists( 'url', $options ) ? $options['url'] : '';
-		$url     = add_query_arg( array(
-			'api_key'      => array_key_exists( 'api-key', $options ) ? $options['api-key'] : '',
-			'api_username' => array_key_exists( 'publish-username', $options ) ? $options['publish-username'] : '',
-		), $url . '/users/' . $options['publish-username'] . '.json' );
+		$options      = self::get_options();
+		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
+
+		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
+
+			return 0;
+		}
+
+		$url = add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		), $url . '/users/' . $api_username . '.json' );
 
 		$url      = esc_url_raw( $url );
 		$response = wp_remote_get( $url );
@@ -92,9 +114,7 @@ class Utilities {
 
 		$categories = get_option( 'wpdc_discourse_categories' );
 
-		if ( isset( $options['publish-category-update'] ) && 1 === intval( $options['publish-category-update'] ) ||
-		     ! $categories
-		) {
+		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
 			$force_update = true;
 		}
 
@@ -113,7 +133,7 @@ class Utilities {
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
 				$categories = $remote['categories'];
-				if ( ! isset( $options['display-subcategories'] ) || 0 === intval( $options['display-subcategories'] ) ) {
+				if ( empty( $options['display-subcategories'] ) ) {
 					foreach ( $categories as $category => $values ) {
 						if ( array_key_exists( 'parent_category_id', $values ) ) {
 							unset( $categories[ $category ] );
@@ -122,11 +142,27 @@ class Utilities {
 				}
 				update_option( 'wpdc_discourse_categories', $categories );
 			} else {
+
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
 			}
 		}
 
 		return $categories;
+	}
+
+	/**
+	 * Tries to find a WordPress post that's associated with a Discourse topic_id.
+	 *
+	 * @param int $topic_id The topic_id to lookup.
+	 *
+	 * @return null|string
+	 */
+	public static function get_post_id_by_topic_id( $topic_id ) {
+		global $wpdb;
+
+		$post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
+
+		return $post_id;
 	}
 
 	/**

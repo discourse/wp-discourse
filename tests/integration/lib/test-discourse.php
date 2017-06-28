@@ -118,12 +118,4 @@ class TestDiscourse extends \WP_UnitTestCase {
 		$this->assertTrue( is_array( $hosts ) );
 		$this->assertContains( 'forum.example.com', $hosts );
 	}
-
-	public function test_discourse_username_is_added_to_user_profile_fields() {
-		$profile_fields = $this->discourse->extend_user_profile( array( 'twitter' => 'Twitter' ) );
-
-		$this->assertArrayHasKey( 'twitter', $profile_fields );
-		$this->assertArrayHasKey( 'discourse_username', $profile_fields );
-		$this->assertEquals( 'Discourse Username', $profile_fields['discourse_username'] );
-	}
 }

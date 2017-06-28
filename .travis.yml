@@ -20,6 +20,8 @@ matrix:
     include:
         # WP Discourse can't be installed on php < 5.4, run tests against php 5.3 to make sure we can display an appropriate error message.
         - php: 5.3
+        - php: 5.4
+          env: PHPCS_BRANCH=2.9 SNIFF=1
         # Run PHPCS against WPCS. I just picked to run it against 5.5.
         - php: 5.5
           env: PHPCS_BRANCH=2.9 SNIFF=1

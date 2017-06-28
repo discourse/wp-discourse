@@ -183,6 +183,8 @@ class DiscourseSSO {
 				// Build login URL.
 				$login = wp_login_url( esc_url_raw( $redirect ) );
 
+				do_action( 'wpdc_sso_before_login_redirect', $redirect, $login );
+
 				// Redirect to login.
 				wp_safe_redirect( $login );
 
