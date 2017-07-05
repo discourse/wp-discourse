@@ -77,6 +77,11 @@ class WebhookSettings {
                 'use_discourse_user_webhook_checkbox',
             ), 'discourse_webhook', 'discourse_webhook_settings_section' );
 
+			add_settings_field( 'discourse_webhook_match_user_email', __( 'Match Users by Email Address', 'wp-discourse' ), array(
+                $this,
+                'webhook_match_user_email_checkbox',
+            ), 'discourse_webhook', 'discourse_webhook_settings_section' );
+
 			add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
 				$this,
 				'webhook_secret_input',
@@ -144,6 +149,11 @@ class WebhookSettings {
 	    $this->form_helper->checkbox_input( 'use-discourse-user-webhook', 'discourse_webhook', __( 'Use a webhook
 		to sync user data with Discourse.', 'wp-discourse' ), $description );
 
+    }
+
+    public function webhook_match_user_email_checkbox() {
+        $this->form_helper->checkbox_input( 'webhook-match-user-email', 'discourse_webhook', __( 'Match users with Discourse
+        through their email address.', 'wp-discourse' ), __( '<strong>Note: only enable this setting if you are certain that email addresses match.</strong>', 'wp-discourse' ) );
     }
 
 	/**

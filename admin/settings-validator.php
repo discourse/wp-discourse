@@ -151,6 +151,8 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
 		add_filter( 'wpdc_validate_use_discourse_user_webhook', array( $this, 'validate_use_discourse_user_webhook' ) );
+		// Todo: use a separate function for this and add an admin notice when it's enabled.
+		add_filter( 'wpdc_validate_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
