@@ -127,7 +127,7 @@ class WebhookSettings {
 	 * Outputs markup for use-discourse-user-webhook checkbox.
 	 */
     public function use_discourse_user_webhook_checkbox() {
-	    $webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user-data' );
+	    $webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user' );
 	    if ( ! empty( $this->options['url'] ) ) {
 		    $discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
 		                              esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
