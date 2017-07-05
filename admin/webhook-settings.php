@@ -62,7 +62,7 @@ class WebhookSettings {
 		), 'discourse_webhook' );
 
 		if ( $this->display_webhook_options ) {
-			add_settings_field( 'discourse_use_discourse_webhook', __( 'Use Sync Comment Data Webhook', 'wp-discourse' ), array(
+			add_settings_field( 'discourse_use_discourse_webhook', __( 'Sync Comment Data', 'wp-discourse' ), array(
 				$this,
 				'use_discourse_webhook_checkbox',
 			), 'discourse_webhook', 'discourse_webhook_settings_section' );
@@ -72,10 +72,16 @@ class WebhookSettings {
 				'webhook_match_old_topics_checkbox',
 			), 'discourse_webhook', 'discourse_webhook_settings_section' );
 
+			add_settings_field( 'discourse_use_discourse_user_webhook', __( 'Update Userdata', 'wp-discourse' ), array(
+                $this,
+                'use_discourse_user_webhook_checkbox',
+            ), 'discourse_webhook', 'discourse_webhook_settings_section' );
+
 			add_settings_field( 'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
 				$this,
 				'webhook_secret_input',
 			), 'discourse_webhook', 'discourse_webhook_settings_section' );
+
 		}
 
 		register_setting( 'discourse_webhook', 'discourse_webhook', array(
@@ -116,6 +122,29 @@ class WebhookSettings {
 	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
 	    'post' to Discourse topics through their titles.", 'wp-discourse' ) );
 	}
+
+	/**
+	 * Outputs markup for use-discourse-user-webhook checkbox.
+	 */
+    public function use_discourse_user_webhook_checkbox() {
+	    $webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user-data' );
+	    if ( ! empty( $this->options['url'] ) ) {
+		    $discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+		                              esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
+	    } else {
+		    $discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
+	    }
+
+	    $description = sprintf(
+	    // translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
+		    __( 'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
+ URL <code>%2$s</code>. Make sure that the \'User Event\' checkbox is enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
+	    );
+
+	    $this->form_helper->checkbox_input( 'use-discourse-user-webhook', 'discourse_webhook', __( 'Use a webhook
+		to sync user data with Discourse.', 'wp-discourse' ), $description );
+
+    }
 
 	/**
 	 * Outputs markup for webhook-secret input.

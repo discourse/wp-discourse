@@ -149,8 +149,9 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_linked_to_discourse_text', array( $this, 'validate_text_input' ) );
 
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
-		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
+		add_filter( 'wpdc_validate_use_discourse_user_webhook', array( $this, 'validate_use_discourse_user_webhook' ) );
+		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
@@ -417,6 +418,20 @@ class SettingsValidator {
 	public function validate_use_discourse_webhook( $input ) {
 		$this->use_discourse_webhook = $this->validate_checkbox( $input );
 		$this->maybe_update_site_option( 'use_discourse_webhook', $this->use_discourse_webhook );
+
+		return $this->use_discourse_webhook;
+	}
+
+	/**
+	 * Validates user_discourse_user_webhook.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return bool|int
+	 */
+	public function validate_use_discourse_user_webhook( $input ) {
+		$this->use_discourse_webhook = $this->validate_checkbox( $input );
+		$this->maybe_update_site_option( 'use_discourse_user_webhook', $this->use_discourse_webhook );
 
 		return $this->use_discourse_webhook;
 	}

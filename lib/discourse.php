@@ -98,6 +98,7 @@ class Discourse {
 		'use-discourse-webhook'      => 0,
 		'webhook-secret' => '',
 		'webhook-match-old-topics' => 0,
+		'use-discourse-user-webhook' => 0,
 	);
 
 	/**
