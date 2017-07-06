@@ -208,7 +208,6 @@ class Utilities {
 			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
 		}
 
-		// Try to get the user by external_id.
 		$external_user_url = esc_url_raw( "{$url}/users/by-external/{$user_id}.json" );
 		$external_user_url = add_query_arg( array(
 			'api_key'      => $api_key,
@@ -220,6 +219,7 @@ class Utilities {
 		if ( self::validate( $response ) ) {
 
 			return json_decode( wp_remote_retrieve_body( $response ) );
+
 		} elseif ( $match_by_email ) {
 			$user = get_user_by( 'id', $user_id );
 			if ( $user ) {
