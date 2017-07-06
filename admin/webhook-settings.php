@@ -221,6 +221,4 @@ class WebhookSettings {
 		<?php endif; ?>
 		<?php
 	}
-
-
 }
