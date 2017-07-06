@@ -57,12 +57,11 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function check_connection_status() {
-		$options      = self::get_options();
-		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
+		$url = self::get_connection_option( 'url' );
+		$api_key = self::get_connection_option( 'api-key' );
+		$api_username = self::get_connection_option( 'publish-username' );
 
-		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
+		if ( ! ( $url && $api_key && $api_username ) ) {
 
 			return 0;
 		}
@@ -119,12 +118,23 @@ class Utilities {
 		}
 
 		if ( $force_update ) {
+			$base_url = self::get_connection_option( 'url' );
+			$api_key = self::get_connection_option( 'api-key' );
+			$api_username = self::get_connection_option( 'publish-username' );
 
-			$url    = add_query_arg( array(
-				'api_key'      => $options['api-key'],
-				'api_username' => $options['publish-username'],
-			), $options['url'] . '/site.json' );
-			$remote = wp_remote_get( $url );
+			if ( ! ( $base_url && $api_key && $api_username ) ) {
+
+				return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+			}
+
+			$site_url = esc_url_raw( "{$base_url}/site.json" );
+			$site_url    = add_query_arg( array(
+				'api_key'      => $api_key,
+				'api_username' => $api_username,
+			), $site_url );
+
+			$remote = wp_remote_get( $site_url );
+
 			if ( ! self::validate( $remote ) ) {
 
 				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
@@ -181,6 +191,57 @@ class Utilities {
 	}
 
 	/**
+	 * Get a Discourse user object.
+	 *
+	 * @param int $user_id The WordPress user_id.
+	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
+	 *
+	 * @return array|mixed|object|\WP_Error
+	 */
+	public static function get_discourse_user( $user_id, $match_by_email = false ) {
+		$url          = self::get_connection_option( 'url' );
+		$api_key      = self::get_connection_option( 'api-key' );
+		$api_username = self::get_connection_option( 'publish-username' );
+
+		if ( ! ( $url && $api_key && $api_username ) ) {
+
+			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+		}
+
+		// Try to get the user by external_id.
+		$external_user_url = esc_url_raw( "{$url}/users/by-external/{$user_id}.json" );
+		$external_user_url = add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		), $external_user_url );
+
+		$response = wp_remote_get( $external_user_url );
+
+		if ( self::validate( $response ) ) {
+
+			return json_decode( wp_remote_retrieve_body( $response ) );
+		} elseif ( $match_by_email ) {
+			$user = get_user_by( 'id', $user_id );
+			if ( $user ) {
+				$users_url = esc_url_raw( "{$url}/admin/users/list/active.json" );
+				$users_url = add_query_arg( array(
+					'filter'       => rawurlencode_deep( $user->user_email ),
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+				), $users_url );
+
+				$response = wp_remote_get( $users_url );
+				if ( self::validate( $response ) ) {
+
+					return json_decode( wp_remote_retrieve_body( $response ) );
+				}
+			}
+		}
+
+		return new \WP_Error( 'discourse_response_error', 'The Discourse user could not be retrieved.' );
+	}
+
+	/**
 	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
 	 *
 	 * @param \WP_REST_Request $data The WP_REST_Request object.
@@ -212,5 +273,26 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	/**
+	 * @param string $option The option to be returned.
+	 *
+	 * @return string|null
+	 */
+	protected static function get_connection_option( $option ) {
+		static $connection_options = null;
+
+		if ( ! $connection_options ) {
+			$connection_options = get_option( 'discourse_connect' );
+		}
+
+		if ( isset( $connection_options[ $option ] ) ) {
+
+			return $connection_options[ $option ];
+		} else {
+
+			return null;
+		}
 	}
 }
