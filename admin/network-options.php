@@ -4,7 +4,26 @@ namespace WPDiscourse\Admin;
 
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
-
+/**
+ * Class NetworkOptions
+ *
+ * Adds the following options as site options and saves them as 'wpdc_site_option_name':
+ *      - multisite_configuration
+ *      - url
+ *      - api_key
+ *      - publish_username
+ *      - use_discourse_webhook
+ *      - webhook_match_old_topics
+ *      - use_discourse_user_webhook
+ *      - webhook_match_user_email
+ *      - webhook_secret
+ *      - enable_sso
+ *      - sso_client_enabled
+ *      - sso_secret
+ *
+ * When multisite_configuration is enabled, the site options can be accessed through DiscourseUtilities::get_options()
+ * with the regular option key.
+ */
 class NetworkOptions {
 
 	public function __construct() {
@@ -16,8 +35,8 @@ class NetworkOptions {
 	}
 
 	public function network_config_notices() {
-	    $screen = get_current_screen();
-	    $discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
+		$screen           = get_current_screen();
+		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
 		if ( $discourse_screen && ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
 			$notices                    = '';
 			$url                        = get_site_option( 'wpdc_site_url' );
@@ -48,18 +67,23 @@ class NetworkOptions {
 			     ( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
 			) {
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You need to supply a webhook secret key.', 'wp-discourse' ) .
+				            __( 'You need to supply a webhook secret key at least 12 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
-
 			}
 
 			if ( ( ! empty( $enable_sso ) || ! empty( $sso_client_enabled ) ) &&
 			     empty( $sso_secret )
 			) {
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You need to supply an sso secret key.', 'wp-discourse' ) .
+				            __( 'You need to supply an sso secret key at least 10 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
+
+			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
+				            '</p></div>';
+            }
 
 		}
 
@@ -156,13 +180,15 @@ class NetworkOptions {
 	 */
 	public function multisite_configuration_checkbox() {
 		$this->checkbox_input( 'multisite_configuration', __( 'Configure the plugin for a WordPress multisite setup', 'wp-discourse' ) );
-		?>
-        <div class="discourse-options-section-end">
-            <hr class="discourse-options-section-hr">
-            <h2>Connection Settings</h2>
-        </div>
-        <?php
+		$this->next_setting_heading( __( 'Connection Settings', 'wp-discourse' ) );
+
 	}
+
+	/**********************
+	 *
+	 * Connection Settings.
+	 *
+	 **********************/
 
 	/**
 	 * Outputs markup for the Discourse-url input.
@@ -176,7 +202,6 @@ class NetworkOptions {
 	 * Outputs markup for the api-key input.
 	 */
 	public function api_key_input() {
-//		$discourse_options = $this->options;
 		$url = get_site_option( 'wpdc_site_url' );
 		if ( $url ) {
 			$this->input( 'api_key', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
@@ -194,16 +219,17 @@ class NetworkOptions {
 	public function publish_username_input() {
 		$this->input( 'publish_username', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
-		?>
-		<div class="discourse-options-section-end">
-            <hr class="discourse-options-section-hr">
-            <h2>Webhook Settings</h2>
-        </div>
-        <?php
+		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
 
+	/*******************
+	 *
+	 * Webhook Settings.
+	 *
+	 *******************/
+
 	/**
-	 * Outpurs markup for use-discourse-webhook checkbox.
+	 * Outputs markup for use-discourse-webhook checkbox.
 	 */
 	public function use_discourse_webhook_checkbox() {
 		// Todo: make sure this is getting the URL for the main site in the network.
@@ -285,13 +311,14 @@ class NetworkOptions {
 		);
 
 		$this->input( 'webhook_secret', $description );
-		?>
-        <div class="discourse-options-section-end">
-            <hr class="discourse-options-section-hr">
-            <h2>SSO Settings</h2>
-        </div>
-        <?php
+		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
 	}
+
+	/***************
+	 *
+	 * SSO Settings.
+	 *
+	 ***************/
 
 	/**
 	 * Outputs markup for the sso-secret input.
@@ -337,7 +364,8 @@ class NetworkOptions {
             </h2>
 
             <!--			--><?php //settings_errors(); ?>
-            <form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
+            <form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>"
+                  method="post">
 				<?php wp_nonce_field( 'update_discourse_network_options', 'update_discourse_network_options_nonce' ); ?>
 				<?php
 				settings_fields( 'discourse_network_options' );
@@ -370,7 +398,6 @@ class NetworkOptions {
 		if ( isset( $_POST['wpdc_site_options'] ) ) { // Input var okay.
 			$site_options = wp_unslash( $_POST['wpdc_site_options'] );
 			$this->validate_and_update_site_options( $site_options );
-
 		}
 
 		wp_redirect( add_query_arg( array(
@@ -385,12 +412,26 @@ class NetworkOptions {
 		?>
         <p>
             <em>
-                <?php esc_html_e( "By enabling the Multisite Configuration option, the fields on this page will not be
+				<?php esc_html_e( "By enabling the Multisite Configuration option, the fields on this page will not be
                 displayed for your network's sites.", 'wp-discourse' ); ?>
             </em>
         </p>
 
 		<?php
+	}
+
+	public function validate_and_update_site_options( $site_options ) {
+		foreach ( $site_options as $key => $value ) {
+			$filter = 'wpdc_validate_site_' . $key;
+			if ( ! has_filter( $filter ) ) {
+				// It's safe to log errors here. This should never have to be called on a production site.
+				error_log( 'Missing validation filter: ' . $filter );
+			}
+			$value           = apply_filters( $filter, $value );
+			$site_option_key = 'wpdc_site_' . $key;
+
+			update_site_option( $site_option_key, $value );
+		}
 	}
 
 	/**
@@ -405,7 +446,7 @@ class NetworkOptions {
 	 * @param null|int $max The max value (applies to number inputs).
 	 * @param null|string $default The default value of the input.
 	 */
-	public function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
+	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$key     = 'wpdc_site_' . $option;
 		$value   = get_site_option( $key );
 		$allowed = array(
@@ -438,7 +479,7 @@ class NetworkOptions {
 	 * @param string $label The text for the label.
 	 * @param string $description The description of the settings field.
 	 */
-	public function checkbox_input( $option, $label = '', $description = '' ) {
+	protected function checkbox_input( $option, $label = '', $description = '' ) {
 		$key     = 'wpdc_site_' . $option;
 		$value   = get_site_option( $key );
 		$allowed = array(
@@ -467,17 +508,13 @@ class NetworkOptions {
 		<?php
 	}
 
-	public function validate_and_update_site_options( $site_options ) {
-		foreach ( $site_options as $key => $value ) {
-			$filter = 'wpdc_validate_site_' . $key;
-			if ( ! has_filter( $filter ) ) {
-				// It's safe to log errors here. This should never have to be called on a production site.
-				error_log( 'Missing validation filter: ' . $filter );
-			}
-			$value           = apply_filters( $filter, $value );
-			$site_option_key = 'wpdc_site_' . $key;
-
-			update_site_option( $site_option_key, $value );
-		}
+	protected function next_setting_heading( $title ) {
+		?>
+        <div class="discourse-options-section-end">
+            <hr class="discourse-options-section-hr">
+            <h2><?php esc_html_e( $title ); ?></h2>
+        </div>
+		<?php
 	}
+
 }

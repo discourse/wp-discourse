@@ -169,9 +169,9 @@ class Discourse {
 		'use_discourse_user_webhook',
 		'webhook_match_user_email',
 		'webhook_secret',
-		'sso_secret',
 		'enable_sso',
 		'sso_client_enabled',
+		'sso_secret',
 	);
 
 
