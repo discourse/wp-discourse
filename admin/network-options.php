@@ -16,7 +16,9 @@ class NetworkOptions {
 	}
 
 	public function network_config_notices() {
-		if ( ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
+	    $screen = get_current_screen();
+	    $discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
+		if ( $discourse_screen && ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
 			$notices                    = '';
 			$url                        = get_site_option( 'wpdc_site_url' );
 			$api_key                    = get_site_option( 'wpdc_site_api_key' );
@@ -300,7 +302,7 @@ class NetworkOptions {
             </h2>
 
             <!--			--><?php //settings_errors(); ?>
-            <form action="<?php echo esc_url( $action_url ); ?>" method="post">
+            <form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>" method="post">
 				<?php wp_nonce_field( 'update_discourse_network_options', 'update_discourse_network_options_nonce' ); ?>
 				<?php
 				settings_fields( 'discourse_network_options' );
