@@ -156,27 +156,6 @@ class Discourse {
 	);
 
 	/**
-	 * The array of options that are overridden by site_options when multisite_configuration is enabled.
-	 * @var array
-	 */
-	protected $discourse_site_options = array(
-		'multisite_configuration',
-		'url',
-		'api_key',
-		'publish_username',
-		'use_discourse_webhook',
-		'webhook-match-old-topics',
-		'use_discourse_user_webhook',
-		'webhook_match_user_email',
-		'webhook_secret',
-		'enable_sso',
-		'sso_client_enabled',
-		'sso_secret',
-	);
-
-
-
-	/**
 	 * Discourse constructor.
 	 */
 	public function __construct() {
@@ -204,7 +183,6 @@ class Discourse {
 		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
-		update_option( 'wpdc_site_options', $this->discourse_site_options );
 
 		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
 		// from a previous version, transfer the 'discourse_sso' options into the new arrays.
