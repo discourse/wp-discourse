@@ -22,7 +22,6 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
-		'multisite-configuration' => 0,
 	);
 
 	/**
@@ -166,6 +165,7 @@ class Discourse {
 		'api_key',
 		'publish_username',
 		'use_discourse_webhook',
+		'webhook-match-old-topics',
 		'use_discourse_user_webhook',
 		'webhook_match_user_email',
 		'webhook_secret',

@@ -54,7 +54,7 @@ class WebhookSettings {
 	 */
 	public function register_webhook_settings() {
 		$this->options                 = DiscourseUtilities::get_options();
-		$this->display_webhook_options = is_main_site() || empty( $this->options['multisite-configuration'] );
+		$this->display_webhook_options = ! is_multisite() || empty( $this->options['multisite-configuration'] );
 
 		add_settings_section( 'discourse_webhook_settings_section', __( 'Webhook Settings', 'wp-discourse' ), array(
 			$this,

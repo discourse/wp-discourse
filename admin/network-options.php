@@ -71,7 +71,7 @@ class NetworkOptions {
 
 	public function setup() {
 
-		add_settings_section( 'discourse_network_settings_section', __( 'Network Settings', 'wp-discourse' ), array(
+		add_settings_section( 'discourse_network_settings_section', __( 'Enable Settings for the Entire Network', 'wp-discourse' ), array(
 			$this,
 			'network_settings_details',
 		), 'discourse_network_options' );
@@ -101,6 +101,11 @@ class NetworkOptions {
 			'use_discourse_webhook_checkbox',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 
+		add_settings_field( 'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
+			$this,
+			'webhook_match_old_topics_checkbox',
+		), 'discourse_network_options', 'discourse_network_settings_section' );
+
 		add_settings_field( 'discourse_network_use_discourse_user_webhook', __( 'Update Userdata', 'wp-discourse' ), array(
 			$this,
 			'use_discourse_user_webhook_checkbox',
@@ -116,10 +121,6 @@ class NetworkOptions {
 			'webhook_secret_input',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 
-		add_settings_field( 'discourse_network_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
-			$this,
-			'sso_secret_input',
-		), 'discourse_network_options', 'discourse_network_settings_section' );
 
 		add_settings_field( 'discourse_network_enable_sso', __( 'Enable SSO Provider', 'wp-discourse' ), array(
 			$this,
@@ -129,6 +130,11 @@ class NetworkOptions {
 		add_settings_field( 'discourse_network_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_client_checkbox',
+		), 'discourse_network_options', 'discourse_network_settings_section' );
+
+		add_settings_field( 'discourse_network_sso_secret', __( 'SSO Secret Key', 'wp-discourse' ), array(
+			$this,
+			'sso_secret_input',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 	}
 
@@ -149,8 +155,13 @@ class NetworkOptions {
 	 * Outputs markup for multisite-configuration-checkbox.
 	 */
 	public function multisite_configuration_checkbox() {
-		$this->checkbox_input( 'multisite_configuration', __( 'Configure the plugin for a
-	    WordPress multisite setup', 'wp-discourse' ) );
+		$this->checkbox_input( 'multisite_configuration', __( 'Configure the plugin for a WordPress multisite setup', 'wp-discourse' ) );
+		?>
+        <div class="discourse-options-section-end">
+            <hr class="discourse-options-section-hr">
+            <h2>Connection Settings</h2>
+        </div>
+        <?php
 	}
 
 	/**
@@ -183,6 +194,12 @@ class NetworkOptions {
 	public function publish_username_input() {
 		$this->input( 'publish_username', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
+		?>
+		<div class="discourse-options-section-end">
+            <hr class="discourse-options-section-hr">
+            <h2>Webhook Settings</h2>
+        </div>
+        <?php
 	}
 
 	/**
@@ -207,6 +224,17 @@ class NetworkOptions {
 
 		$this->checkbox_input( 'use_discourse_webhook', __( 'Use a webhook
 		to sync comment data between Discourse and WordPress.', 'wp-discourse' ), $description );
+	}
+
+	/**
+	 * Outputs markup for webhook-match-old-topics input.
+	 */
+	public function webhook_match_old_topics_checkbox() {
+		$this->checkbox_input( 'webhook_match_old_topics', __( 'Match WordPress posts
+	    published prior to WP Discourse version 1.4.0.', 'wp-discourse' ), __( "By default, posts
+	    are matched to Discourse topics through their discourse_topic_id metadata. That value isn't available for posts
+	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
+	    'post' to Discourse topics through their titles.", 'wp-discourse' ) );
 	}
 
 	/**
@@ -235,6 +263,7 @@ class NetworkOptions {
 	public function webhook_match_user_email_checkbox() {
 		$this->checkbox_input( 'webhook_match_user_email', __( 'Match users with Discourse
         through their email address.', 'wp-discourse' ), __( '<strong>Note: only enable this setting if you are certain that email addresses match.</strong>', 'wp-discourse' ) );
+
 	}
 
 	/**
@@ -256,6 +285,12 @@ class NetworkOptions {
 		);
 
 		$this->input( 'webhook_secret', $description );
+		?>
+        <div class="discourse-options-section-end">
+            <hr class="discourse-options-section-hr">
+            <h2>SSO Settings</h2>
+        </div>
+        <?php
 	}
 
 	/**
@@ -350,7 +385,8 @@ class NetworkOptions {
 		?>
         <p>
             <em>
-                Network settings details.
+                <?php esc_html_e( "By enabling the Multisite Configuration option, the fields on this page will not be
+                displayed for your network's sites.", 'wp-discourse' ); ?>
             </em>
         </p>
 
