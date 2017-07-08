@@ -32,18 +32,11 @@ class Utilities {
 					}
 				}
 
-				$use_multisite_configuration = get_site_option( 'wpdc_site_multisite_configuration' );
-				if ( ! is_main_site() && 1 === intval( $use_multisite_configuration ) ) {
-					$options['url']                      = get_site_option( 'wpdc_site_url' );
-					$options['api-key']                  = get_site_option( 'wpdc_site_api_key' );
-					$options['publish-username']         = get_site_option( 'wpdc_site_publish_username' );
-					$options['use-discourse-webhook']    = get_site_option( 'wpdc_site_use_discourse_webhook' );
-					$options['multisite-configuration']  = get_site_option( 'wpdc_site_multisite_configuration' );
-					$options['webhook-match-old-topics'] = get_site_option( 'wpdc_site_webhook_match_old_topics' );
-
-					$options['sso-secret']         = get_site_option( 'wpdc_site_sso_secret' );
-					$options['enable-sso']         = get_site_option( 'wpdc_site_enable_sso' );
-					$options['sso-client-enabled'] = get_site_option( 'wpdc_site_sso_client_enabled' );
+				if ( ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
+					$site_options = get_option( 'wpdc_site_options' );
+					foreach ( $site_options as $key ) {
+						$options[ $key ] = get_site_option( 'wpdc_site_' . $key );
+					}
 				}
 			}
 		}
@@ -57,8 +50,8 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function check_connection_status() {
-		$url = self::get_connection_option( 'url' );
-		$api_key = self::get_connection_option( 'api-key' );
+		$url          = self::get_connection_option( 'url' );
+		$api_key      = self::get_connection_option( 'api-key' );
 		$api_username = self::get_connection_option( 'publish-username' );
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
@@ -118,8 +111,8 @@ class Utilities {
 		}
 
 		if ( $force_update ) {
-			$base_url = self::get_connection_option( 'url' );
-			$api_key = self::get_connection_option( 'api-key' );
+			$base_url     = self::get_connection_option( 'url' );
+			$api_key      = self::get_connection_option( 'api-key' );
 			$api_username = self::get_connection_option( 'publish-username' );
 
 			if ( ! ( $base_url && $api_key && $api_username ) ) {
@@ -128,7 +121,7 @@ class Utilities {
 			}
 
 			$site_url = esc_url_raw( "{$base_url}/site.json" );
-			$site_url    = add_query_arg( array(
+			$site_url = add_query_arg( array(
 				'api_key'      => $api_key,
 				'api_username' => $api_username,
 			), $site_url );
