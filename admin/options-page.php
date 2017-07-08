@@ -150,7 +150,7 @@ class OptionsPage {
 
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );
 
-					$multisite_configuration = get_site_option( 'wpdc_site_multisite_configuration' );
+					$multisite_configuration = get_site_option( 'wpdc_multisite_configuration' );
 					$hide_submit_button = is_multisite() &&
 					                      ( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
 					                      ! empty( $multisite_configuration );

@@ -127,7 +127,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
 		add_filter( 'wpdc_validate_use_discourse_user_webhook', array( $this, 'validate_use_discourse_user_webhook' ) );
-		// Todo: use a separate function for this and add an admin notice when it's enabled.
 		add_filter( 'wpdc_validate_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 
@@ -148,18 +147,18 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_force_avatar_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'wpdc_validate_site_multisite_configuration', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_site_url', array( $this, 'validate_url' ) );
-		add_filter( 'wpdc_validate_site_api_key', array( $this, 'validate_api_key' ) );
-		add_filter( 'wpdc_validate_site_publish_username', array( $this, 'validate_publish_username' ) );
-		add_filter( 'wpdc_validate_site_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
-		add_filter( 'wpdc_validate_site_webhook_match_old_topics', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_site_webhook_secret', array( $this, 'validate_webhook_secret' ) );
-		add_filter( 'wpdc_validate_site_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_site_use_discourse_user_webhook', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_site_sso_secret', array( $this, 'validate_sso_secret' ) );
-		add_filter( 'wpdc_validate_site_enable_sso', array( $this, 'validate_enable_sso' ) );
-		add_filter( 'wpdc_validate_site_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
+		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_checkbox' ) );
+//		add_filter( 'wpdc_validate_site_url', array( $this, 'validate_url' ) );
+//		add_filter( 'wpdc_validate_site_api_key', array( $this, 'validate_api_key' ) );
+//		add_filter( 'wpdc_validate_site_publish_username', array( $this, 'validate_publish_username' ) );
+//		add_filter( 'wpdc_validate_site_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
+//		add_filter( 'wpdc_validate_site_webhook_match_old_topics', array( $this, 'validate_checkbox' ) );
+//		add_filter( 'wpdc_validate_site_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+//		add_filter( 'wpdc_validate_site_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
+//		add_filter( 'wpdc_validate_site_use_discourse_user_webhook', array( $this, 'validate_checkbox' ) );
+//		add_filter( 'wpdc_validate_site_sso_secret', array( $this, 'validate_sso_secret' ) );
+//		add_filter( 'wpdc_validate_site_enable_sso', array( $this, 'validate_enable_sso' ) );
+//		add_filter( 'wpdc_validate_site_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 	}
 
 	/**
@@ -168,10 +167,9 @@ class SettingsValidator {
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 
-		// Todo: the true :false ternary is redundant.
-		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ? true : false;
-		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] ) && 1 === intval( $this->options['sso-client-enabled'] ) ? true : false;
-		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] ) ? true : false;
+		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] );
+		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] );
+		$this->sso_secret_set       = ! empty( $this->options['sso-secret'] );
 	}
 
 	/**

@@ -111,7 +111,7 @@ class DiscourseWebhookRefresh {
 	public function maybe_create_db() {
 		global $wpdb;
 		if ( is_multisite() ) {
-			$use_multisite_configuration = ( 1 === intval( get_site_option( 'wpdc_site_multisite_configuration' ) ) );
+			$use_multisite_configuration = ( 1 === intval( get_site_option( 'wpdc_multisite_configuration' ) ) );
 			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
 
 			if ( $use_multisite_configuration && $create_or_update_db ) {

@@ -32,7 +32,7 @@ class Utilities {
 					}
 				}
 
-				if ( ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
+				if ( ! empty( get_site_option( 'wpdc_multisite_configuration' ) ) ) {
 					$site_options = get_site_option( 'wpdc_site_options' );
 					foreach ( $site_options as $key => $value ) {
 						$options[ $key ] = $value;

@@ -37,7 +37,7 @@ class NetworkOptions {
 	public function network_config_notices() {
 		$screen           = get_current_screen();
 		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
-		if ( $discourse_screen && ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
+		if ( $discourse_screen && ! empty( get_site_option( 'wpdc_multisite_configuration' ) ) ) {
 			$notices                    = '';
 			$url                        = get_site_option( 'wpdc_site_url' );
 			$api_key                    = get_site_option( 'wpdc_site_api_key' );
@@ -423,12 +423,17 @@ class NetworkOptions {
 	public function validate_site_options( $site_options ) {
 		$updated_options = array();
 		foreach ( $site_options as $key => $value ) {
-			$filter = 'wpdc_validate_site_' . str_replace( '-', '_', $key );
+			$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
 			if ( ! has_filter( $filter ) ) {
 				// It's safe to log errors here. This should never have to be called on a production site.
 				error_log( 'Missing validation filter: ' . $filter );
 			}
-			$updated_options[ $key ] = apply_filters( $filter, $value );
+			$value = apply_filters( $filter, $value );
+			$updated_options[ $key ] = $value;
+
+			if ( 'multisite-configuration' === $key ) {
+			    update_site_option( 'wpdc_multisite_configuration', $value );
+            }
 		}
 
 		update_site_option( 'wpdc_site_options', $updated_options );
