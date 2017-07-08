@@ -396,8 +396,8 @@ class NetworkOptions {
 		}
 
 		if ( isset( $_POST['wpdc_site_options'] ) ) { // Input var okay.
-			$site_options = wp_unslash( $_POST['wpdc_site_options'] );
-			$this->validate_and_update_site_options( $site_options );
+			$site_options = wp_unslash( $_POST['wpdc_site_options'] ); // Input var okay.
+			$this->validate_site_options( $site_options );
 		}
 
 		wp_redirect( add_query_arg( array(
@@ -420,7 +420,7 @@ class NetworkOptions {
 		<?php
 	}
 
-	public function validate_and_update_site_options( $site_options ) {
+	public function validate_site_options( $site_options ) {
 		$updated_options = array();
 		foreach ( $site_options as $key => $value ) {
 			$filter = 'wpdc_validate_site_' . str_replace( '-', '_', $key );
@@ -456,9 +456,8 @@ class NetworkOptions {
 	 * @param null|string $type The type of input ('number', 'url', etc).
 	 * @param null|int $min The min value (applied to number inputs).
 	 * @param null|int $max The max value (applies to number inputs).
-	 * @param null|string $default The default value of the input.
 	 */
-	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
+	protected function input( $option, $description, $type = null, $min = null, $max = null ) {
 		$value   = $this->get_site_option( $option );
 		$allowed = array(
 			'a' => array(

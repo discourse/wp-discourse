@@ -85,7 +85,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
-		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
