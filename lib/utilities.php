@@ -33,9 +33,9 @@ class Utilities {
 				}
 
 				if ( ! empty( get_site_option( 'wpdc_site_multisite_configuration' ) ) ) {
-					$site_options = get_option( 'wpdc_site_options' );
-					foreach ( $site_options as $key ) {
-						$options[ $key ] = get_site_option( 'wpdc_site_' . $key );
+					$site_options = get_site_option( 'wpdc_site_options' );
+					foreach ( $site_options as $key => $value ) {
+						$options[ $key ] = $value;
 					}
 				}
 			}
@@ -50,9 +50,10 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function check_connection_status() {
-		$url          = self::get_connection_option( 'url' );
-		$api_key      = self::get_connection_option( 'api-key' );
-		$api_username = self::get_connection_option( 'publish-username' );
+		$options = self::get_options();
+		$url = ! empty( $options['url']) ? $options['url'] : null;
+		$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
 
@@ -111,9 +112,9 @@ class Utilities {
 		}
 
 		if ( $force_update ) {
-			$base_url     = self::get_connection_option( 'url' );
-			$api_key      = self::get_connection_option( 'api-key' );
-			$api_username = self::get_connection_option( 'publish-username' );
+			$base_url = ! empty( $options['url']) ? $options['url'] : null;
+			$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
+			$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
 
 			if ( ! ( $base_url && $api_key && $api_username ) ) {
 
@@ -192,9 +193,10 @@ class Utilities {
 	 * @return array|mixed|object|\WP_Error
 	 */
 	public static function get_discourse_user( $user_id, $match_by_email = false ) {
-		$url          = self::get_connection_option( 'url' );
-		$api_key      = self::get_connection_option( 'api-key' );
-		$api_username = self::get_connection_option( 'publish-username' );
+		$options = self::get_options();
+		$url = ! empty( $options['url']) ? $options['url'] : null;
+		$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
 
@@ -266,26 +268,5 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
-	}
-
-	/**
-	 * @param string $option The option to be returned.
-	 *
-	 * @return string|null
-	 */
-	protected static function get_connection_option( $option ) {
-		static $connection_options = null;
-
-		if ( ! $connection_options ) {
-			$connection_options = get_option( 'discourse_connect' );
-		}
-
-		if ( isset( $connection_options[ $option ] ) ) {
-
-			return $connection_options[ $option ];
-		} else {
-
-			return null;
-		}
 	}
 }
