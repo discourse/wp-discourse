@@ -14,6 +14,7 @@ if ( is_admin() ) {
 	require_once( __DIR__ . '/configurable-text-settings.php' );
 	require_once( __DIR__ . '/connection-settings.php' );
 	require_once( __DIR__ . '/form-helper.php' );
+	require_once( __DIR__ . '/network-options.php' );
 	require_once( __DIR__ . '/options-page.php' );
 	require_once( __DIR__ . '/publish-settings.php' );
 	require_once( __DIR__ . '/settings-validator.php' );
@@ -25,6 +26,7 @@ if ( is_admin() ) {
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();
 	new AdminMenu( $options_page, $form_helper );
+	new NetworkOptions( $form_helper );
 	new ConnectionSettings( $form_helper );
 	new PublishSettings( $form_helper );
 	new CommentSettings( $form_helper );
