@@ -83,7 +83,7 @@ class NetworkOptions {
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
 				            __( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
 				            '</p></div>';
-            }
+			}
 
 		}
 
@@ -179,7 +179,7 @@ class NetworkOptions {
 	 * Outputs markup for multisite-configuration-checkbox.
 	 */
 	public function multisite_configuration_checkbox() {
-		$this->checkbox_input( 'multisite_configuration', __( 'Configure the plugin for a WordPress multisite setup', 'wp-discourse' ) );
+		$this->checkbox_input( 'multisite-configuration', __( 'Configure the plugin for a WordPress multisite setup', 'wp-discourse' ) );
 		$this->next_setting_heading( __( 'Connection Settings', 'wp-discourse' ) );
 
 	}
@@ -204,11 +204,11 @@ class NetworkOptions {
 	public function api_key_input() {
 		$url = get_site_option( 'wpdc_site_url' );
 		if ( $url ) {
-			$this->input( 'api_key', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
+			$this->input( 'api-key', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
 			                         '/admin/api/keys" target="_blank">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
 			                         "If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
 		} else {
-			$this->input( 'api_key', __( "Found on your forum at /admin/api/keys.
+			$this->input( 'api-key', __( "Found on your forum at /admin/api/keys.
 			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' ) );
 		}
 	}
@@ -217,7 +217,7 @@ class NetworkOptions {
 	 * Outputs markup for the publish-username input.
 	 */
 	public function publish_username_input() {
-		$this->input( 'publish_username', __( 'The default Discourse username under which WordPress posts will be published on your forum.
+		$this->input( 'publish-username', __( 'The default Discourse username under which WordPress posts will be published on your forum.
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
 		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
@@ -248,7 +248,7 @@ class NetworkOptions {
  URL <code>%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
 		);
 
-		$this->checkbox_input( 'use_discourse_webhook', __( 'Use a webhook
+		$this->checkbox_input( 'use-discourse-webhook', __( 'Use a webhook
 		to sync comment data between Discourse and WordPress.', 'wp-discourse' ), $description );
 	}
 
@@ -256,7 +256,7 @@ class NetworkOptions {
 	 * Outputs markup for webhook-match-old-topics input.
 	 */
 	public function webhook_match_old_topics_checkbox() {
-		$this->checkbox_input( 'webhook_match_old_topics', __( 'Match WordPress posts
+		$this->checkbox_input( 'webhook-match-old-topics', __( 'Match WordPress posts
 	    published prior to WP Discourse version 1.4.0.', 'wp-discourse' ), __( "By default, posts
 	    are matched to Discourse topics through their discourse_topic_id metadata. That value isn't available for posts
 	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
@@ -282,12 +282,12 @@ class NetworkOptions {
  URL <code>%2$s</code>. Make sure that the \'User Event\' checkbox is enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
 		);
 
-		$this->checkbox_input( 'use_discourse_user_webhook', __( 'Use a webhook to sync user data with Discourse.', 'wp-discourse' ), $description );
+		$this->checkbox_input( 'use-discourse-user-webhook', __( 'Use a webhook to sync user data with Discourse.', 'wp-discourse' ), $description );
 
 	}
 
 	public function webhook_match_user_email_checkbox() {
-		$this->checkbox_input( 'webhook_match_user_email', __( 'Match users with Discourse
+		$this->checkbox_input( 'webhook-match-user-email', __( 'Match users with Discourse
         through their email address.', 'wp-discourse' ), __( '<strong>Note: only enable this setting if you are certain that email addresses match.</strong>', 'wp-discourse' ) );
 
 	}
@@ -296,7 +296,7 @@ class NetworkOptions {
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
-		$url = get_site_option( 'wpdc_site_url' );
+		$url = get_site_option( 'wpdc-site-url' );
 		if ( ! empty( $url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank">' .
 			                          esc_url( $url ) . '/admin/api/web_hooks</a>';
@@ -310,7 +310,7 @@ class NetworkOptions {
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
 		);
 
-		$this->input( 'webhook_secret', $description );
+		$this->input( 'webhook-secret', $description );
 		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
 	}
 
@@ -324,7 +324,7 @@ class NetworkOptions {
 	 * Outputs markup for the sso-secret input.
 	 */
 	public function sso_secret_input() {
-		$this->input( 'sso_secret', __( "A string of text (numbers, letters, and symbols)
+		$this->input( 'sso-secret', __( "A string of text (numbers, letters, and symbols)
 		at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
 	}
 
@@ -333,14 +333,14 @@ class NetworkOptions {
 	 */
 	public function enable_sso_provider_checkbox() {
 		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
-		$this->checkbox_input( 'enable_sso', $description );
+		$this->checkbox_input( 'enable-sso', $description );
 	}
 
 	/**
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
-		$this->checkbox_input( 'sso_client_enabled', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		$this->checkbox_input( 'sso-client-enabled', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
 	}
 
 
@@ -421,17 +421,29 @@ class NetworkOptions {
 	}
 
 	public function validate_and_update_site_options( $site_options ) {
+		$updated_options = array();
 		foreach ( $site_options as $key => $value ) {
-			$filter = 'wpdc_validate_site_' . $key;
+			$filter = 'wpdc_validate_site_' . str_replace( '-', '_', $key );
 			if ( ! has_filter( $filter ) ) {
 				// It's safe to log errors here. This should never have to be called on a production site.
 				error_log( 'Missing validation filter: ' . $filter );
 			}
-			$value           = apply_filters( $filter, $value );
-			$site_option_key = 'wpdc_site_' . $key;
-
-			update_site_option( $site_option_key, $value );
+			$updated_options[ $key ] = apply_filters( $filter, $value );
 		}
+
+		update_site_option( 'wpdc_site_options', $updated_options );
+	}
+
+	protected function get_site_option( $key ) {
+		static $site_options = array();
+
+		if ( empty( $site_options ) ) {
+			$site_options = get_site_option( 'wpdc_site_options' );
+		}
+
+		$option = ! empty( $site_options[ $key ] ) ? $site_options[ $key ] : false;
+
+		return $option;
 	}
 
 	/**
@@ -447,8 +459,7 @@ class NetworkOptions {
 	 * @param null|string $default The default value of the input.
 	 */
 	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
-		$key     = 'wpdc_site_' . $option;
-		$value   = get_site_option( $key );
+		$value   = $this->get_site_option( $option );
 		$allowed = array(
 			'a' => array(
 				'href'   => array(),
@@ -480,8 +491,7 @@ class NetworkOptions {
 	 * @param string $description The description of the settings field.
 	 */
 	protected function checkbox_input( $option, $label = '', $description = '' ) {
-		$key     = 'wpdc_site_' . $option;
-		$value   = get_site_option( $key );
+		$value   = $this->get_site_option( $option );
 		$allowed = array(
 			'a'      => array(
 				'href'   => array(),
@@ -516,5 +526,4 @@ class NetworkOptions {
         </div>
 		<?php
 	}
-
 }
