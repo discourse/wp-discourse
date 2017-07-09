@@ -147,7 +147,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_force_avatar_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'wpdc_validate_site_multisite_configuration', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_multisite_configuration-enabled', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_site_url', array( $this, 'validate_url' ) );
 		add_filter( 'wpdc_validate_site_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_site_publish_username', array( $this, 'validate_publish_username' ) );
