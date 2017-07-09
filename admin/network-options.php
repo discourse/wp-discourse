@@ -107,10 +107,10 @@ class NetworkOptions {
 
 
 	/**
-	 * Outputs markup for multisite-configuration-checkbox.
+	 * Outputs markup for multisite-configuration-enabled-checkbox.
 	 */
 	public function multisite_configuration_checkbox() {
-		$this->checkbox_input( 'multisite-configuration', __( 'Configure the plugin for a WordPress multisite setup.', 'wp-discourse' ),
+		$this->checkbox_input( 'multisite-configuration-enabled', __( 'Configure the plugin for a WordPress multisite setup.', 'wp-discourse' ),
 			__( "Enabling this setting will create a wpdc_topic_blog database table so that Discourse topics can be associated
             with the blog they were posted from. When enabled, the remaining settings on this page will be
             used to configure their related settings on your network's subsites.", 'wp-discourse' ) );
@@ -429,7 +429,7 @@ class NetworkOptions {
 			$value                   = apply_filters( $filter, $value );
 			$updated_options[ $key ] = $value;
 
-			if ( 'multisite-configuration' === $key ) {
+			if ( 'multisite-configuration-enabled' === $key ) {
 				update_site_option( 'wpdc_multisite_configuration', $value );
 			}
 		}
@@ -440,7 +440,7 @@ class NetworkOptions {
 	public function network_config_notices() {
 		$screen           = get_current_screen();
 		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
-		if ( $discourse_screen && ! empty( $this->get_site_option( 'multisite-configuration' ) ) ) {
+		if ( $discourse_screen && ! empty( $this->get_site_option( 'multisite-configuration-enabled' ) ) ) {
 			$notices                    = '';
 			$url                        = $this->get_site_option( 'url' );
 			$api_key                    = $this->get_site_option( 'api-key' );

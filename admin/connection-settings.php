@@ -54,7 +54,7 @@ class ConnectionSettings {
 	 */
 	public function register_connection_settings() {
 		$this->options                    = DiscourseUtilities::get_options();
-		$this->display_connection_options = ! is_multisite() ||  empty( $this->options['multisite-configuration'] );
+		$this->display_connection_options = ! is_multisite() ||  empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connecting With Discourse', 'wp-discourse' ), array(
 			$this,

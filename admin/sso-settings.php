@@ -64,7 +64,7 @@ class SSOSettings {
 	 */
 	public function register_sso_settings() {
 		$this->options                  = DiscourseUtilities::get_options();
-		$this->use_network_sso_settings = is_multisite() && ! empty( $this->options['multisite-configuration'] );
+		$this->use_network_sso_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
 

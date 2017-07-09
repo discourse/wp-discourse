@@ -79,7 +79,7 @@ class DiscourseWebhookRefresh {
 
 		if ( ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
-			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration'] );
+			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
