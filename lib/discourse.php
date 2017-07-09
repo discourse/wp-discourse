@@ -7,10 +7,20 @@
 
 namespace WPDiscourse\Discourse;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class Discourse
  */
 class Discourse {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
 
 	/**
 	 * The connection options array.
@@ -171,17 +181,10 @@ class Discourse {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
 
 		// Set the Discourse domain name option.
-		$connection_options = get_option( 'discourse_connect' );
-		if ( $connection_options && ! empty( $connection_options['url'] ) ) {
-
-			$discourse_url = $connection_options['url'];
-		} else {
-
-			$discourse_url = null;
-		}
-
+		$discourse_url = ! empty( $this->options['url']) ? $this->options['url'] : null;
 		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
+
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 
 		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
