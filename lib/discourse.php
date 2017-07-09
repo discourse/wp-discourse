@@ -41,17 +41,17 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_publish = array(
-		'display-subcategories'   => 0,
-		'publish-category'        => '',
-		'publish-category-update' => 0,
-		'full-post-content'       => 0,
-		'custom-excerpt-length'   => 55,
-		'add-featured-link'       => 0,
-		'auto-publish'            => 0,
-		'publish-failure-notice'  => 0,
-		'publish-failure-email'   => '',
-		'auto-track'              => 1,
-		'allowed_post_types'      => array( 'post' ),
+		'display-subcategories'     => 0,
+		'publish-category'          => '',
+		'publish-category-update'   => 0,
+		'full-post-content'         => 0,
+		'custom-excerpt-length'     => 55,
+		'add-featured-link'         => 0,
+		'auto-publish'              => 0,
+		'publish-failure-notice'    => 0,
+		'publish-failure-email'     => '',
+		'auto-track'                => 1,
+		'allowed_post_types'        => array( 'post' ),
 		'hide-discourse-name-field' => 0,
 	);
 
@@ -105,10 +105,10 @@ class Discourse {
 	 */
 	protected $discourse_webhook = array(
 		'use-discourse-webhook'      => 0,
-		'webhook-secret' => '',
-		'webhook-match-old-topics' => 0,
+		'webhook-secret'             => '',
+		'webhook-match-old-topics'   => 0,
 		'use-discourse-user-webhook' => 0,
-		'webhook-match-user-email' => 0,
+		'webhook-match-user-email'   => 0,
 	);
 
 	/**
@@ -179,10 +179,11 @@ class Discourse {
 	 */
 	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
+		$this->options = DiscourseUtilities::get_options();
 
 		// Set the Discourse domain name option.
-		$discourse_url = ! empty( $this->options['url']) ? $this->options['url'] : null;
-		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		$discourse_url = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
+		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
 
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
@@ -250,7 +251,7 @@ class Discourse {
 	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
 	 *
 	 * @param string $old_option The name of the old option_group.
-	 * @param array  $transferable_option_groups The array of transferable_option_group names.
+	 * @param array $transferable_option_groups The array of transferable_option_group names.
 	 */
 	protected function transfer_options( $old_option, $transferable_option_groups ) {
 		$discourse_options = get_option( $old_option );
@@ -263,7 +264,7 @@ class Discourse {
 	/**
 	 * Transfers saved option values to the new options group.
 	 *
-	 * @param array  $existing_options The old 'discourse' options array.
+	 * @param array $existing_options The old 'discourse' options array.
 	 * @param string $group_name The name of the current options group.
 	 */
 	protected function transfer_option_group( $existing_options, $group_name ) {
