@@ -7,22 +7,7 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 /**
  * Class NetworkOptions
  *
- * Adds the following options as site options and saves them as 'wpdc_site_option_name':
- *      - multisite_configuration
- *      - url
- *      - api_key
- *      - publish_username
- *      - use_discourse_webhook
- *      - webhook_match_old_topics
- *      - use_discourse_user_webhook
- *      - webhook_match_user_email
- *      - webhook_secret
- *      - enable_sso
- *      - sso_client_enabled
- *      - sso_secret
- *
- * When multisite_configuration is enabled, the site options can be accessed through DiscourseUtilities::get_options()
- * with the regular option key.
+ * Saves site_options with matching keys to the blog_options to the 'wpdc_site_options' array.
  */
 class NetworkOptions {
 
@@ -34,64 +19,6 @@ class NetworkOptions {
 		add_action( 'network_admin_notices', array( $this, 'network_config_notices' ) );
 	}
 
-	public function network_config_notices() {
-		$screen           = get_current_screen();
-		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
-		if ( $discourse_screen && ! empty( get_site_option( 'wpdc_multisite_configuration' ) ) ) {
-			$notices                    = '';
-			$url                        = get_site_option( 'wpdc_site_url' );
-			$api_key                    = get_site_option( 'wpdc_site_api_key' );
-			$publish_username           = get_site_option( 'wpdc_site_publish_username' );
-			$use_discourse_webhook      = get_site_option( 'wpdc_site_use_discourse_webhook' );
-			$use_discourse_user_webhook = get_site_option( 'wpdc_site_use_discourse_user_webhook' );
-			$webhook_secret             = get_site_option( 'wpdc_site_webhook_secret' );
-			$sso_secret                 = get_site_option( 'wpdc_site_sso_secret' );
-			$enable_sso                 = get_site_option( 'wpdc_site_enable_sso' );
-			$sso_client_enabled         = get_site_option( 'wpdc_site_sso_client_enabled' );
-
-			if ( ! ( $url && $api_key && $publish_username ) ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You need to supply the Discourse URL, API Key, and Publishing Username on this page.', 'wp-discourse' ) .
-				            '</p></div>';
-			} elseif ( ! DiscourseUtilities::check_connection_status() ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You are not connected to Discourse.', 'wp-discourse' ) .
-				            '</p></div>';
-			} else {
-				$notices .= '<div class="notice notice-success is-dismissible"><p>' .
-				            __( 'You are connected to Discourse!', 'wp-discourse' ) .
-				            '</p></div>';
-			}
-
-			if ( ( ! empty( $use_discourse_webhook ) && empty( $webhook_secret ) ) ||
-			     ( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
-			) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You need to supply a webhook secret key at least 12 characters long.', 'wp-discourse' ) .
-				            '</p></div>';
-			}
-
-			if ( ( ! empty( $enable_sso ) || ! empty( $sso_client_enabled ) ) &&
-			     empty( $sso_secret )
-			) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( 'You need to supply an sso secret key at least 10 characters long.', 'wp-discourse' ) .
-				            '</p></div>';
-			}
-
-			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
-				            '</p></div>';
-			}
-
-		}
-
-		if ( ! empty( $notices ) ) {
-			echo $notices;
-		}
-
-	}
 
 	public function setup() {
 
@@ -179,9 +106,11 @@ class NetworkOptions {
 	 * Outputs markup for multisite-configuration-checkbox.
 	 */
 	public function multisite_configuration_checkbox() {
-		$this->checkbox_input( 'multisite-configuration', __( 'Configure the plugin for a WordPress multisite setup', 'wp-discourse' ) );
+		$this->checkbox_input( 'multisite-configuration', __( 'Configure the plugin for a WordPress multisite setup.', 'wp-discourse' ),
+			__( "Enabling this setting will create a wpdc_topic_blog database table so that Discourse topics can be associated
+            with the blog they were posted from. When enabled, the remaining settings on this page will be
+            used to configure their related settings on your network's subsites.", 'wp-discourse' ) );
 		$this->next_setting_heading( __( 'Connection Settings', 'wp-discourse' ) );
-
 	}
 
 	/**********************
@@ -194,15 +123,14 @@ class NetworkOptions {
 	 * Outputs markup for the Discourse-url input.
 	 */
 	public function url_input() {
-		// Todo: change this back to 'url'
-		$this->input( 'url', __( 'The base URL of your forum, for example http://discourse.example.com', 'wp-discourse' ), 'text' );
+		$this->input( 'url', __( 'The base URL of your forum, for example http://discourse.example.com', 'wp-discourse' ), 'url' );
 	}
 
 	/**
 	 * Outputs markup for the api-key input.
 	 */
 	public function api_key_input() {
-		$url = get_site_option( 'wpdc_site_url' );
+		$url = $this->get_site_option( 'url' );
 		if ( $url ) {
 			$this->input( 'api-key', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
 			                         '/admin/api/keys" target="_blank">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
@@ -218,7 +146,7 @@ class NetworkOptions {
 	 */
 	public function publish_username_input() {
 		$this->input( 'publish-username', __( 'The default Discourse username under which WordPress posts will be published on your forum.
-		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ) );
+		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.', 'wp-discourse' ), null, null, null, 'system' );
 		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
 
@@ -232,9 +160,8 @@ class NetworkOptions {
 	 * Outputs markup for use-discourse-webhook checkbox.
 	 */
 	public function use_discourse_webhook_checkbox() {
-		// Todo: make sure this is getting the URL for the main site in the network.
-		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
-		$discourse_url       = get_site_option( 'wpdc_site_url' );
+		$webhook_payload_url = network_site_url( '/wp-json/wp-discourse/v1/update-topic-content' );
+		$discourse_url       = $this->get_site_option( 'url' );
 		if ( ! empty( $discourse_url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $discourse_url ) . '/admin/api/web_hooks" target="_blank">' .
 			                          esc_url( $discourse_url ) . '/admin/api/web_hooks</a>';
@@ -267,8 +194,8 @@ class NetworkOptions {
 	 * Outputs markup for use-discourse-user-webhook checkbox.
 	 */
 	public function use_discourse_user_webhook_checkbox() {
-		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user' );
-		$url                 = get_site_option( 'wpdc_site_url' );
+		$webhook_payload_url = network_site_url( '/wp-json/wp-discourse/v1/update-user' );
+		$url                 = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank">' .
 			                          esc_url( $url ) . '/admin/api/web_hooks</a>';
@@ -278,7 +205,9 @@ class NetworkOptions {
 
 		$description = sprintf(
 		// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
-			__( 'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
+			__( 'This setting is primarily designed for when WordPress is enabled as the SSO Provider for Discourse. It
+ supplies the Discourse username to WordPress when a user is created or updated on your forum. Before enabling this setting,
+ create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
  URL <code>%2$s</code>. Make sure that the \'User Event\' checkbox is enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
 		);
 
@@ -288,7 +217,10 @@ class NetworkOptions {
 
 	public function webhook_match_user_email_checkbox() {
 		$this->checkbox_input( 'webhook-match-user-email', __( 'Match users with Discourse
-        through their email address.', 'wp-discourse' ), __( '<strong>Note: only enable this setting if you are certain that email addresses match.</strong>', 'wp-discourse' ) );
+        through their email address.', 'wp-discourse' ), __( "If you are not using WordPress as the SSO Provider for Discourse
+ it is possible to use the Update Userdata webhook by syncing users by their email address.<strong>Note: this should only be enabled if
+ you are using an external service to authenticate users on both your WordPress site and Discourse forum and can guarantee the user's email
+ addresses match between the two systems.</strong>", 'wp-discourse' ) );
 
 	}
 
@@ -296,7 +228,7 @@ class NetworkOptions {
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
-		$url = get_site_option( 'wpdc-site-url' );
+		$url = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank">' .
 			                          esc_url( $url ) . '/admin/api/web_hooks</a>';
@@ -320,29 +252,52 @@ class NetworkOptions {
 	 *
 	 ***************/
 
-	/**
-	 * Outputs markup for the sso-secret input.
-	 */
-	public function sso_secret_input() {
-		$this->input( 'sso-secret', __( "A string of text (numbers, letters, and symbols)
-		at least 10 characters long. Use the same value in your forum's 'sso secret' setting.", 'wp-discourse' ) );
-	}
 
 	/**
 	 * Outputs markup for the enable-sso checkbox.
 	 */
 	public function enable_sso_provider_checkbox() {
-		$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
-		$this->checkbox_input( 'enable-sso', $description );
+		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+		$details                = sprintf(
+			__( 'For details about using WordPress as the SSO Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
+		);
+		$this->checkbox_input( 'enable-sso', $description, $details );
 	}
 
 	/**
 	 * Outputs markup for sso-client-enabled checkbox.
 	 */
 	public function enable_sso_client_checkbox() {
-		$this->checkbox_input( 'sso-client-enabled', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
+		$details                = sprintf(
+			__( 'For details about using WordPress as an SSO Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
+		);
+		$this->checkbox_input( 'sso-client-enabled', $description, $details );
 	}
 
+	/**
+	 * Outputs markup for the sso-secret input.
+	 */
+	public function sso_secret_input() {
+		$url = $this->get_site_option( 'url' );
+		if ( ! empty( $url ) ) {
+			$discourse_sso_url = '<a href="' . esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso" target="_blank">' .
+			                     esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso</a>';
+		} else {
+			$discourse_sso_url = 'http://forum.example.com/admin/site_settings/category/all_results?filter=sso';
+		}
+
+		$description = sprintf(
+		// translators: SSO secret input. Placeholder: discourse_sso_url.
+			__( 'The secret key used to verify Discourse SSO requests. Set it to a string of text, at least 10
+		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_sso_url
+		);
+		$this->input( 'sso-secret', $description );
+	}
 
 	public function network_options_page() {
 		if ( ! current_user_can( 'manage_network_options' ) ) {
@@ -412,31 +367,128 @@ class NetworkOptions {
 		?>
         <p>
             <em>
-				<?php esc_html_e( "By enabling the Multisite Configuration option, the fields on this page will not be
-                displayed for your network's sites.", 'wp-discourse' ); ?>
+				<?php esc_html_e( "The Multisite Configuration option is for the case where one Discourse forum is connected
+                to a network of WordPress sites. If it's enabled, the fields on this page will not be displayed on
+                the WP Discourse options pages for your network's subsites. This allows you to use the plugin on a network without
+                exposing your forum's API credentials to the subsite's administrators.", 'wp-discourse' ); ?>
             </em>
         </p>
-
+        <h2><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?></h2>
+        <p>
+            <em>
+				<?php esc_html_e( "Webhooks can be used to sync data between Discourse and WordPress. Their use is optional,
+				but they're easy to setup. In a multisite environment the Sync Comment Data webhook will improve the efficiency of syncing Discourse
+				topic data with WordPress. The Update User Data webhook is used to sync user data between WordPress and Discourse when
+				a Discourse user is created or updated. When Multisite Configuration is enabled, all webhook options are set for your network's sites here.", 'wp-discourse' ); ?>
+            </em>
+        </p>
+        <h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
+        <p>
+            <em>
+				<?php esc_html_e( "When Multisite Configuration is enabled, SSO functionality to either use WordPress as the
+                SSO provider for Discourse, or WordPress as an SSO client to Discourse is enabled on this page. The SSO Secret
+                Key is also set here. In a multisite setup, the SSO Client functionality is only available when Multisite Configuration
+                is enabled.", 'wp-discourse' ); ?>
+            </em>
+        </p>
+        <div class="discourse-doc-section-end">
+            <hr class="discourse-options-section-hr">
+        </div>
 		<?php
 	}
 
 	public function validate_site_options( $site_options ) {
 		$updated_options = array();
 		foreach ( $site_options as $key => $value ) {
-			$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
+			$filter = 'wpdc_validate_site_' . str_replace( '-', '_', $key );
 			if ( ! has_filter( $filter ) ) {
 				// It's safe to log errors here. This should never have to be called on a production site.
 				error_log( 'Missing validation filter: ' . $filter );
 			}
-			$value = apply_filters( $filter, $value );
+			$value                   = apply_filters( $filter, $value );
 			$updated_options[ $key ] = $value;
 
 			if ( 'multisite-configuration' === $key ) {
-			    update_site_option( 'wpdc_multisite_configuration', $value );
-            }
+				update_site_option( 'wpdc_multisite_configuration', $value );
+			}
 		}
 
 		update_site_option( 'wpdc_site_options', $updated_options );
+	}
+
+	public function network_config_notices() {
+		$screen           = get_current_screen();
+		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
+		if ( $discourse_screen && ! empty( $this->get_site_option( 'multisite-configuration' ) ) ) {
+			$notices                    = '';
+			$url                        = $this->get_site_option( 'url' );
+			$api_key                    = $this->get_site_option( 'api-key' );
+			$publish_username           = $this->get_site_option( 'publish-username' );
+			$use_discourse_webhook      = $this->get_site_option( 'use-discourse-webhook' );
+			$use_discourse_user_webhook = $this->get_site_option( 'use-discourse-user-webhook' );
+			$webhook_secret             = $this->get_site_option( 'webhook-secret' );
+			$sso_secret                 = $this->get_site_option( 'sso-secret' );
+			$enable_sso                 = $this->get_site_option( 'enable-sso' );
+			$sso_client_enabled         = $this->get_site_option( 'sso-client-enabled' );
+
+			if ( ! ( $url && $api_key && $publish_username ) ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( 'To connect with Discourse, you need to supply the Discourse URL, API Key, and Publishing Username.', 'wp-discourse' ) .
+				            '</p></div>';
+			} elseif ( ! DiscourseUtilities::check_connection_status() ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( 'You are not connected to Discourse. Check that your connection settings are correct.', 'wp-discourse' ) .
+				            '</p></div>';
+			} else {
+				$notices .= '<div class="notice notice-success is-dismissible"><p>' .
+				            __( 'You are connected to Discourse!', 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ( ! empty( $use_discourse_webhook ) && empty( $webhook_secret ) ) ||
+			     ( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
+			) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( 'To use Discourse webhooks, you need to supply a webhook secret key.', 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ! empty( $webhook_secret ) && strlen( $webhook_secret ) < 12 ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( "The Webhook Secret Key must be at least 12 characters long.", 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ! empty( $enable_sso ) && empty( $sso_secret )
+			) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( 'To use WordPress as the SSO Provider, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ! empty( $sso_client_enabled ) && empty( $sso_secret )
+			) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( 'To use WordPress as the SSO Client, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
+				            '</p></div>';
+			}
+
+			if ( ! empty( $sso_secret ) && strlen( $sso_secret ) < 10 ) {
+				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				            __( "The SSO Secret Key must be at least 10 characters long.", 'wp-discourse' ) .
+				            '</p></div>';
+			}
+		}
+
+		if ( ! empty( $notices ) ) {
+			echo $notices;
+		}
 	}
 
 	protected function get_site_option( $key ) {
@@ -462,8 +514,9 @@ class NetworkOptions {
 	 * @param null|int $min The min value (applied to number inputs).
 	 * @param null|int $max The max value (applies to number inputs).
 	 */
-	protected function input( $option, $description, $type = null, $min = null, $max = null ) {
+	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$value   = $this->get_site_option( $option );
+		$value   = empty( $value ) && $default ? $default : $value;
 		$allowed = array(
 			'a' => array(
 				'href'   => array(),
@@ -522,11 +575,13 @@ class NetworkOptions {
 		<?php
 	}
 
-	protected function next_setting_heading( $title ) {
+	protected function next_setting_heading( $title = null ) {
 		?>
         <div class="discourse-options-section-end">
             <hr class="discourse-options-section-hr">
-            <h2><?php esc_html_e( $title ); ?></h2>
+			<?php if ( $title ) : ?>
+                <h2><?php esc_html_e( $title ); ?></h2>
+			<?php endif; ?>
         </div>
 		<?php
 	}
