@@ -22,12 +22,12 @@ class NetworkOptions {
 
 	public function setup() {
 
-		add_settings_section( 'discourse_network_settings_section', __( 'Enable Settings for the Entire Network', 'wp-discourse' ), array(
+		add_settings_section( 'discourse_network_settings_section', __( 'Multisite Configuration', 'wp-discourse' ), array(
 			$this,
 			'network_settings_details',
 		), 'discourse_network_options' );
 
-		add_settings_field( 'discourse_network_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
+		add_settings_field( 'discourse_network_multisite_configuration', __( 'Enable Multisite Configuration', 'wp-discourse' ), array(
 			$this,
 			'multisite_configuration_checkbox',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
@@ -112,8 +112,8 @@ class NetworkOptions {
 	public function multisite_configuration_checkbox() {
 		$this->checkbox_input( 'multisite-configuration-enabled', __( 'Configure the plugin for a WordPress multisite setup.', 'wp-discourse' ),
 			__( "Enabling this setting will create a wpdc_topic_blog database table so that Discourse topics can be associated
-            with the blog they were posted from. When enabled, the remaining settings on this page will be
-            used to configure their related settings on your network's subsites.", 'wp-discourse' ) );
+            with the blog they were posted from. This makes it possible to sync topic data between Discourse and WordPress with a single webhook.
+            When Multisite Configuration is enabled, the settings on this page will be used to configure their related settings on your network's subsites.", 'wp-discourse' ) );
 		$this->next_setting_heading( __( 'Connection Settings', 'wp-discourse' ) );
 	}
 
@@ -388,18 +388,27 @@ class NetworkOptions {
 		<p>
 			<em>
 				<?php esc_html_e( "The Multisite Configuration option is for the case where one Discourse forum is connected
-                to a network of WordPress sites. If it's enabled, the fields on this page will not be displayed on
-                the WP Discourse options pages for your network's subsites. This allows you to use the plugin on a network without
-                exposing your forum's API credentials to the subsite's administrators.", 'wp-discourse' ); ?>
+                to a network of WordPress sites. If, instead, you would like to connect many forums to
+                many subsites, don't enable the Multisite Configuration option or any settings on this page. For that case you can
+                configure the settings individually on each of your subsites' WP Discourse options pages.", 'wp-discourse' ); ?>
 			</em>
 		</p>
+        <h2><?php esc_html_e( 'Connection', 'wp-discourse' ); ?></h2>
+        <p>
+            <em>
+                <?php esc_html_e( "If the Multisite Configuration option is enabled, all the subsites in your network will
+                be configured to use the API credentials entered on this page. Your forum's API credentials will not be displayed
+                on your subsites' settings pages.", 'wp-discourse' ); ?>
+            </em>
+        </p>
 		<h2><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?></h2>
 		<p>
 			<em>
 				<?php esc_html_e( "Webhooks can be used to sync data between Discourse and WordPress. Their use is optional,
 				but they're easy to setup. In a multisite environment the Sync Comment Data webhook will improve the efficiency of syncing Discourse
 				topic data with WordPress. The Update User Data webhook is used to sync user data between WordPress and Discourse when
-				a Discourse user is created or updated. When Multisite Configuration is enabled, all webhook options are set for your network's sites here.", 'wp-discourse' ); ?>
+				a Discourse user is created or updated. When Multisite Configuration is enabled, all webhook options for your network
+				are set on this page.", 'wp-discourse' ); ?>
 			</em>
 		</p>
 		<h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
@@ -413,6 +422,7 @@ class NetworkOptions {
 		</p>
 		<div class="discourse-doc-section-end">
 			<hr class="discourse-options-section-hr">
+            <h2><?php esc_html_e( 'Multisite Settings', 'wp-discourse' ); ?></h2>
 		</div>
 		<?php
 	}
