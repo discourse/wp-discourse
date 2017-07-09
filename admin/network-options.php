@@ -72,7 +72,6 @@ class NetworkOptions {
 			'webhook_secret_input',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 
-
 		add_settings_field( 'discourse_network_enable_sso', __( 'Enable SSO Provider', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_provider_checkbox',
@@ -113,10 +112,10 @@ class NetworkOptions {
 		$this->next_setting_heading( __( 'Connection Settings', 'wp-discourse' ) );
 	}
 
-	/**********************
+	/**
+	 * *******************
 	 *
 	 * Connection Settings.
-	 *
 	 **********************/
 
 	/**
@@ -134,7 +133,7 @@ class NetworkOptions {
 		if ( $url ) {
 			$this->input( 'api-key', __( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
 			                         '/admin/api/keys" target="_blank">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
-			                         "If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
+			"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' );
 		} else {
 			$this->input( 'api-key', __( "Found on your forum at /admin/api/keys.
 			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.", 'wp-discourse' ) );
@@ -150,10 +149,10 @@ class NetworkOptions {
 		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
 
-	/*******************
+	/**
+	 * ****************
 	 *
 	 * Webhook Settings.
-	 *
 	 *******************/
 
 	/**
@@ -170,7 +169,7 @@ class NetworkOptions {
 		}
 
 		$description = sprintf(
-		// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
+			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__( 'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
  URL <code>%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
 		);
@@ -204,7 +203,7 @@ class NetworkOptions {
 		}
 
 		$description = sprintf(
-		// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
+			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__( 'This setting is primarily designed for when WordPress is enabled as the SSO Provider for Discourse. It
  supplies the Discourse username to WordPress when a user is created or updated on your forum. Before enabling this setting,
  create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
@@ -237,7 +236,7 @@ class NetworkOptions {
 		}
 
 		$description = sprintf(
-		// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
+			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
 			__( 'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_webhooks_url
 		);
@@ -246,10 +245,10 @@ class NetworkOptions {
 		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
 	}
 
-	/***************
+	/**
+	 * ************
 	 *
 	 * SSO Settings.
-	 *
 	 ***************/
 
 
@@ -292,7 +291,7 @@ class NetworkOptions {
 		}
 
 		$description = sprintf(
-		// translators: SSO secret input. Placeholder: discourse_sso_url.
+			// translators: SSO secret input. Placeholder: discourse_sso_url.
 			__( 'The secret key used to verify Discourse SSO requests. Set it to a string of text, at least 10
 		        characters long. It needs to match the key set at %1$s.', 'wp-discourse' ), $discourse_sso_url
 		);
@@ -310,25 +309,25 @@ class NetworkOptions {
 			network_admin_url( 'edit.php' )
 		)
 		?>
-        <div class="wrap discourse-options-page-wrap">
-            <h2>
-                <img
-                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII="
-                        alt="Discourse logo" class="discourse-logo">
+		<div class="wrap discourse-options-page-wrap">
+			<h2>
+				<img
+						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII="
+						alt="Discourse logo" class="discourse-logo">
 				<?php esc_html_e( 'WP Discourse Network Settings', 'wp-discourse' ); ?>
-            </h2>
+			</h2>
 
-            <!--			--><?php //settings_errors(); ?>
-            <form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>"
-                  method="post">
+			<!--			--><?php // settings_errors(); ?>
+			<form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>"
+				  method="post">
 				<?php wp_nonce_field( 'update_discourse_network_options', 'update_discourse_network_options_nonce' ); ?>
 				<?php
 				settings_fields( 'discourse_network_options' );
 				do_settings_sections( 'discourse_network_options' );
 				submit_button( 'Save Options', 'primary', 'discourse_save_options', false );
 				?>
-            </form>
-        </div>
+			</form>
+		</div>
 		<?php
 	}
 
@@ -357,7 +356,7 @@ class NetworkOptions {
 
 		wp_redirect( add_query_arg( array(
 			'page'    => 'discourse_network_options',
-			'updated' => 'true'
+			'updated' => 'true',
 		), network_admin_url( 'admin.php' ) ) );
 
 		exit();
@@ -365,35 +364,35 @@ class NetworkOptions {
 
 	public function network_settings_details() {
 		?>
-        <p>
-            <em>
+		<p>
+			<em>
 				<?php esc_html_e( "The Multisite Configuration option is for the case where one Discourse forum is connected
                 to a network of WordPress sites. If it's enabled, the fields on this page will not be displayed on
                 the WP Discourse options pages for your network's subsites. This allows you to use the plugin on a network without
                 exposing your forum's API credentials to the subsite's administrators.", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <h2><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?></h2>
-        <p>
-            <em>
+			</em>
+		</p>
+		<h2><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?></h2>
+		<p>
+			<em>
 				<?php esc_html_e( "Webhooks can be used to sync data between Discourse and WordPress. Their use is optional,
 				but they're easy to setup. In a multisite environment the Sync Comment Data webhook will improve the efficiency of syncing Discourse
 				topic data with WordPress. The Update User Data webhook is used to sync user data between WordPress and Discourse when
 				a Discourse user is created or updated. When Multisite Configuration is enabled, all webhook options are set for your network's sites here.", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
-        <p>
-            <em>
-				<?php esc_html_e( "When Multisite Configuration is enabled, SSO functionality to either use WordPress as the
+			</em>
+		</p>
+		<h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
+		<p>
+			<em>
+				<?php esc_html_e( 'When Multisite Configuration is enabled, SSO functionality to either use WordPress as the
                 SSO provider for Discourse, or WordPress as an SSO client to Discourse is enabled on this page. The SSO Secret
                 Key is also set here. In a multisite setup, the SSO Client functionality is only available when Multisite Configuration
-                is enabled.", 'wp-discourse' ); ?>
-            </em>
-        </p>
-        <div class="discourse-doc-section-end">
-            <hr class="discourse-options-section-hr">
-        </div>
+                is enabled.', 'wp-discourse' ); ?>
+			</em>
+		</p>
+		<div class="discourse-doc-section-end">
+			<hr class="discourse-options-section-hr">
+		</div>
 		<?php
 	}
 
@@ -455,7 +454,7 @@ class NetworkOptions {
 
 			if ( ! empty( $webhook_secret ) && strlen( $webhook_secret ) < 12 ) {
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( "The Webhook Secret Key must be at least 12 characters long.", 'wp-discourse' ) .
+				            __( 'The Webhook Secret Key must be at least 12 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
@@ -481,10 +480,10 @@ class NetworkOptions {
 
 			if ( ! empty( $sso_secret ) && strlen( $sso_secret ) < 10 ) {
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
-				            __( "The SSO Secret Key must be at least 10 characters long.", 'wp-discourse' ) .
+				            __( 'The SSO Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
-		}
+		}// End if().
 
 		if ( ! empty( $notices ) ) {
 			echo $notices;
@@ -507,12 +506,12 @@ class NetworkOptions {
 	 * Outputs the markup for an input box, defaults to outputting a text input, but
 	 * can be used for other types.
 	 *
-	 * @param string $option The name of the option.
-	 * @param string $option_group The option group for the field to be saved to.
-	 * @param string $description The description of the settings field.
+	 * @param string      $option The name of the option.
+	 * @param string      $option_group The option group for the field to be saved to.
+	 * @param string      $description The description of the settings field.
 	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|int $min The min value (applied to number inputs).
-	 * @param null|int $max The max value (applies to number inputs).
+	 * @param null|int    $min The min value (applied to number inputs).
+	 * @param null|int    $max The max value (applies to number inputs).
 	 */
 	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$value   = $this->get_site_option( $option );
@@ -525,17 +524,17 @@ class NetworkOptions {
 		);
 
 		?>
-        <input id='discourse-<?php echo esc_attr( $option ); ?>'
-               name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-               type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
+		<input id='discourse-<?php echo esc_attr( $option ); ?>'
+			   name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
+			   type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-			} ?>
+} ?>
 			<?php if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-			} ?>
-               value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
-        <p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
+} ?>
+			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
+		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
 	}
 
@@ -561,28 +560,28 @@ class NetworkOptions {
 		$checked = ! empty( $value ) ? 'checked="checked"' : '';
 
 		?>
-        <label>
-            <input name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-                   type='hidden'
-                   value='0'/>
-            <input id='discourse-<?php echo esc_attr( $option ); ?>'
-                   name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-                   type='checkbox'
-                   value='1' <?php echo esc_attr( $checked ); ?> />
+		<label>
+			<input name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
+				   type='hidden'
+				   value='0'/>
+			<input id='discourse-<?php echo esc_attr( $option ); ?>'
+				   name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
+				   type='checkbox'
+				   value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo wp_kses( $label, $allowed ); ?>
-        </label>
-        <p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
+		</label>
+		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
 	}
 
 	protected function next_setting_heading( $title = null ) {
 		?>
-        <div class="discourse-options-section-end">
-            <hr class="discourse-options-section-hr">
+		<div class="discourse-options-section-end">
+			<hr class="discourse-options-section-hr">
 			<?php if ( $title ) : ?>
-                <h2><?php esc_html_e( $title ); ?></h2>
+				<h2><?php esc_html_e( $title ); ?></h2>
 			<?php endif; ?>
-        </div>
+		</div>
 		<?php
 	}
 }
