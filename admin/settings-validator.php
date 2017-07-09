@@ -156,6 +156,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_site_webhook_secret', array( $this, 'validate_webhook_secret' ) );
 		add_filter( 'wpdc_validate_site_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_site_use_discourse_user_webhook', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_site_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_site_enable_sso', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_site_sso_client_enabled', array( $this, 'validate_checkbox' ) );

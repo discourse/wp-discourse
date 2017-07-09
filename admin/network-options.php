@@ -72,6 +72,11 @@ class NetworkOptions {
 			'webhook_secret_input',
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 
+		add_settings_field( 'discourse_network_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
+			$this,
+			'hide_discourse_name_field_checkbox',
+		), 'discourse_network_options', 'discourse_network_settings_section' );
+
 		add_settings_field( 'discourse_network_enable_sso', __( 'Enable SSO Provider', 'wp-discourse' ), array(
 			$this,
 			'enable_sso_provider_checkbox',
@@ -242,13 +247,30 @@ class NetworkOptions {
 		);
 
 		$this->input( 'webhook-secret', $description );
-		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
+		$this->next_setting_heading( __( 'Publishing Settings', 'wp-discourse' ) );
 	}
 
+	/*******************
+	 *
+     * Publish Settings.
+     *
+	 *******************/
+
 	/**
-	 * ************
+	 * Outputs markup for hide-discourse-name-field checkbox.
+	 */
+	public function hide_discourse_name_field_checkbox() {
+		$this->checkbox_input( 'hide-discourse-name-field', __( 'Removes the Discourse Name field
+	    from the WordPress user profile page.', 'wp-discourse' ), __( "If you enable this setting and also enable the Update
+	    Userdata webhook, new users created on Discourse will have the their Discourse Name automatically filled in and be
+	    uneditable on WordPress.", 'wp-discourse' ) );
+	    $this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
+	}
+
+	/***************
 	 *
 	 * SSO Settings.
+     *
 	 ***************/
 
 
@@ -435,7 +457,7 @@ class NetworkOptions {
 				            __( 'To connect with Discourse, you need to supply the Discourse URL, API Key, and Publishing Username.', 'wp-discourse' ) .
 				            '</p></div>';
 			} elseif ( ! DiscourseUtilities::check_connection_status() ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'You are not connected to Discourse. Check that your connection settings are correct.', 'wp-discourse' ) .
 				            '</p></div>';
 			} else {
@@ -447,39 +469,39 @@ class NetworkOptions {
 			if ( ( ! empty( $use_discourse_webhook ) && empty( $webhook_secret ) ) ||
 			     ( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
 			) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'To use Discourse webhooks, you need to supply a webhook secret key.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
 			if ( ! empty( $webhook_secret ) && strlen( $webhook_secret ) < 12 ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'The Webhook Secret Key must be at least 12 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
 			if ( ! empty( $enable_sso ) && empty( $sso_secret )
 			) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'To use WordPress as the SSO Provider, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
 			if ( ! empty( $sso_client_enabled ) && empty( $sso_secret )
 			) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'To use WordPress as the SSO Client, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
 			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
 				            '</p></div>';
 			}
 
 			if ( ! empty( $sso_secret ) && strlen( $sso_secret ) < 10 ) {
-				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
+				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 				            __( 'The SSO Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
 				            '</p></div>';
 			}
