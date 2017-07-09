@@ -1,4 +1,9 @@
 <?php
+/**
+ * Network Options.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\Admin;
 
@@ -11,6 +16,9 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 class NetworkOptions {
 
+	/**
+	 * NetworkOptions constructor.
+	 */
 	public function __construct() {
 		add_action( 'admin_init', array( $this, 'setup' ) );
 		add_action( 'network_admin_menu', array( $this, 'add_network_settings_page' ) );
@@ -19,7 +27,9 @@ class NetworkOptions {
 		add_action( 'network_admin_notices', array( $this, 'network_config_notices' ) );
 	}
 
-
+	/**
+	 * Adds settings section and settings fields.
+	 */
 	public function setup() {
 
 		add_settings_section( 'discourse_network_settings_section', __( 'Multisite Configuration', 'wp-discourse' ), array(
@@ -93,7 +103,10 @@ class NetworkOptions {
 		), 'discourse_network_options', 'discourse_network_settings_section' );
 	}
 
-	public function add_network_settings_page( $context ) {
+	/**
+	 * Adds the network menu page.
+	 */
+	public function add_network_settings_page() {
 		add_menu_page(
 			__( 'Discourse', 'wp-discourse' ),
 			__( 'Discourse', 'wp-discourse' ),
@@ -105,6 +118,11 @@ class NetworkOptions {
 		);
 	}
 
+	/*********************************
+     *
+	 * Multisite Configuration Fields.
+     *
+	 *********************************/
 
 	/**
 	 * Outputs markup for multisite-configuration-enabled-checkbox.
@@ -118,13 +136,14 @@ class NetworkOptions {
 	}
 
 	/**
-	 * *******************
+	 * ***************************
 	 *
-	 * Connection Settings.
-	 **********************/
+	 * Connection Settings Fields.
+     *
+	 *****************************/
 
 	/**
-	 * Outputs markup for the Discourse-url input.
+	 * Outputs markup for the url input.
 	 */
 	public function url_input() {
 		$this->input( 'url', __( 'The base URL of your forum, for example http://discourse.example.com', 'wp-discourse' ), 'url' );
@@ -155,10 +174,11 @@ class NetworkOptions {
 	}
 
 	/**
-	 * ****************
+	 * ************************
 	 *
-	 * Webhook Settings.
-	 *******************/
+	 * Webhook Settings Fields.
+     *
+	 **************************/
 
 	/**
 	 * Outputs markup for use-discourse-webhook checkbox.
@@ -219,6 +239,9 @@ class NetworkOptions {
 
 	}
 
+	/**
+	 * Outputs markup for the webhook-match-user-email-checkbox.
+	 */
 	public function webhook_match_user_email_checkbox() {
 		$this->checkbox_input( 'webhook-match-user-email', __( 'Match users with Discourse
         through their email address.', 'wp-discourse' ), __( "If you are not using WordPress as the SSO Provider for Discourse
@@ -250,11 +273,11 @@ class NetworkOptions {
 		$this->next_setting_heading( __( 'Publishing Settings', 'wp-discourse' ) );
 	}
 
-	/*******************
+	/**************************
 	 *
-     * Publish Settings.
+     * Publish Settings Fields.
      *
-	 *******************/
+	 **************************/
 
 	/**
 	 * Outputs markup for hide-discourse-name-field checkbox.
@@ -267,11 +290,11 @@ class NetworkOptions {
 	    $this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
 	}
 
-	/***************
+	/**********************
 	 *
-	 * SSO Settings.
+	 * SSO Settings Fields.
      *
-	 ***************/
+	 **********************/
 
 
 	/**
@@ -282,6 +305,7 @@ class NetworkOptions {
 		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
 		$details                = sprintf(
+		        // translators: enable_sso_provider input. Placeholder: sso_documentation_link.
 			__( 'For details about using WordPress as the SSO Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
 		);
 		$this->checkbox_input( 'enable-sso', $description, $details );
@@ -295,6 +319,7 @@ class NetworkOptions {
 		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
 		$details                = sprintf(
+		        // translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
 			__( 'For details about using WordPress as an SSO Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
 		);
 		$this->checkbox_input( 'sso-client-enabled', $description, $details );
@@ -320,6 +345,9 @@ class NetworkOptions {
 		$this->input( 'sso-secret', $description );
 	}
 
+	/**
+	 * Creates the network options page.
+	 */
 	public function network_options_page() {
 		if ( ! current_user_can( 'manage_network_options' ) ) {
 
@@ -339,7 +367,6 @@ class NetworkOptions {
 				<?php esc_html_e( 'WP Discourse Network Settings', 'wp-discourse' ); ?>
 			</h2>
 
-			<!--			--><?php // settings_errors(); ?>
 			<form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>"
 				  method="post">
 				<?php wp_nonce_field( 'update_discourse_network_options', 'update_discourse_network_options_nonce' ); ?>
@@ -353,10 +380,15 @@ class NetworkOptions {
 		<?php
 	}
 
+	/**
+     * Saves the options.
+     *
+	 * @return null
+	 */
 	public function save_network_settings() {
 		if ( ! isset( $_POST['update_discourse_network_options_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_network_options_nonce'] ) ), 'update_discourse_network_options' )
-		) { // Input var okay.
+		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_network_options_nonce'] ) ), 'update_discourse_network_options' ) // Input var okay.
+		) {
 
 			return null;
 		}
@@ -383,6 +415,9 @@ class NetworkOptions {
 		exit();
 	}
 
+	/**
+	 * Adds documentation to the top of the settings page.
+	 */
 	public function network_settings_details() {
 		?>
 		<p>
@@ -427,6 +462,11 @@ class NetworkOptions {
 		<?php
 	}
 
+	/**
+     * Validates the options and saves them as a site option with the key wpdc_site_options.
+     *
+	 * @param array $site_options The array of options to be validated.
+	 */
 	public function validate_site_options( $site_options ) {
 		$updated_options = array();
 		foreach ( $site_options as $key => $value ) {
@@ -446,6 +486,11 @@ class NetworkOptions {
 		update_site_option( 'wpdc_site_options', $updated_options );
 	}
 
+	/**
+	 * Sets success and error notices.
+     *
+     * This is an awkward way to do it, but I'm not finding a better option.
+	 */
 	public function network_config_notices() {
 		$screen           = get_current_screen();
 		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
@@ -521,6 +566,13 @@ class NetworkOptions {
 		}
 	}
 
+	/**
+     * Returns a single option from the wpdc_site_options array.
+     *
+	 * @param string $key The option to find.
+	 *
+	 * @return bool|mixed
+	 */
 	protected function get_site_option( $key ) {
 		static $site_options = array();
 
@@ -543,6 +595,7 @@ class NetworkOptions {
 	 * @param null|string $type The type of input ('number', 'url', etc).
 	 * @param null|int    $min The min value (applied to number inputs).
 	 * @param null|int    $max The max value (applies to number inputs).
+     * @param null|int|string $default An optional default value.
 	 */
 	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$value   = $this->get_site_option( $option );
@@ -605,6 +658,11 @@ class NetworkOptions {
 		<?php
 	}
 
+	/**
+     * A workaround for creating subsections when option fields are displayed using settings_fields function.
+     *
+	 * @param null|string $title The title of the next setting.
+	 */
 	protected function next_setting_heading( $title = null ) {
 		?>
 		<div class="discourse-options-section-end">
