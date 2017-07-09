@@ -26,6 +26,7 @@ delete_option( 'wpdc_discourse_categories' );
 // Todo: loop through blogs to delete options for each.
 delete_site_option( 'wpdc_multisite_configuration' );
 delete_site_option( 'wpdc_site_options' );
+delete_site_option( 'wpdc_topic_blog_db_version' );
 
 global $wpdb;
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}discourse_nonce" );
