@@ -96,7 +96,7 @@ class WebhookSettings {
 	}
 
 	/**
-	 * Outpurs markup for use-discourse-webhook checkbox.
+	 * Outputs markup for use-discourse-webhook checkbox.
 	 */
 	public function use_discourse_webhook_checkbox() {
 		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
