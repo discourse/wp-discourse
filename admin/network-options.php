@@ -354,7 +354,6 @@ class NetworkOptions {
 	}
 
 	public function save_network_settings() {
-		write_log( $_POST );
 		if ( ! isset( $_POST['update_discourse_network_options_nonce'] ) || // Input var okay.
 		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_network_options_nonce'] ) ), 'update_discourse_network_options' )
 		) { // Input var okay.

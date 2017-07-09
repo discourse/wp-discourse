@@ -55,7 +55,6 @@ class PublishSettings {
 	public function register_publish_settings() {
 		$this->options                      = DiscourseUtilities::get_options();
 		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
-		write_log('options', $this->options );
 
 		add_settings_section( 'discourse_publishing_settings_section', __( 'Publishing Settings', 'wp-discourse' ), array(
 			$this,
