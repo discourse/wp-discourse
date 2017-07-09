@@ -147,18 +147,18 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_force_avatar_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_redirect_without_login', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'wpdc_validate_multisite_configuration', array( $this, 'validate_checkbox' ) );
-//		add_filter( 'wpdc_validate_site_url', array( $this, 'validate_url' ) );
-//		add_filter( 'wpdc_validate_site_api_key', array( $this, 'validate_api_key' ) );
-//		add_filter( 'wpdc_validate_site_publish_username', array( $this, 'validate_publish_username' ) );
-//		add_filter( 'wpdc_validate_site_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
-//		add_filter( 'wpdc_validate_site_webhook_match_old_topics', array( $this, 'validate_checkbox' ) );
-//		add_filter( 'wpdc_validate_site_webhook_secret', array( $this, 'validate_webhook_secret' ) );
-//		add_filter( 'wpdc_validate_site_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
-//		add_filter( 'wpdc_validate_site_use_discourse_user_webhook', array( $this, 'validate_checkbox' ) );
-//		add_filter( 'wpdc_validate_site_sso_secret', array( $this, 'validate_sso_secret' ) );
-//		add_filter( 'wpdc_validate_site_enable_sso', array( $this, 'validate_enable_sso' ) );
-//		add_filter( 'wpdc_validate_site_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
+		add_filter( 'wpdc_validate_site_multisite_configuration', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_url', array( $this, 'validate_url' ) );
+		add_filter( 'wpdc_validate_site_api_key', array( $this, 'validate_api_key' ) );
+		add_filter( 'wpdc_validate_site_publish_username', array( $this, 'validate_publish_username' ) );
+		add_filter( 'wpdc_validate_site_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
+		add_filter( 'wpdc_validate_site_webhook_match_old_topics', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+		add_filter( 'wpdc_validate_site_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_use_discourse_user_webhook', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_sso_secret', array( $this, 'validate_sso_secret' ) );
+		add_filter( 'wpdc_validate_site_enable_sso', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_site_sso_client_enabled', array( $this, 'validate_checkbox' ) );
 	}
 
 	/**
