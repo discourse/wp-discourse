@@ -60,7 +60,9 @@ class DiscourseUser {
 	 * Registers the Rest API route wp-discourse/v1/update-topic-content.
 	 */
 	public function initialize_update_user_route() {
-		if ( ! empty( $this->options['use-discourse-user-webhook'] ) ) {
+		$initialize_route = ! empty( $this->options['enable-sso']) && ! empty( $this->options['use-discourse-user-webhook']);
+		$initialize_route = apply_filters( 'wpdc_use_discourse_user_webhook', $initialize_route );
+		if ( $initialize_route ) {
 			register_rest_route( 'wp-discourse/v1', 'update-user', array(
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
@@ -78,8 +80,7 @@ class DiscourseUser {
 	 * @return null|\WP_Error
 	 */
 	public function update_user( $data ) {
-		$use_webhook_sync = ! empty( $this->options['use-discourse-user-webhook'] ) &&
-		                    ( ! empty( $this->options['enable-sso'] || ! empty( $this->options['webhook-match-user-email'] ) ) );
+		$use_webhook_sync = ! empty( $this->options['use-discourse-user-webhook'] ) && ( ! empty( $this->options['enable-sso']  ) );
 		$use_webhook_sync = apply_filters( 'wpdc_use_discourse_user_webhook', $use_webhook_sync );
 
 		if ( ! $use_webhook_sync ) {
@@ -100,6 +101,7 @@ class DiscourseUser {
 		if ( ! empty( $json['user'] ) ) {
 			$discourse_user  = $json['user'];
 			$discourse_email = $discourse_user['email'];
+			$discourse_id    = $discourse_user['id'];
 			$external_id     = ! empty( $discourse_user['external_id'] ) ? $discourse_user['external_id'] : null;
 			$wordpress_user  = null;
 
@@ -111,13 +113,25 @@ class DiscourseUser {
 				} else {
 					$wordpress_user = get_user_by( 'email', $discourse_email );
 				}
-			} elseif ( 'user' === $event_type ) { // This should maybe be an option?
+			} elseif ( 'user' === $event_type ) {
 				do_action( 'wpdc_webhook_user_updated', $discourse_user );
 
 				if ( $external_id ) {
 					$wordpress_user = get_user_by( 'id', $external_id );
-				} elseif ( ! empty( $this->options['webhook-match-user-email'] ) ) {
-					$wordpress_user = get_user_by( 'email', $discourse_email );
+				} else {
+					$user_query = new \WP_User_Query( array(
+						'meta_key'   => 'discourse_sso_user_id',
+						'meta_value' => $discourse_id,
+						'number'     => 1,
+					) );
+
+					$user_query_results = $user_query->get_results();
+
+					if ( empty( $user_query_results && ! empty( $this->options['webhook-match-user-email'] ) ) ) {
+						$wordpress_user = get_user_by( 'email', $discourse_email );
+					} elseif ( ! is_wp_error( $user_query_results ) ) {
+						$wordpress_user = $user_query_results[0];
+					}
 				}
 			}
 
@@ -141,7 +155,6 @@ class DiscourseUser {
 		$discourse_id       = $user_data['id'];
 
 		update_user_meta( $user_id, 'discourse_username', $discourse_username );
-		// Possibly don't add this. If it's set incorrectly, it will be a mess.
 		add_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
 	}
 }
