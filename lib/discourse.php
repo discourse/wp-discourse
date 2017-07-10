@@ -201,6 +201,7 @@ class Discourse {
 			$site_options['use-discourse-webhook'] = $this->options['use-discourse-webhook'];
 			$site_options['webhook-secret'] = $this->options['webhook-secret'];
 			$site_options['enable-sso'] = $this->options['enable-sso'];
+			$site_options['sso-secret'] = $this->options['sso-secret'];
 			update_site_option( 'wpdc_site_options', $site_options );
 		}
 
