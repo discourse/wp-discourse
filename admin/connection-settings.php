@@ -124,14 +124,6 @@ class ConnectionSettings {
 		$setup_howto_url           = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url        = 'https://meta.discourse.org/';
 		?>
-		<?php if ( is_multisite() && is_main_site() ) : ?>
-            <p>
-                <strong>
-					<?php esc_html_e( 'Note: as of version 1.4.1, the network configuration settings are found
-                        on the Network Admin Dashboard.', 'wp-discourse' ); ?>
-                </strong>
-            </p>
-		<?php endif; ?>
         <p class="wpdc-options-documentation">
 			<em>
 				<?php esc_html_e( "The WP Discourse plugin is used to connect an existing Discourse forum with your WordPress site.

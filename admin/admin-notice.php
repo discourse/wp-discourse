@@ -14,11 +14,12 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  */
 class AdminNotice {
 
+
 	/**
 	 * Gives access to the plugin options.
 	 *
 	 * @access protected
-	 * @var mixed|void
+	 * @var    mixed|void
 	 */
 	protected $options;
 
@@ -43,6 +44,7 @@ class AdminNotice {
 	public function set_admin_notices() {
 		global $pagenow, $post;
 
+		// Post edit screen notices.
 		if ( 'post.php' === $pagenow || 'post-new.php' === $pagenow ) {
 			$allowed_post_types = ! empty( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : array();
 
@@ -64,7 +66,8 @@ class AdminNotice {
 
 						$success_message = sprintf(
 							// translators: Discourse post-published success message. Placeholder: discourse_permalink.
-						__( '<div class="notice notice-success is-dismissible"><p>You\'re post has been published to Discourse. %1$s on Discourse.</p></div>', 'wp-discourse' ), $discourse_link );
+							__( '<div class="notice notice-success is-dismissible"><p>You\'re post has been published to Discourse. %1$s on Discourse.</p></div>', 'wp-discourse' ), $discourse_link
+						);
 
 						delete_post_meta( $post_id, 'wpdc_publishing_response' );
 
@@ -79,17 +82,30 @@ class AdminNotice {
 
 				$profile_page_link = '<a href="' . esc_url( admin_url( '/profile.php' ) ) . '">' . __( 'profile page', 'wp-discourse' ) . '</a>';
 
-				if ( empty( $discourse_username ) &&
-				     $use_discourse_name_field &&
-				     $current_username !== $publish_username
+				if ( empty( $discourse_username )
+					&& $use_discourse_name_field
+					&& $current_username !== $publish_username
 				) {
 					$username_not_set_notice = sprintf(
 						// translators: Discourse username_not_set notice. Placeholder: discourse_username.
-					__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ), $publish_username, $profile_page_link );
+						__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ), $publish_username, $profile_page_link
+					);
 
 					echo wp_kses_post( $username_not_set_notice );
 				}
 			}// End if().
 		}// End if().
+
+		// All admin screen notices.
+		if ( is_multisite() && is_main_site() && 'display' === get_option( 'wpdc_141_update_notice' ) ) {
+			$options_moved_notice = __(
+				'<div class="notice notice-warning is-dismissible"><p>As of WP Discourse version 1.4.1, the WP Discourse
+network options have been moved to the Network Admin Dashboard.</p></div>', 'wp-discourse'
+			);
+
+			update_option( 'wpdc_141_update_notice', 'displayed' );
+
+			echo wp_kses_post( $options_moved_notice );
+		}
 	}
 }
