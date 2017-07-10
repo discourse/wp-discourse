@@ -577,7 +577,11 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			$site_options = get_site_option( 'wpdc_site_options' );
 		}
 
-		$option = ! empty( $site_options[ $key ] ) ? $site_options[ $key ] : false;
+		if ( ! empty( $site_options[ $key ] ) ) {
+		    $option = $site_options[ $key ];
+        } else {
+		    $option = false;
+        }
 
 		return $option;
 	}
