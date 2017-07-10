@@ -188,6 +188,16 @@ class Discourse {
 
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 
+		// Transfer the nultisite-configuration option to the new site_option multisite-configuration-enabled.
+		if ( ! empty( $this->options['multisite-configuration'] ) ) {
+			$connection_options = get_option( 'discourse_connect' );
+			unset( $connection_options['multisite-configuration'] );
+			update_option( 'discourse_connect', $connection_options );
+			$site_options = get_site_option( 'wpdc_site_options' ) ? get_site_option( 'wpdc_site_options' ) : array();
+			$site_options['multisite-configuration-enabled'] = 1;
+			update_site_option( 'wpdc_site_options', $site_options );
+		}
+
 		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
 		// from a previous version, transfer the 'discourse_sso' options into the new arrays.
 		if ( get_option( 'discourse_sso' ) ) {
