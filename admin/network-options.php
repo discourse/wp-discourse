@@ -680,7 +680,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		<div class="discourse-options-section-end">
 			<hr class="discourse-options-section-hr">
 			<?php if ( $title ) : ?>
-				<h2><?php esc_attr( $title ); ?></h2>
+				<h2><?php echo esc_attr( $title ); ?></h2>
 			<?php endif; ?>
 		</div>
 		<?php
