@@ -193,20 +193,19 @@ This setting will only be activated if your site is functioning as the SSO provi
 		?>
 		<p class="wpdc-options-documentation">
 			<em>
-				<?php esc_html_e( "This section is for configuring Discourse Webhooks. Webhooks can be used to sync data
-				between Discourse and WordPress. Their use is optional, but they're easy to
+				<?php esc_html_e( "Webhooks can be used to sync data between Discourse and WordPress. Their use is optional, but they're easy to
 				setup. The WP Discourse plugin has two webhook endpoints, Sync Comment Data and Update Userdata. The
 				Sync Comment Data webhook is used to let the plugin know when a Discourse topic has had a new post added to it.
 				Using it will reduce the number of API requests made between WordPress and your forum. The Update Userdata
-				webhook will only be functional when WordPress is functioning as the SSO Provider for Discourse. It's used to
-				automatically fill in the user's WordPress name field when a new account is created or updated on Discourse
+				webhook will only be functional when WordPress is used as the SSO Provider for Discourse. If enabled, it
+				automatically fills in the user's WordPress name field when a new account is created or updated on Discourse
 				through SSO.", 'wp-discourse' ); ?>
 			</em>
 		</p>
 		<?php if ( $this->display_webhook_options ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
-					<?php esc_html_e( "There are some issues with syncing posts published from WordPress to
+					<?php esc_html_e( "There are some issues with syncing posts that were published from WordPress to
 					Discourse before WP Discourse version 1.4.0. Old posts can be synced with their corresponding Discourse
 					topic if they are using the post type 'post' and the title of the post matches the title of the Discourse
 					topic. To enable this functionality, select the 'Match Old Topics' option.", 'wp-discourse' ); ?>
