@@ -111,6 +111,7 @@ class DiscourseUser {
 				if ( $external_id ) {
 					$wordpress_user = get_user_by( 'id', $external_id );
 				} else {
+					// It's safe to find the user by email when they are first created through SSO.
 					$wordpress_user = get_user_by( 'email', $discourse_email );
 				}
 			} elseif ( 'user' === $event_type ) {
@@ -127,6 +128,7 @@ class DiscourseUser {
 
 					$user_query_results = $user_query->get_results();
 
+					// For updating users created prior to version 1.4.0.
 					if ( empty( $user_query_results ) && ! empty( $this->options['webhook-match-user-email'] ) ) {
 						$wordpress_user = get_user_by( 'email', $discourse_email );
 					} elseif ( ! is_wp_error( $user_query_results ) ) {
