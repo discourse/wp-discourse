@@ -229,14 +229,13 @@ class NetworkOptions {
 
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
-			__( 'This setting is primarily designed for when WordPress is enabled as the SSO Provider for Discourse. It
- supplies the Discourse username to WordPress when a user is created or updated on your forum. Before enabling this setting,
- create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code>%2$s</code>. Make sure that the \'User Event\' checkbox is enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
+			__( 'This webhook is only active when WordPress is enabled as the SSO Provider for Discourse (this can be overridden by
+hooking into the \'wpdc_use_discourse_user_webhook\' filter.) It supplies the Discourse username to WordPress when a user is created or updated on your forum.
+Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
+URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.', 'wp-discourse' ), $discourse_webhooks_url, $webhook_payload_url
 		);
 
 		$this->checkbox_input( 'use-discourse-user-webhook', __( 'Use a webhook to sync user data with Discourse.', 'wp-discourse' ), $description );
-
 	}
 
 	/**
@@ -244,10 +243,10 @@ class NetworkOptions {
 	 */
 	public function webhook_match_user_email_checkbox() {
 		$this->checkbox_input( 'webhook-match-user-email', __( 'Match users with Discourse
-        through their email address.', 'wp-discourse' ), __( "If you are not using WordPress as the SSO Provider for Discourse
- it is possible to use the Update Userdata webhook by syncing users by their email address.<strong>Note: this should only be enabled if
- you are using an external service to authenticate users on both your WordPress site and Discourse forum and can guarantee the user's email
- addresses match between the two systems.</strong>", 'wp-discourse' ) );
+        through their email address.', 'wp-discourse' ), __( 'Used for syncing accounts that were created before enabling the
+        Update Userdata webhook. Existing accounts are synced when the user updates and saves their profile on Discourse.
+        <strong>Note: only enable this setting if you are certain that email addresses match between Discourse
+        and WordPress.</strong>', 'wp-discourse' ) );
 
 	}
 
