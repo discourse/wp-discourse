@@ -26,7 +26,9 @@ if ( is_admin() ) {
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();
 	new AdminMenu( $options_page, $form_helper );
-	new NetworkOptions( $form_helper );
+	if ( is_multisite() ) {
+		new NetworkOptions();
+	}
 	new ConnectionSettings( $form_helper );
 	new PublishSettings( $form_helper );
 	new CommentSettings( $form_helper );
