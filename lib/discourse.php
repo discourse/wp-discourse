@@ -191,7 +191,7 @@ class Discourse {
 		// For updating from 1.4.0 to 1.4.1.
 		if ( ! empty( $this->options['multisite-configuration'] ) && is_multisite() && is_main_site() ) {
 			add_option( 'wpdc_141_update_notice', 'display' );
-			// Transfer the nultisite-configuration option to the new site_option multisite-configuration-enabled.
+			// Transfer the multisite-configuration option to the new site_option multisite-configuration-enabled.
 			$connection_options = get_option( 'discourse_connect' );
 			unset( $connection_options['multisite-configuration'] );
 			update_option( 'discourse_connect', $connection_options );

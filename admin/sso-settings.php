@@ -164,6 +164,15 @@ class SSOSettings {
 			), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
 		}
 
+		// If SSO Client is disabled, make sure that discourse_sso_client['sso-client-enabled'] is set to 0.
+        if ( $this->remove_sso_client_settings ) {
+		    $discourse_sso_client = get_option( 'discourse_sso_client' );
+		    if ( is_array( $discourse_sso_client ) ) {
+		        $discourse_sso_client['sso-client-enabled'] = 0;
+		        update_option( 'discourse_sso_client', $discourse_sso_client );
+            }
+        }
+
 		register_setting( 'discourse_sso_client', 'discourse_sso_client', array(
 			$this->form_helper,
 			'validate_options',
