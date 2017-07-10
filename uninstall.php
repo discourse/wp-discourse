@@ -22,7 +22,7 @@ foreach ( $discourse_options as $option ) {
 }
 
 delete_option( 'wpdc_discourse_categories' );
-delete_option('wpdc_141_update_notice' );
+delete_option( 'wpdc_141_update_notice' );
 
 // Todo: loop through blogs to delete options for each.
 delete_site_option( 'wpdc_multisite_configuration' );
