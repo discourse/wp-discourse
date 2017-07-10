@@ -118,10 +118,10 @@ class NetworkOptions {
 		);
 	}
 
-	/*********************************
-     *
+	/**
+	 * ******************************
+	 *
 	 * Multisite Configuration Fields.
-     *
 	 *********************************/
 
 	/**
@@ -139,7 +139,6 @@ class NetworkOptions {
 	 * ***************************
 	 *
 	 * Connection Settings Fields.
-     *
 	 *****************************/
 
 	/**
@@ -177,7 +176,6 @@ class NetworkOptions {
 	 * ************************
 	 *
 	 * Webhook Settings Fields.
-     *
 	 **************************/
 
 	/**
@@ -272,10 +270,10 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$this->next_setting_heading( __( 'Publishing Settings', 'wp-discourse' ) );
 	}
 
-	/**************************
+	/**
+	 * ***********************
 	 *
-     * Publish Settings Fields.
-     *
+	 * Publish Settings Fields.
 	 **************************/
 
 	/**
@@ -283,16 +281,16 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function hide_discourse_name_field_checkbox() {
 		$this->checkbox_input( 'hide-discourse-name-field', __( 'Removes the Discourse Name field
-	    from the WordPress user profile page.', 'wp-discourse' ), __( "If you enable this setting and also enable the Update
-	    Userdata webhook, new users created on Discourse will have the their Discourse Name automatically filled in and be
-	    uneditable on WordPress.", 'wp-discourse' ) );
+	    from the WordPress user profile page.', 'wp-discourse' ), __( 'If you enable this setting and also enable the Update
+        Userdata webhook, new users created on Discourse will have the their Discourse Name automatically filled in and be
+        uneditable on WordPress.', 'wp-discourse' ) );
 	    $this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
 	}
 
-	/**********************
+	/**
+	 * *******************
 	 *
 	 * SSO Settings Fields.
-     *
 	 **********************/
 
 
@@ -304,7 +302,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
 		$details                = sprintf(
-		        // translators: enable_sso_provider input. Placeholder: sso_documentation_link.
+			// translators: enable_sso_provider input. Placeholder: sso_documentation_link.
 			__( 'For details about using WordPress as the SSO Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
 		);
 		$this->checkbox_input( 'enable-sso', $description, $details );
@@ -318,7 +316,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
 		$details                = sprintf(
-		        // translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
+			// translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
 			__( 'For details about using WordPress as an SSO Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ), $sso_documentation_link
 		);
 		$this->checkbox_input( 'sso-client-enabled', $description, $details );
@@ -380,8 +378,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	}
 
 	/**
-     * Saves the options.
-     *
+	 * Saves the options.
+	 *
 	 * @return null
 	 */
 	public function save_network_settings() {
@@ -427,14 +425,14 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
                 configure the settings individually on each of your subsites' WP Discourse options pages.", 'wp-discourse' ); ?>
 			</em>
 		</p>
-        <h2><?php esc_html_e( 'Connection', 'wp-discourse' ); ?></h2>
-        <p>
-            <em>
-                <?php esc_html_e( "If the Multisite Configuration option is enabled, all the subsites in your network will
+		<h2><?php esc_html_e( 'Connection', 'wp-discourse' ); ?></h2>
+		<p>
+			<em>
+				<?php esc_html_e( "If the Multisite Configuration option is enabled, all the subsites in your network will
                 be configured to use the API credentials entered on this page. Your forum's API credentials will not be displayed
                 on your subsites' settings pages.", 'wp-discourse' ); ?>
-            </em>
-        </p>
+			</em>
+		</p>
 		<h2><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?></h2>
 		<p>
 			<em>
@@ -456,14 +454,14 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		</p>
 		<div class="discourse-doc-section-end">
 			<hr class="discourse-options-section-hr">
-            <h2><?php esc_html_e( 'Multisite Settings', 'wp-discourse' ); ?></h2>
+			<h2><?php esc_html_e( 'Multisite Settings', 'wp-discourse' ); ?></h2>
 		</div>
 		<?php
 	}
 
 	/**
-     * Validates the options and saves them as a site option with the key wpdc_site_options.
-     *
+	 * Validates the options and saves them as a site option with the key wpdc_site_options.
+	 *
 	 * @param array $site_options The array of options to be validated.
 	 */
 	public function validate_site_options( $site_options ) {
@@ -487,8 +485,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 
 	/**
 	 * Sets success and error notices.
-     *
-     * This is an awkward way to do it, but I'm not finding a better option.
+	 *
+	 * This is an awkward way to do it, but I'm not finding a better option.
 	 */
 	public function network_config_notices() {
 		$screen           = get_current_screen();
@@ -566,8 +564,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	}
 
 	/**
-     * Returns a single option from the wpdc_site_options array.
-     *
+	 * Returns a single option from the wpdc_site_options array.
+	 *
 	 * @param string $key The option to find.
 	 *
 	 * @return bool|mixed
@@ -588,13 +586,13 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 * Outputs the markup for an input box, defaults to outputting a text input, but
 	 * can be used for other types.
 	 *
-	 * @param string      $option The name of the option.
-	 * @param string      $option_group The option group for the field to be saved to.
-	 * @param string      $description The description of the settings field.
-	 * @param null|string $type The type of input ('number', 'url', etc).
-	 * @param null|int    $min The min value (applied to number inputs).
-	 * @param null|int    $max The max value (applies to number inputs).
-     * @param null|int|string $default An optional default value.
+	 * @param string          $option The name of the option.
+	 * @param string          $option_group The option group for the field to be saved to.
+	 * @param string          $description The description of the settings field.
+	 * @param null|string     $type The type of input ('number', 'url', etc).
+	 * @param null|int        $min The min value (applied to number inputs).
+	 * @param null|int        $max The max value (applies to number inputs).
+	 * @param null|int|string $default An optional default value.
 	 */
 	protected function input( $option, $description, $type = null, $min = null, $max = null, $default = null ) {
 		$value   = $this->get_site_option( $option );
@@ -658,8 +656,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	}
 
 	/**
-     * A workaround for creating subsections when option fields are displayed using settings_fields function.
-     *
+	 * A workaround for creating subsections when option fields are displayed using settings_fields function.
+	 *
 	 * @param null|string $title The title of the next setting.
 	 */
 	protected function next_setting_heading( $title = null ) {

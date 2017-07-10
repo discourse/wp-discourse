@@ -51,9 +51,9 @@ class Utilities {
 	 */
 	public static function check_connection_status() {
 		$options = self::get_options();
-		$url = ! empty( $options['url']) ? $options['url'] : null;
-		$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
+		$url = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
 
@@ -112,9 +112,9 @@ class Utilities {
 		}
 
 		if ( $force_update ) {
-			$base_url = ! empty( $options['url']) ? $options['url'] : null;
-			$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
-			$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
+			$base_url = ! empty( $options['url'] ) ? $options['url'] : null;
+			$api_key = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+			$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
 			if ( ! ( $base_url && $api_key && $api_username ) ) {
 
@@ -149,7 +149,7 @@ class Utilities {
 
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
 			}
-		}
+		}// End if().
 
 		return $categories;
 	}
@@ -187,16 +187,16 @@ class Utilities {
 	/**
 	 * Get a Discourse user object.
 	 *
-	 * @param int $user_id The WordPress user_id.
+	 * @param int  $user_id The WordPress user_id.
 	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
 	 *
 	 * @return array|mixed|object|\WP_Error
 	 */
 	public static function get_discourse_user( $user_id, $match_by_email = false ) {
 		$options = self::get_options();
-		$url = ! empty( $options['url']) ? $options['url'] : null;
-		$api_key = ! empty( $options['api-key']) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username']) ? $options['publish-username'] : null;
+		$url = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
 

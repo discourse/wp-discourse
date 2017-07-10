@@ -60,7 +60,7 @@ class DiscourseUser {
 	 * Registers the Rest API route wp-discourse/v1/update-topic-content.
 	 */
 	public function initialize_update_user_route() {
-		$initialize_route = ! empty( $this->options['enable-sso']) && ! empty( $this->options['use-discourse-user-webhook']);
+		$initialize_route = ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['use-discourse-user-webhook'] );
 		$initialize_route = apply_filters( 'wpdc_use_discourse_user_webhook', $initialize_route );
 		if ( $initialize_route ) {
 			register_rest_route( 'wp-discourse/v1', 'update-user', array(
@@ -80,7 +80,7 @@ class DiscourseUser {
 	 * @return null|\WP_Error
 	 */
 	public function update_user( $data ) {
-		$use_webhook_sync = ! empty( $this->options['use-discourse-user-webhook'] ) && ( ! empty( $this->options['enable-sso']  ) );
+		$use_webhook_sync = ! empty( $this->options['use-discourse-user-webhook'] ) && ( ! empty( $this->options['enable-sso'] ) );
 		$use_webhook_sync = apply_filters( 'wpdc_use_discourse_user_webhook', $use_webhook_sync );
 
 		if ( ! $use_webhook_sync ) {
@@ -139,7 +139,7 @@ class DiscourseUser {
 				$user_id = $wordpress_user->ID;
 				$this->update_user_data( $user_id, $discourse_user );
 			}
-		}
+		}// End if().
 
 		return null;
 	}
@@ -147,7 +147,7 @@ class DiscourseUser {
 	/**
 	 * Update the WordPress user's metadata with values from the Discourse webhook.
 	 *
-	 * @param int $user_id The WordPress user's id.
+	 * @param int    $user_id The WordPress user's id.
 	 * @param object $user_data The json data from the Discourse webhook.
 	 */
 	protected function update_user_data( $user_id, $user_data ) {
