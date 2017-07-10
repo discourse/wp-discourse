@@ -40,6 +40,7 @@ if ( is_admin() ) {
 	new MetaBox();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
+	add_action( 'admin_print_scripts', __NAMESPACE__ . '\\enqueue_network_styles' );
 }
 
 
@@ -49,4 +50,19 @@ if ( is_admin() ) {
 function enqueue_admin_scripts() {
 	wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
 	wp_enqueue_style( 'wp_discourse_admin' );
+}
+
+/**
+ * Enqueue styles for network page.
+ */
+function enqueue_network_styles() {
+	global $current_screen;
+	if ( ! $current_screen->is_network ) {
+
+		return;
+	}
+
+	// Todo: create a separate stylesheet for this.
+	wp_register_style( 'wp_discourse_network_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
+	wp_enqueue_style( 'wp_discourse_network_admin' );
 }
