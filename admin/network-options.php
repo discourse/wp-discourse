@@ -398,7 +398,6 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 
 			return null;
 		}
-		write_log( $_POST );
 
 		if ( isset( $_POST['wpdc_site_options'] ) ) { // Input var okay.
 
@@ -508,7 +507,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	public function network_config_notices() {
 		$screen           = get_current_screen();
 		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
-		$multisite_configuration_enabled = $this->get_site_option( 'multisite_configuration_enabled' );
+		$multisite_configuration_enabled = $this->get_site_option( 'multisite-configuration-enabled' );
 		if ( $discourse_screen && $multisite_configuration_enabled ) {
 			$notices                    = '';
 			$url                        = $this->get_site_option( 'url' );
