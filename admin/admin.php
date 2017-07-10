@@ -57,12 +57,11 @@ function enqueue_admin_scripts() {
  */
 function enqueue_network_styles() {
 	global $current_screen;
-	if ( ! $current_screen->is_network ) {
+	if ( ! $current_screen->in_admin( 'network' ) ) {
 
 		return;
 	}
 
-	// Todo: create a separate stylesheet for this.
-	wp_register_style( 'wp_discourse_network_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
+	wp_register_style( 'wp_discourse_network_admin', WPDISCOURSE_URL . '/admin/css/network-admin-styles.css' );
 	wp_enqueue_style( 'wp_discourse_network_admin' );
 }
