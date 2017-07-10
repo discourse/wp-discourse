@@ -398,9 +398,14 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 
 			return null;
 		}
+		write_log( $_POST );
 
 		if ( isset( $_POST['wpdc_site_options'] ) ) { // Input var okay.
-			$site_options = wp_unslash( $_POST['wpdc_site_options'] ); // Input var okay.
+
+            // See: https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/wiki/Sanitizing-array-input-data.
+			// @codingStandardsIgnoreStart
+			$site_options = array_map( array( $this, 'sanitize_item' ), wp_unslash( $_POST['wpdc_site_options'] ) ); // Input var okay.
+            // @codingStandardsIgnoreEnd
 			$this->validate_site_options( $site_options );
 		}
 
@@ -410,6 +415,18 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		), network_admin_url( 'admin.php' ) ) );
 
 		exit();
+	}
+
+	/**
+	 * A callback function used for sanitizing array values.
+	 *
+	 * @param string $item The item to be sanitized.
+	 *
+	 * @return array|string
+	 */
+	protected function sanitize_item( $item ) {
+
+	    return esc_attr( $item );
 	}
 
 	/**
@@ -491,7 +508,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	public function network_config_notices() {
 		$screen           = get_current_screen();
 		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
-		if ( $discourse_screen && ! empty( $this->get_site_option( 'multisite-configuration-enabled' ) ) ) {
+		$multisite_configuration_enabled = $this->get_site_option( 'multisite_configuration_enabled' );
+		if ( $discourse_screen && $multisite_configuration_enabled ) {
 			$notices                    = '';
 			$url                        = $this->get_site_option( 'url' );
 			$api_key                    = $this->get_site_option( 'api-key' );
@@ -559,7 +577,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		}// End if().
 
 		if ( ! empty( $notices ) ) {
-			echo $notices;
+			echo wp_kses_post( $notices );
 		}
 	}
 
@@ -577,11 +595,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			$site_options = get_site_option( 'wpdc_site_options' );
 		}
 
-		if ( ! empty( $site_options[ $key ] ) ) {
-		    $option = $site_options[ $key ];
-        } else {
-		    $option = false;
-        }
+		$option = ! empty( $site_options[ $key ] ) ? $site_options[ $key ] : false;
 
 		return $option;
 	}
@@ -591,7 +605,6 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 * can be used for other types.
 	 *
 	 * @param string          $option The name of the option.
-	 * @param string          $option_group The option group for the field to be saved to.
 	 * @param string          $description The description of the settings field.
 	 * @param null|string     $type The type of input ('number', 'url', etc).
 	 * @param null|int        $min The min value (applied to number inputs).
@@ -627,7 +640,6 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 * Outputs the markup for a checkbox input.
 	 *
 	 * @param string $option The option name.
-	 * @param string $option_group The option group for the field to be saved to.
 	 * @param string $label The text for the label.
 	 * @param string $description The description of the settings field.
 	 */
@@ -669,7 +681,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		<div class="discourse-options-section-end">
 			<hr class="discourse-options-section-hr">
 			<?php if ( $title ) : ?>
-				<h2><?php esc_html_e( $title ); ?></h2>
+				<h2><?php esc_attr( $title ); ?></h2>
 			<?php endif; ?>
 		</div>
 		<?php

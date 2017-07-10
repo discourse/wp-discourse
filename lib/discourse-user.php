@@ -127,7 +127,7 @@ class DiscourseUser {
 
 					$user_query_results = $user_query->get_results();
 
-					if ( empty( $user_query_results && ! empty( $this->options['webhook-match-user-email'] ) ) ) {
+					if ( empty( $user_query_results ) && ! empty( $this->options['webhook-match-user-email'] ) ) {
 						$wordpress_user = get_user_by( 'email', $discourse_email );
 					} elseif ( ! is_wp_error( $user_query_results ) ) {
 						$wordpress_user = $user_query_results[0];
