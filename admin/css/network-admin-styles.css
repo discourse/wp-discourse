@@ -16,3 +16,7 @@
 .toplevel_page_discourse_network_options  #adminmenumain .wp-menu-image img {
     padding-top: 5px;
 }
+
+.wp-discourse-network-options-form {
+    max-width: 800px;
+}
