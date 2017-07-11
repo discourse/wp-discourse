@@ -54,7 +54,7 @@ class ConnectionSettings {
 	 */
 	public function register_connection_settings() {
 		$this->options                    = DiscourseUtilities::get_options();
-		$this->display_connection_options = is_main_site() || empty( $this->options['multisite-configuration'] );
+		$this->display_connection_options = ! is_multisite() ||  empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section( 'discourse_connection_settings_section', __( 'Connecting With Discourse', 'wp-discourse' ), array(
 			$this,
@@ -76,13 +76,6 @@ class ConnectionSettings {
 				$this,
 				'publish_username_input',
 			), 'discourse_connect', 'discourse_connection_settings_section' );
-
-			if ( is_multisite() && is_main_site() ) {
-				add_settings_field( 'discourse_multisite_configuration', __( 'Multisite Configuration', 'wp-discourse' ), array(
-					$this,
-					'multisite_configuration_checkbox',
-				), 'discourse_connect', 'discourse_connection_settings_section' );
-			}
 		}// End if().
 
 		register_setting( 'discourse_connect', 'discourse_connect', array(
@@ -122,18 +115,6 @@ class ConnectionSettings {
 	}
 
 	/**
-	 * Outputs markup for multisite-configuration-checkbox.
-	 */
-	public function multisite_configuration_checkbox() {
-		$this->form_helper->checkbox_input( 'multisite-configuration', 'discourse_connect', __( 'Configure the plugin for a
-	    WordPress multisite setup', 'wp-discourse' ), __( "This setting is intended for the case when a single Discourse forum
-	    is connected to a network of WordPress sites. Enabling it will  allow some of the plugin's settings to function for
-	    the entire network and remove them from the options tabs of the network's subsites. It will remove all of the settings
-	    found on the Connection options tab, as well as the SSO Secret Key, Enable SSO Provider, and Enable SSO Client settings.
-	    This option must be enabled to use the Sync Comment Data webhook in a multisite environment.", 'wp-discourse' ) );
-	}
-
-	/**
 	 * Details for the connection_options tab.
 	 */
 	public function connection_settings_tab_details() {
@@ -143,7 +124,7 @@ class ConnectionSettings {
 		$setup_howto_url           = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url        = 'https://meta.discourse.org/';
 		?>
-		<p class="wpdc-options-documentation">
+        <p class="wpdc-options-documentation">
 			<em>
 				<?php esc_html_e( "The WP Discourse plugin is used to connect an existing Discourse forum with your WordPress site.
                 If you don't already have a Discourse forum, here are some options for setting one up:", 'wp-discourse' ); ?>

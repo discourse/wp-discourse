@@ -21,7 +21,8 @@
 	border-width: 1px;
 }
 
-.wp-discourse-options-form {
+.wp-discourse-options-form,
+.wp-discourse-network-options-form {
 	max-width: 800px;
 }
 
@@ -43,7 +44,9 @@
 }
 
 /* Menu logo */
-#adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img {
+#adminmenu .toplevel_page_wp_discourse_options .wp-menu-image img,
+.network-admin #adminmenu .toplevel_page_discourse_network_options .wp-menu-image img,
+.toplevel_page_discourse_network_options  #adminmenumain .wp-menu-image img {
 	padding-top: 5px;
 }
 
@@ -73,3 +76,4 @@ ul.wpdc-documentation-list {
 	list-style: disc;
 	margin-left: 40px;
 }
+

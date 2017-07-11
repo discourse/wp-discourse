@@ -22,17 +22,11 @@ foreach ( $discourse_options as $option ) {
 }
 
 delete_option( 'wpdc_discourse_categories' );
+delete_option( 'wpdc_141_update_notice' );
 
 // Todo: loop through blogs to delete options for each.
-delete_site_option( 'wpdc_site_url' );
-delete_site_option( 'wpdc_site_api_key' );
-delete_site_option( 'wpdc_site_publish_username' );
-delete_site_option( 'wpdc_site_use_discourse_webhook' );
-delete_site_option( 'wpdc_site_multisite_configuration' );
-delete_site_option( 'wpdc_site_webhook_match_old_topics' );
-delete_site_option( 'wpdc_site_sso_secret' );
-delete_site_option( 'wpdc_site_enable_sso' );
-delete_site_option( 'wpdc_site_sso_client_enabled' );
+delete_site_option( 'wpdc_multisite_configuration' );
+delete_site_option( 'wpdc_site_options' );
 delete_site_option( 'wpdc_topic_blog_db_version' );
 
 global $wpdb;
