@@ -67,12 +67,12 @@ class DiscourseSSO {
 
 			parse_str( $referer_query, $query_params );
 
-
 			$sso_referer    = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
+			$autologin = ! isset( $query_params['skip_autologin'] );
 			$email_verified = ! get_user_meta( $user->ID, 'discourse_email_not_verified', true );
 			$email_verified = apply_filters( 'wpdc_auto_create_login_email_verification', $email_verified, $user_login, $user );
 
-			if ( $email_verified && ! $sso_referer && $sso_url ) {
+			if ( $autologin && $email_verified && ! $sso_referer && $sso_url ) {
 				if ( DiscourseUtilities::check_connection_status() ) {
 					update_user_meta( $user->ID, 'wpdc_sso_user_created', 'user_created' );
 
@@ -134,6 +134,7 @@ class DiscourseSSO {
 	public function sso_add_query_vars( $vars ) {
 		$vars[] = 'sso';
 		$vars[] = 'sig';
+		$vars[] = 'skip_autologin';
 
 		return $vars;
 	}
