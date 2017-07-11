@@ -157,6 +157,7 @@ class DiscourseUser {
 		$discourse_id       = $user_data['id'];
 
 		update_user_meta( $user_id, 'discourse_username', $discourse_username );
-		add_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
+		// The unique flag is important here.
+		add_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id, true );
 	}
 }
