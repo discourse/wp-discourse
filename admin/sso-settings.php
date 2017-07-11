@@ -47,6 +47,14 @@ class SSOSettings {
 	protected $use_network_sso_settings;
 
 	/**
+	 * Whether or not to remove the SSO Client settings.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $remove_sso_client_settings;
+
+	/**
 	 * SSOSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -63,8 +71,9 @@ class SSOSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_sso_settings() {
-		$this->options                  = DiscourseUtilities::get_options();
-		$this->use_network_sso_settings = ! is_main_site() && ! empty( $this->options['multisite-configuration'] );
+		$this->options                    = DiscourseUtilities::get_options();
+		$this->use_network_sso_settings   = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+		$this->remove_sso_client_settings = is_multisite() && empty( $this->options['multisite-configuration-enabled'] );
 
 		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
 
@@ -138,20 +147,31 @@ class SSOSettings {
 			'sso_client_settings_details',
 		), 'discourse_sso_client' );
 
-		add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
-			$this,
-			'enable_sso_client_checkbox',
-		), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
+		if ( ! $this->remove_sso_client_settings ) {
+			add_settings_field( 'discourse_enable_discourse_sso', __( 'Enable SSO Client', 'wp-discourse' ), array(
+				$this,
+				'enable_sso_client_checkbox',
+			), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
 
-		add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add Login Link', 'wp-discourse' ), array(
-			$this,
-			'enable_discourse_sso_login_form_change_checkbox',
-		), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
+			add_settings_field( 'enable_discourse_sso_login_form_change', __( 'Add Login Link', 'wp-discourse' ), array(
+				$this,
+				'enable_discourse_sso_login_form_change_checkbox',
+			), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
 
-		add_settings_field( 'discourse_enable_sso_sync', __( 'Sync Existing Users by Email', 'wp-discourse' ), array(
-			$this,
-			'sso_client_sync_by_email_checkbox',
-		), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
+			add_settings_field( 'discourse_enable_sso_sync', __( 'Sync Existing Users by Email', 'wp-discourse' ), array(
+				$this,
+				'sso_client_sync_by_email_checkbox',
+			), 'discourse_sso_client', 'discourse_sso_client_settings_section' );
+		}
+
+		// If SSO Client is disabled, make sure that discourse_sso_client['sso-client-enabled'] is set to 0.
+        if ( $this->remove_sso_client_settings ) {
+		    $discourse_sso_client = get_option( 'discourse_sso_client' );
+		    if ( is_array( $discourse_sso_client ) ) {
+		        $discourse_sso_client['sso-client-enabled'] = 0;
+		        update_option( 'discourse_sso_client', $discourse_sso_client );
+            }
+        }
 
 		register_setting( 'discourse_sso_client', 'discourse_sso_client', array(
 			$this->form_helper,
@@ -201,10 +221,12 @@ class SSOSettings {
 				   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'SSO Provider', 'wpdc' ); ?>
 				</a>
-				<a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
-				   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
-				</a>
+				<?php if ( ! $this->remove_sso_client_settings ) : ?>
+					<a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
+					   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
+						<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
+					</a>
+				<?php endif; ?>
 			</h3>
 			<?php
 

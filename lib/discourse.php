@@ -7,10 +7,20 @@
 
 namespace WPDiscourse\Discourse;
 
+use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+
 /**
  * Class Discourse
  */
 class Discourse {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
 
 	/**
 	 * The connection options array.
@@ -22,7 +32,6 @@ class Discourse {
 		'url'              => '',
 		'api-key'          => '',
 		'publish-username' => 'system',
-		'multisite-configuration' => 0,
 	);
 
 	/**
@@ -32,17 +41,17 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_publish = array(
-		'display-subcategories'   => 0,
-		'publish-category'        => '',
-		'publish-category-update' => 0,
-		'full-post-content'       => 0,
-		'custom-excerpt-length'   => 55,
-		'add-featured-link'       => 0,
-		'auto-publish'            => 0,
-		'publish-failure-notice'  => 0,
-		'publish-failure-email'   => '',
-		'auto-track'              => 1,
-		'allowed_post_types'      => array( 'post' ),
+		'display-subcategories'     => 0,
+		'publish-category'          => '',
+		'publish-category-update'   => 0,
+		'full-post-content'         => 0,
+		'custom-excerpt-length'     => 55,
+		'add-featured-link'         => 0,
+		'auto-publish'              => 0,
+		'publish-failure-notice'    => 0,
+		'publish-failure-email'     => '',
+		'auto-track'                => 1,
+		'allowed_post_types'        => array( 'post' ),
 		'hide-discourse-name-field' => 0,
 	);
 
@@ -96,8 +105,10 @@ class Discourse {
 	 */
 	protected $discourse_webhook = array(
 		'use-discourse-webhook'      => 0,
-		'webhook-secret' => '',
-		'webhook-match-old-topics' => 0,
+		'webhook-secret'             => '',
+		'webhook-match-old-topics'   => 0,
+		'use-discourse-user-webhook' => 0,
+		'webhook-match-user-email'   => 0,
 	);
 
 	/**
@@ -168,20 +179,33 @@ class Discourse {
 	 */
 	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
+		$this->options = DiscourseUtilities::get_options();
 
 		// Set the Discourse domain name option.
-		$connection_options = get_option( 'discourse_connect' );
-		if ( $connection_options && ! empty( $connection_options['url'] ) ) {
-
-			$discourse_url = $connection_options['url'];
-		} else {
-
-			$discourse_url = null;
-		}
-
-		$domain_name = wp_parse_url( $discourse_url, PHP_URL_HOST );
+		$discourse_url = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
+		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
+
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
+
+		// For updating from 1.4.0 to 1.4.1.
+		if ( ! empty( $this->options['multisite-configuration'] ) && is_multisite() && is_main_site() ) {
+			add_option( 'wpdc_141_update_notice', 'display' );
+			// Transfer the multisite-configuration option to the new site_option multisite-configuration-enabled.
+			$connection_options = get_option( 'discourse_connect' );
+			unset( $connection_options['multisite-configuration'] );
+			update_option( 'discourse_connect', $connection_options );
+			$site_options = get_site_option( 'wpdc_site_options' ) ? get_site_option( 'wpdc_site_options' ) : array();
+			$site_options['multisite-configuration-enabled'] = 1;
+			$site_options['url'] = $this->options['url'];
+			$site_options['api-key'] = $this->options['api-key'];
+			$site_options['publish-username'] = $this->options['publish-username'];
+			$site_options['use-discourse-webhook'] = $this->options['use-discourse-webhook'];
+			$site_options['webhook-secret'] = $this->options['webhook-secret'];
+			$site_options['enable-sso'] = $this->options['enable-sso'];
+			$site_options['sso-secret'] = $this->options['sso-secret'];
+			update_site_option( 'wpdc_site_options', $site_options );
+		}
 
 		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
 		// from a previous version, transfer the 'discourse_sso' options into the new arrays.

@@ -7,8 +7,6 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
-
 /**
  * Class AdminMenu
  */

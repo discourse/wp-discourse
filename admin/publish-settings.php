@@ -31,6 +31,14 @@ class PublishSettings {
 	protected $options;
 
 	/**
+	 * Whether or not to use some network publish settings.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $use_network_publish_settings;
+
+	/**
 	 * PublishSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -45,7 +53,8 @@ class PublishSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_publish_settings() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options                      = DiscourseUtilities::get_options();
+		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section( 'discourse_publishing_settings_section', __( 'Publishing Settings', 'wp-discourse' ), array(
 			$this,
@@ -107,10 +116,12 @@ class PublishSettings {
 			'post_types_select',
 		), 'discourse_publish', 'discourse_publishing_settings_section' );
 
-		add_settings_field( 'discourse_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
-			$this,
-			'hide_discourse_name_field_checkbox',
-		), 'discourse_publish', 'discourse_publishing_settings_section' );
+		if ( ! $this->use_network_publish_settings ) {
+			add_settings_field( 'discourse_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
+				$this,
+				'hide_discourse_name_field_checkbox',
+			), 'discourse_publish', 'discourse_publishing_settings_section' );
+		}
 
 		register_setting( 'discourse_publish', 'discourse_publish', array(
 			$this->form_helper,
@@ -179,7 +190,7 @@ class PublishSettings {
 	 * Outputs markup for add-featired-link input.
 	 */
 	public function add_featured_link_checkbox() {
-	    $this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Adds a link to the WordPress post
+		$this->form_helper->checkbox_input( 'add-featured-link', 'discourse_publish', __( 'Adds a link to the WordPress post
 	    to the Discourse topic list and topic title.', 'wp-discourse' ) );
 	}
 

@@ -12,22 +12,6 @@ class TestDiscourse extends \WP_UnitTestCase {
 		$this->discourse = new Discourse();
 	}
 
-	public function test_wpdc_discourse_domain_option_is_updated() {
-		$discourse_connect = array(
-			'url'              => 'http://forum.example.com',
-			'api-key'          => 'testapikey',
-			'publish-username' => 'admin_tester',
-		);
-
-		update_option( 'discourse_connect', $discourse_connect );
-
-		$this->discourse->initialize_plugin();
-
-		$wpdc_discourse_domain = get_option( 'wpdc_discourse_domain', false );
-
-		$this->assertEquals( 'forum.example.com', $wpdc_discourse_domain );
-	}
-
 	public function test_discourse_sso_option_is_removed() {
 		$discourse_sso = array(
 			'sso-secret'             => 'thisisatest',
@@ -100,22 +84,5 @@ class TestDiscourse extends \WP_UnitTestCase {
 
 	public function test_discourse_version_option_is_set() {
 		$this->assertEquals( WPDISCOURSE_VERSION, get_option( 'discourse_version', false ) );
-	}
-
-	public function test_discourse_domain_is_added_to_allowed_redirect_hosts() {
-		$discourse_connect = array(
-			'url'              => 'http://forum.example.com',
-			'api-key'          => 'testapikey',
-			'publish-username' => 'admin_tester',
-		);
-
-		update_option( 'discourse_connect', $discourse_connect );
-
-		$this->discourse->initialize_plugin();
-
-		$hosts = $this->discourse->allow_discourse_redirect( array() );
-
-		$this->assertTrue( is_array( $hosts ) );
-		$this->assertContains( 'forum.example.com', $hosts );
 	}
 }
