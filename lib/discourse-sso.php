@@ -52,9 +52,7 @@ class DiscourseSSO {
 	 * @param \WP_User $user The user who has logged in.
 	 */
 	public function auto_login_discourse_user( $user_login, $user ) {
-		if ( ( ! empty( $this->options['enable-sso'] ) && 1 === intval( $this->options['enable-sso'] ) ) &&
-		     ! empty( $this->options['auto-create-sso-user'] ) && 1 === intval( $this->options['auto-create-sso-user'] )
-		) {
+		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
 			$welcome_redirect = null;
 
 			if ( 'user_created' !== get_user_meta( $user->ID, 'wpdc_sso_user_created', true ) ) {
@@ -70,15 +68,18 @@ class DiscourseSSO {
 			parse_str( $referer_query, $query_params );
 
 			$sso_referer    = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
+			$autologin = ! isset( $query_params['skip_autologin'] );
 			$email_verified = ! get_user_meta( $user->ID, 'discourse_email_not_verified', true );
 			$email_verified = apply_filters( 'wpdc_auto_create_login_email_verification', $email_verified, $user_login, $user );
 
-			if ( $email_verified && ! $sso_referer && $sso_url ) {
-				update_user_meta( $user->ID, 'wpdc_sso_user_created', 'user_created' );
+			if ( $autologin && $email_verified && ! $sso_referer && $sso_url ) {
+				if ( DiscourseUtilities::check_connection_status() ) {
+					update_user_meta( $user->ID, 'wpdc_sso_user_created', 'user_created' );
 
-				wp_safe_redirect( esc_url( $sso_url ) );
+					wp_safe_redirect( esc_url( $sso_url ) );
 
-				exit;
+					exit;
+				}
 			}
 		}
 	}
@@ -133,6 +134,7 @@ class DiscourseSSO {
 	public function sso_add_query_vars( $vars ) {
 		$vars[] = 'sso';
 		$vars[] = 'sig';
+		$vars[] = 'skip_autologin';
 
 		return $vars;
 	}
