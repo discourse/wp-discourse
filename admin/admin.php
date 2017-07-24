@@ -57,7 +57,7 @@ function enqueue_admin_scripts() {
  */
 function enqueue_network_styles() {
 	global $current_screen;
-	if ( ! $current_screen->in_admin( 'network' ) ) {
+	if ( ! $current_screen || ! $current_screen->in_admin( 'network' ) ) {
 
 		return;
 	}
