@@ -43,7 +43,7 @@ if ( is_admin() ) {
 	if ( is_multisite() ) {
 		add_action( 'admin_print_scripts', __NAMESPACE__ . '\\enqueue_network_styles' );
 	}
-} //End if().
+} // End if().
 
 
 /**
