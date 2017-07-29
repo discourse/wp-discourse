@@ -40,8 +40,10 @@ if ( is_admin() ) {
 	new MetaBox();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
-	add_action( 'admin_print_scripts', __NAMESPACE__ . '\\enqueue_network_styles' );
-}
+	if ( is_multisite() ) {
+		add_action( 'admin_print_scripts', __NAMESPACE__ . '\\enqueue_network_styles' );
+	}
+} // End if().
 
 
 /**
@@ -57,7 +59,7 @@ function enqueue_admin_scripts() {
  */
 function enqueue_network_styles() {
 	global $current_screen;
-	if ( ! $current_screen->in_admin( 'network' ) ) {
+	if ( ! $current_screen || ! $current_screen->in_admin( 'network' ) ) {
 
 		return;
 	}
