@@ -25,7 +25,7 @@ based on post score and commenter "trust level" -- see docs.
 The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
 Single Sign On provider for your Discourse forum.
 
-This will override Discourse's native (and powerful) login flow and is only recommended for use cases
+This will override Discourse's native (and powerful) login flow and is only recommended for use in cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
 
 ### Contact
