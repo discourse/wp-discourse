@@ -99,7 +99,7 @@ class WebhookSettings {
 				), 'discourse_webhook', 'discourse_webhook_settings_section'
 			);
 
-		}
+		}// End if().
 
 		register_setting(
 			'discourse_webhook', 'discourse_webhook', array(
