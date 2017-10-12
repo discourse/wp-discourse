@@ -45,12 +45,14 @@ class MetaBox {
 	 */
 	public function add_meta_box( $post_type ) {
 		if ( isset( $this->options['allowed_post_types'] ) &&
-		     in_array( $post_type, $this->options['allowed_post_types'], true )
+			 in_array( $post_type, $this->options['allowed_post_types'], true )
 		) {
-			add_meta_box( 'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
-				$this,
-				'render_meta_box',
-			), null, 'side', 'high', null );
+			add_meta_box(
+				'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
+					$this,
+					'render_meta_box',
+				), null, 'side', 'high', null
+			);
 		}
 	}
 
@@ -63,10 +65,10 @@ class MetaBox {
 		$post_id                = $post->ID;
 		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
 		$saved                  = 'publish' === get_post_status( $post_id ) ||
-		                          'future' === get_post_status( $post_id ) ||
-		                          'draft' === get_post_status( $post_id ) ||
-		                          'private' === get_post_status( $post_id ) ||
-		                          'pending' === get_post_status( $post_id );
+								  'future' === get_post_status( $post_id ) ||
+								  'draft' === get_post_status( $post_id ) ||
+								  'private' === get_post_status( $post_id ) ||
+								  'pending' === get_post_status( $post_id );
 		$categories             = DiscourseUtilities::get_discourse_categories();
 		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$selected_category_name = '';
@@ -112,8 +114,10 @@ class MetaBox {
 			<div class="warning">
 				<p>
 					<?php
-					esc_html_e( 'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
-					or try refreshing the page.', 'wp-discourse' );
+					esc_html_e(
+						'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
+					or try refreshing the page.', 'wp-discourse'
+					);
 					?>
 				</p>
 			</div>
@@ -145,7 +149,7 @@ class MetaBox {
 	 */
 	function save_meta_box( $post_id ) {
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
+			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
 		) {
 			return 0;
 		}

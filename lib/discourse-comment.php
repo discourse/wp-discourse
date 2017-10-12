@@ -28,6 +28,7 @@ class DiscourseComment {
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
+		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );

@@ -90,12 +90,16 @@ class FormHelper {
 		<input id='discourse-<?php echo esc_attr( $option ); ?>'
 			   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
 			   type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
-			<?php if ( isset( $min ) ) {
+			<?php
+			if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
-} ?>
-			<?php if ( isset( $max ) ) {
+			}
+?>
+			<?php
+			if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
-} ?>
+			}
+?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -206,7 +210,8 @@ class FormHelper {
 		echo '<select id="discourse-' . esc_attr( $option ) . '" name="' . esc_attr( $option_name ) . '">';
 
 		foreach ( $group as $item ) {
-			printf( '<option value="%s"%s>%s</option>',
+			printf(
+				'<option value="%s"%s>%s</option>',
 				esc_attr( $item['id'] ),
 				selected( $selected, $item['id'], false ),
 				esc_html( $item['name'] )
@@ -249,9 +254,11 @@ class FormHelper {
 	 * @return array
 	 */
 	public function post_types_to_publish( $excluded_types = array() ) {
-		$post_types = get_post_types( array(
-			'public' => true,
-		) );
+		$post_types = get_post_types(
+			array(
+				'public' => true,
+			)
+		);
 		foreach ( $excluded_types as $excluded ) {
 			unset( $post_types[ $excluded ] );
 		}
@@ -317,8 +324,14 @@ class FormHelper {
 		?>
 		<div class="notice notice-warning is-dismissible">
 			<p>
-				<strong><?php esc_html_e( 'You are not connected to Discourse. If you are setting up the plugin, this
-                notice should go away after completing the form on this page.', 'wp-discourse' ); ?></strong>
+				<strong>
+				<?php
+				esc_html_e(
+					'You are not connected to Discourse. If you are setting up the plugin, this
+                notice should go away after completing the form on this page.', 'wp-discourse'
+				);
+?>
+</strong>
 			</p>
 		</div>
 		<?php

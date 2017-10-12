@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.4.3
+ * Version: 1.4.4
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -32,9 +32,9 @@
 
 define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
-define( 'MIN_WP_VERSION', '4.4' );
+define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.4.3' );
+define( 'WPDISCOURSE_VERSION', '1.4.4' );
 
 register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
@@ -83,7 +83,7 @@ function wpdc_check_requirements() {
 
 	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
 		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION .
-		                        '. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
+								'. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
 	}
 
 	if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
@@ -98,9 +98,11 @@ function wpdc_check_requirements() {
 
 		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
 
-		wp_die( esc_html( $message ), 'Plugin Activation Error', array(
-			'response' => 200,
-			'back_link' => true,
-		) );
+		wp_die(
+			esc_html( $message ), 'Plugin Activation Error', array(
+				'response' => 200,
+				'back_link' => true,
+			)
+		);
 	}
 }

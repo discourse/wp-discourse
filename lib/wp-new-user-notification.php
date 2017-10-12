@@ -63,11 +63,13 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 				$wp_hasher = new PasswordHash( 8, true );
 			}
 			$hashed = time() . ':' . $wp_hasher->HashPassword( $key );
-			$wpdb->update( $wpdb->users, array(
-				'user_activation_key' => $hashed,
+			$wpdb->update(
+				$wpdb->users, array(
+					'user_activation_key' => $hashed,
 				), array(
-				'user_login' => $user->user_login,
-			) );
+					'user_login' => $user->user_login,
+				)
+			);
 
 			// Added by the wp-discourse plugin.
 			$email_verification_sig = time() . '_' . wp_generate_password( 20, false );

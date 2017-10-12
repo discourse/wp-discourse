@@ -17,10 +17,12 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @return string markup
  */
 function discourse_sso_client_shortcode( $atts = array() ) {
-	$options = shortcode_atts(array(
-		'login' => null,
-		'link' => null,
-	), $atts);
+	$options = shortcode_atts(
+		array(
+			'login' => null,
+			'link' => null,
+		), $atts
+	);
 
 	return get_discourse_sso_link_markup( $options );
 }

@@ -37,73 +37,99 @@ class CommentSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_comment_settings() {
-		add_settings_section( 'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
-			$this,
-			'commenting_settings_tab_details',
-		), 'discourse_comment' );
+		add_settings_section(
+			'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
+				$this,
+				'commenting_settings_tab_details',
+			), 'discourse_comment'
+		);
 
-		add_settings_field( 'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array(
-			$this,
-			'use_discourse_comments_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array(
+				$this,
+				'use_discourse_comments_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
-			$this,
-			'show_existing_comments_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
+				$this,
+				'show_existing_comments_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_existing_comments_heading', __( 'Existing Comments Heading', 'wp-discourse' ), array(
-			$this,
-			'existing_comments_heading_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_existing_comments_heading', __( 'Existing Comments Heading', 'wp-discourse' ), array(
+				$this,
+				'existing_comments_heading_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_max_comments', __( 'Max Visible Comments', 'wp-discourse' ), array(
-			$this,
-			'max_comments_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_max_comments', __( 'Max Visible Comments', 'wp-discourse' ), array(
+				$this,
+				'max_comments_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_min_replies', __( 'Min Number of Replies', 'wp-discourse' ), array(
-			$this,
-			'min_replies_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_min_replies', __( 'Min Number of Replies', 'wp-discourse' ), array(
+				$this,
+				'min_replies_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_min_score', __( 'Min Score of Posts', 'wp-discourse' ), array(
-			$this,
-			'min_score_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_min_score', __( 'Min Score of Posts', 'wp-discourse' ), array(
+				$this,
+				'min_score_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_min_trust_level', __( 'Min Trust Level', 'wp-discourse' ), array(
-			$this,
-			'min_trust_level_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_min_trust_level', __( 'Min Trust Level', 'wp-discourse' ), array(
+				$this,
+				'min_trust_level_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_bypass_trust_level_score', __( 'Bypass Trust Level Score', 'wp-discourse' ), array(
-			$this,
-			'bypass_trust_level_input',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_bypass_trust_level_score', __( 'Bypass Trust Level Score', 'wp-discourse' ), array(
+				$this,
+				'bypass_trust_level_input',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
-			$this,
-			'custom_datetime_format',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
+				$this,
+				'custom_datetime_format',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		add_settings_field( 'discourse_only_show_moderator_liked', __( 'Only Import Moderator-Liked', 'wp-discourse' ), array(
-			$this,
-			'only_show_moderator_liked_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_only_show_moderator_liked', __( 'Only Import Moderator-Liked', 'wp-discourse' ), array(
+				$this,
+				'only_show_moderator_liked_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
-		register_setting( 'discourse_comment', 'discourse_comment', array(
-			$this->form_helper,
-			'validate_options',
-		) );
+		register_setting(
+			'discourse_comment', 'discourse_comment', array(
+				$this->form_helper,
+				'validate_options',
+			)
+		);
 	}
 
 	/**
 	 * Outputs markup for the use-discourse-comments checkbox.
 	 */
 	public function use_discourse_comments_checkbox() {
-		$this->form_helper->checkbox_input( 'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
-		__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input(
+			'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
+			__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' )
+		);
 	}
 
 	/**
@@ -124,8 +150,12 @@ class CommentSettings {
 	 * Outputs markup for the max-comments input.
 	 */
 	public function max_comments_input() {
-		$this->form_helper->input( 'max-comments', 'discourse_comment', __( "Maximum number of comments to display. To display a link to the Discourse
-		topic, without displaying comments on WordPress, set 'max visible comments' to 0.", 'wp-discourse' ), 'number', 0 );
+		$this->form_helper->input(
+			'max-comments', 'discourse_comment', __(
+				"Maximum number of comments to display. To display a link to the Discourse
+		topic, without displaying comments on WordPress, set 'max visible comments' to 0.", 'wp-discourse'
+			), 'number', 0
+		);
 	}
 
 	/**
@@ -146,8 +176,12 @@ class CommentSettings {
 	 * Outputs markup for the min-trust-level input.
 	 */
 	public function min_trust_level_input() {
-		$this->form_helper->input( 'min-trust-level', 'discourse_comment', __( 'Minimum Discourse user trust level required
-		for comments that are pulled to WordPress. (Trust levels range between 0 and 5.)', 'wp-discourse' ), 'number', 0, 5 );
+		$this->form_helper->input(
+			'min-trust-level', 'discourse_comment', __(
+				'Minimum Discourse user trust level required
+		for comments that are pulled to WordPress. (Trust levels range between 0 and 5.)', 'wp-discourse'
+			), 'number', 0, 5
+		);
 	}
 
 	/**
@@ -161,10 +195,12 @@ class CommentSettings {
 	 * Outputs markup for the custom-datetime input.
 	 */
 	public function custom_datetime_format() {
-		$this->form_helper->input( 'custom-datetime-format', 'discourse_comment', __( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
-		                                                                          get_option( 'date_format' ) . '").' .
-		                                                                          __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
-		__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' ) );
+		$this->form_helper->input(
+			'custom-datetime-format', 'discourse_comment', __( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
+																				  get_option( 'date_format' ) . '").' .
+																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+			__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' )
+		);
 	}
 
 	/**

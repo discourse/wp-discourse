@@ -90,11 +90,14 @@ class QueryRedirect {
 			$redirect_to = home_url( '/' );
 		}
 
-		$payload = base64_encode( http_build_query( array(
-				'nonce'          => Nonce::get_instance()->create( '_discourse_sso' ),
-				'return_sso_url' => $redirect_to,
+		$payload = base64_encode(
+			http_build_query(
+				array(
+					'nonce'          => Nonce::get_instance()->create( '_discourse_sso' ),
+					'return_sso_url' => $redirect_to,
+				)
 			)
-		) );
+		);
 
 		$request = array(
 			'sso' => $payload,
