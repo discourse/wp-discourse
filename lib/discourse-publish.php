@@ -114,7 +114,7 @@ class DiscoursePublish {
 	}
 
 	/**
-	 * Calls `sync_do_discourse_work` after getting the lock.
+	 * Calls `sync_to_discourse_work` after getting the lock.
 	 *
 	 * @param int    $post_id The post id.
 	 * @param string $title The title.
