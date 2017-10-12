@@ -19,8 +19,10 @@ function get_discourse_sso_url() {
 		$redirect_to = $is_user_logged_in ? admin_url( 'profile.php' ) : home_url( '/' );
 	}
 
-	return add_query_arg(array(
-		'discourse_sso' => 1,
-		'redirect_to' => $redirect_to,
-	), home_url( '/' ));
+	return add_query_arg(
+		array(
+			'discourse_sso' => 1,
+			'redirect_to' => $redirect_to,
+		), home_url( '/' )
+	);
 }

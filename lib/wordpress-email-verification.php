@@ -269,7 +269,7 @@ class WordPressEmailVerification {
 	public function is_verified( $user_id ) {
 
 		if ( 1 === intval( $this->get_email_flag_status( $user_id ) ) ||
-		     1 === intval( $this->get_email_changed_status( $user_id ) ) ) {
+			 1 === intval( $this->get_email_changed_status( $user_id ) ) ) {
 
 			return apply_filters( 'wpdc_email_verification_not_verified', false, $user_id );
 		} else {

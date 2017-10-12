@@ -83,7 +83,7 @@ function wpdc_check_requirements() {
 
 	if ( version_compare( PHP_VERSION, MIN_PHP_VERSION, '<' ) ) {
 		$flags['php_version'] = 'The WP Discourse plugin requires at least PHP version ' . MIN_PHP_VERSION .
-		                        '. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
+								'. Your server is using php ' . PHP_VERSION . '. Please contact your hosting provider about upgrading your version of php.';
 	}
 
 	if ( version_compare( $wp_version, MIN_WP_VERSION, '<' ) ) {
@@ -98,9 +98,11 @@ function wpdc_check_requirements() {
 
 		deactivate_plugins( plugin_basename( __FILE__ ), false, true );
 
-		wp_die( esc_html( $message ), 'Plugin Activation Error', array(
-			'response' => 200,
-			'back_link' => true,
-		) );
+		wp_die(
+			esc_html( $message ), 'Plugin Activation Error', array(
+				'response' => 200,
+				'back_link' => true,
+			)
+		);
 	}
 }

@@ -57,7 +57,7 @@ class Nonce {
 	 */
 	public static function get_instance() {
 		if ( is_null( self::$instance ) ) {
-			self::$instance = new SELF;
+			self::$instance = new self();
 		}
 
 		return self::$instance;
@@ -86,13 +86,15 @@ class Nonce {
 			$table_name = $this->get_table_name();
 			$charset = $this->wpdb->get_charset_collate();
 
-			dbDelta("CREATE TABLE {$table_name} (
+			dbDelta(
+				"CREATE TABLE {$table_name} (
 					id mediumint(9) NOT NULL AUTO_INCREMENT,
 					added_on datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
 					nonce varchar(255) DEFAULT '' NOT NULL,
 					action varchar(255) DEFAULT '' NOT NULL,
 					PRIMARY KEY  (id)
-				) $charset;");
+				) $charset;"
+			);
 
 				update_option( 'wpdiscourse_nonce_db_version', $this->db_version );
 		}
@@ -129,10 +131,12 @@ class Nonce {
 	public function create( $action = -1 ) {
 		$nonce = wp_hash( uniqid( $action, true ), 'nonce' );
 
-		$this->wpdb->insert( $this->get_table_name(), array(
-			'nonce' => $nonce,
-			'action' => $action,
-		), array( '%s', '%s' ) );
+		$this->wpdb->insert(
+			$this->get_table_name(), array(
+				'nonce' => $nonce,
+				'action' => $action,
+			), array( '%s', '%s' )
+		);
 
 		return $nonce;
 	}
@@ -169,8 +173,10 @@ class Nonce {
 	 * @return boolean
 	 */
 	private function invalidate_nonce( $id ) {
-		return $this->wpdb->delete( $this->get_table_name(), array(
-			'id' => $id,
-		), array( '%d' ) );
+		return $this->wpdb->delete(
+			$this->get_table_name(), array(
+				'id' => $id,
+			), array( '%d' )
+		);
 	}
 }

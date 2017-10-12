@@ -51,12 +51,14 @@ class DiscourseWebhookRefresh {
 	 */
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
-			register_rest_route( 'wp-discourse/v1', 'update-topic-content', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'update_topic_content' ),
-				),
-			) );
+			register_rest_route(
+				'wp-discourse/v1', 'update-topic-content', array(
+					array(
+						'methods'  => \WP_REST_Server::CREATABLE,
+						'callback' => array( $this, 'update_topic_content' ),
+					),
+				)
+			);
 		}
 	}
 

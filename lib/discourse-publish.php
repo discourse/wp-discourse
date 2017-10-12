@@ -72,12 +72,14 @@ class DiscoursePublish {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 
 		} elseif ( $post_is_published && $this->is_valid_sync_post_type( $post_id ) && isset( $this->options['auto-publish'] ) &&
-		           1 === intval( $this->options['auto-publish'] )
+				   1 === intval( $this->options['auto-publish'] )
 		) {
 			// The post should have been published.
-			$this->email_notifier->publish_failure_notification( $post, array(
-				'location' => 'after_save',
-			) );
+			$this->email_notifier->publish_failure_notification(
+				$post, array(
+					'location' => 'after_save',
+				)
+			);
 		}
 	}
 
@@ -103,9 +105,11 @@ class DiscoursePublish {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
-			$this->email_notifier->publish_failure_notification( $post, array(
-				'location' => 'after_xmlrpc_publish',
-			) );
+			$this->email_notifier->publish_failure_notification(
+				$post, array(
+					'location' => 'after_xmlrpc_publish',
+				)
+			);
 		}
 	}
 
@@ -296,9 +300,11 @@ class DiscoursePublish {
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
-		$this->email_notifier->publish_failure_notification( $current_post, array(
-			'location' => 'after_bad_response',
-		) );
+		$this->email_notifier->publish_failure_notification(
+			$current_post, array(
+				'location' => 'after_bad_response',
+			)
+		);
 	}
 
 	/**

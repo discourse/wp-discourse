@@ -61,10 +61,12 @@ class Utilities {
 			return 0;
 		}
 
-		$url = add_query_arg( array(
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-		), $url . '/users/' . $api_username . '.json' );
+		$url = add_query_arg(
+			array(
+				'api_key'      => $api_key,
+				'api_username' => $api_username,
+			), $url . '/users/' . $api_username . '.json'
+		);
 
 		$url      = esc_url_raw( $url );
 		$response = wp_remote_get( $url );
@@ -123,10 +125,12 @@ class Utilities {
 			}
 
 			$site_url = esc_url_raw( "{$base_url}/site.json" );
-			$site_url = add_query_arg( array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-			), $site_url );
+			$site_url = add_query_arg(
+				array(
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+				), $site_url
+			);
 
 			$remote = wp_remote_get( $site_url );
 
@@ -205,10 +209,12 @@ class Utilities {
 		}
 
 		$external_user_url = esc_url_raw( "{$url}/users/by-external/{$user_id}.json" );
-		$external_user_url = add_query_arg( array(
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-		), $external_user_url );
+		$external_user_url = add_query_arg(
+			array(
+				'api_key'      => $api_key,
+				'api_username' => $api_username,
+			), $external_user_url
+		);
 
 		$response = wp_remote_get( $external_user_url );
 
@@ -220,11 +226,13 @@ class Utilities {
 			$user = get_user_by( 'id', $user_id );
 			if ( $user ) {
 				$users_url = esc_url_raw( "{$url}/admin/users/list/active.json" );
-				$users_url = add_query_arg( array(
-					'filter'       => rawurlencode_deep( $user->user_email ),
-					'api_key'      => $api_key,
-					'api_username' => $api_username,
-				), $users_url );
+				$users_url = add_query_arg(
+					array(
+						'filter'       => rawurlencode_deep( $user->user_email ),
+						'api_key'      => $api_key,
+						'api_username' => $api_username,
+					), $users_url
+				);
 
 				$response = wp_remote_get( $users_url );
 				if ( self::validate( $response ) ) {

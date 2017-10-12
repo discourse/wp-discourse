@@ -63,12 +63,14 @@ class DiscourseUser {
 		$initialize_route = ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['use-discourse-user-webhook'] );
 		$initialize_route = apply_filters( 'wpdc_use_discourse_user_webhook', $initialize_route );
 		if ( $initialize_route ) {
-			register_rest_route( 'wp-discourse/v1', 'update-user', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'update_user' ),
-				),
-			) );
+			register_rest_route(
+				'wp-discourse/v1', 'update-user', array(
+					array(
+						'methods'  => \WP_REST_Server::CREATABLE,
+						'callback' => array( $this, 'update_user' ),
+					),
+				)
+			);
 		}
 	}
 
@@ -120,11 +122,13 @@ class DiscourseUser {
 				if ( $external_id ) {
 					$wordpress_user = get_user_by( 'id', $external_id );
 				} else {
-					$user_query = new \WP_User_Query( array(
-						'meta_key'   => 'discourse_sso_user_id',
-						'meta_value' => $discourse_id,
-						'number'     => 1,
-					) );
+					$user_query = new \WP_User_Query(
+						array(
+							'meta_key'   => 'discourse_sso_user_id',
+							'meta_value' => $discourse_id,
+							'number'     => 1,
+						)
+					);
 
 					$user_query_results = $user_query->get_results();
 

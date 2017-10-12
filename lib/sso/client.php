@@ -44,7 +44,7 @@ class Client {
 		$this->options = DiscourseUtilities::get_options();
 
 		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
-		     empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.
+			 empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.
 		) {
 			return;
 		}
@@ -226,10 +226,12 @@ class Client {
 			return $user_id;
 
 		} else {
-			$user_query = new \WP_User_Query( array(
-				'meta_key'   => $this->sso_meta_key,
-				'meta_value' => $this->get_sso_response( 'external_id' ),
-			) );
+			$user_query = new \WP_User_Query(
+				array(
+					'meta_key'   => $this->sso_meta_key,
+					'meta_value' => $this->get_sso_response( 'external_id' ),
+				)
+			);
 
 			$user_query_results = $user_query->get_results();
 
