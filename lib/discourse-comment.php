@@ -105,9 +105,8 @@ class DiscourseComment {
 			return 0;
 		}
 
-	//	$setting = get_post_meta( $postid, 'publish_to_discourse', true );
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
-	//	return 1 === intval( $setting );
+
 		return $discourse_post_id > 0;
 	}
 
