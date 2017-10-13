@@ -77,8 +77,7 @@ class MetaBox {
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
-			//$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-            $publish_to_discourse = 0;
+			$publish_to_discourse = 0;
 			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			if ( ! is_wp_error( $categories ) ) {
 				foreach ( $categories as $category ) {
@@ -92,55 +91,54 @@ class MetaBox {
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
-		$publish_text = __( 'Publish post to Discourse ', 'wp-discourse' );
-		$update_topic_text = __( 'Update Discourse topic', 'wp-discourse' );
-		?>
-
-		<label for="publish_to_discourse"><?php echo ! $published ? esc_html( $publish_text ) : esc_html( $update_topic_text ); ?>
-			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
-				<?php checked( $publish_to_discourse ); ?> >
-		</label>
-		<br>
-		<?php if ( $published ) : ?>
-			<hr>
-			<?php
+		if ( $published ) {
 			// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
 			$allowed = array(
 				'strong' => array(),
 			);
-			echo wp_kses( $message, $allowed );
-			?>
+			echo wp_kses( $message, $allowed ) . '<br><hr>';
 
-		<?php elseif ( is_wp_error( $categories ) ) : ?>
-			<hr>
-			<div class="warning">
-				<p>
-					<?php
-					esc_html_e(
-						'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
+			$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
+			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+		} else {
+			$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
+			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+
+			if ( is_wp_error( $categories ) ) {
+				?>
+				<hr>
+				<div class="warning">
+					<p>
+						<?php
+						esc_html_e(
+							'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
 					or try refreshing the page.', 'wp-discourse'
-					);
-					?>
-				</p>
-			</div>
-			<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-			<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
-
-		<?php else : ?>
-			<label for="publish_post_category"><?php esc_html_e( 'Category to publish to:', 'wp-discourse' ); ?>
-				<select name="publish_post_category" id="publish_post_category">
-					<?php foreach ( $categories as $category ) : ?>
-						<option
-								value="<?php echo( esc_attr( $category['id'] ) ); ?>"
-							<?php selected( $selected_category, $category['id'] ); ?>>
-							<?php echo( esc_html( $category['name'] ) ); ?>
-						</option>
-					<?php endforeach; ?>
-				</select>
-			</label>
-		<?php endif; ?>
-		<?php
+						);
+						?>
+					</p>
+				</div>
+				<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
+				<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
+				<?php
+			} else {
+				?>
+				<div>
+				<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
+					<select name="publish_post_category" id="publish_post_category">
+						<?php foreach ( $categories as $category ) : ?>
+							<option
+									value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+								<?php selected( $selected_category, $category['id'] ); ?>>
+								<?php echo( esc_html( $category['name'] ) ); ?>
+							</option>
+						<?php endforeach; ?>
+					</select>
+				</label>
+				</div>
+				<?php
+			}
+		}
 	}
 
 	/**
@@ -150,7 +148,7 @@ class MetaBox {
 	 *
 	 * @return int
 	 */
-	function save_meta_box( $post_id ) {
+	public function save_meta_box( $post_id ) {
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
 			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
 		) {
@@ -174,5 +172,20 @@ class MetaBox {
 		}
 
 		return $post_id;
+	}
+
+	/**
+     * Outputs the Publish to Discourse checkbox.
+     *
+	 * @param string $text The label text.
+	 * @param int $publish_to_discourse Whether or not the checkbox should be checked.
+	 */
+	protected function publish_to_discourse_checkbox( $text, $publish_to_discourse ) {
+		?>
+		<label for="publish_to_discourse"><?php echo esc_html( $text ); ?>
+			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
+				<?php checked( $publish_to_discourse ); ?> >
+		</label>
+		<?php
 	}
 }
