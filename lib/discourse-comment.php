@@ -100,14 +100,15 @@ class DiscourseComment {
 	 *
 	 * @return bool|int
 	 */
-	protected function use_discourse_comments( $postid ) {
+	protected function use_discourse_comments( $post_id ) {
 		if ( empty( $this->options['use-discourse-comments'] ) ) {
 			return 0;
 		}
 
-		$setting = get_post_meta( $postid, 'publish_to_discourse', true );
-
-		return 1 === intval( $setting );
+	//	$setting = get_post_meta( $postid, 'publish_to_discourse', true );
+		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+	//	return 1 === intval( $setting );
+		return $discourse_post_id > 0;
 	}
 
 	/**

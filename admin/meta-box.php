@@ -77,7 +77,8 @@ class MetaBox {
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
-			$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+			//$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+            $publish_to_discourse = 0;
 			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			if ( ! is_wp_error( $categories ) ) {
 				foreach ( $categories as $category ) {
@@ -90,10 +91,12 @@ class MetaBox {
 		}
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
+
+		$publish_text = __( 'Publish post to Discourse ', 'wp-discourse' );
+		$update_topic_text = __( 'Update Discourse topic', 'wp-discourse' );
 		?>
 
-		<label
-				for="publish_to_discourse"><?php esc_html_e( 'Publish post to Discourse:', 'wp-discourse' ); ?>
+		<label for="publish_to_discourse"><?php echo ! $published ? esc_html( $publish_text ) : esc_html( $update_topic_text ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
 		</label>
