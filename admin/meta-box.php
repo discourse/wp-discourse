@@ -138,7 +138,7 @@ class MetaBox {
 				</div>
 				<?php
 			}
-		}
+		}// End if().
 	}
 
 	/**
@@ -175,10 +175,10 @@ class MetaBox {
 	}
 
 	/**
-     * Outputs the Publish to Discourse checkbox.
-     *
+	 * Outputs the Publish to Discourse checkbox.
+	 *
 	 * @param string $text The label text.
-	 * @param int $publish_to_discourse Whether or not the checkbox should be checked.
+	 * @param int    $publish_to_discourse Whether or not the checkbox should be checked.
 	 */
 	protected function publish_to_discourse_checkbox( $text, $publish_to_discourse ) {
 		?>

@@ -96,7 +96,7 @@ class DiscourseComment {
 	/**
 	 * Checks if a post is using Discourse comments.
 	 *
-	 * @param int $postid The ID of the post.
+	 * @param int $post_id The ID of the post.
 	 *
 	 * @return bool|int
 	 */
