@@ -63,6 +63,7 @@ class Discourse {
 	 */
 	protected $discourse_comment = array(
 		'use-discourse-comments'    => 0,
+		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,
 		'show-existing-comments'    => 0,
 		'existing-comments-heading' => '',
