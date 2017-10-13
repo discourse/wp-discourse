@@ -50,11 +50,11 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-		        'discourse_new_tab', __( 'Open Links in New Tab', 'wp-discourse' ), array(
-		                $this,
-                    'discourse_new_tab_checkbox',
-            ), 'discourse_comment', 'discourse_commenting_settings_section'
-        );
+			'discourse_new_tab', __( 'Open Links in New Tab', 'wp-discourse' ), array(
+				$this,
+				'discourse_new_tab_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
 		add_settings_field(
 			'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
@@ -138,10 +138,10 @@ class CommentSettings {
 	}
 
 	public function discourse_new_tab_checkbox() {
-	    $this->form_helper->checkbox_input(
-	            'discourse-new-tab', 'discourse_comment', __( 'Open links to Discourse in a new tab.', 'wp-discourse' )
-        );
-    }
+		$this->form_helper->checkbox_input(
+			'discourse-new-tab', 'discourse_comment', __( 'Open links to Discourse in a new tab.', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the show-existing-comments checkbox.

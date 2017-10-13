@@ -33,14 +33,14 @@ class HTMLTemplates {
 
 	/**
 	 * Sets the target attribute.
-     *
-     * @return void
+	 *
+	 * @return void
 	 */
 	protected static function target() {
-	    if ( ! empty( DiscourseUtilities::get_options()['discourse-new-tab'] ) ) {
-	        echo 'target="_blank"';
-        }
-    }
+		if ( ! empty( DiscourseUtilities::get_options()['discourse-new-tab'] ) ) {
+			echo 'target="_blank"';
+		}
+	}
 
 	/**
 	 * HTML template for replies.
@@ -155,10 +155,10 @@ class HTMLTemplates {
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
 						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
-						     height="64"
-						     width="64">
+							 height="64"
+							 width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
-						                 class="url">{username}</a></b>
+										 class="url">{username}</a></b>
 						<span class="says screen-reader-text"><?php esc_html_e( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
@@ -195,7 +195,7 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
-		     width="25">
+			 width="25">
 		<?php
 		$output = ob_get_clean();
 
