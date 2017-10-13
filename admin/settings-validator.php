@@ -98,6 +98,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
+		add_filter( 'wpdc_validate_discourse_new_tab', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
 		add_filter( 'wpdc_validate_max_comments', array( $this, 'validate_max_comments' ) );
