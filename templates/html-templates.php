@@ -32,6 +32,17 @@ class HTMLTemplates {
 	}
 
 	/**
+	 * Sets the target attribute.
+     *
+     * @return void
+	 */
+	protected static function target() {
+	    if ( ! empty( DiscourseUtilities::get_options()['discourse-new-tab'] ) ) {
+	        echo 'target="_blank"';
+        }
+    }
+
+	/**
 	 * HTML template for replies.
 	 *
 	 * Can be customized from within a theme using the filter provided.
@@ -53,7 +64,7 @@ class HTMLTemplates {
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
 					<?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
-					<a href="{topic_url}">
+					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a>
 				</h3>
@@ -88,7 +99,7 @@ class HTMLTemplates {
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
 					<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' ' ); ?>
-					<a href="{topic_url}">
+					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a></h3>
 			</div><!-- #respond -->
