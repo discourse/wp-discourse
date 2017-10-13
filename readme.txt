@@ -131,6 +131,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 #### 1.4.5 12/10/2017
 
 - Allow posts to be updated on WordPress without being republished to Discourse
+- Add option to open links to Discourse in a new tab
 
 #### 1.4.4 12/10/2017
 
