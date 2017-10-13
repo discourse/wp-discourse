@@ -137,6 +137,9 @@ class CommentSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for the discourse-new-tab checkbox.
+	 */
 	public function discourse_new_tab_checkbox() {
 		$this->form_helper->checkbox_input(
 			'discourse-new-tab', 'discourse_comment', __( 'Open links to Discourse in a new tab.', 'wp-discourse' )
