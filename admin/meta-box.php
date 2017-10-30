@@ -196,7 +196,7 @@ class MetaBox {
 	}
 
 	/**
-	 * Outputs the Publish to Discourse checkbox.
+	 * Outputs the Update Discourse Topic checkbox.
 	 *
 	 * @param string $text The label text.
 	 * @param int    $update_discourse_topic Whether or not the checkbox should be checked.
