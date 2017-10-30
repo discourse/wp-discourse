@@ -100,7 +100,7 @@ class MetaBox {
 			echo wp_kses( $message, $allowed ) . '<br><hr>';
 
 			$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-			$this->update_discourse_topic_checkbox( $publish_text, $publish_to_discourse );
+			$this->update_discourse_topic_checkbox( $publish_text, 0 );
 		} else {
 			$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
