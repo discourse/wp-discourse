@@ -73,12 +73,11 @@ class MetaBox {
 		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$selected_category_name = '';
 
-
 		if ( ! $saved ) {
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
-		    $publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+			$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			if ( ! is_wp_error( $categories ) ) {
 				foreach ( $categories as $category ) {
@@ -204,10 +203,10 @@ class MetaBox {
 	 */
 	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic ) {
 		?>
-        <label for="update_discourse_topic"><?php echo esc_html( $text ); ?>
-            <input type="checkbox" name="update_discourse_topic" id="update_discourse_topic" value="1"
+		<label for="update_discourse_topic"><?php echo esc_html( $text ); ?>
+			<input type="checkbox" name="update_discourse_topic" id="update_discourse_topic" value="1"
 				<?php checked( $update_discourse_topic ); ?> >
-        </label>
+		</label>
 		<?php
 	}
 }

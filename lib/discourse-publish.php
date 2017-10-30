@@ -76,7 +76,7 @@ class DiscoursePublish {
 				if ( $publish_to_discourse && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 
 					$this->sync_to_discourse( $post_id, $title, $post->post_content );
-				} elseif ( $this->is_valid_sync_post_type( $post_id ) && ! empty( $this->options['auto-publish'])) {
+				} elseif ( $this->is_valid_sync_post_type( $post_id ) && ! empty( $this->options['auto-publish'] ) ) {
 
 					$this->email_notifier->publish_failure_notification(
 						$post, array(
