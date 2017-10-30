@@ -73,11 +73,12 @@ class MetaBox {
 		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$selected_category_name = '';
 
+
 		if ( ! $saved ) {
 			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
 			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
 		} else {
-			$publish_to_discourse = 0;
+		    $publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
 			if ( ! is_wp_error( $categories ) ) {
 				foreach ( $categories as $category ) {
@@ -100,7 +101,7 @@ class MetaBox {
 			echo wp_kses( $message, $allowed ) . '<br><hr>';
 
 			$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+			$this->update_discourse_topic_checkbox( $publish_text, $publish_to_discourse );
 		} else {
 			$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
@@ -171,6 +172,12 @@ class MetaBox {
 			update_post_meta( $post_id, 'publish_to_discourse', 0 );
 		}
 
+		if ( isset( $_POST['update_discourse_topic'] ) ) { // Input var okay.
+			update_post_meta( $post_id, 'update_discourse_topic', intval( wp_unslash( $_POST['update_discourse_topic'] ) ) ); // Input var okay.
+		} else {
+			update_post_meta( $post_id, 'update_discourse_topic', 0 );
+		}
+
 		return $post_id;
 	}
 
@@ -186,6 +193,21 @@ class MetaBox {
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
 		</label>
+		<?php
+	}
+
+	/**
+	 * Outputs the Publish to Discourse checkbox.
+	 *
+	 * @param string $text The label text.
+	 * @param int    $update_discourse_topic Whether or not the checkbox should be checked.
+	 */
+	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic ) {
+		?>
+        <label for="update_discourse_topic"><?php echo esc_html( $text ); ?>
+            <input type="checkbox" name="update_discourse_topic" id="update_discourse_topic" value="1"
+				<?php checked( $update_discourse_topic ); ?> >
+        </label>
 		<?php
 	}
 }

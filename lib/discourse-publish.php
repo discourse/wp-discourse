@@ -63,23 +63,31 @@ class DiscoursePublish {
 			return;
 		}
 
-		$post_is_published    = 'publish' === get_post_status( $post_id );
+		$has_published_status    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+		$published_on_discourse = get_post_meta( $post_id, 'discourse_post_id', true );
+		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                = $this->sanitize_title( $post->post_title );
 
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+		if ( $has_published_status ) {
+			if ( ! $published_on_discourse ) {
 
-		} elseif ( $post_is_published && $this->is_valid_sync_post_type( $post_id ) && isset( $this->options['auto-publish'] ) &&
-				   1 === intval( $this->options['auto-publish'] )
-		) {
-			// The post should have been published.
-			$this->email_notifier->publish_failure_notification(
-				$post, array(
-					'location' => 'after_save',
-				)
-			);
+				if ( $publish_to_discourse && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
+
+					$this->sync_to_discourse( $post_id, $title, $post->post_content );
+				} elseif ( $this->is_valid_sync_post_type( $post_id ) && ! empty( $this->options['auto-publish'])) {
+
+					$this->email_notifier->publish_failure_notification(
+						$post, array(
+							'location' => 'after_save',
+						)
+					);
+				}
+			} elseif ( $published_on_discourse && $update_discourse_topic && ! empty( $title ) ) {
+
+				$this->sync_to_discourse( $post_id, $title, $post->post_content );
+			}
 		}
 	}
 
