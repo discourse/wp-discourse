@@ -12,7 +12,7 @@ jQuery( document ).ready(function() {
 			url = 'https://www.youtube.com/watch?v=' + id;
 		jQuery( this ).replaceWith( '<a href="' + url + '">' + url + '</a>' );
 	});
-	jQuery( 'a.mention' ).each(function() {
+	/*jQuery( 'a.mention' ).each(function() {
 		jQuery( this ).attr( 'href', discourse.url + jQuery( this ).attr( 'href' ) );
-	});
+	});*/
 });

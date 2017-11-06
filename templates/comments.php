@@ -68,6 +68,7 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {
+			write_log('comment body', $post->cooked );
 			$comment_html = wp_kses_post( Templates::comment_html() );
 			$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 			$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
