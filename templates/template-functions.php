@@ -59,8 +59,24 @@ class TemplateFunctions {
 		return preg_replace( $search, $replace, $content );
 	}
 
+	/**
+	 * Converts relative URLs retured from Discourse to absolute URLs with DOMDocument.
+	 *
+	 * Checks if libxml is loaded. If not, calls convert_relative_img_src_to_absolute.
+	 *
+	 * @param string $url The Discourse URL.
+	 * @param string $content The content to be parsed.
+	 *
+	 * @return mixed|string
+	 */
 	public static function convert_relative_urls_to_absolute( $url, $content ) {
-		libxml_use_internal_errors( true );
+		if ( ! extension_loaded( 'libxml' ) ) {
+
+			return self::convert_relative_img_src_to_absolute( $url, $content );
+		}
+
+		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
+		$use_internal_errors = libxml_use_internal_errors( true );
 
 		$doc = new \DOMDocument( '1.0', 'utf-8' );
 		$html = $html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="inner-content">' . $content . '</div></body></html>';
@@ -70,9 +86,9 @@ class TemplateFunctions {
 		$links = $doc->getElementsByTagName( 'a' );
 		foreach ( $links as $link ) {
 			$href= $link->getAttribute( 'href' );
-			$url_parts = parse_url( $href );
+			$url_parts = wp_parse_url( $href );
 
-			if ( ! isset( $url_parts['host']) || $url_parts['host'] === '' ) {
+			if ( ! isset( $url_parts['host'] ) || $url_parts['host'] === '' ) {
 				$link->setAttribute( 'href', $url . $href );
 			}
 		}
@@ -81,21 +97,31 @@ class TemplateFunctions {
 		$images = $doc->getElementsByTagName( 'img' );
 		foreach( $images as $image ) {
 			$src = $image->getAttribute( 'src' );
-			$url_parts = parse_url( $src );
+			$url_parts = wp_parse_url( $src );
 
-			if ( ! isset( $url_parts['host']) || $url_parts['host'] === '' ) {
+			if ( ! isset( $url_parts['host'] ) || $url_parts['host'] === '' ) {
 				$image->setAttribute( 'src', $url . $src );
 			}
 		}
 
 		$inner_html = self::inner_html($doc->getElementById('inner-content'));
 
+		// Clear the libxml error buffer.
 		libxml_clear_errors();
+		// Restore the previous value of libxml_use_internal_errors.
+		libxml_use_internal_errors( $use_internal_errors );
 
 		return $inner_html;
 	}
 
-	public static function inner_html( \DOMElement $element ) {
+	/**
+	 * Extracts the childNodes from a DOMElement and saves them to a string.
+	 *
+	 * @param \DOMElement $element The DOMElement to extract from.
+	 *
+	 * @return string
+	 */
+	protected static function inner_html( \DOMElement $element ) {
 		$doc = $element->ownerDocument;
 		$html = '';
 
