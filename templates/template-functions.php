@@ -9,7 +9,6 @@ namespace WPDiscourse\Templates;
 
 /**
  * Class TemplateFunctions
- * Todo: there's no good reason for these to be static functions.
  */
 class TemplateFunctions {
 
@@ -79,32 +78,32 @@ class TemplateFunctions {
 		$use_internal_errors = libxml_use_internal_errors( true );
 
 		$doc = new \DOMDocument( '1.0', 'utf-8' );
-		$html = $html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="inner-content">' . $content . '</div></body></html>';
+		$html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="inner-content">' . $content . '</div></body></html>';
 		$doc->loadHTML( $html );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
 		foreach ( $links as $link ) {
-			$href= $link->getAttribute( 'href' );
+			$href = $link->getAttribute( 'href' );
 			$url_parts = wp_parse_url( $href );
 
-			if ( ! isset( $url_parts['host'] ) || $url_parts['host'] === '' ) {
+			if ( empty( $url_parts['host'] ) ) {
 				$link->setAttribute( 'href', $url . $href );
 			}
 		}
 
 		// Images, emojis etc.
 		$images = $doc->getElementsByTagName( 'img' );
-		foreach( $images as $image ) {
+		foreach ( $images as $image ) {
 			$src = $image->getAttribute( 'src' );
 			$url_parts = wp_parse_url( $src );
 
-			if ( ! isset( $url_parts['host'] ) || $url_parts['host'] === '' ) {
+			if ( empty( $url_parts['host'] ) ) {
 				$image->setAttribute( 'src', $url . $src );
 			}
 		}
 
-		$inner_html = self::inner_html($doc->getElementById('inner-content'));
+		$inner_html = self::inner_html( $doc->getElementById( 'inner-content' ) );
 
 		// Clear the libxml error buffer.
 		libxml_clear_errors();
