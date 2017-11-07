@@ -80,9 +80,6 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 			$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 			$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 			$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-			// Todo: run a test for the php-xml extension when the plugin's activated. If it's not there, use
-			// the old function.
-			//$comment_body = TemplateFunctions::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
 			$comment_body = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 			$comment_body = wp_kses_post( $comment_body );
 			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
