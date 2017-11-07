@@ -20,6 +20,8 @@
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
         <!-- Have to add this so that $table_name can be included in a prepare statment. -->
         <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
+        <!-- DOMDocument uses camelCase. -->
+        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->
