@@ -68,7 +68,7 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 
 	if ( count( $discourse_info->posts ) > 0 ) {
 		foreach ( $discourse_info->posts as &$post ) {
-			write_log('comment body', $post->cooked );
+
 			$comment_html = wp_kses_post( Templates::comment_html() );
 			$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 			$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
@@ -80,8 +80,11 @@ if ( empty( $custom['discourse_permalink'] ) ) {
 			$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 			$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 			$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-			$comment_body = wp_kses_post( $post->cooked );
-			$comment_body = TemplateFunctions::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
+			// Todo: run a test for the php-xml extension when the plugin's activated. If it's not there, use
+			// the old function.
+			//$comment_body = TemplateFunctions::convert_relative_img_src_to_absolute( $discourse_url, $comment_body );
+			$comment_body = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
+			$comment_body = wp_kses_post( $comment_body );
 			$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
 			$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );
 			$comments_html .= $comment_html;
