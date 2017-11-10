@@ -63,6 +63,11 @@ class DiscoursePublish {
 			return;
 		}
 
+		if ( ! empty( $this->options['force-publish'] ) && $this->is_valid_sync_post_type( $post_id ) ) {
+			// Set the post to be published even if the 'publish_to_discourse' checkbox has been unchecked.
+			update_post_meta( $post_id, 'publish_to_discourse', 1 );
+		}
+
 		$has_published_status    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
 		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
@@ -250,8 +255,8 @@ class DiscoursePublish {
 				$topic_id   = $body->topic_id;
 
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
-				add_post_meta( $post_id, 'discourse_topic_id', $topic_id );
-				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
+				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
 
 				// Used for resetting the error notification, if one was being displayed.
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
