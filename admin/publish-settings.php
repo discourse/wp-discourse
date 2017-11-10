@@ -113,11 +113,11 @@ class PublishSettings {
 		);
 
 		add_settings_field(
-		        'discourse_force_publish', __( 'Force Publish', 'wp-discourse' ), array(
-		                $this,
-                    'force_publish_checkbox',
-            ), 'discourse_publish', 'discourse_publishing_settings_section'
-        );
+			'discourse_force_publish', __( 'Force Publish', 'wp-discourse' ), array(
+				$this,
+				'force_publish_checkbox',
+			), 'discourse_publish', 'discourse_publishing_settings_section'
+		);
 
 		add_settings_field(
 			'discourse_publish_failure_notice', __( 'Send Email Notification on Publish Failure', 'wp-discourse' ), array(
@@ -260,11 +260,11 @@ class PublishSettings {
 	}
 
 	public function force_publish_checkbox() {
-	    $this->form_helper->checkbox_input(
-	            'force-publish', 'discourse_publish', __( 'Force all new posts to be published to Discourse.', 'wp-discourse' ),
-                __( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
-        );
-    }
+		$this->form_helper->checkbox_input(
+			'force-publish', 'discourse_publish', __( 'Force all new posts to be published to Discourse.', 'wp-discourse' ),
+			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the publish-failure-notice checkbox.
