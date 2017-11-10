@@ -259,6 +259,9 @@ class PublishSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for force-publish checkbox.
+	 */
 	public function force_publish_checkbox() {
 		$this->form_helper->checkbox_input(
 			'force-publish', 'discourse_publish', __( 'Force all new posts to be published to Discourse.', 'wp-discourse' ),
