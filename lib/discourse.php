@@ -130,12 +130,12 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_sso_provider = array(
-		'enable-sso'                   => 0,
-		'auto-create-sso-user'         => 0,
-		'login-path'                   => '',
-		'real-name-as-discourse-name'  => 0,
-		'force-avatar-update'          => 0,
-		'redirect-without-login'       => 0,
+		'enable-sso'                  => 0,
+		'auto-create-sso-user'        => 0,
+		'login-path'                  => '',
+		'real-name-as-discourse-name' => 0,
+		'force-avatar-update'         => 0,
+		'redirect-without-login'      => 0,
 	);
 
 	/**
@@ -195,15 +195,15 @@ class Discourse {
 			$connection_options = get_option( 'discourse_connect' );
 			unset( $connection_options['multisite-configuration'] );
 			update_option( 'discourse_connect', $connection_options );
-			$site_options = get_site_option( 'wpdc_site_options' ) ? get_site_option( 'wpdc_site_options' ) : array();
+			$site_options                                    = get_site_option( 'wpdc_site_options' ) ? get_site_option( 'wpdc_site_options' ) : array();
 			$site_options['multisite-configuration-enabled'] = 1;
-			$site_options['url'] = $this->options['url'];
-			$site_options['api-key'] = $this->options['api-key'];
-			$site_options['publish-username'] = $this->options['publish-username'];
-			$site_options['use-discourse-webhook'] = $this->options['use-discourse-webhook'];
-			$site_options['webhook-secret'] = $this->options['webhook-secret'];
-			$site_options['enable-sso'] = $this->options['enable-sso'];
-			$site_options['sso-secret'] = $this->options['sso-secret'];
+			$site_options['url']                             = $this->options['url'];
+			$site_options['api-key']                         = $this->options['api-key'];
+			$site_options['publish-username']                = $this->options['publish-username'];
+			$site_options['use-discourse-webhook']           = $this->options['use-discourse-webhook'];
+			$site_options['webhook-secret']                  = $this->options['webhook-secret'];
+			$site_options['enable-sso']                      = $this->options['enable-sso'];
+			$site_options['sso-secret']                      = $this->options['sso-secret'];
 			update_site_option( 'wpdc_site_options', $site_options );
 		}
 

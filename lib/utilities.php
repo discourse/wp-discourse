@@ -295,14 +295,14 @@ class Utilities {
 	 * Creates a Discourse user through the API.
 	 *
 	 * @param \WP_User $user The WordPress user.
-	 * @param bool $require_activation Whether or not to require an activation email to be sent.
+	 * @param bool     $require_activation Whether or not to require an activation email to be sent.
 	 *
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
-		$options = self::get_options();
-		$url = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$options      = self::get_options();
+		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
 		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
@@ -311,24 +311,26 @@ class Utilities {
 		}
 
 		$require_activation = apply_filters( 'wpdc_auto_create_user_require_activation', $require_activation, $user );
-		$create_user_url = esc_url_raw( "{$url}/users" );
-		$username = $user->user_login;
-		$name     = $user->display_name;
-		$email    = $user->user_email;
-		$password = wp_generate_password( 20 );
-		$response = wp_remote_post( $create_user_url, array(
-			'method' => 'POST',
-			'body'   => array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-				'name'         => $name,
-				'email'        => $email,
-				'password'     => $password,
-				'username'     => $username,
-				'active'       => $require_activation ? 'false' : 'true',
-				'approved' => 'true',
-			),
-		) );
+		$create_user_url    = esc_url_raw( "{$url}/users" );
+		$username           = $user->user_login;
+		$name               = $user->display_name;
+		$email              = $user->user_email;
+		$password           = wp_generate_password( 20 );
+		$response           = wp_remote_post(
+			$create_user_url, array(
+				'method' => 'POST',
+				'body'   => array(
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+					'name'         => $name,
+					'email'        => $email,
+					'password'     => $password,
+					'username'     => $username,
+					'active'       => $require_activation ? 'false' : 'true',
+					'approved'     => 'true',
+				),
+			)
+		);
 
 		if ( ! self::validate( $response ) ) {
 

@@ -20,7 +20,7 @@ namespace WPDiscourse\WordPressEmailVerification;
  * The signature is also saved as user_metadata under a key that must be equal to the `$verification_signature_key_name`:
  *`update_user_meta( $user_id, 'discourse_email_verification_key', $email_verification_sig );`
  */
-require_once( __DIR__ . '/wp-new-user-notification.php' );
+require_once __DIR__ . '/wp-new-user-notification.php';
 
 /**
  * Class WordPressEmailVerification
@@ -131,11 +131,11 @@ class WordPressEmailVerification {
 			if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['verify_email_nonce'] ) ), 'verify_email' ) ) { // Input var okay.
 				return 0;
 			}
-			$user_id = $user->ID;
-			list( $sig_created_at, $sig_value ) = explode( '_', sanitize_key( wp_unslash( $_POST['mail_key'] ) ) ); // Input var okay.
-			$saved_sig = $this->get_user_signature_value( $user_id );
+			$user_id                                       = $user->ID;
+			list( $sig_created_at, $sig_value )            = explode( '_', sanitize_key( wp_unslash( $_POST['mail_key'] ) ) ); // Input var okay.
+			$saved_sig                                     = $this->get_user_signature_value( $user_id );
 			list( $saved_sig_create_at, $saved_sig_value ) = explode( '_', sanitize_key( wp_unslash( $saved_sig ) ) );
-			$expired_sig = time() > intval( $sig_created_at ) + $this->email_expiration_period;
+			$expired_sig                                   = time() > intval( $sig_created_at ) + $this->email_expiration_period;
 
 			if ( $expired_sig ) {
 				$this->process_expired_sig( $user_id );
@@ -249,7 +249,7 @@ class WordPressEmailVerification {
 		$redirect = rawurlencode( home_url( '/' ) );
 
 		// translators: Existing user email verification message. Placeholder: username.
-		$message = sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
+		$message  = sprintf( __( 'Username: %s', 'wp-email-verification' ), $user->user_login ) . "\r\n\r\n";
 		$message .= __( 'To verify your email address, visit the following address:', 'wp-email-verification' ) . "\r\n\r\n";
 		$message .= '<' . network_site_url( "wp-login.php?action=login&mail_key=$email_verification_sig&error=emailnotverified&redirect_to=$redirect&login=" . rawurlencode( $user->user_login ), 'login' ) . ">\r\n\r\n";
 

@@ -26,10 +26,10 @@ function get_discourse_sso_link_markup( $options = array() ) {
 			return;
 		}
 		$link_account_text = ! empty( $discourse_options['link-to-discourse-text'] ) ? $discourse_options['link-to-discourse-text'] : '';
-		$anchor = ! empty( $options['link'] ) ? $options['link'] : $link_account_text;
+		$anchor            = ! empty( $options['link'] ) ? $options['link'] : $link_account_text;
 	} else {
 		$login_text = ! empty( $discourse_options['external-login-text'] ) ? $discourse_options['external-login-text'] : '';
-		$anchor = ! empty( $options['login'] ) ? $options['login'] : $login_text;
+		$anchor     = ! empty( $options['login'] ) ? $options['login'] : $login_text;
 	}
 
 	$sso_login_url = get_discourse_sso_url();

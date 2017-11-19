@@ -20,7 +20,7 @@ function discourse_sso_client_shortcode( $atts = array() ) {
 	$options = shortcode_atts(
 		array(
 			'login' => null,
-			'link' => null,
+			'link'  => null,
 		), $atts
 	);
 

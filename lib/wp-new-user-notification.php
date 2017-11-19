@@ -40,7 +40,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 			// we want to reverse this for the plain text arena of emails.
 			$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 
-			$message = sprintf( __( 'New user registration on your site %s:' ), $blogname ) . "\r\n\r\n";
+			$message  = sprintf( __( 'New user registration on your site %s:' ), $blogname ) . "\r\n\r\n";
 			$message .= sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
 			$message .= sprintf( __( 'Email: %s' ), $user->user_email ) . "\r\n";
 
@@ -75,7 +75,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 			$email_verification_sig = time() . '_' . wp_generate_password( 20, false );
 			update_user_meta( $user_id, 'discourse_email_verification_key', $email_verification_sig );
 
-			$message = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
+			$message  = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
 			$message .= __( 'To set your password, visit the following address:' ) . "\r\n\r\n";
 			$message .= network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ), 'login' ) . "\r\n\r\n";
 

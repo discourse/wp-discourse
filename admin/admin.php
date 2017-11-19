@@ -9,19 +9,19 @@
 namespace WPDiscourse\Admin;
 
 if ( is_admin() ) {
-	require_once( __DIR__ . '/admin-menu.php' );
-	require_once( __DIR__ . '/comment-settings.php' );
-	require_once( __DIR__ . '/configurable-text-settings.php' );
-	require_once( __DIR__ . '/connection-settings.php' );
-	require_once( __DIR__ . '/form-helper.php' );
-	require_once( __DIR__ . '/network-options.php' );
-	require_once( __DIR__ . '/options-page.php' );
-	require_once( __DIR__ . '/publish-settings.php' );
-	require_once( __DIR__ . '/settings-validator.php' );
-	require_once( __DIR__ . '/sso-settings.php' );
-	require_once( __DIR__ . '/webhook-settings.php' );
-	require_once( __DIR__ . '/admin-notice.php' );
-	require_once( __DIR__ . '/meta-box.php' );
+	require_once __DIR__ . '/admin-menu.php';
+	require_once __DIR__ . '/comment-settings.php';
+	require_once __DIR__ . '/configurable-text-settings.php';
+	require_once __DIR__ . '/connection-settings.php';
+	require_once __DIR__ . '/form-helper.php';
+	require_once __DIR__ . '/network-options.php';
+	require_once __DIR__ . '/options-page.php';
+	require_once __DIR__ . '/publish-settings.php';
+	require_once __DIR__ . '/settings-validator.php';
+	require_once __DIR__ . '/sso-settings.php';
+	require_once __DIR__ . '/webhook-settings.php';
+	require_once __DIR__ . '/admin-notice.php';
+	require_once __DIR__ . '/meta-box.php';
 
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();

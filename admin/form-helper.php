@@ -338,10 +338,14 @@ class FormHelper {
 					<?php
 					$current_user_email = wp_get_current_user()->user_email;
 					// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
-					$message = sprintf( __( 'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
+					$message = sprintf(
+						__(
+							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
                                              an existing Discourse admin account, before enabling SSO please ensure that your email
                                              addresses on Discourse and WordPress match. This is required for SSO login to an
-                                             existing Discourse account.', 'wp-discourse' ), esc_attr( $current_user_email ) );
+                                             existing Discourse account.', 'wp-discourse'
+						), esc_attr( $current_user_email )
+					);
 
 					$allowed = array(
 						'strong' => array(),

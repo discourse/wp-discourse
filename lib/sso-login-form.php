@@ -25,7 +25,7 @@ function discourse_sso_alter_login_form() {
 		return;
 	}
 
-	printf( '<p>%s</p><p>&nbsp;</p>',  wp_kses_data( get_discourse_sso_link_markup() ) );
+	printf( '<p>%s</p><p>&nbsp;</p>', wp_kses_data( get_discourse_sso_link_markup() ) );
 
 	do_action( 'wpdc_sso_client_after_login_link' );
 }
@@ -38,9 +38,9 @@ add_action( 'login_form', 'discourse_sso_alter_login_form' );
  */
 function discourse_sso_alter_user_profile() {
 	$auto_inject_button = discourse_sso_auto_inject_button();
-	$options = DiscourseUtilities::get_options();
-	$link_text = ! empty( $options['link-to-discourse-text'] ) ? $options['link-to-discourse-text'] : '';
-	$linked_text = ! empty( $options['linked-to-discourse-text'] ) ? $options['linked-to-discourse-text'] : '';
+	$options            = DiscourseUtilities::get_options();
+	$link_text          = ! empty( $options['link-to-discourse-text'] ) ? $options['link-to-discourse-text'] : '';
+	$linked_text        = ! empty( $options['linked-to-discourse-text'] ) ? $options['linked-to-discourse-text'] : '';
 
 	if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
 		return;

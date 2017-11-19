@@ -126,7 +126,7 @@ class DiscourseWebhookRefresh {
                   PRIMARY KEY  (topic_id)
 	             ) $charset_collate;";
 
-				require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 				$result = dbDelta( $sql );
 
 				if ( ! empty( $result[ $table_name ] ) ) {

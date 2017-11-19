@@ -84,7 +84,7 @@ class Nonce {
 			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
 			$table_name = $this->get_table_name();
-			$charset = $this->wpdb->get_charset_collate();
+			$charset    = $this->wpdb->get_charset_collate();
 
 			dbDelta(
 				"CREATE TABLE {$table_name} (
@@ -133,7 +133,7 @@ class Nonce {
 
 		$this->wpdb->insert(
 			$this->get_table_name(), array(
-				'nonce' => $nonce,
+				'nonce'  => $nonce,
 				'action' => $action,
 			), array( '%s', '%s' )
 		);

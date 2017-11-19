@@ -48,7 +48,7 @@ class DiscourseSSO {
 	/**
 	 * Creates a Discourse user and saves their Discourse ID on login.
 	 *
-	 * @param string $user_login The user's username.
+	 * @param string   $user_login The user's username.
 	 * @param \WP_User $user The User object.
 	 */
 	public function create_discourse_user( $user_login, $user ) {
@@ -63,12 +63,12 @@ class DiscourseSSO {
 
 				if ( ! empty( $discourse_user->id ) ) {
 
-					update_user_meta($user_id, 'discourse_sso_user_id', $discourse_user->id );
+					update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user->id );
 
 				} else {
 					// Create the user.
 					$require_activation = ! $this->wordpress_email_verifier->is_verified( $user_id );
-					$discourse_user_id = DiscourseUtilities::create_discourse_user( $user, $require_activation );
+					$discourse_user_id  = DiscourseUtilities::create_discourse_user( $user, $require_activation );
 					if ( ! empty( $discourse_user_id ) && ! is_wp_error( $discourse_user_id ) ) {
 
 						update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
@@ -142,7 +142,7 @@ class DiscourseSSO {
 	 *
 	 * @throws \Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
 	 */
-	function sso_parse_request( $wp ) {
+	public function sso_parse_request( $wp ) {
 
 		/**
 		 * Sync logout from Discourse to WordPress from Adam Capirola : https://meta.discourse.org/t/wordpress-integration-guide/27531.
@@ -207,7 +207,7 @@ class DiscourseSSO {
 
 				if ( ! empty( $this->options['real-name-as-discourse-name'] ) && 1 === intval( $this->options['real-name-as-discourse-name'] ) ) {
 					$first_name = ! empty( $current_user->first_name ) ? $current_user->first_name : '';
-					$last_name = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
+					$last_name  = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
 
 					if ( $first_name || $last_name ) {
 						$name = trim( $first_name . ' ' . $last_name );
@@ -282,10 +282,10 @@ class DiscourseSSO {
 		$api_username = $this->options['publish-username'];
 		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
 		// user info on login to WordPress and store it in the user_metadata table.
-		$user_url  = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
+		$user_url = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
 		$user_url = add_query_arg(
 			array(
-				'api_key' => $api_key,
+				'api_key'      => $api_key,
 				'api_username' => $api_username,
 			), $user_url
 		);

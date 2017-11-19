@@ -597,8 +597,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 * This is an awkward way to do it, but I'm not finding a better option.
 	 */
 	public function network_config_notices() {
-		$screen           = get_current_screen();
-		$discourse_screen = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
+		$screen                          = get_current_screen();
+		$discourse_screen                = ! empty( $screen->parent_base ) && 'discourse_network_options' === $screen->parent_base;
 		$multisite_configuration_enabled = $this->get_site_option( 'multisite-configuration-enabled' );
 		if ( $discourse_screen && $multisite_configuration_enabled ) {
 			$notices                    = '';
