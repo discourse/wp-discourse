@@ -42,43 +42,37 @@ class DiscourseSSO {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
-		add_action( 'wp_login', array( $this, 'auto_login_discourse_user' ), 10, 2 );
+		add_action( 'wp_login', array( $this, 'create_discourse_user' ), 10, 2 );
 	}
 
 	/**
-	 * Automatically login users to Discourse after they have logged in to WordPress.
+	 * Creates a Discourse user and saves their Discourse ID on login.
 	 *
-	 * @param int      $user_login The user ID.
-	 * @param \WP_User $user The user who has logged in.
+	 * @param string $user_login The user's username.
+	 * @param \WP_User $user The User object.
 	 */
-	public function auto_login_discourse_user( $user_login, $user ) {
+	public function create_discourse_user( $user_login, $user ) {
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$welcome_redirect = null;
+			$user_id = $user->ID;
 
-			if ( 'user_created' !== get_user_meta( $user->ID, 'wpdc_sso_user_created', true ) ) {
-				$welcome_redirect = ! empty( $this->options['auto-create-welcome-redirect'] ) ? home_url( $this->options['auto-create-welcome-redirect'] ) : null;
-			}
+			// Check if the discourse_sso_user_id has been saved.
+			if ( ! get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
 
-			$redirect      = ! empty( $this->options['auto-create-login-redirect'] ) ? home_url( $this->options['auto-create-login-redirect'] ) : home_url( '/' );
-			$redirect      = ! empty( $welcome_redirect ) ? $welcome_redirect : apply_filters( 'wpdc_auto_create_login_redirect', $redirect, $user_login, $user );
-			$sso_url       = ! empty( $this->options['url'] ) ? $this->options['url'] . '/session/sso?return_path=' . $redirect : null;
-			$referer_query = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
-			$query_params  = array();
+				// Check if the user already exists on Discourse.
+				$discourse_user = DiscourseUtilities::get_discourse_user( $user_id, true );
 
-			parse_str( $referer_query, $query_params );
+				if ( ! empty( $discourse_user->id ) ) {
 
-			$sso_referer    = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
-			$autologin = ! isset( $query_params['skip_autologin'] );
-			$email_verified = ! get_user_meta( $user->ID, 'discourse_email_not_verified', true );
-			$email_verified = apply_filters( 'wpdc_auto_create_login_email_verification', $email_verified, $user_login, $user );
+					update_user_meta($user_id, 'discourse_sso_user_id', $discourse_user->id );
 
-			if ( $autologin && $email_verified && ! $sso_referer && $sso_url ) {
-				if ( DiscourseUtilities::check_connection_status() ) {
-					update_user_meta( $user->ID, 'wpdc_sso_user_created', 'user_created' );
+				} else {
+					// Create the user.
+					$require_activation = ! $this->wordpress_email_verifier->is_verified( $user_id );
+					$discourse_user_id = DiscourseUtilities::create_discourse_user( $user, $require_activation );
+					if ( ! empty( $discourse_user_id ) && ! is_wp_error( $discourse_user_id ) ) {
 
-					wp_safe_redirect( esc_url( $sso_url ) );
-
-					exit;
+						update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
+					}
 				}
 			}
 		}
@@ -134,7 +128,6 @@ class DiscourseSSO {
 	public function sso_add_query_vars( $vars ) {
 		$vars[] = 'sso';
 		$vars[] = 'sig';
-		$vars[] = 'skip_autologin';
 
 		return $vars;
 	}
