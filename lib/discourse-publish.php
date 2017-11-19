@@ -70,12 +70,12 @@ class DiscoursePublish {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 		}
 
-		$has_published_status    = 'publish' === get_post_status( $post_id );
-		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+		$has_published_status   = 'publish' === get_post_status( $post_id );
+		$publish_to_discourse   = get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_to_discourse   = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
 		$published_on_discourse = get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
-		$title                = $this->sanitize_title( $post->post_title );
+		$title                  = $this->sanitize_title( $post->post_title );
 
 		if ( $has_published_status ) {
 			// If 'force-publish' is enabled, don't check $update_discourse_topic.

@@ -93,7 +93,7 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
 		if ( $published ) {
-		    // The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
+			// The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
 			// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
 			$allowed = array(
@@ -104,40 +104,38 @@ class MetaBox {
 			if ( ! $force_publish ) {
 				$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
 				$this->update_discourse_topic_checkbox( $publish_text, 0 );
-            }
-
+			}
 		} else {
-		    // The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
-            if ( $force_publish ) {
-	            // translators: Discourse force-publish message.
-	            $message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse.', 'wp-discourse' ) );
-	            $allowed = array(
-		            'strong' => array(),
-	            );
-	            echo wp_kses( $message, $allowed ) . '<br><hr>';
+			// The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
+			if ( $force_publish ) {
+				// translators: Discourse force-publish message.
+				$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse.', 'wp-discourse' ) );
+				$allowed = array(
+					'strong' => array(),
+				);
+				echo wp_kses( $message, $allowed ) . '<br><hr>';
 
-
-            } else {
-	            $publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
-	            $this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
-            }
+			} else {
+				$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
+				$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+			}
 
 			if ( is_wp_error( $categories ) ) {
 				?>
 				<hr>
 				<div class="warning">
 					<p>
-						<?php
-						esc_html_e(
-							'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
+				<?php
+				esc_html_e(
+					'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
 					or try refreshing the page.', 'wp-discourse'
-						);
+				);
 						?>
 					</p>
-				</div>
-				<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-				<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
-				<?php
+						</div>
+						<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
+						<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
+						<?php
 			} else {
 				?>
 				<div>
