@@ -64,6 +64,7 @@ class MetaBox {
 	public function render_meta_box( $post ) {
 		$post_id                = $post->ID;
 		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
+		$force_publish          = ! empty( $this->options['force-publish'] );
 		$saved                  = 'publish' === get_post_status( $post_id ) ||
 								  'future' === get_post_status( $post_id ) ||
 								  'draft' === get_post_status( $post_id ) ||
@@ -92,6 +93,7 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
 		if ( $published ) {
+		    // The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
 			// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
 			$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
 			$allowed = array(
@@ -99,11 +101,26 @@ class MetaBox {
 			);
 			echo wp_kses( $message, $allowed ) . '<br><hr>';
 
-			$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-			$this->update_discourse_topic_checkbox( $publish_text, 0 );
+			if ( ! $force_publish ) {
+				$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
+				$this->update_discourse_topic_checkbox( $publish_text, 0 );
+            }
+
 		} else {
-			$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
-			$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+		    // The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
+            if ( $force_publish ) {
+	            // translators: Discourse force-publish message.
+	            $message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse.', 'wp-discourse' ) );
+	            $allowed = array(
+		            'strong' => array(),
+	            );
+	            echo wp_kses( $message, $allowed ) . '<br><hr>';
+
+
+            } else {
+	            $publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
+	            $this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+            }
 
 			if ( is_wp_error( $categories ) ) {
 				?>

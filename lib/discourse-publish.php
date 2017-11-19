@@ -63,7 +63,9 @@ class DiscoursePublish {
 			return;
 		}
 
-		if ( ! empty( $this->options['force-publish'] ) && $this->is_valid_sync_post_type( $post_id ) ) {
+		$force_publish = ! empty( $this->options['force-publish'] );
+
+		if ( $force_publish && $this->is_valid_sync_post_type( $post_id ) ) {
 			// Set the post to be published even if the 'publish_to_discourse' checkbox has been unchecked.
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 		}
@@ -76,13 +78,15 @@ class DiscoursePublish {
 		$title                = $this->sanitize_title( $post->post_title );
 
 		if ( $has_published_status ) {
-			if ( ! $published_on_discourse ) {
+			// If 'force-publish' is enabled, don't check $update_discourse_topic.
+			if ( ! $published_on_discourse || $force_publish ) {
 
 				if ( $publish_to_discourse && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 
 					$this->sync_to_discourse( $post_id, $title, $post->post_content );
 				} elseif ( $this->is_valid_sync_post_type( $post_id ) && ! empty( $this->options['auto-publish'] ) ) {
 
+					// Something has gone wrong - send an email. This can hopefully be removed soon.
 					$this->email_notifier->publish_failure_notification(
 						$post, array(
 							'location' => 'after_save',
