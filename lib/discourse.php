@@ -132,8 +132,6 @@ class Discourse {
 	protected $discourse_sso_provider = array(
 		'enable-sso'                   => 0,
 		'auto-create-sso-user'         => 0,
-		'auto-create-login-redirect'   => '',
-		'auto-create-welcome-redirect' => '',
 		'login-path'                   => '',
 		'real-name-as-discourse-name'  => 0,
 		'force-avatar-update'          => 0,

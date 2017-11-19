@@ -138,13 +138,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_enable_sso', array( $this, 'validate_enable_sso' ) );
 		add_filter( 'wpdc_validate_auto_create_sso_user', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_auto_create_login_redirect', array( $this, 'validate_auto_create_login_redirect' ) );
-		add_filter(
-			'wpdc_validate_auto_create_welcome_redirect', array(
-				$this,
-				'validate_auto_create_welcome_redirect',
-			)
-		);
+
 		add_filter( 'wpdc_validate_sso_secret', array( $this, 'validate_sso_secret' ) );
 		add_filter( 'wpdc_validate_login_path', array( $this, 'validate_login_path' ) );
 		add_filter( 'wpdc_validate_real_name_as_discourse_name', array( $this, 'validate_checkbox' ) );
