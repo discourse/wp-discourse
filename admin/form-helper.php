@@ -337,8 +337,8 @@ class FormHelper {
 			<p>
 					<?php
 					$current_user_email = wp_get_current_user()->user_email;
-					// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
 					$message = sprintf(
+					// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
 						__(
 							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
                                              an existing Discourse admin account, before enabling SSO please ensure that your email
