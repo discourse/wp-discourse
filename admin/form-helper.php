@@ -295,6 +295,8 @@ class FormHelper {
 	 * Adds notices to indicate the connection status with Discourse.
 	 *
 	 * This method is called by the `load-{settings_page_hook}` action - see https://codex.wordpress.org/Plugin_API/Action_Reference/load-(page).
+	 *
+	 * Todo: this function should be renamed.
 	 */
 	public function connection_status_notice() {
 		if ( ! empty( $_GET['tab'] ) ) { // Input var okay.
@@ -303,6 +305,15 @@ class FormHelper {
 			$current_page = sanitize_key( wp_unslash( $_GET['page'] ) ); // Input var okay.
 		} else {
 			$current_page = null;
+		}
+
+		if ( $current_page && ( 'sso_provider' === $current_page ) ) {
+			// Check if the user saving the options has an email address on Discourse.
+			$current_user_email = wp_get_current_user()->user_email;
+			$discourse_user     = DiscourseUtilities::get_discourse_user_by_email( $current_user_email );
+			if ( is_wp_error( $discourse_user ) || empty( $discourse_user->admin ) ) {
+				add_action( 'admin_notices', array( $this, 'no_matching_discourse_user' ) );
+			}
 		}
 
 		// Only check the connection status on the main settings tab.
@@ -315,6 +326,32 @@ class FormHelper {
 				add_action( 'admin_notices', array( $this, 'connected' ) );
 			}
 		}
+	}
+
+	/**
+	 * Outputs the markup for the no_matching_discourse_user notice.
+	 */
+	public function no_matching_discourse_user() {
+		?>
+		<div class="notice notice-error is-dismissible">
+			<p>
+					<?php
+					$current_user_email = wp_get_current_user()->user_email;
+					// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
+					$message = sprintf( __( 'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
+                                             an existing Discourse admin account, before enabling SSO please ensure that your email
+                                             addresses on Discourse and WordPress match. This is required for SSO login to an
+                                             existing Discourse account.', 'wp-discourse' ), esc_attr( $current_user_email ) );
+
+					$allowed = array(
+						'strong' => array(),
+					);
+
+					echo wp_kses( $message, $allowed );
+					?>
+			</p>
+		</div>
+		<?php
 	}
 
 	/**
