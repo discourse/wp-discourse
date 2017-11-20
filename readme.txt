@@ -2,8 +2,8 @@
 Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 4.8.3
-Stable tag: 1.4.9
+Tested up to: 4.9
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,17 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.5.0 19/11/2017
+
+- Don't display Publish to Discourse checkbox when Force Publish is enabled
+- Always publish updates when Force Publish is enabled
+- Add warning to SSO Provider tab when current user's email doesn't match an admin email on Discourse
+- Remove Auto Login option
+- Add Auto Create User option
+- Add get_discourse_user API function
+- Add get_discourse_user_by_email API function
+- Add create_discourse_user API function
 
 #### 1.4.9 10/11/2017
 
