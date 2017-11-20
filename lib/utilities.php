@@ -347,7 +347,108 @@ class Utilities {
 		return new \WP_Error( 'wpdc_response_error', 'The Discourse user could not be created.' );
 	}
 
+	public static function get_discourse_groups() {
+		$options      = self::get_options();
+		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
+		if ( ! ( $url && $api_key && $api_username ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse configuration options have not been set.' );
+		}
+
+		$groups_url = "{$url}/groups.json";
+		$groups_url = esc_url_raw(add_query_arg( array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		), $groups_url ) );
+
+		$response = wp_remote_get( $groups_url );
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
+		}
+
+		$response = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( ! empty( $response->groups ) ) {
+			$groups = $response->groups;
+			$non_automatic_groups = [];
+
+			foreach ( $groups as $group ) {
+				if ( empty( $group->automatic ) ) {
+					$non_automatic_groups[] = $group;
+				}
+			}
+			set_transient( 'wpdc_non_automatic_groups', $non_automatic_groups, 10 * MINUTE_IN_SECONDS );
+
+			return $non_automatic_groups;
+		}
+
+		return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
+	}
+
+	public function add_users_to_discourse_group( Array $usernames, $group_name, $force_update = false ) {
+		$discourse_groups = get_transient( 'wpdc_non_automatic_groups' );
+		$selected_group   = null;
+
+		foreach ( $usernames as $username ) {
+			$user               = get_user_by( 'login', $username );
+			$discourse_username = '';
+
+			if ( ! empty( $user ) && ! empty( $user->id ) ) {
+
+				$user_id            = $user->id;
+				$discourse_username = get_user_meta( $user_id, 'discourse_username', true );
+				if ( empty( $discourse_username ) ) {
+
+					$discourse_user = self::get_discourse_user( $user_id, true );
+					if ( ! empty( $discourse_user ) && ! is_wp_error( $discourse_user ) ) {
+
+						$discourse_username = $discourse_user->username;
+						update_user_meta( $user_id, 'discourse_username', $discourse_username );
+					} else {
+
+						$require_activation    = 1 === get_user_meta( $user_id, 'discourse_email_not_verified', true );
+						$discourse_sso_user_id = self::create_discourse_user( $user, $require_activation );
+						if ( ! empty( $discourse_sso_user_id ) && ! is_wp_error( $discourse_sso_user_id ) ) {
+							// There needs to be another check here.
+							$discourse_username = $user->user_login;
+							update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_sso_user_id );
+							update_user_meta( $user_id, 'discourse_username', $discourse_username );
+						}
+
+					}
+
+
+				}
+			}
+		}
+
+
+
+
+		if (empty( $discourse_groups ) || $force_update ) {
+			$discourse_groups = self::get_discourse_groups();
+
+			if ( empty( $discourse_groups ) || is_wp_error( $discourse_groups ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The groups data could not be returned from Discoursee.' );
+			}
+		}
+
+		foreach ( $discourse_groups as $group ) {
+			if ( $group->name === $group_name ) {
+				$selected_group = $group;
+
+				break;
+			}
+		}
+
+
+	}
 
 	/**
 	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
