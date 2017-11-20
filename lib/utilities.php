@@ -407,51 +407,12 @@ class Utilities {
 	}
 
 	public static function add_user_to_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$group_id         = null;
-		$discourse_id     = null;
+		$discourse_id =  self::get_discourse_id( $user_id );
+		$group_id = self::get_discourse_group_id_from_name( $group_name, $force_update );
 
-		$discourse_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
-		if ( empty( $discourse_id ) ) {
+		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
 
-			$discourse_user = self::get_discourse_user( $user_id, true );
-			if ( ! empty( $discourse_user ) && ! is_wp_error( $discourse_user ) ) {
-
-				$discourse_id = $discourse_user->id;
-				update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
-			} else {
-
-				$require_activation = 1 === get_user_meta( $user_id, 'discourse_email_not_verified', true );
-				$user               = get_user_by( 'id', $user_id );
-				if ( empty( $user ) || is_wp_error( $user ) ) {
-
-					return new \WP_Error( 'wpdc_user_does_not_exist_error', 'The user you are trying to add to a Discourse group does not exist on WordPress.' );
-				}
-
-				$discourse_sso_user_id = self::create_discourse_user( $user, $require_activation );
-
-				if ( empty( $discourse_sso_user_id ) || is_wp_error( $discourse_sso_user_id ) ) {
-
-					return new \WP_Error( 'wpdc_response_error', 'Unable to create a Discourse user to add to the group.' );
-				}
-			}
-		}
-
-		$discourse_groups = get_transient( 'wpdc_non_automatic_groups' );
-		if ( empty( $discourse_groups ) || $force_update ) {
-			$discourse_groups = self::get_discourse_groups();
-
-			if ( empty( $discourse_groups ) || is_wp_error( $discourse_groups ) ) {
-
-				return new \WP_Error( 'wpdc_response_error', 'The groups data could not be returned from Discourse.' );
-			}
-		}
-
-		foreach ( $discourse_groups as $group ) {
-			if ( $group->name === $group_name ) {
-				$group_id = $group->id;
-
-				break;
-			}
+			return new \WP_Error( 'wpdc_groups_error', 'Cannot add user to group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
 		}
 
 		if ( $discourse_id && $group_id ) {
@@ -470,66 +431,27 @@ class Utilities {
 				),
 			) );
 
-			$response = wp_remote_retrieve_body( $response );
+			$response = json_decode( wp_remote_retrieve_body( $response ) );
+			if ( ! empty( $response->errors ) ) {
+				write_log( 'response errors', $response->errors );
+
+			}
 			write_log( 'groups response', $response );
 		}
+
+		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
 	}
 
 	public static function remove_user_from_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$group_id         = null;
-		$discourse_id     = null;
+		$discourse_id = self::get_discourse_id( $user_id );
+		$group_id = self::get_discourse_group_id_from_name( $group_name, $force_update );
 
-		$discourse_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
-		$discourse_username = get_user_meta( $user_id, 'discourse_username', true );
-		if ( empty( $discourse_id ) || empty( $discourse_username ) ) {
+		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
 
-			$discourse_user = self::get_discourse_user( $user_id, true );
-			if ( ! empty( $discourse_user ) && ! is_wp_error( $discourse_user ) ) {
-
-				$discourse_id = $discourse_user->id;
-				$discourse_username = $discourse_user->username;
-
-				update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
-				update_user_meta( $user_id, 'discourse_username', $discourse_username );
-			} else {
-
-				$require_activation = 1 === get_user_meta( $user_id, 'discourse_email_not_verified', true );
-				$user               = get_user_by( 'id', $user_id );
-				if ( empty( $user ) || is_wp_error( $user ) ) {
-
-					return new \WP_Error( 'wpdc_user_does_not_exist_error', 'The user you are trying to add to a Discourse group does not exist on WordPress.' );
-				}
-
-				$discourse_sso_user_id = self::create_discourse_user( $user, $require_activation );
-
-				if ( empty( $discourse_sso_user_id ) || is_wp_error( $discourse_sso_user_id ) ) {
-
-					return new \WP_Error( 'wpdc_response_error', 'Unable to create a Discourse user to add to the group.' );
-				}
-
-				$discourse_username = get_user_meta( $user_id, 'discourse_username', true );
-			}
+			return new \WP_Error( 'wpdc_groups_error', 'Cannot remove user from group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
 		}
 
-		$discourse_groups = get_transient( 'wpdc_non_automatic_groups' );
-		if ( empty( $discourse_groups ) || $force_update ) {
-			$discourse_groups = self::get_discourse_groups();
-
-			if ( empty( $discourse_groups ) || is_wp_error( $discourse_groups ) ) {
-
-				return new \WP_Error( 'wpdc_response_error', 'The groups data could not be returned from Discourse.' );
-			}
-		}
-
-		foreach ( $discourse_groups as $group ) {
-			if ( $group->name === $group_name ) {
-				$group_id = $group->id;
-
-				break;
-			}
-		}
-
-		if ( $discourse_id && $discourse_username && $group_id ) {
+		if ( $discourse_id && $group_id ) {
 			$options      = self::get_options();
 			$url          = ! empty( $options['url'] ) ? $options['url'] : null;
 			$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
@@ -545,11 +467,11 @@ class Utilities {
 				),
 			) );
 
-			$response = wp_remote_retrieve_body( $response );
+			$response = json_decode( wp_remote_retrieve_body( $response ) );
 			write_log( 'groups response', $response );
 		}
 
-
+		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
 	}
 
 	/**
@@ -584,5 +506,56 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	protected static function get_discourse_group_id_from_name( $group_name, $force_update = false ) {
+		$discourse_groups = get_transient( 'wpdc_non_automatic_groups' );
+		if ( empty( $discourse_groups ) || $force_update ) {
+			$discourse_groups = self::get_discourse_groups();
+
+			if ( empty( $discourse_groups ) || is_wp_error( $discourse_groups ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The groups data could not be returned from Discourse.' );
+			}
+		}
+
+		foreach ( $discourse_groups as $group ) {
+			if ( $group->name === $group_name ) {
+
+				return $group->id;
+			}
+		}
+
+		return new \WP_Error( 'wpdc_group_not_found', 'A Discourse group was not found with the name you provided.' );
+	}
+
+	protected static function get_discourse_id( $user_id ) {
+		$discourse_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
+		if ( empty( $discourse_id ) ) {
+
+			$discourse_user = self::get_discourse_user( $user_id, true );
+			if ( ! empty( $discourse_user ) && ! is_wp_error( $discourse_user ) ) {
+
+				$discourse_id = $discourse_user->id;
+				update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
+			} else {
+
+				$require_activation = ( 1 === get_user_meta( $user_id, 'discourse_email_not_verified', true ) );
+				$user               = get_user_by( 'id', $user_id );
+				if ( empty( $user ) || is_wp_error( $user ) ) {
+
+					return new \WP_Error( 'wpdc_user_does_not_exist_error', 'The user you are trying to add to a Discourse group does not exist on WordPress.' );
+				}
+
+				$discourse_sso_user_id = self::create_discourse_user( $user, $require_activation );
+
+				if ( empty( $discourse_sso_user_id ) || is_wp_error( $discourse_sso_user_id ) ) {
+
+					return new \WP_Error( 'wpdc_response_error', 'Unable to create a Discourse user to add to the group.' );
+				}
+			}
+		}
+
+		return $discourse_id;
 	}
 }
