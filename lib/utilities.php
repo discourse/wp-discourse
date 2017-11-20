@@ -433,10 +433,12 @@ class Utilities {
 
 			$response = json_decode( wp_remote_retrieve_body( $response ) );
 			if ( ! empty( $response->errors ) ) {
-				write_log( 'response errors', $response->errors );
 
+				return new \WP_Error( 'wpdc_groups_error', $response->errors );
+			} else {
+
+				return $response;
 			}
-			write_log( 'groups response', $response );
 		}
 
 		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
@@ -468,7 +470,13 @@ class Utilities {
 			) );
 
 			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			write_log( 'groups response', $response );
+			if ( ! empty( $response->errors ) ) {
+
+				return new \WP_Error( 'wpdc_groups_error', $response->errors );
+			} else {
+
+				return $response;
+			}
 		}
 
 		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
