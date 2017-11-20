@@ -300,6 +300,7 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
+		static $username_instance = 0;
 		$options      = self::get_options();
 		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
 		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
@@ -325,7 +326,7 @@ class Utilities {
 					'name'         => $name,
 					'email'        => $email,
 					'password'     => $password,
-					'username'     => $username,
+					'username'     => $username_instance === 0 ? $username : $username . $username_instance,
 					'active'       => $require_activation ? 'false' : 'true',
 					'approved'     => 'true',
 				),
@@ -338,6 +339,14 @@ class Utilities {
 		}
 
 		$user_data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		// The username is taken on Discourse.
+		if ( ! empty( $user_data->errors ) && ! empty( $user_data->errors->username ) && $username_instance < 3 ) {
+			$username_instance += 1;
+			self::create_discourse_user( $user, $require_activation );
+
+			return new \WP_Error( 'wpdc_username_taken_error', 'The Discourse username is already taken. Attempting to create another user.' );
+		}
 
 		if ( isset( $user_data->user_id ) ) {
 
