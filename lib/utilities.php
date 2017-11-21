@@ -270,11 +270,15 @@ class Utilities {
 			);
 		} else {
 			$users_url = esc_url_raw( "{$api_credentials['url']}/admin/users/list/active.json" );
-			$users_url = esc_url_raw( add_query_arg( array(
-				'filter'       => rawurlencode_deep( $email ),
-				'api_key'      => $api_credentials['api_key'],
-				'api_username' => $api_credentials['api_username'],
-			), $users_url ) );
+			$users_url = esc_url_raw(
+				add_query_arg(
+					array(
+						'filter'       => rawurlencode_deep( $email ),
+						'api_key'      => $api_credentials['api_key'],
+						'api_username' => $api_credentials['api_username'],
+					), $users_url
+				)
+			);
 		}
 
 		$response = wp_remote_get( $users_url );
@@ -532,10 +536,12 @@ class Utilities {
 		}
 
 		$about_url = esc_url_raw( "{$api_credentials['url']}/about.json" );
-		$about_url = add_query_arg( array(
-			'api_key' => $api_credentials['api_key'],
-			'api_username' => $api_credentials['api_username'],
-		), $about_url );
+		$about_url = add_query_arg(
+			array(
+				'api_key'      => $api_credentials['api_key'],
+				'api_username' => $api_credentials['api_username'],
+			), $about_url
+		);
 
 		$response = wp_remote_get( $about_url );
 
