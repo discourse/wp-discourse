@@ -248,22 +248,34 @@ class Utilities {
 	 * @return object \WP_Error
 	 */
 	public static function get_discourse_user_by_email( $email ) {
+		// The route for getting Discourse users by email has changed for versions >= '1.9.0.beta14'.
+		$use_email_param = self::email_param_available( '1.9.0.beta14' );
+
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
 			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
 		}
 
-		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
-		$users_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'email'        => rawurlencode_deep( $email ),
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
-				), $users_url
-			)
-		);
+		if ( $use_email_param ) {
+			$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
+			$users_url = esc_url_raw(
+				add_query_arg(
+					array(
+						'email'        => rawurlencode_deep( $email ),
+						'api_key'      => $api_credentials['api_key'],
+						'api_username' => $api_credentials['api_username'],
+					), $users_url
+				)
+			);
+		} else {
+			$users_url = esc_url_raw( "{$api_credentials['url']}/admin/users/list/active.json" );
+			$users_url = esc_url_raw( add_query_arg( array(
+				'filter'       => rawurlencode_deep( $email ),
+				'api_key'      => $api_credentials['api_key'],
+				'api_username' => $api_credentials['api_username'],
+			), $users_url ) );
+		}
 
 		$response = wp_remote_get( $users_url );
 		if ( self::validate( $response ) ) {
@@ -507,6 +519,31 @@ class Utilities {
 		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
 	}
 
+	public static function get_discourse_stats() {
+		$api_credentials = self::get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+		}
+
+		$about_url = esc_url_raw( "{$api_credentials['url']}/about.json" );
+		$about_url = add_query_arg( array(
+			'api_key' => $api_credentials['api_key'],
+			'api_username' => $api_credentials['api_username'],
+		), $about_url );
+
+		$response = wp_remote_get( $about_url );
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'The Discourse stats could not be returned.' );
+		}
+
+		$response = json_decode( wp_remote_retrieve_body( $response ) );
+
+		return $response;
+	}
+
 	/**
 	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
 	 *
@@ -539,6 +576,35 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	// Todo: make this protected.
+	public static function discourse_version_at_least( $version ) {
+		$stats = self::get_discourse_stats();
+		if ( is_wp_error( $stats ) || empty( $stats->about ) || empty( $stats->about->version ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
+		}
+
+		$discourse_version = $stats->about->version;
+
+		return version_compare( $version, $discourse_version ) >= 0;
+	}
+
+	public static function email_param_available( $version ) {
+		$param_available = get_transient( 'wpdc_email_param_available' );
+
+		if ( empty( $param_available ) ) {
+			$param_available = self::discourse_version_at_least( $version );
+			if ( is_wp_error( $param_available ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
+			}
+
+			set_transient( 'wpdc_email_param_available', $param_available, HOUR_IN_SECONDS );
+		}
+
+		return $param_available;
 	}
 
 	/**
