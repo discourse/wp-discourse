@@ -519,6 +519,11 @@ class Utilities {
 		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
 	}
 
+	/**
+	 * Get the Discourse about.json route.
+	 *
+	 * @return array|mixed|object|\WP_Error
+	 */
 	public static function get_discourse_stats() {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
@@ -578,24 +583,37 @@ class Utilities {
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
 	}
 
-	// Todo: make this protected.
-	public static function discourse_version_at_least( $version ) {
+	/**
+	 * Checks if the Discourse instance meets a version requirement.
+	 *
+	 * @param string $required_version The version to check against.
+	 *
+	 * @return bool|\WP_Error
+	 */
+	protected static function discourse_version_at_least( $required_version ) {
 		$stats = self::get_discourse_stats();
 		if ( is_wp_error( $stats ) || empty( $stats->about ) || empty( $stats->about->version ) ) {
 
 			return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
 		}
 
-		$discourse_version = $stats->about->version;
+		$available_version = $stats->about->version;
 
-		return version_compare( $version, $discourse_version ) >= 0;
+		return version_compare( $available_version, $required_version ) >= 0;
 	}
 
-	public static function email_param_available( $version ) {
+	/**
+	 * Checks if the email param is available.
+	 *
+	 * @param string $required_version The version where the email param was added to admin/users/list/all.json.
+	 *
+	 * @return bool|mixed|\WP_Error
+	 */
+	protected static function email_param_available( $required_version ) {
 		$param_available = get_transient( 'wpdc_email_param_available' );
 
 		if ( empty( $param_available ) ) {
-			$param_available = self::discourse_version_at_least( $version );
+			$param_available = self::discourse_version_at_least( $required_version );
 			if ( is_wp_error( $param_available ) ) {
 
 				return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
