@@ -138,6 +138,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 - Add get_discourse_user API function
 - Add get_discourse_user_by_email API function
 - Add create_discourse_user API function
+- Add add_user_to_discourse_group and remove_user_from_discourse_group API functions
 
 #### 1.4.9 10/11/2017
 
