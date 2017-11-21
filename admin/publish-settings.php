@@ -264,7 +264,7 @@ class PublishSettings {
 	 */
 	public function force_publish_checkbox() {
 		$this->form_helper->checkbox_input(
-			'force-publish', 'discourse_publish', __( 'Force all new posts to be published to Discourse.', 'wp-discourse' ),
+			'force-publish', 'discourse_publish', __( 'Force all posts and post updates to be published to Discourse.', 'wp-discourse' ),
 			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
 		);
 	}
