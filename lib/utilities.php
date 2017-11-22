@@ -278,9 +278,6 @@ class Utilities {
 				// A valid response was returned, but the user wasn't found.
 				return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
 			}
-		} else {
-
-			return new \WP_Error( 'wpdc_response_error', 'An error was returned by Discourse when attempting to retrieve the user by their email address.' );
 		}
 	}
 
