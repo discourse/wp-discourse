@@ -192,7 +192,7 @@ class Utilities {
 	/**
 	 * Get a Discourse user object.
 	 *
-	 * @param int  $user_id The WordPress user_id.
+	 * @param int $user_id The WordPress user_id.
 	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
 	 *
 	 * @return array|mixed|object|\WP_Error
@@ -248,38 +248,23 @@ class Utilities {
 	 * @return object \WP_Error
 	 */
 	public static function get_discourse_user_by_email( $email ) {
-		// The route for getting Discourse users by email has changed for versions >= '1.9.0.beta14'.
-		$use_email_param = self::email_param_available( '1.9.0.beta14' );
-
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
 			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
 		}
 
-		if ( $use_email_param ) {
-			$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
-			$users_url = esc_url_raw(
-				add_query_arg(
-					array(
-						'email'        => rawurlencode_deep( $email ),
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					), $users_url
-				)
-			);
-		} else {
-			$users_url = esc_url_raw( "{$api_credentials['url']}/admin/users/list/active.json" );
-			$users_url = esc_url_raw(
-				add_query_arg(
-					array(
-						'filter'       => rawurlencode_deep( $email ),
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					), $users_url
-				)
-			);
-		}
+		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
+		$users_url = esc_url_raw(
+			add_query_arg(
+				array(
+					'email'        => rawurlencode_deep( $email ),
+					'filter'       => rawurlencode_deep( $email ),
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
+				), $users_url
+			)
+		);
 
 		$response = wp_remote_get( $users_url );
 		if ( self::validate( $response ) ) {
@@ -303,7 +288,7 @@ class Utilities {
 	 * Creates a Discourse user through the API.
 	 *
 	 * @param \WP_User $user The WordPress user.
-	 * @param bool     $require_activation Whether or not to require an activation email to be sent.
+	 * @param bool $require_activation Whether or not to require an activation email to be sent.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -355,7 +340,7 @@ class Utilities {
 
 		// The username is taken on Discourse.
 		if ( ! empty( $user_data->errors ) && ! empty( $user_data->errors->username ) && $username_instance < 2 ) {
-			$username_instance++;
+			$username_instance ++;
 			self::create_discourse_user( $user, $require_activation );
 
 			return new \WP_Error( 'wpdc_username_taken_error', 'The Discourse username is already taken. Attempting to create another user.' );
@@ -424,9 +409,9 @@ class Utilities {
 	/**
 	 * Adds a WordPress user to a Discourse group.
 	 *
-	 * @param int    $user_id The user id.
+	 * @param int $user_id The user id.
 	 * @param string $group_name The Discourse group to add the user to.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group transient.
+	 * @param bool $force_update Whether or not to force an update of the Discourse group transient.
 	 *
 	 * @return array|mixed|object|\WP_Error
 	 */
@@ -475,9 +460,9 @@ class Utilities {
 	/**
 	 * Removes a WordPress user from a Discourse group.
 	 *
-	 * @param int    $user_id The WordPress user id.
+	 * @param int $user_id The WordPress user id.
 	 * @param string $group_name The Discourse group name.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group data transient.
+	 * @param bool $force_update Whether or not to force an update of the Discourse group data transient.
 	 *
 	 * @return array|mixed|object|\WP_Error
 	 */
@@ -590,52 +575,10 @@ class Utilities {
 	}
 
 	/**
-	 * Checks if the Discourse instance meets a version requirement.
-	 *
-	 * @param string $required_version The version to check against.
-	 *
-	 * @return bool|\WP_Error
-	 */
-	protected static function discourse_version_at_least( $required_version ) {
-		$stats = self::get_discourse_stats();
-		if ( is_wp_error( $stats ) || empty( $stats->about ) || empty( $stats->about->version ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
-		}
-
-		$available_version = $stats->about->version;
-
-		return version_compare( $available_version, $required_version ) >= 0;
-	}
-
-	/**
-	 * Checks if the email param is available.
-	 *
-	 * @param string $required_version The version where the email param was added to admin/users/list/all.json.
-	 *
-	 * @return bool|mixed|\WP_Error
-	 */
-	protected static function email_param_available( $required_version ) {
-		$param_available = get_transient( 'wpdc_email_param_available' );
-
-		if ( empty( $param_available ) ) {
-			$param_available = self::discourse_version_at_least( $required_version );
-			if ( is_wp_error( $param_available ) ) {
-
-				return new \WP_Error( 'wpdc_response_error', 'The Discourse version could not be returned.' );
-			}
-
-			set_transient( 'wpdc_email_param_available', $param_available, HOUR_IN_SECONDS );
-		}
-
-		return $param_available;
-	}
-
-	/**
 	 * Gets the Discourse group_id from the group name.
 	 *
 	 * @param string $group_name The Discourse group name.
-	 * @param bool   $force_update Whether or not to force an update of the groups data transient.
+	 * @param bool $force_update Whether or not to force an update of the groups data transient.
 	 *
 	 * @return \WP_Error
 	 */
