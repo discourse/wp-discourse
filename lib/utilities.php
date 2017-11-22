@@ -192,7 +192,7 @@ class Utilities {
 	/**
 	 * Get a Discourse user object.
 	 *
-	 * @param int $user_id The WordPress user_id.
+	 * @param int  $user_id The WordPress user_id.
 	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
 	 *
 	 * @return array|mixed|object|\WP_Error
@@ -280,7 +280,7 @@ class Utilities {
 			}
 		} else {
 
-			return new \WP_Error('wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
+			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
 		}
 	}
 
@@ -288,7 +288,7 @@ class Utilities {
 	 * Creates a Discourse user through the API.
 	 *
 	 * @param \WP_User $user The WordPress user.
-	 * @param bool $require_activation Whether or not to require an activation email to be sent.
+	 * @param bool     $require_activation Whether or not to require an activation email to be sent.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -409,9 +409,9 @@ class Utilities {
 	/**
 	 * Adds a WordPress user to a Discourse group.
 	 *
-	 * @param int $user_id The user id.
+	 * @param int    $user_id The user id.
 	 * @param string $group_name The Discourse group to add the user to.
-	 * @param bool $force_update Whether or not to force an update of the Discourse group transient.
+	 * @param bool   $force_update Whether or not to force an update of the Discourse group transient.
 	 *
 	 * @return array|mixed|object|\WP_Error
 	 */
@@ -460,9 +460,9 @@ class Utilities {
 	/**
 	 * Removes a WordPress user from a Discourse group.
 	 *
-	 * @param int $user_id The WordPress user id.
+	 * @param int    $user_id The WordPress user id.
 	 * @param string $group_name The Discourse group name.
-	 * @param bool $force_update Whether or not to force an update of the Discourse group data transient.
+	 * @param bool   $force_update Whether or not to force an update of the Discourse group data transient.
 	 *
 	 * @return array|mixed|object|\WP_Error
 	 */
@@ -578,7 +578,7 @@ class Utilities {
 	 * Gets the Discourse group_id from the group name.
 	 *
 	 * @param string $group_name The Discourse group name.
-	 * @param bool $force_update Whether or not to force an update of the groups data transient.
+	 * @param bool   $force_update Whether or not to force an update of the groups data transient.
 	 *
 	 * @return \WP_Error
 	 */
