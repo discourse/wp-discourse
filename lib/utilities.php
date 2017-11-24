@@ -621,7 +621,7 @@ class Utilities {
 				update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
 			} else {
 
-				$require_activation = ( 1 === get_user_meta( $user_id, 'discourse_email_not_verified', true ) );
+				$require_activation = ( 1 === intval( get_user_meta( $user_id, 'discourse_email_not_verified', true ) ) );
 				$user               = get_user_by( 'id', $user_id );
 				if ( empty( $user ) || is_wp_error( $user ) ) {
 
