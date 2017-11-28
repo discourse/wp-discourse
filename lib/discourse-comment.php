@@ -32,6 +32,7 @@ class DiscourseComment {
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
 	}
 
 	/**
@@ -91,6 +92,32 @@ class DiscourseComment {
 				wp_localize_script( 'discourse-comments-js', 'discourse', $data );
 			}
 		}
+
+		if ( ! empty( $this->options['ajax-load'] ) ) {
+			wp_register_script( 'load_comments_js', plugins_url( '../js/load-comments.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+			$data = array(
+				'commentsURL' => home_url( '/wp-json/wp-discourse/v1/discourse-comments' ),
+			);
+			wp_enqueue_script( 'load_comments_js' );
+			wp_localize_script( 'load_comments_js', 'wpdc', $data );
+		}
+	}
+
+	public function initialize_comment_route() {
+		if ( ! empty( $this->options['ajax-load'])) {
+			register_rest_route( 'wp-discourse/v1', 'discourse-comments', array(
+				array(
+					'methods' => \WP_REST_Server::READABLE,
+					'callback' => array( $this, 'get_discourse_comments' ),
+				),
+			));
+		}
+	}
+
+	public function get_discourse_comments( $request ) {
+		write_log('request', $request );
+
+		return 'This is a test';
 	}
 
 	/**
