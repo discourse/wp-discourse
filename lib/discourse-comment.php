@@ -7,6 +7,7 @@
 
 namespace WPDiscourse\DiscourseComment;
 
+//use WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
@@ -23,9 +24,21 @@ class DiscourseComment {
 	protected $options;
 
 	/**
-	 * DiscourseComment constructor.
+	 * An instance of the DiscourseCommentFormatter class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter DiscourseCommentFormatter
 	 */
-	public function __construct() {
+	protected $comment_formatter;
+
+	/**
+	 * DiscourseComment constructor.
+	 *
+	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter An instance of DiscourseCommentFormatter
+	 */
+	public function __construct( $comment_formatter ) {
+		$this->comment_formatter = $comment_formatter;
+
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
@@ -115,9 +128,9 @@ class DiscourseComment {
 	}
 
 	public function get_discourse_comments( $request ) {
-		write_log('request', $request );
+		$post_id =   isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'])) : null;
 
-		return 'This is a test';
+		return $this->comment_formatter->format( $post_id );
 	}
 
 	/**
@@ -144,6 +157,7 @@ class DiscourseComment {
 	 */
 	function sync_comments( $postid ) {
 		global $wpdb;
+
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );
@@ -227,6 +241,10 @@ class DiscourseComment {
 		if ( $this->use_discourse_comments( $post->ID ) ) {
 			$this->sync_comments( $post->ID );
 			$options = $this->options;
+
+			if ( ! empty( $this->options['ajax-load'] ) ) {
+				return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
+			}
 			// Use $post->comment_count because get_comments_number will return the Discourse comments
 			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
