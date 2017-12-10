@@ -52,6 +52,7 @@ class DiscourseSSO {
 	 * @param \WP_User $user The User object.
 	 */
 	public function create_discourse_user( $user_login, $user ) {
+		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
 			$user_id = $user->ID;
 
@@ -252,6 +253,7 @@ class DiscourseSSO {
 
 				$q = $sso->build_login_string( $params );
 
+				do_action( 'wpdc_sso_provider_before_sso_redirect', $user_id, $current_user );
 				// Redirect back to Discourse.
 				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
