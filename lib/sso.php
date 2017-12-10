@@ -26,7 +26,7 @@ class SSO {
 	 *
 	 * @param string $secret The SSO secret key.
 	 */
-	function __construct( $secret ) {
+	public function __construct( $secret ) {
 		$this->sso_secret = $secret;
 	}
 
