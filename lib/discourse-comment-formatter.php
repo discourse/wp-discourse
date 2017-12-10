@@ -1,4 +1,9 @@
 <?php
+/**
+ * Formats Discourse comments.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\DiscourseCommentFormatter;
 
@@ -6,15 +11,40 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Templates\TemplateFunctions as TemplateFunctions;
 
+/**
+ * Class DiscourseCommentFormatter
+ */
 class DiscourseCommentFormatter {
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
+	protected $options;
+
+	/**
+	 * DiscourseCommentFormatter constructor.
+	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 	}
 
+	/**
+	 * Setup options.
+	 */
 	public function setup_options() {
 		$this->options = DiscourseUtilities::get_options();
 	}
 
+	/**
+	 * Formats the Discourse comments for a given post.
+	 *
+	 * @param int $post_id The post_id to retrieve comments for.
+	 *
+	 * @return string
+	 */
 	public function format( $post_id ) {
 		$custom = get_post_custom( $post_id );
 		if ( empty( $custom['discourse_permalink'] ) ) {
@@ -67,7 +97,6 @@ class DiscourseCommentFormatter {
 			}
 
 			$discourse_url     = esc_url( $options['url'] );
-			$discourse_html    = '';
 			$comments_html     = '';
 			$participants_html = '';
 			$topic_id          = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
@@ -75,33 +104,33 @@ class DiscourseCommentFormatter {
 			if ( count( $discourse_info->posts ) > 0 ) {
 				foreach ( $discourse_info->posts as &$post ) {
 
-					$comment_html = wp_kses_post( Templates::comment_html() );
-					$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
-					$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
-					$comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
-					$comment_html = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
-					$avatar_url   = TemplateFunctions::avatar( $post->avatar_template, 64 );
-					$comment_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
-					$user_url     = TemplateFunctions::homepage( $options['url'], $post );
-					$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
-					$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
-					$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-					$comment_body = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
-					$comment_body = wp_kses_post( $comment_body );
-					$comment_html = str_replace( '{comment_body}', $comment_body, $comment_html );
-					$comment_html = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );
+					$comment_html   = wp_kses_post( Templates::comment_html() );
+					$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
+					$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
+					$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
+					$comment_html   = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
+					$avatar_url     = TemplateFunctions::avatar( $post->avatar_template, 64 );
+					$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
+					$user_url       = TemplateFunctions::homepage( $options['url'], $post );
+					$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
+					$comment_html   = str_replace( '{username}', esc_html( $post->username ), $comment_html );
+					$comment_html   = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
+					$comment_body   = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
+					$comment_body   = wp_kses_post( $comment_body );
+					$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
+					$comment_html   = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );
 					$comments_html .= $comment_html;
 				}
 				foreach ( $discourse_info->participants as &$participant ) {
-					$participant_html = wp_kses_post( Templates::participant_html() );
-					$participant_html = str_replace( '{discourse_url}', $discourse_url, $participant_html );
-					$participant_html = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
-					$participant_html = str_replace( '{topic_url}', $permalink, $participant_html );
-					$avatar_url       = TemplateFunctions::avatar( $participant->avatar_template, 64 );
-					$participant_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
-					$user_url         = TemplateFunctions::homepage( $options['url'], $participant );
-					$participant_html = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
-					$participant_html = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
+					$participant_html   = wp_kses_post( Templates::participant_html() );
+					$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
+					$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
+					$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
+					$avatar_url         = TemplateFunctions::avatar( $participant->avatar_template, 64 );
+					$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
+					$user_url           = TemplateFunctions::homepage( $options['url'], $participant );
+					$participant_html   = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
+					$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 					$participants_html .= $participant_html;
 				}
 				$discourse_html = wp_kses_post( Templates::replies_html() );
