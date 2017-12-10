@@ -250,7 +250,10 @@ class DiscourseComment {
 			$num_wp_comments = $post->comment_count;
 			if ( empty( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				// Only show the Discourse comments.
-				return WPDISCOURSE_PATH . 'templates/comments.php';
+				//return WPDISCOURSE_PATH . 'templates/comments.php';
+				$discourse_comments = $this->comment_formatter->format( $post->ID );
+				write_log('discourse comments', $discourse_comments );
+				echo $discourse_comments;
 			} else {
 				// Show the Discourse comments then show the existing WP comments (in $old).
 				include WPDISCOURSE_PATH . 'templates/comments.php';
