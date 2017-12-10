@@ -142,7 +142,7 @@ class DiscourseComment {
 
 		if ( empty( $post_id ) ) {
 
-			return new \WP_Error('wpdc_ajax_request_error', 'A post_id parameter was not included in the request for Discourse comments.' );
+			return '';
 		}
 
 		return $this->comment_formatter->format( $post_id );
