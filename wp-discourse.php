@@ -50,6 +50,7 @@ require_once( __DIR__ . '/lib/email-notification.php' );
 require_once( __DIR__ . '/lib/sso-login-form.php' );
 require_once( __DIR__ . '/lib/utilities.php' );
 require_once( __DIR__ . '/lib/wordpress-email-verification.php' );
+require_once( __DIR__ . '/lib/discourse-comment-formatter.php' );
 
 require_once( __DIR__ . '/lib/shortcodes/sso-client.php' );
 
@@ -66,7 +67,8 @@ require_once( __DIR__ . '/admin/admin.php' );
 $discourse = new WPDiscourse\Discourse\Discourse();
 $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();
 new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
-new WPDiscourse\DiscourseComment\DiscourseComment();
+$discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
+new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );
 $wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
 new WPDiscourse\DiscourseUser\DiscourseUser();
