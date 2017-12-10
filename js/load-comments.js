@@ -5,9 +5,9 @@
  * @package WPDiscourse
  */
 
-(function ($) {
+(function($) {
 	$( document ).ready(
-		function () {
+		function() {
 			var commentsURL  = wpdc.commentsURL,
 				$commentArea = $( '#wpdc-comments' ),
 				postId       = $commentArea.data( 'post-id' );
@@ -15,7 +15,7 @@
 			$.ajax(
 				{
 					url: commentsURL + '?post_id=' + postId,
-					success: function (response) {
+					success: function( response ) {
 						$commentArea.removeClass( 'wpdc-comments-loading' );
 						$commentArea.addClass( 'wpdc-comments-loaded' );
 						$commentArea.html( response );
