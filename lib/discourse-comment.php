@@ -237,28 +237,27 @@ class DiscourseComment {
 	 */
 	function comments_template( $old ) {
 		global $post;
+		$post_id = $post->ID;
 
-		if ( $this->use_discourse_comments( $post->ID ) ) {
-			$this->sync_comments( $post->ID );
-			$options = $this->options;
+		if ( $this->use_discourse_comments( $post_id ) ) {
+			$this->sync_comments( $post_id );
 
 			if ( ! empty( $this->options['ajax-load'] ) ) {
+
 				return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
 			}
+
+			$discourse_comments = $this->comment_formatter->format( $post_id );
+
 			// Use $post->comment_count because get_comments_number will return the Discourse comments
 			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
-			if ( empty( $options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
-				// Only show the Discourse comments.
-				//return WPDISCOURSE_PATH . 'templates/comments.php';
-				$discourse_comments = $this->comment_formatter->format( $post->ID );
-				write_log('discourse comments', $discourse_comments );
+			if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 				echo $discourse_comments;
-			} else {
-				// Show the Discourse comments then show the existing WP comments (in $old).
-				include WPDISCOURSE_PATH . 'templates/comments.php';
 
-				echo '<div class="discourse-existing-comments-heading">' . wp_kses_post( $options['existing-comments-heading'] ) . '</div>';
+				return WPDISCOURSE_PATH . 'templates/blank.php';
+			} else {
+				echo $discourse_comments . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
 
 				return $old;
 			}
