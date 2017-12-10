@@ -5,7 +5,7 @@
  * @package WPDiscourse
  */
 
-(function($) {
+(function( $ ) {
 	$( document ).ready(
 		function() {
 			var commentsURL  = wpdc.commentsURL,
