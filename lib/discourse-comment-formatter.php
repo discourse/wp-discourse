@@ -46,6 +46,8 @@ class DiscourseCommentFormatter {
 	 * @return string
 	 */
 	public function format( $post_id ) {
+		// Sync the comments.
+		do_action( 'wpdc_sync_discourse_comments', $post_id );
 		$custom = get_post_custom( $post_id );
 		if ( empty( $custom['discourse_permalink'] ) ) {
 

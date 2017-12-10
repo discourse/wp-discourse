@@ -260,8 +260,6 @@ class DiscourseComment {
 		$post_id = $post->ID;
 
 		if ( $this->use_discourse_comments( $post_id ) ) {
-			$this->sync_comments( $post_id );
-
 			if ( ! empty( $this->options['ajax-load'] ) ) {
 
 				return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
