@@ -7,7 +7,6 @@
 
 namespace WPDiscourse\DiscourseComment;
 
-//use WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
 use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
@@ -34,7 +33,7 @@ class DiscourseComment {
 	/**
 	 * DiscourseComment constructor.
 	 *
-	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter An instance of DiscourseCommentFormatter
+	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter $comment_formatter An instance of DiscourseCommentFormatter.
 	 */
 	public function __construct( $comment_formatter ) {
 		$this->comment_formatter = $comment_formatter;
@@ -87,7 +86,7 @@ class DiscourseComment {
 	 *
 	 * Hooks into 'wp_enqueue_scripts'.
 	 */
-	function discourse_comments_js() {
+	public function discourse_comments_js() {
 		// Is the query for an existing single post of any of the allowed_post_types?
 		if ( isset( $this->options['allowed_post_types'] ) && is_singular( $this->options['allowed_post_types'] ) ) {
 			if ( $this->use_discourse_comments( get_the_ID() ) ) {
@@ -120,13 +119,15 @@ class DiscourseComment {
 	 * Registers a Rest API route for returning comments at /wp-json/wp-discourse/v1/discourse-comments.
 	 */
 	public function initialize_comment_route() {
-		if ( ! empty( $this->options['ajax-load'])) {
-			register_rest_route( 'wp-discourse/v1', 'discourse-comments', array(
-				array(
-					'methods' => \WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_discourse_comments' ),
-				),
-			));
+		if ( ! empty( $this->options['ajax-load'] ) ) {
+			register_rest_route(
+				'wp-discourse/v1', 'discourse-comments', array(
+					array(
+						'methods'  => \WP_REST_Server::READABLE,
+						'callback' => array( $this, 'get_discourse_comments' ),
+					),
+				)
+			);
 		}
 	}
 
@@ -138,7 +139,7 @@ class DiscourseComment {
 	 * @return \WP_Error|string
 	 */
 	public function get_discourse_comments( $request ) {
-		$post_id =   isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'])) : null;
+		$post_id = isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'] ) ) : null;
 
 		if ( empty( $post_id ) ) {
 
@@ -173,7 +174,7 @@ class DiscourseComment {
 	 *
 	 * @return null
 	 */
-	function sync_comments( $postid ) {
+	public function sync_comments( $postid ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -255,7 +256,7 @@ class DiscourseComment {
 	 *
 	 * @return string
 	 */
-	function comments_template( $old ) {
+	public function comments_template( $old ) {
 		global $post;
 		$post_id = $post->ID;
 
@@ -271,11 +272,11 @@ class DiscourseComment {
 			// number for posts that are published to Discourse.
 			$num_wp_comments = $post->comment_count;
 			if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
-				echo $discourse_comments;
+				echo wp_kses_post( $discourse_comments );
 
 				return WPDISCOURSE_PATH . 'templates/blank.php';
 			} else {
-				echo $discourse_comments . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
+				echo wp_kses_post( $discourse_comments ) . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
 
 				return $old;
 			}
@@ -295,7 +296,7 @@ class DiscourseComment {
 	 *
 	 * @return mixed
 	 */
-	function get_comments_number( $count, $post_id ) {
+	public function get_comments_number( $count, $post_id ) {
 		if ( $this->use_discourse_comments( $post_id ) ) {
 
 			$single_page = is_single( $post_id ) || is_page( $post_id );
