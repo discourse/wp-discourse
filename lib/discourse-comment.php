@@ -116,6 +116,9 @@ class DiscourseComment {
 		}
 	}
 
+	/**
+	 * Registers a Rest API route for returning comments at /wp-json/wp-discourse/v1/discourse-comments.
+	 */
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['ajax-load'])) {
 			register_rest_route( 'wp-discourse/v1', 'discourse-comments', array(
@@ -127,8 +130,20 @@ class DiscourseComment {
 		}
 	}
 
+	/**
+	 * Handles the REST request for Discourse comments.
+	 *
+	 * @param \WP_REST_Request Object $request The WP_REST_Request for Discourse comments.
+	 *
+	 * @return \WP_Error|string
+	 */
 	public function get_discourse_comments( $request ) {
 		$post_id =   isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'])) : null;
+
+		if ( empty( $post_id ) ) {
+
+			return new \WP_Error('wpdc_ajax_request_error', 'A post_id parameter was not included in the request for Discourse comments.' );
+		}
 
 		return $this->comment_formatter->format( $post_id );
 	}
@@ -142,6 +157,7 @@ class DiscourseComment {
 	 */
 	protected function use_discourse_comments( $post_id ) {
 		if ( empty( $this->options['use-discourse-comments'] ) ) {
+
 			return 0;
 		}
 
@@ -154,6 +170,8 @@ class DiscourseComment {
 	 * Syncs Discourse comments to WordPress.
 	 *
 	 * @param int $postid The WordPress post id.
+	 *
+	 * @return null
 	 */
 	function sync_comments( $postid ) {
 		global $wpdb;
@@ -224,6 +242,8 @@ class DiscourseComment {
 
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
 		}// End if().
+
+		return null;
 	}
 
 	/**
@@ -263,7 +283,7 @@ class DiscourseComment {
 			}
 		}
 
-		// Show the existing WP comments.
+		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
 	}
 
