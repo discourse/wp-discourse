@@ -148,7 +148,7 @@ class DiscourseCommentFormatter {
 
 			do_action( 'wp_discourse_after_comments', $topic_id );
 
-			return wp_kses_post( $discourse_html );
+			return $discourse_html;
 		}// End if().
 	}
 }
