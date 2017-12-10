@@ -13,6 +13,8 @@
 				{
 					url: commentsURL + '?post_id=' + postId,
 					success: function (response) {
+					    $commentArea.removeClass( 'wpdc-comments-loading' );
+					    $commentArea.addClass( 'wpdc-comments-loaded' );
 					    $commentArea.html( response );
 					}
 				}

@@ -7,4 +7,4 @@
 
 global $post;
 
-echo '<div id="wpdc-comments" data-post-id="' . esc_attr( $post->ID ) . '"></div>';
+echo '<div class="wpdc-comments-loading" id="wpdc-comments" data-post-id="' . esc_attr( $post->ID ) . '"></div>';
