@@ -16,6 +16,7 @@
 #setting-error-auto_create_login_redirect ~ form #discourse-auto-create-login-redirect,
 #setting-error-auto_create_welcome_redirect ~ form #discourse-auto-create-welcome-redirect,
 #setting-error-login_path ~ form #discourse-login-path,
+#setting-error-sso_secret ~ form #discourse-sso-secret,
 #setting-error-webhook_secret ~ form #discourse-webhook-secret {
 	border-color: #dc3232;
 	border-width: 1px;

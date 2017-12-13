@@ -422,12 +422,13 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_webhook_secret( $input ) {
-		$secret = $this->validate_text_input( $input );
-		if ( ( $this->use_discourse_webhook || $this->use_discourse_user_webhook ) && iconv_strlen( $secret ) < 12 ) {
+		if ( ( $this->use_discourse_webhook || $this->use_discourse_user_webhook ) && iconv_strlen( $input ) < 12 ) {
 			add_settings_error( 'discourse', 'webhook_secret', __( 'To use a Discourse webhook, the secret must be set to a value at least 12 characters long.', 'wp-discourse' ) );
+
+			return '';
 		}
 
-		return $secret;
+		return $input;
 	}
 
 	/**
@@ -521,9 +522,13 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
-		$sso_secret = sanitize_text_field( $input );
+		if ( iconv_strlen( $input ) < 10 ) {
+			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key must be at least 10 characters long.', 'wp-discourse' ) );
 
-		return $sso_secret;
+			return '';
+		}
+
+		return $input;
 	}
 
 	/**
