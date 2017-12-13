@@ -51,9 +51,9 @@ class CommentSettings {
 
 		add_settings_field(
 			'discourse_ajax_load', __( 'Load Comments With Ajax', 'wp-discourse' ), array(
-			$this,
-			'ajax_load_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'ajax_load_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		add_settings_field(

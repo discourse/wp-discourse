@@ -110,7 +110,7 @@ network options have been moved to the Network Admin Dashboard.</p></div>', 'wp-
 
 		// Setting changed notices.
 		$settings_change_notice_seen = get_option( 'wpdc_settings_update_notice_150' );
-		if ( ! empty( $this->options['auto-create-sso-user'] )  && ! $settings_change_notice_seen ) {
+		if ( ! empty( $this->options['auto-create-sso-user'] ) && ! $settings_change_notice_seen ) {
 			add_option( 'wpdc_settings_update_notice_150', 1 );
 
 			$settings_changed_notice = __(
