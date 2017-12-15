@@ -243,14 +243,22 @@ class DiscoursePublish {
 		$result = wp_remote_post( $url, $post_options );
 
 		if ( ! DiscourseUtilities::validate( $result ) ) {
-			$this->create_bad_response_notifications( $current_post, $post_id );
+			if ( is_wp_error( $result ) ) {
+				$error_message = $result->get_error_message();
+				$error_code = null;
+			} else {
+				$error_message = wp_remote_retrieve_response_message( $result );
+				$error_code = wp_remote_retrieve_response_code( $result );
+			}
+
+			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
 
 			return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $result ) );
 
-		// The response when a topic is first created.
+				// The response when a topic is first created.
 		if ( property_exists( $body, 'id' ) ) {
 			$discourse_id = (int) $body->id;
 
@@ -315,11 +323,13 @@ class DiscoursePublish {
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
 	 * @param int      $post_id The current post id.
 	 */
-	protected function create_bad_response_notifications( $current_post, $post_id ) {
+	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
 		$this->email_notifier->publish_failure_notification(
 			$current_post, array(
 				'location' => 'after_bad_response',
+				'error_message' => $error_message,
+				'error_code' => $error_code,
 			)
 		);
 	}
