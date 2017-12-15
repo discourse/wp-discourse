@@ -82,9 +82,24 @@ class EmailNotification {
 					$message .= __( 'The post was published through XML-RPC.', 'wp-discourse' ) . "\r\n\r\n";
 					break;
 				case 'after_bad_response':
-					$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n\r\n";
-					$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
-					$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n\r\n";
+					if ( ! empty( $args['error_code'] ) ) {
+						$error_code = intval( $args['error_code'] );
+						// translators: Discourse publishing email. Placeholder: HTTP response code.
+						$message .= sprintf( __( 'A %d response code was returned from Discourse.', 'wp-discourse' ), $error_code ) . "\r\n";
+						$message .= $args['error_message'] . "\r\n\r\n";
+						if ( 403 === $error_code ) {
+							$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
+							$message .= __( '- the author has correctly set their Discourse username', 'wp-discourse' ) . "\r\n\r\n";
+						} elseif ( 429 === $error_code ) {
+							$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
+							$message .= __( '- your API requests are not being rate limited by your Discourse hosting provider.', 'wp-discourse' ) . "\r\n\r\n";
+						}
+					} else {
+						$message .=  __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n";
+						$message .= $args['error_message'] . "\r\n\r\n";
+						$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
+						$message .= __( '- your Discourse forum is online.', 'wp-discourse' ) . "\r\n\r\n";
+					}
 					break;
 			}
 
