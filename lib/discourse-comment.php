@@ -220,7 +220,6 @@ class DiscourseComment {
 
 					$result = wp_remote_get( $permalink );
 
-					// Todo: if there is a 404 response, delete the post's Discourse metadata.
 					if ( DiscourseUtilities::validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
