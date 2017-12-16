@@ -325,7 +325,7 @@ class PublishSettings {
 	/**
 	 * Details for the 'publishing_options' tab.
 	 */
-	function publishing_settings_tab_details() {
+	public function publishing_settings_tab_details() {
 		$setup_howto_url    = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url = 'https://meta.discourse.org/';
 		?>

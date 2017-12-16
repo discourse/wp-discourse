@@ -95,7 +95,7 @@ class EmailNotification {
 							$message .= __( '- your API requests are not being rate limited by your Discourse hosting provider.', 'wp-discourse' ) . "\r\n\r\n";
 						}
 					} else {
-						$message .=  __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n";
+						$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n";
 						$message .= $args['error_message'] . "\r\n\r\n";
 						$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
 						$message .= __( '- your Discourse forum is online.', 'wp-discourse' ) . "\r\n\r\n";

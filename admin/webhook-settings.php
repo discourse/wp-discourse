@@ -227,7 +227,7 @@ This setting will only be activated if your site is functioning as the SSO provi
 	/**
 	 * Details for the 'webhook_options' tab.
 	 */
-	function webhook_settings_tab_details() {
+	public function webhook_settings_tab_details() {
 		$setup_howto_url    = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url = 'https://meta.discourse.org/';
 		?>

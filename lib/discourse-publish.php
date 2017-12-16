@@ -245,10 +245,10 @@ class DiscoursePublish {
 		if ( ! DiscourseUtilities::validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
-				$error_code = null;
+				$error_code    = null;
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
-				$error_code = intval( wp_remote_retrieve_response_code( $result ) );
+				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
 				if ( 404 === $error_code || 500 === $error_code ) {
 					// Publishing to a deleted topic is currently returning a 500 response code.
 					update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
@@ -326,14 +326,16 @@ class DiscoursePublish {
 	 *
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
 	 * @param int      $post_id The current post id.
+	 * @param string   $error_message The error message returned from the request.
+	 * @param int      $error_code The error code returned from the request.
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
 		$this->email_notifier->publish_failure_notification(
 			$current_post, array(
-				'location' => 'after_bad_response',
+				'location'      => 'after_bad_response',
 				'error_message' => $error_message,
-				'error_code' => $error_code,
+				'error_code'    => $error_code,
 			)
 		);
 	}

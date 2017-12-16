@@ -64,7 +64,7 @@ class MetaBox {
 	public function render_meta_box( $post ) {
 		$post_id                = $post->ID;
 		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error = ! empty( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) );
+		$publishing_error       = ! empty( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) );
 		$force_publish          = ! empty( $this->options['force-publish'] );
 		$saved                  = 'publish' === get_post_status( $post_id ) ||
 								  'future' === get_post_status( $post_id ) ||
@@ -94,24 +94,24 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
 		if ( $published ) {
-		    if ( $publishing_error ) {
-		        $this->unlink_from_discourse();
-            } else {
-			    // The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
-			    // translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
-			    $message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
-			    $allowed = array(
-				    'strong' => array(),
-			    );
-			    echo wp_kses( $message, $allowed ) . '<br><hr>';
+			if ( $publishing_error ) {
+				$this->unlink_from_discourse();
+			} else {
+				// The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
+				// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
+				$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
+				$allowed = array(
+					'strong' => array(),
+				);
+				echo wp_kses( $message, $allowed ) . '<br><hr>';
 
-			    if ( $force_publish ) {
-			        _e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
-                } else {
-				    $publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-				    $this->update_discourse_topic_checkbox( $publish_text, 0 );
-                }
-            }
+				if ( $force_publish ) {
+					esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
+				} else {
+					$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
+					$this->update_discourse_topic_checkbox( $publish_text, 0 );
+				}
+			}
 		} else {
 			// The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
 			if ( $force_publish ) {
@@ -200,12 +200,12 @@ class MetaBox {
 		}
 
 		if ( isset( $_POST['unlink_from_discourse'] ) ) { // Input var okay.
-		    delete_post_meta( $post_id, 'discourse_post_id' );
-		    delete_post_meta( $post_id, 'discourse_topic_id' );
-		    delete_post_meta( $post_id, 'discourse_permalink' );
-		    delete_post_meta( $post_id, 'wpdc_publishing_response' );
-		    delete_post_meta( $post_id, 'wpdc_deleted_topic' );
-        }
+			delete_post_meta( $post_id, 'discourse_post_id' );
+			delete_post_meta( $post_id, 'discourse_topic_id' );
+			delete_post_meta( $post_id, 'discourse_permalink' );
+			delete_post_meta( $post_id, 'wpdc_publishing_response' );
+			delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+		}
 
 		return $post_id;
 	}
@@ -241,15 +241,19 @@ class MetaBox {
 	}
 
 	protected function unlink_from_discourse() {
-	    ?>
-        <p>
-            <?php _e( "An error has been returned while trying to republish your post to Discourse. The most likely cause
+		?>
+		<p>
+			<?php
+			esc_html_e(
+				"An error has been returned while trying to republish your post to Discourse. The most likely cause
             is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
-            can be republished as a new topic.", 'wp-discourse' ); ?>
-        </p>
-        <label for="unlink_from_discourse"><?php _e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
-            <input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
-        </label>
-        <?php
-    }
+            can be republished as a new topic.", 'wp-discourse'
+			);
+?>
+		</p>
+		<label for="unlink_from_discourse"><?php esc_html_e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
+			<input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
+		</label>
+		<?php
+	}
 }

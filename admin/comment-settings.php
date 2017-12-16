@@ -243,7 +243,7 @@ class CommentSettings {
 	/**
 	 * Details for the 'commenting_options' tab.
 	 */
-	function commenting_settings_tab_details() {
+	public function commenting_settings_tab_details() {
 		$setup_howto_url            = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url         = 'https://meta.discourse.org/';
 		$template_customization_url = 'https://meta.discourse.org/t/wp-discourse-template-customization/50754';
