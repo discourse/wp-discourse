@@ -240,6 +240,9 @@ class MetaBox {
 		<?php
 	}
 
+	/**
+	 * Outputs the unlink from Discourse Topic checkbox.
+	 */
 	protected function unlink_from_discourse() {
 		?>
 		<p>
