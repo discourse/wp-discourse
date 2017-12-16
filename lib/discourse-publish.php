@@ -248,7 +248,11 @@ class DiscoursePublish {
 				$error_code = null;
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
-				$error_code = wp_remote_retrieve_response_code( $result );
+				$error_code = intval( wp_remote_retrieve_response_code( $result ) );
+				if ( 403 === $error_code || 500 === $error_code ) {
+					// Publishing to a deleted topic is currently returning a 500 response code.
+					update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
+				}
 			}
 
 			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
