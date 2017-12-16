@@ -105,10 +105,12 @@ class MetaBox {
 			    );
 			    echo wp_kses( $message, $allowed ) . '<br><hr>';
 
-			    if ( ! $force_publish ) {
+			    if ( $force_publish ) {
+			        _e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
+                } else {
 				    $publish_text = __( 'Update Discourse topic', 'wp-discourse' );
 				    $this->update_discourse_topic_checkbox( $publish_text, 0 );
-			    }
+                }
             }
 		} else {
 			// The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
@@ -242,8 +244,8 @@ class MetaBox {
 	    ?>
         <p>
             <?php _e( "An error has been returned while trying to republish your post to Discourse. The most likely cause
-            is that the post's associated topic has been deleted. If that's the case, unlink the post from Discourse so that you can
-            publish it again.", 'wp-discourse' ); ?>
+            is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
+            can be republished as a new topic.", 'wp-discourse' ); ?>
         </p>
         <label for="unlink_from_discourse"><?php _e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
             <input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
