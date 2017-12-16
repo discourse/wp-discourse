@@ -262,7 +262,7 @@ class DiscoursePublish {
 
 		$body = json_decode( wp_remote_retrieve_body( $result ) );
 
-				// The response when a topic is first created.
+		// The response when a topic is first created.
 		if ( property_exists( $body, 'id' ) ) {
 			$discourse_id = (int) $body->id;
 
