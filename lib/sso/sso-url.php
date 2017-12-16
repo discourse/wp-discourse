@@ -22,7 +22,7 @@ function get_discourse_sso_url() {
 	return add_query_arg(
 		array(
 			'discourse_sso' => 1,
-			'redirect_to'   => rawurlencode( $redirect_to ),
+			'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url', rawurlencode( $redirect_to ), $redirect_to ),
 		), home_url( '/' )
 	);
 }
