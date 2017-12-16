@@ -132,6 +132,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 - Add an option to load Discourse comments with an ajax call
 - Add action hooks to SSO Provider functions
+- Add unlink_from_discourse checkbox to deal with cases where a post's associated topic has been deleted on Discourse
+- Improve error message when posts fail to publish to Discourse
+- Add filter to sso_client redirect_url
+- Fix sanitization of sso_secret and webhook_secret
 
 #### 1.5.3 23/11/2017
 
