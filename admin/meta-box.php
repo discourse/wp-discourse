@@ -64,7 +64,7 @@ class MetaBox {
 	public function render_meta_box( $post ) {
 		$post_id                = $post->ID;
 		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error       = 1 === intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) );
+		$publishing_error       = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
 		$force_publish          = ! empty( $this->options['force-publish'] );
 		$saved                  = 'publish' === get_post_status( $post_id ) ||
 								  'future' === get_post_status( $post_id ) ||
