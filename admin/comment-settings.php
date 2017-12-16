@@ -149,7 +149,7 @@ class CommentSettings {
 	 */
 	public function ajax_load_checkbox() {
 		$this->form_helper->checkbox_input(
-			'ajax-load', 'discourse_comment', __( 'Load comments with Ajax.', 'wp-discourse' )
+			'ajax-load', 'discourse_comment', __( 'Load comments with Ajax if page caching is preventing them from updating.', 'wp-discourse' )
 		);
 	}
 
