@@ -338,7 +338,7 @@ class SSOSettings {
 			"After WordPress login, if the user doesn't exist on Discourse, create a Discourse user for them through the API. (If this setting
 			is not enabled, Discourse users will be created when the user first logs into Discourse with SSO.)", 'wp-discourse'
 		);
-		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create and login users.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create Discourse users.', 'wp-discourse' ), $description );
 	}
 
 	/**
