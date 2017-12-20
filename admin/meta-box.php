@@ -109,7 +109,7 @@ class MetaBox {
 					esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
 				} else {
 					$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-					$this->update_discourse_topic_checkbox( $publish_text, 0 );
+					$this->update_discourse_topic_checkbox( $publish_text );
 				}
 			}
 		} else {
@@ -231,7 +231,7 @@ class MetaBox {
 	 * @param string $text The label text.
 	 * @param int    $update_discourse_topic Whether or not the checkbox should be checked.
 	 */
-	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic ) {
+	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic = false ) {
 		?>
 		<label for="update_discourse_topic"><?php echo esc_html( $text ); ?>
 			<input type="checkbox" name="update_discourse_topic" id="update_discourse_topic" value="1"
@@ -252,8 +252,10 @@ class MetaBox {
             is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
             can be republished as a new topic.", 'wp-discourse'
 			);
-?>
+            ?>
 		</p>
+        <?php $this->update_discourse_topic_checkbox( 'Try to republish post to discourse' ); ?>
+        <br><strong><?php _e( 'or', 'wp-discourse' ) ?></strong><br>
 		<label for="unlink_from_discourse"><?php esc_html_e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
 		</label>
