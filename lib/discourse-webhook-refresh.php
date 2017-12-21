@@ -160,10 +160,13 @@ class DiscourseWebhookRefresh {
 				$post_id = $this->get_post_id_by_title( $post_title, $topic_id );
 			}
 			if ( $post_id ) {
+				// If the post is found, sync comments if a post has been edited or a new post has been added.
+				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+
+				// If the post_number is > discourse_comments_count, update the comments count.
 				$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
 				if ( $current_comment_count < $post_number - 1 ) {
 					update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
-					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 				}
 			}
 		}
