@@ -203,6 +203,7 @@ class MetaBox {
 			delete_post_meta( $post_id, 'discourse_post_id' );
 			delete_post_meta( $post_id, 'discourse_topic_id' );
 			delete_post_meta( $post_id, 'discourse_permalink' );
+			update_post_meta( $post_id, 'discourse_comments_count', 0 );
 			delete_post_meta( $post_id, 'wpdc_publishing_response' );
 			delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 		}
