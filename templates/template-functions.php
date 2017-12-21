@@ -77,14 +77,14 @@ class TemplateFunctions {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors = libxml_use_internal_errors( true );
 
-		$doc = new \DOMDocument( '1.0', 'utf-8' );
+		$doc  = new \DOMDocument( '1.0', 'utf-8' );
 		$html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="inner-content">' . $content . '</div></body></html>';
 		$doc->loadHTML( $html );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
 		foreach ( $links as $link ) {
-			$href = $link->getAttribute( 'href' );
+			$href      = $link->getAttribute( 'href' );
 			$url_parts = wp_parse_url( $href );
 
 			if ( empty( $url_parts['host'] ) ) {
@@ -95,7 +95,7 @@ class TemplateFunctions {
 		// Images, emojis etc.
 		$images = $doc->getElementsByTagName( 'img' );
 		foreach ( $images as $image ) {
-			$src = $image->getAttribute( 'src' );
+			$src       = $image->getAttribute( 'src' );
 			$url_parts = wp_parse_url( $src );
 
 			if ( empty( $url_parts['host'] ) ) {
@@ -121,7 +121,7 @@ class TemplateFunctions {
 	 * @return string
 	 */
 	protected static function inner_html( \DOMElement $element ) {
-		$doc = $element->ownerDocument;
+		$doc  = $element->ownerDocument;
 		$html = '';
 
 		foreach ( $element->childNodes as $node ) {

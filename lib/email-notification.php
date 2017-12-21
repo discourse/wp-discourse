@@ -94,7 +94,7 @@ class EmailNotification {
 							$message .= __( 'Check that:', 'wp-discourse' ) . "\r\n";
 							$message .= __( '- your API requests are not being rate limited by your Discourse hosting provider.', 'wp-discourse' ) . "\r\n\r\n";
 						} elseif ( 500 === $error_code ) {
-							$message .= __( "It is possible that the topic has been deleted on Discourse. If so, unlink the post from Discourse and try publishing again.", 'wp-discourse' ) . "\r\n\r\n";
+							$message .= __( 'It is possible that the topic has been deleted on Discourse. If so, unlink the post from Discourse and try publishing again.', 'wp-discourse' ) . "\r\n\r\n";
 						}
 					} else {
 						$message .= __( 'A bad response was returned from Discourse.', 'wp-discourse' ) . "\r\n";

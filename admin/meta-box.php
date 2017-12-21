@@ -252,10 +252,10 @@ class MetaBox {
             is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
             can be republished as a new topic.", 'wp-discourse'
 			);
-            ?>
+			?>
 		</p>
-        <?php $this->update_discourse_topic_checkbox( 'Try to republish post to discourse' ); ?>
-        <br><strong><?php _e( 'or', 'wp-discourse' ) ?></strong><br>
+		<?php $this->update_discourse_topic_checkbox( 'Try to republish post to discourse' ); ?>
+		<br><strong><?php esc_html_e( 'or', 'wp-discourse' ); ?></strong><br>
 		<label for="unlink_from_discourse"><?php esc_html_e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
 		</label>
