@@ -107,6 +107,11 @@ class TemplateFunctions {
 		// Restore the previous value of libxml_use_internal_errors.
 		libxml_use_internal_errors( $use_internal_errors );
 
-		return $doc->saveHTML( $doc->documentElement );
+		$parsed =  $doc->saveHTML( $doc->documentElement );
+
+		// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
+		$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
+
+		return $parsed;
 	}
 }
