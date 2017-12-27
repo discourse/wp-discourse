@@ -78,8 +78,7 @@ class TemplateFunctions {
 		$use_internal_errors = libxml_use_internal_errors( true );
 
 		$doc  = new \DOMDocument( '1.0', 'utf-8' );
-		$html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="inner-content">' . $content . '</div></body></html>';
-		$doc->loadHTML( $html );
+		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
@@ -103,31 +102,11 @@ class TemplateFunctions {
 			}
 		}
 
-		$inner_html = self::inner_html( $doc->getElementById( 'inner-content' ) );
-
 		// Clear the libxml error buffer.
 		libxml_clear_errors();
 		// Restore the previous value of libxml_use_internal_errors.
 		libxml_use_internal_errors( $use_internal_errors );
 
-		return $inner_html;
-	}
-
-	/**
-	 * Extracts the childNodes from a DOMElement and saves them to a string.
-	 *
-	 * @param \DOMElement $element The DOMElement to extract from.
-	 *
-	 * @return string
-	 */
-	protected static function inner_html( \DOMElement $element ) {
-		$doc  = $element->ownerDocument;
-		$html = '';
-
-		foreach ( $element->childNodes as $node ) {
-			$html .= $doc->saveHTML( $node );
-		}
-
-		return $html;
+		return $doc->saveHTML( $doc->documentElement );
 	}
 }
