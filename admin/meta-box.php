@@ -29,6 +29,15 @@ class MetaBox {
 		add_action( 'admin_init', array( $this, 'setup_options' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_meta_box_js' ) );
+	}
+
+	/**
+	 * Enqueue meta_box_js.
+	 */
+	public function enqueue_meta_box_js() {
+		wp_register_script( 'meta_box_js', plugins_url( '../admin/js/meta-box.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+		wp_enqueue_script( 'meta_box_js' );
 	}
 
 	/**
@@ -48,7 +57,7 @@ class MetaBox {
 			 in_array( $post_type, $this->options['allowed_post_types'], true )
 		) {
 			add_meta_box(
-				'discourse-publish-meta-box', esc_html__( 'Publish to Discourse' ), array(
+				'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
 					$this,
 					'render_meta_box',
 				), null, 'side', 'high', null
@@ -62,105 +71,88 @@ class MetaBox {
 	 * @param object $post The current Post object.
 	 */
 	public function render_meta_box( $post ) {
-		$post_id                = $post->ID;
-		$published              = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error       = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
-		$force_publish          = ! empty( $this->options['force-publish'] );
-		$saved                  = 'publish' === get_post_status( $post_id ) ||
-								  'future' === get_post_status( $post_id ) ||
-								  'draft' === get_post_status( $post_id ) ||
-								  'private' === get_post_status( $post_id ) ||
-								  'pending' === get_post_status( $post_id );
-		$categories             = DiscourseUtilities::get_discourse_categories();
-		$categories             = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
-		$selected_category_name = '';
-
-		if ( ! $saved ) {
-			$publish_to_discourse = isset( $this->options['auto-publish'] ) ? intval( $this->options['auto-publish'] ) : 0;
-			$selected_category    = isset( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 1;
-		} else {
-			$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-			$selected_category    = get_post_meta( $post_id, 'publish_post_category', true );
-			if ( ! is_wp_error( $categories ) ) {
-				foreach ( $categories as $category ) {
-					if ( intval( $selected_category ) === $category['id'] ) {
-						$selected_category_name = $category['name'];
-						break;
-					}
-				}
-			}
-		}
+		$post_id             = $post->ID;
+		$published           = get_post_meta( $post_id, 'discourse_post_id', true );
+		$publishing_error    = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
+		$force_publish       = ! empty( $this->options['force-publish'] );
+		$saved               = 'publish' === get_post_status( $post_id ) ||
+							   'future' === get_post_status( $post_id ) ||
+							   'draft' === get_post_status( $post_id ) ||
+							   'private' === get_post_status( $post_id ) ||
+							   'pending' === get_post_status( $post_id );
+		$categories          = DiscourseUtilities::get_discourse_categories();
+		$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
+		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
-		if ( $published ) {
-			if ( $publishing_error ) {
-				$this->unlink_from_discourse();
-			} else {
-				// The post has been published. Unless 'force-publish' is enabled, display the Update Discourse topic checkbox.
-				// translators: Discourse post has been published message. Placeholder: Discourse category name in which the post has been published.
-				$message = sprintf( __( 'This post has been published to Discourse in the <strong>%s</strong> category.', 'wp-discourse' ), esc_attr( $selected_category_name ) );
+		if ( ! $published ) {
+			if ( $force_publish ) {
+
+				$category_name = $this->get_discourse_category_name( $default_category_id );
+				// translators: Discourse force-publish message. Placeholder: category_name.
+				$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
 				$allowed = array(
 					'strong' => array(),
 				);
-				echo wp_kses( $message, $allowed ) . '<br><hr>';
+				echo wp_kses( $message, $allowed );
 
+			} else {
+				$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
+				$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
+				?>
+
+				<label for="wpdc_publish_option">
+					<input type="radio" name="wpdc_publish_options" value="new" checked><?php esc_html_e( 'Create new Topic' ); ?>
+				</label><br>
+				<label for="wpdc_publish_options">
+					<input type="radio" name="wpdc_publish_options" value="link"><?php esc_html_e( 'Link to Existing Topic' ); ?>
+				</label>
+
+				<?php
+				if ( is_wp_error( $categories ) ) {
+					echo '<hr>';
+					$this->category_error_markup( $default_category_id );
+				} else {
+					?>
+					<div class="wpdc-new-discourse-topic">
+						<hr>
+						<?php
+						$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
+						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
+						echo '<br>';
+						$this->category_select_input( $publish_category_id, $categories );
+						?>
+						<br>
+					</div>
+					<?php
+				}
+				echo '<div class="wpdc-link-to-topic hidden">';
+				echo '<hr>';
+				$this->link_to_discourse_topic_input();
+				echo '</div>';
+
+			}
+		} else {
+			// The post has already been published to Discourse.
+			if ( $publishing_error ) {
+				$this->publishing_error_markup( $force_publish );
+			} else {
+				$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+				$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . esc_url( $discourse_permalink ) . '</a>';
+				// translators: Discourse post_is_linked_to_discourse message. Placeholder: A link to the Discourse topic.
+				$message = sprintf( __( 'This post is linked to %1$s.<br><hr>', 'wp-discourse' ), $discourse_link );
+				echo wp_kses_post( $message );
 				if ( $force_publish ) {
 					esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
 				} else {
 					$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
 					$this->update_discourse_topic_checkbox( $publish_text );
+					echo '<br>';
+					$this->unlink_from_discourse_checkbox();
 				}
 			}
-		} else {
-			// The post has not been published. Display the Publish post checkbox unless 'force-publish' is enabled.
-			if ( $force_publish ) {
-				// translators: Discourse force-publish message.
-				$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse.', 'wp-discourse' ) );
-				$allowed = array(
-					'strong' => array(),
-				);
-				echo wp_kses( $message, $allowed ) . '<br><hr>';
-
-			} else {
-				$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
-				$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
-			}
-
-			if ( is_wp_error( $categories ) ) {
-				?>
-				<hr>
-				<div class="warning">
-					<p>
-				<?php
-				esc_html_e(
-					'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
-					or try refreshing the page.', 'wp-discourse'
-				);
-						?>
-					</p>
-						</div>
-						<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-						<input type="hidden" name="publish_post_category" value="<?php echo esc_attr( $selected_category ); ?>">
-						<?php
-			} else {
-				?>
-				<div>
-				<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
-					<select name="publish_post_category" id="publish_post_category">
-						<?php foreach ( $categories as $category ) : ?>
-							<option
-									value="<?php echo( esc_attr( $category['id'] ) ); ?>"
-								<?php selected( $selected_category, $category['id'] ); ?>>
-								<?php echo( esc_html( $category['name'] ) ); ?>
-							</option>
-						<?php endforeach; ?>
-					</select>
-				</label>
-				</div>
-				<?php
-			}
-		}// End if().
+		}
 	}
 
 	/**
@@ -174,12 +166,15 @@ class MetaBox {
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
 			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
 		) {
+
 			return 0;
 		}
 		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+
 			return 0;
 		}
 		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+
 			return 0;
 		}
 
@@ -199,13 +194,25 @@ class MetaBox {
 			update_post_meta( $post_id, 'update_discourse_topic', 0 );
 		}
 
+		// Delete all Discourse metadata that could be associated with a post.
 		if ( isset( $_POST['unlink_from_discourse'] ) ) { // Input var okay.
 			delete_post_meta( $post_id, 'discourse_post_id' );
 			delete_post_meta( $post_id, 'discourse_topic_id' );
 			delete_post_meta( $post_id, 'discourse_permalink' );
-			update_post_meta( $post_id, 'discourse_comments_count', 0 );
+			delete_post_meta( $post_id, 'discourse_comments_raw' );
+			delete_post_meta( $post_id, 'discourse_comments_count' );
+			delete_post_meta( $post_id, 'discourse_last_sync' );
+			delete_post_meta( $post_id, 'publish_to_discourse' );
+			delete_post_meta( $post_id, 'publish_post_category' );
+			delete_post_meta( $post_id, 'update_discourse_topic' );
+			delete_post_meta( $post_id, 'wpdc_sync_post_comments' );
 			delete_post_meta( $post_id, 'wpdc_publishing_response' );
 			delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+		}
+
+		if ( ! empty( $_POST['link_to_discourse_topic'] ) ) { // Input var okay.
+			$topic_url = esc_url_raw( wp_unslash( $_POST['link_to_discourse_topic'] ) ); // Input var okay.
+			$this->link_to_discourse_topic( $post_id, $topic_url );
 		}
 
 		return $post_id;
@@ -222,6 +229,18 @@ class MetaBox {
 		<label for="publish_to_discourse"><?php echo esc_html( $text ); ?>
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
+		</label>
+		<?php
+	}
+
+	/**
+	 * Outputs the Link to Discourse topic URL input.
+	 */
+	protected function link_to_discourse_topic_input() {
+		?>
+		<label for="link_to_discourse_topic">
+			<?php esc_html_e( 'Topic URL', 'wp-discourse' ); ?>
+			<input type="url" name="link_to_discourse_topic" id="link_to_discourse_topic" class="widefat">
 		</label>
 		<?php
 	}
@@ -244,22 +263,149 @@ class MetaBox {
 	/**
 	 * Outputs the unlink from Discourse Topic checkbox.
 	 */
-	protected function unlink_from_discourse() {
+	protected function unlink_from_discourse_checkbox() {
 		?>
-		<p>
-			<?php
-			esc_html_e(
-				"An error has been returned while trying to republish your post to Discourse. The most likely cause
-            is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
-            can be republished as a new topic.", 'wp-discourse'
-			);
-			?>
-		</p>
-		<?php $this->update_discourse_topic_checkbox( 'Try to republish post to discourse' ); ?>
-		<br><strong><?php esc_html_e( 'or', 'wp-discourse' ); ?></strong><br>
-		<label for="unlink_from_discourse"><?php esc_html_e( 'Unlink Post from Discourse', 'wp-discourse' ); ?>
+		<label for="unlink_from_discourse"><?php esc_html_e( 'Unlink Post from Discourse?', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlink_from_discourse" id="unlink_from_discourse" value="1">
 		</label>
 		<?php
+	}
+
+	/**
+	 * Links a WordPress post to a Discourse topic.
+	 *
+	 * @param int    $post_id The WordPress post_id to link to.
+	 * @param string $topic_url The Discourse topic URL.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function link_to_discourse_topic( $post_id, $topic_url ) {
+		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
+		delete_post_meta( $post_id, 'publish_to_discourse' );
+
+		$topic_domain = wp_parse_url( $topic_url, PHP_URL_HOST );
+		if ( get_option( 'wpdc_discourse_domain' ) !== $topic_domain ) {
+			update_post_meta( $post_id, 'wpdc_linking_response', 'invalid_url' );
+
+			return new \WP_Error( 'wpdc_configuration_error', 'An invalid topic URL was supplied when attempting to link post to Discourse topic.' );
+		}
+		$topic = DiscourseUtilities::get_discourse_topic( $topic_url );
+
+		// Check for the topic->post_stream here just to make sure it's a valid topic.
+		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) ) {
+			update_post_meta( $post_id, 'wpdc_linking_response', 'error' );
+
+			return new \WP_Error( 'wpdc_response_error', 'Unable to link to Discourse topic.' );
+		}
+
+		update_post_meta( $post_id, 'wpdc_linking_response', 'success' );
+
+		$discourse_post_id        = $topic->post_stream->stream[0];
+		$topic_id                 = $topic->id;
+		$category_id              = $topic->category_id;
+		$discourse_comments_count = $topic->posts_count - 1;
+		$topic_slug               = $topic->slug;
+		$discourse_permalink      = esc_url_raw( "{$this->options['url']}/t/{$topic_slug}/{$topic_id}" );
+
+		update_post_meta( $post_id, 'discourse_post_id', $discourse_post_id );
+		update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
+		update_post_meta( $post_id, 'publish_post_category', $category_id );
+		update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
+		update_post_meta( $post_id, 'discourse_comments_count', $discourse_comments_count );
+		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
+			update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Outputs the category select input.
+	 *
+	 * @param int   $publish_category_id The Discourse category_id.
+	 * @param array $categories The array of Discourse category data.
+	 */
+	protected function category_select_input( $publish_category_id, $categories ) {
+		?>
+		<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
+			<select name="publish_post_category" id="publish_post_category">
+				<?php foreach ( $categories as $category ) : ?>
+					<option
+							value="<?php echo( esc_attr( $category['id'] ) ); ?>"
+						<?php selected( $publish_category_id, $category['id'] ); ?>>
+						<?php echo( esc_html( $category['name'] ) ); ?>
+					</option>
+				<?php endforeach; ?>
+			</select>
+		</label>
+		<?php
+	}
+
+	/**
+	 * Gets the Discourse category name from the category_id.
+	 *
+	 * @param int $category_id The Discourse category_id.
+	 *
+	 * @return string|\WP_Error
+	 */
+	protected function get_discourse_category_name( $category_id ) {
+		$categories = DiscourseUtilities::get_discourse_categories();
+		if ( ! is_wp_error( $categories ) ) {
+			foreach ( $categories as $category ) {
+				if ( $category_id === $category['id'] ) {
+
+					return $category['name'];
+				}
+			}
+
+			return new \WP_Error( 'wpdc_category_not_found', 'The category name could not be found. Try updating the Discourse categories on the WP Discourse publishing options tab.' );
+		}
+
+		return new \WP_Error( 'wpdc_categories_error', 'The Discourse category list could not be returned. Check your Connection settings.' );
+	}
+
+	/**
+	 * The markup that is displayed when the categories can't be retrieved.
+	 *
+	 * This function should never need to be called.
+	 *
+	 * @param int $default_category_id The default publish category.
+	 */
+	protected function category_error_markup( $default_category_id ) {
+		?>
+		<div class="warning">
+			<p>
+				<?php
+				esc_html_e(
+					'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
+                        or try refreshing the page.', 'wp-discourse'
+				);
+				?>
+			</p>
+		</div>
+		<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
+		<input type="hidden" name="publish_post_category"
+			   value="<?php echo esc_attr( $default_category_id ); ?>">
+		<?php
+	}
+
+	/**
+	 * The message to be displayed when a 404 or 500 error has been returned after publishing a post to Discourse.
+	 *
+	 * @param bool $force_publish Whether or not the force_publish option has been selected.
+	 */
+	protected function publishing_error_markup( $force_publish ) {
+		esc_html_e(
+			"An error has been returned while trying to republish your post to Discourse. The most likely cause
+            is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
+            can be republished as a new topic.", 'wp-discourse'
+		);
+		echo '<hr>';
+		$this->unlink_from_discourse_checkbox();
+		if ( ! $force_publish ) {
+			echo '<br>';
+			$publish_text = __( 'Try Updating the Topic?', 'wp-discourse' );
+			$this->update_discourse_topic_checkbox( $publish_text );
+		}
 	}
 }

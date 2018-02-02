@@ -160,18 +160,29 @@ class Utilities {
 	}
 
 	/**
-	 * Tries to find a WordPress post that's associated with a Discourse topic_id.
+	 * Tries to find a WordPress posts that are associated with a Discourse topic_id.
+	 *
+	 * An array is being returned because it's possible for more than one WordPress post to be associated with a Discourse topic.
 	 *
 	 * @param int $topic_id The topic_id to lookup.
 	 *
-	 * @return null|string
+	 * @return array|null
 	 */
-	public static function get_post_id_by_topic_id( $topic_id ) {
+	public static function get_post_ids_from_topic_id( $topic_id ) {
 		global $wpdb;
 
-		$post_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
+		$topic_posts = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
 
-		return $post_id;
+		if ( ! empty( $topic_posts ) ) {
+			$topic_post_ids = [];
+			foreach ( $topic_posts as $topic_post ) {
+				$topic_post_ids[] = $topic_post->post_id;
+			}
+
+			return $topic_post_ids;
+		}
+
+		return null;
 	}
 
 	/**
@@ -201,7 +212,7 @@ class Utilities {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
-			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
 		}
 
 		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
@@ -251,7 +262,7 @@ class Utilities {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
-			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
@@ -299,7 +310,7 @@ class Utilities {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
-			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		if ( empty( $user ) || empty( $user->ID ) || is_wp_error( $user ) ) {
@@ -357,6 +368,38 @@ class Utilities {
 	}
 
 	/**
+	 * Gets a Discourse topic's json from its URL.
+	 *
+	 * @param string $topic_url The Discourse topic URL.
+	 *
+	 * @return array|mixed|object|\WP_Error
+	 */
+	public static function get_discourse_topic( $topic_url ) {
+		$api_credentials = self::get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$topic_url = esc_url_raw( "{$topic_url}.json" );
+		$topic_url = add_query_arg(
+			array(
+				'api_key'      => $api_credentials['api_key'],
+				'api_username' => $api_credentials['api_username'],
+			), $topic_url
+		);
+
+		$response = wp_remote_get( $topic_url );
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'The topic could not be retrieved from Discourse.' );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ) );
+	}
+
+	/**
 	 * Gets the Discourse groups and saves the non-automatic groups in a transient.
 	 *
 	 * The transient has an expiry time of 10 minutes.
@@ -367,7 +410,7 @@ class Utilities {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
-			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		$groups_url = "{$api_credentials['url']}/groups.json";
@@ -428,7 +471,7 @@ class Utilities {
 			$api_credentials = self::get_api_credentials();
 			if ( is_wp_error( $api_credentials ) ) {
 
-				return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 			}
 
 			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
@@ -479,7 +522,7 @@ class Utilities {
 			$api_credentials = self::get_api_credentials();
 			if ( is_wp_error( $api_credentials ) ) {
 
-				return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 			}
 
 			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
@@ -517,7 +560,7 @@ class Utilities {
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
-			return new \WP_Error( 'wpdc_get_user_error', 'The WP Discourse plugin is not properly configured.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		$about_url = esc_url_raw( "{$api_credentials['url']}/about.json" );

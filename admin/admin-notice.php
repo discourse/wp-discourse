@@ -49,15 +49,17 @@ class AdminNotice {
 			$allowed_post_types = ! empty( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : array();
 
 			if ( in_array( $post->post_type, $allowed_post_types, true ) ) {
-				$post_id                       = $post->ID;
-				$discourse_publishing_response = get_post_meta( $post_id, 'wpdc_publishing_response', true );
+				$post_id = $post->ID;
 
+				$discourse_publishing_response = get_post_meta( $post_id, 'wpdc_publishing_response', true );
 				if ( ! empty( $discourse_publishing_response ) ) {
 
 					if ( 'error' === $discourse_publishing_response ) {
 						$error_message = __( '<div class="notice notice-error is-dismissible"><p>There has been an error publishing this post to Discourse.</p></div>', 'wp-discourse' );
 
 						echo wp_kses_post( $error_message );
+
+						delete_post_meta( $post_id, 'wpdc_publishing_response' );
 					}
 
 					if ( 'success' === $discourse_publishing_response ) {
@@ -73,6 +75,21 @@ class AdminNotice {
 
 						echo wp_kses_post( $success_message );
 					}
+				}
+
+				$discourse_linking_response = get_post_meta( $post_id, 'wpdc_linking_response', true );
+				if ( 'error' === $discourse_linking_response ) {
+					$error_message = __( '<div class="notice notice-error is-dismissible"><p>There has been an error linking this post with Discourse. Make sure the URL you supply the URL of existing Discourse topic on your forum.</p></div>', 'wp-discourse' );
+
+					delete_post_meta( $post_id, 'wpdc_linking_response' );
+					echo wp_kses_post( $error_message );
+				}
+
+				if ( 'invalid_url' === $discourse_linking_response ) {
+					$error_message = __( '<div class="notice notice-error is-dismissible"><p>There has been an error linking this post with Discourse. The supplied URL does not match your forum\'s domain.</p></div>', 'wp-discourse' );
+
+					delete_post_meta( $post_id, 'wpdc_linking_response' );
+					echo wp_kses_post( $error_message );
 				}
 
 				$discourse_username       = get_user_meta( get_current_user_id(), 'discourse_username', true );

@@ -58,43 +58,23 @@ class DiscoursePublish {
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
-		if ( wp_is_post_revision( $post_id ) ) {
+		if ( wp_is_post_revision( $post_id ) || empty( $post->post_title ) || ! $this->is_valid_sync_post_type( $post_id ) ) {
 
 			return;
 		}
 
-		$force_publish = ! empty( $this->options['force-publish'] );
-
-		if ( $force_publish && $this->is_valid_sync_post_type( $post_id ) ) {
-			// Set the post to be published even if the 'publish_to_discourse' checkbox has been unchecked.
-			update_post_meta( $post_id, 'publish_to_discourse', 1 );
+		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+		$force_publish        = ! empty( $this->options['force-publish'] );
+		if ( $force_publish ) {
+			update_post_meta( $post_id, 'publish_post_category', $this->options['publish-category'] );
 		}
-
-		$has_published_status   = 'publish' === get_post_status( $post_id );
-		$publish_to_discourse   = get_post_meta( $post_id, 'publish_to_discourse', true );
-		$publish_to_discourse   = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-		$published_on_discourse = get_post_meta( $post_id, 'discourse_post_id', true );
+		$already_published      = get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 
-		if ( $has_published_status ) {
-			// If 'force-publish' is enabled, don't check $update_discourse_topic.
-			if ( ! $published_on_discourse || $force_publish ) {
-
-				if ( $publish_to_discourse && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
-
-					$this->sync_to_discourse( $post_id, $title, $post->post_content );
-				} elseif ( $this->is_valid_sync_post_type( $post_id ) && ! empty( $this->options['auto-publish'] ) ) {
-
-					// Something has gone wrong - send an email. This can hopefully be removed soon.
-					$this->email_notifier->publish_failure_notification(
-						$post, array(
-							'location' => 'after_save',
-						)
-					);
-				}
-			} elseif ( $published_on_discourse && $update_discourse_topic && ! empty( $title ) ) {
-
+		if ( 'publish' === get_post_status( $post_id ) ) {
+			if ( $force_publish || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 				$this->sync_to_discourse( $post_id, $title, $post->post_content );
 			}
 		}

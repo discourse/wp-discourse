@@ -77,3 +77,12 @@ ul.wpdc-documentation-list {
 	list-style: disc;
 	margin-left: 40px;
 }
+
+.wpdc-new-discourse-topic.hidden,
+.wpdc-link-to-top.hidden {
+	display: none;
+}
+
+#discourse-publish-meta-box a {
+	overflow-wrap: break-word;
+}

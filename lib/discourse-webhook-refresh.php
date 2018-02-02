@@ -147,29 +147,45 @@ class DiscourseWebhookRefresh {
 	 * is updated and the post is marked as needing to be refreshed for the next time DiscourseComment::sync_comments is run.
 	 *
 	 * @param array $post_data The post_data from the Discourse webhook request.
+	 * @return null
 	 */
 	protected function update_post_metadata( $post_data ) {
-		$topic_id    = ! empty( $post_data['topic_id'] ) ? $post_data['topic_id'] : null;
-		$post_number = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
-		$post_title  = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
+		$topic_id       = ! empty( $post_data['topic_id'] ) ? $post_data['topic_id'] : null;
+		$post_number    = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
+		$post_title     = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
+		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? $post_data['topic_posts_count'] - 1 : null;
 
 		if ( $topic_id && $post_number && $post_title ) {
 
-			$post_id = DiscourseUtilities::get_post_id_by_topic_id( $topic_id );
-			if ( ! $post_id && ! empty( $this->options['webhook-match-old-topics'] ) ) {
-				$post_id = $this->get_post_id_by_title( $post_title, $topic_id );
-			}
-			if ( $post_id ) {
-				// If the post is found, sync comments if a post has been edited or a new post has been added.
-				update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+			$post_ids = DiscourseUtilities::get_post_ids_from_topic_id( $topic_id );
 
-				// If the post_number is > discourse_comments_count, update the comments count.
-				$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
-				if ( $current_comment_count < $post_number - 1 ) {
-					update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+			// For matching posts that were published before the plugin was saving the discourse_topic_id as post_metadata.
+			if ( ! $post_ids && ! empty( $this->options['webhook-match-old-topics'] ) ) {
+				$post_id = $this->get_post_id_by_title( $post_title, $topic_id );
+				if ( $post_id ) {
+					$post_ids[] = $post_id;
+				}
+			}
+
+			if ( $post_ids ) {
+				foreach ( $post_ids as $post_id ) {
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+
+					// The topic_posts_count is being returned with the webhook data as of Discourse version 2.0.0.beta1.
+					if ( $comments_count ) {
+						update_post_meta( $post_id, 'discourse_comments_count', $comments_count );
+					} else {
+						// If the post_number is > discourse_comments_count, update the comments count.
+						$current_comment_count = get_post_meta( $post_id, 'discourse_comments_count', true );
+						if ( $current_comment_count < $post_number - 1 ) {
+							update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
+						}
+					}
 				}
 			}
 		}
+
+		return null;
 	}
 
 	/**

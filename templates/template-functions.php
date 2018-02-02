@@ -77,7 +77,7 @@ class TemplateFunctions {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors = libxml_use_internal_errors( true );
 
-		$doc  = new \DOMDocument( '1.0', 'utf-8' );
+		$doc = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		// Mentions and hashtags.
