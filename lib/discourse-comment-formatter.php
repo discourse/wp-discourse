@@ -118,7 +118,6 @@ class DiscourseCommentFormatter {
 					$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 					$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
 					$comment_body = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
-					// Todo: double check this.
 					$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
 					$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
 					$comment_html   = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );
