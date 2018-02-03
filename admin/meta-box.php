@@ -132,7 +132,7 @@ class MetaBox {
 				$this->link_to_discourse_topic_input();
 				echo '</div>';
 
-			}
+			} // End if().
 		} else {
 			// The post has already been published to Discourse.
 			if ( $publishing_error ) {
@@ -152,7 +152,7 @@ class MetaBox {
 					$this->unlink_from_discourse_checkbox();
 				}
 			}
-		}
+		} // End if().
 	}
 
 	/**

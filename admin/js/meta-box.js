@@ -4,13 +4,13 @@
  * @package WPDiscourse
  */
 
-(function ( $ ) {
+(function( $ ) {
 	$( 'input[type=radio][name=wpdc_publish_options]' ).change(
-		function () {
+		function() {
 			var val          = this.value,
 			$newTopicOptions = $( '.wpdc-new-discourse-topic' ),
 			$linkPostOptions = $( '.wpdc-link-to-topic' );
-			if ('new' === val) {
+			if ( 'new' === val ) {
 				$newTopicOptions.removeClass( 'hidden' );
 				$linkPostOptions.addClass( 'hidden' );
 			} else {
