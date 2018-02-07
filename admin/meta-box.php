@@ -404,7 +404,7 @@ class MetaBox {
 		$this->unlink_from_discourse_checkbox();
 		if ( ! $force_publish ) {
 			echo '<br>';
-			$publish_text = __( 'Try Updating the Topic?', 'wp-discourse' );
+			$publish_text = __( 'Try Updating the Topic', 'wp-discourse' );
 			$this->update_discourse_topic_checkbox( $publish_text );
 		}
 	}
