@@ -450,108 +450,6 @@ class Utilities {
 	}
 
 	/**
-	 * Adds a WordPress user to a Discourse group.
-	 *
-	 * @param int    $user_id The user id.
-	 * @param string $group_name The Discourse group to add the user to.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group transient.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function add_user_to_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$discourse_id = self::get_discourse_id( $user_id );
-		$group_id     = self::get_discourse_group_id_from_name( $group_name, $force_update );
-
-		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
-
-			return new \WP_Error( 'wpdc_groups_error', 'Cannot add user to group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
-		}
-
-		if ( $discourse_id && $group_id ) {
-			$api_credentials = self::get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
-
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-			}
-
-			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
-
-			$response = wp_remote_post(
-				$group_url, array(
-					'method' => 'PUT',
-					'body'   => array(
-						'user_ids'     => $discourse_id,
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					),
-				)
-			);
-
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( ! empty( $response->errors ) ) {
-
-				return new \WP_Error( 'wpdc_groups_error', $response->errors );
-			} else {
-
-				return $response;
-			}
-		}
-
-		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
-	}
-
-	/**
-	 * Removes a WordPress user from a Discourse group.
-	 *
-	 * @param int    $user_id The WordPress user id.
-	 * @param string $group_name The Discourse group name.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group data transient.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function remove_user_from_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$discourse_id = self::get_discourse_id( $user_id );
-		$group_id     = self::get_discourse_group_id_from_name( $group_name, $force_update );
-
-		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
-
-			return new \WP_Error( 'wpdc_groups_error', 'Cannot remove user from group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
-		}
-
-		if ( $discourse_id && $group_id ) {
-			$api_credentials = self::get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
-
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-			}
-
-			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
-
-			$response = wp_remote_post(
-				$group_url, array(
-					'method' => 'DELETE',
-					'body'   => array(
-						'user_id'      => $discourse_id,
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					),
-				)
-			);
-
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( ! empty( $response->errors ) ) {
-
-				return new \WP_Error( 'wpdc_groups_error', $response->errors );
-			} else {
-
-				return $response;
-			}
-		}
-
-		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
-	}
-
-	/**
 	 * Get the Discourse about.json route.
 	 *
 	 * @return array|mixed|object|\WP_Error
@@ -617,7 +515,21 @@ class Utilities {
 		write_log('response', $response );
 
 
-		return null;
+		return $response;
+	}
+
+	public static function add_user_to_discourse_group( $user_id, $group_names ) {
+		$user = get_user_by( 'id', $user_id );
+		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
+		$response = self::sync_sso_user( $sso_params );
+		write_log( 'add user to group response', $response );
+	}
+
+	public static function remove_user_from_discourse_group( $user_id, $group_names ) {
+		$user = get_user_by( 'id', $user_id );
+		$sso_params = self::get_sso_params( $user, array( 'remove_groups' => $group_names ) );
+		$response = self::sync_sso_user( $sso_params );
+		write_log( 'remove user from group response', $response );
 	}
 
 	/**
@@ -741,5 +653,47 @@ class Utilities {
 			'api_key'      => $api_key,
 			'api_username' => $api_username,
 		);
+	}
+
+	protected static function get_sso_params( $user, $sso_options ) {
+		$user_id = $user->ID;
+		// todo: setup the commented params here.
+//		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
+//		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
+//		$force_avatar_update = ! empty( $this->options['force-avatar-update'] );
+//		$avatar_url          = $this->get_avatar_url( $user_id );
+//
+//		if ( ! empty( $this->options['real-name-as-discourse-name'] ) ) {
+//			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+//			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+//
+//			if ( $first_name || $last_name ) {
+//				$name = trim( $first_name . ' ' . $last_name );
+//			}
+//		}
+
+		if ( empty( $name ) ) {
+			$name = $user->display_name;
+		}
+
+		$params =  array(
+			'external_id' => $user_id,
+			'username' => $user->user_login,
+			'email' => $user->user_email,
+//			'require_activation' => $require_activation ? 'true' : 'false',
+			'name' => $name,
+			'about_me' => $user->description,
+//			'avatar_url' => $avatar_url,
+//			'avatar_force_update' => $force_avatar_update ? 'true' : 'false'
+		);
+
+		if ( ! empty( $sso_options ) ) {
+			foreach( $sso_options as $option_key => $option_value ) {
+				$params[ $option_key ] = $option_value;
+			}
+
+		}
+
+		return apply_filters( 'wpdc_sso_params', $params, $user );
 	}
 }
