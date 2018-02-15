@@ -42,40 +42,22 @@ class DiscourseSSO {
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
-		add_action( 'wp_login', array( $this, 'create_discourse_user' ), 10, 2 );
+		add_action( 'wp_login', array( $this, 'sync_sso_record' ), 10, 2 );
 	}
 
 	/**
-	 * Creates a Discourse user and saves their Discourse ID on login.
+	 * Syncs a user with Discourse through the sync_sso route.
 	 *
 	 * @param string   $user_login The user's username.
 	 * @param \WP_User $user The User object.
 	 */
-	public function create_discourse_user( $user_login, $user ) {
+	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$user_id = $user->ID;
+			$params = $this->sso_params( $user );
+			$params = apply_filters( 'wpdc_sso_params', $params, $user );
 
-			// Check if the discourse_sso_user_id has been saved.
-			if ( ! get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
-
-				// Check if the user already exists on Discourse.
-				$discourse_user = DiscourseUtilities::get_discourse_user( $user_id, true );
-
-				if ( ! empty( $discourse_user->id ) ) {
-
-					update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user->id );
-
-				} else {
-					// Create the user.
-					$require_activation = ! $this->wordpress_email_verifier->is_verified( $user_id );
-					$discourse_user_id  = DiscourseUtilities::create_discourse_user( $user, $require_activation );
-					if ( ! empty( $discourse_user_id ) && ! is_wp_error( $discourse_user_id ) ) {
-
-						update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
-					}
-				}
-			}
+			DiscourseUtilities::sync_sso_user( $params );
 		}
 	}
 
@@ -194,31 +176,6 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$current_user       = wp_get_current_user();
-				$user_id            = $current_user->ID;
-				$require_activation = false;
-
-				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ) {
-					$require_activation = true;
-				}
-
-				$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
-				$force_avatar_update = ! empty( $this->options['force-avatar-update'] ) && 1 === intval( $this->options['force-avatar-update'] );
-				$avatar_url          = $this->get_avatar_url( $user_id );
-
-				if ( ! empty( $this->options['real-name-as-discourse-name'] ) && 1 === intval( $this->options['real-name-as-discourse-name'] ) ) {
-					$first_name = ! empty( $current_user->first_name ) ? $current_user->first_name : '';
-					$last_name  = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
-
-					if ( $first_name || $last_name ) {
-						$name = trim( $first_name . ' ' . $last_name );
-					}
-				}
-
-				if ( empty( $name ) ) {
-					$name = $current_user->display_name;
-				}
-
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
 				$sig     = $wp->query_vars['sig'];
@@ -236,24 +193,12 @@ class DiscourseSSO {
 				}
 
 				$nonce  = $sso->get_nonce( $payload );
-				$params = array(
-					'nonce'               => $nonce,
-					'name'                => $name,
-					'username'            => $current_user->user_login,
-					'email'               => $current_user->user_email,
-					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
-					'require_activation'  => $require_activation ? 'true' : 'false',
-					'about_me'            => $current_user->description,
-					'external_id'         => $user_id,
-					'avatar_url'          => $avatar_url,
-					'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
-				);
-
-				$params = apply_filters( 'wpdc_sso_params', $params, $current_user );
-
+				$current_user       = wp_get_current_user();
+				$params = $this->sso_params( $current_user );
+				$params['nonce'] = $nonce;
 				$q = $sso->build_login_string( $params );
 
-				do_action( 'wpdc_sso_provider_before_sso_redirect', $user_id, $current_user );
+				do_action( 'wpdc_sso_provider_before_sso_redirect', $current_user->ID, $current_user );
 				// Redirect back to Discourse.
 				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
@@ -320,6 +265,40 @@ class DiscourseSSO {
 		}
 
 		return null;
+	}
+
+	protected function sso_params( $user ) {
+		$user_id = $user->ID;
+		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
+		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
+		$force_avatar_update = ! empty( $this->options['force-avatar-update'] );
+		$avatar_url          = $this->get_avatar_url( $user_id );
+
+		if ( ! empty( $this->options['real-name-as-discourse-name'] ) ) {
+			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+
+			if ( $first_name || $last_name ) {
+				$name = trim( $first_name . ' ' . $last_name );
+			}
+		}
+
+		if ( empty( $name ) ) {
+			$name = $user->display_name;
+		}
+
+		$params =  array(
+			'external_id' => $user_id,
+			'username' => $user->user_login,
+			'email' => $user->user_email,
+			'require_activation' => $require_activation ? 'true' : 'false',
+			'name' => $name,
+			'about_me' => $user->description,
+			'avatar_url' => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false'
+		);
+
+		return apply_filters( 'wpdc_sso_params', $params, $user );
 	}
 
 	/**
