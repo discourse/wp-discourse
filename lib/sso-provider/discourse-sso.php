@@ -54,7 +54,7 @@ class DiscourseSSO {
 	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$params = $this->sso_params( $user );
+			$params = $this->get_sso_params( $user );
 			$params = apply_filters( 'wpdc_sso_params', $params, $user );
 
 			DiscourseUtilities::sync_sso_user( $params );
@@ -267,7 +267,7 @@ class DiscourseSSO {
 		return null;
 	}
 
-	protected function sso_params( $user ) {
+	protected function get_sso_params( $user ) {
 		$user_id = $user->ID;
 		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
