@@ -194,7 +194,7 @@ class DiscourseSSO {
 
 				$nonce  = $sso->get_nonce( $payload );
 				$current_user       = wp_get_current_user();
-				$params = $this->sso_params( $current_user );
+				$params = $this->get_sso_params( $current_user );
 				$params['nonce'] = $nonce;
 				$q = $sso->build_login_string( $params );
 
