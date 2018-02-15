@@ -583,6 +583,43 @@ class Utilities {
 		return $response;
 	}
 
+	public static function sync_sso_user( $sso_params ) {
+		$api_credentials = self::get_api_credentials();
+		$plugin_options = self::get_options();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$url = $api_credentials['url'] . '/admin/users/sync_sso';
+		$sso_secret = $plugin_options['sso-secret'];
+		$sso_payload = base64_encode( http_build_query( $sso_params ) );
+		// Create the signature for Discourse to match against the payload.
+		$sig      = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+
+		$response = wp_remote_post( esc_url_raw( $url ), array(
+			'body'   => array(
+				'sso' => $sso_payload,
+				'sig' => $sig,
+				'api_key' => $api_credentials['api_key'],
+				'api_username' => $api_credentials['api_username'],
+			),
+		) );
+
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'The SSO record could not be synced with Discourse.' );
+		}
+
+		$response = json_decode( wp_remote_retrieve_body( $response ) );
+
+		write_log('response', $response );
+
+
+		return null;
+	}
+
 	/**
 	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
 	 *
