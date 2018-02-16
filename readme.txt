@@ -131,6 +131,9 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 #### 1.5.7 15/02/2018
 
 - Modify add_user_to_discourse_group and remove_user_from_discourse_group functions to avoid To Many Request issues
+- Allow add_user_to_discourse_group and remove_user_from_discourse_group functions to take multiple comma separated groups (no spaces allowed between groups!)
+- Sync SSO records on every login if Create or Sync Discourse Users on Login option is enabled
+- Add Sync Logout with Discourse option to SSO Client settings
 
 #### 1.5.6 02/02/2018
 
