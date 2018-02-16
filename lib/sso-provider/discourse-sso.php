@@ -267,6 +267,13 @@ class DiscourseSSO {
 		return null;
 	}
 
+	/**
+	 * Gets the SSO parameters for a user.
+	 *
+	 * @param object $user The WordPress user.
+	 *
+	 * @return array
+	 */
 	protected function get_sso_params( $user ) {
 		$user_id = $user->ID;
 		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
