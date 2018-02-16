@@ -54,10 +54,9 @@ class DiscourseSSO {
 	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$params = $this->get_sso_params( $user );
-			$params = apply_filters( 'wpdc_sso_params', $params, $user );
+			$params = DiscourseUtilities::get_sso_params( $user );
 
-			DiscourseUtilities::sync_sso_user( $params );
+			DiscourseUtilities::sync_sso_record( $params );
 		}
 	}
 
@@ -194,7 +193,7 @@ class DiscourseSSO {
 
 				$nonce           = $sso->get_nonce( $payload );
 				$current_user    = wp_get_current_user();
-				$params          = $this->get_sso_params( $current_user );
+				$params          = DiscourseUtilities::get_sso_params( $current_user );
 				$params['nonce'] = $nonce;
 				$q               = $sso->build_login_string( $params );
 
@@ -265,47 +264,6 @@ class DiscourseSSO {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Gets the SSO parameters for a user.
-	 *
-	 * @param object $user The WordPress user.
-	 *
-	 * @return array
-	 */
-	protected function get_sso_params( $user ) {
-		$user_id             = $user->ID;
-		$require_activation  = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
-		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
-		$force_avatar_update = ! empty( $this->options['force-avatar-update'] );
-		$avatar_url          = $this->get_avatar_url( $user_id );
-
-		if ( ! empty( $this->options['real-name-as-discourse-name'] ) ) {
-			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
-			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
-
-			if ( $first_name || $last_name ) {
-				$name = trim( $first_name . ' ' . $last_name );
-			}
-		}
-
-		if ( empty( $name ) ) {
-			$name = $user->display_name;
-		}
-
-		$params = array(
-			'external_id'         => $user_id,
-			'username'            => $user->user_login,
-			'email'               => $user->user_email,
-			'require_activation'  => $require_activation ? 'true' : 'false',
-			'name'                => $name,
-			'bio'            => $user->description,
-			'avatar_url'          => $avatar_url,
-			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
-		);
-
-		return apply_filters( 'wpdc_sso_params', $params, $user );
 	}
 
 	/**
