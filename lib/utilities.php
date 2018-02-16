@@ -488,7 +488,7 @@ class Utilities {
 	 *
 	 * @return int|string|\WP_Error
 	 */
-	public static function sync_sso_user( $sso_params ) {
+	public static function sync_sso_record( $sso_params ) {
 		$plugin_options = self::get_options();
 		if ( empty( $plugin_options['enable-sso'] ) ) {
 
@@ -537,7 +537,7 @@ class Utilities {
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
 
-		return self::sync_sso_user( $sso_params );
+		return self::sync_sso_record( $sso_params );
 	}
 
 	/**
@@ -557,7 +557,7 @@ class Utilities {
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params( $user, array( 'remove_groups' => $group_names ) );
 
-		return self::sync_sso_user( $sso_params );
+		return self::sync_sso_record( $sso_params );
 	}
 
 	/**
