@@ -192,11 +192,11 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$nonce  = $sso->get_nonce( $payload );
-				$current_user       = wp_get_current_user();
-				$params = $this->get_sso_params( $current_user );
+				$nonce           = $sso->get_nonce( $payload );
+				$current_user    = wp_get_current_user();
+				$params          = $this->get_sso_params( $current_user );
 				$params['nonce'] = $nonce;
-				$q = $sso->build_login_string( $params );
+				$q               = $sso->build_login_string( $params );
 
 				do_action( 'wpdc_sso_provider_before_sso_redirect', $current_user->ID, $current_user );
 				// Redirect back to Discourse.
@@ -275,8 +275,8 @@ class DiscourseSSO {
 	 * @return array
 	 */
 	protected function get_sso_params( $user ) {
-		$user_id = $user->ID;
-		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
+		$user_id             = $user->ID;
+		$require_activation  = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
 		$force_avatar_update = ! empty( $this->options['force-avatar-update'] );
 		$avatar_url          = $this->get_avatar_url( $user_id );
@@ -294,15 +294,15 @@ class DiscourseSSO {
 			$name = $user->display_name;
 		}
 
-		$params =  array(
-			'external_id' => $user_id,
-			'username' => $user->user_login,
-			'email' => $user->user_email,
-			'require_activation' => $require_activation ? 'true' : 'false',
-			'name' => $name,
-			'about_me' => $user->description,
-			'avatar_url' => $avatar_url,
-			'avatar_force_update' => $force_avatar_update ? 'true' : 'false'
+		$params = array(
+			'external_id'         => $user_id,
+			'username'            => $user->user_login,
+			'email'               => $user->user_email,
+			'require_activation'  => $require_activation ? 'true' : 'false',
+			'name'                => $name,
+			'about_me'            => $user->description,
+			'avatar_url'          => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
 		);
 
 		return apply_filters( 'wpdc_sso_params', $params, $user );
