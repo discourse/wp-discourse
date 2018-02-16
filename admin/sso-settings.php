@@ -182,6 +182,13 @@ class SSOSettings {
 					'sso_client_sync_by_email_checkbox',
 				), 'discourse_sso_client', 'discourse_sso_client_settings_section'
 			);
+
+			add_settings_field(
+			        'discourse_sso_client_sync_logout', __( 'Sync Logout with Discourse', 'wp-discourse' ), array(
+			                $this,
+                        'sso_client_sync_logout_checkbox',
+                ), 'discourse_sso_client', 'discourse_sso_client_settings_section'
+            );
 		}
 
 		// If SSO Client is disabled, make sure that discourse_sso_client['sso-client-enabled'] is set to 0.
@@ -456,6 +463,15 @@ class SSOSettings {
 			)
 		);
 	}
+
+	/**
+	 * Outputs markup for the sso-client-sync-logout checkbox.
+	 */
+	public function sso_client_sync_logout_checkbox() {
+	    $this->form_helper->checkbox_input(
+	            'sso-client-sync-logout', 'discourse_sso_client', __( 'Logout users from Discourse when they logout on WordPress.', 'wp-discourse' )
+        );
+    }
 
 	/**
 	 * Outputs the markup for the sso_common tab details.
