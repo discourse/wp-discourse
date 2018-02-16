@@ -113,7 +113,7 @@ class SSOSettings {
 		);
 
 		add_settings_field(
-			'auto_create_sso_user', __( 'Create Discourse User on Login', 'wp-discourse' ), array(
+			'auto_create_sso_user', __( 'Create or Sync Discourse Users on Login', 'wp-discourse' ), array(
 				$this,
 				'auto_create_sso_user_checkbox',
 			), 'discourse_sso_provider', 'discourse_sso_provider_settings_section'
@@ -335,10 +335,9 @@ class SSOSettings {
 	 */
 	public function auto_create_sso_user_checkbox() {
 		$description = __(
-			"After WordPress login, if the user doesn't exist on Discourse, create a Discourse user for them through the API. (If this setting
-			is not enabled, Discourse users will be created when the user first logs into Discourse with SSO.)", 'wp-discourse'
+			"Create a Discourse user after WordPress login. Users who already exist on Discourse will have their Discourse user's data synced with their WordPress data.", 'wp-discourse'
 		);
-		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create Discourse users.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Sync user data.', 'wp-discourse' ), $description );
 	}
 
 	/**
