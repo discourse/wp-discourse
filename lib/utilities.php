@@ -517,13 +517,6 @@ class Utilities {
 			)
 		);
 
-		if ( ! self::validate( $response ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'The SSO record could not be synced with Discourse.' );
-		}
-
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
 		return wp_remote_retrieve_response_code( $response );
 	}
 
@@ -543,9 +536,8 @@ class Utilities {
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
-		$response   = self::sync_sso_user( $sso_params );
 
-		return $response;
+		return self::sync_sso_user( $sso_params );
 	}
 
 	/**
@@ -564,9 +556,8 @@ class Utilities {
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params( $user, array( 'remove_groups' => $group_names ) );
-		$response   = self::sync_sso_user( $sso_params );
 
-		return $response;
+		return self::sync_sso_user( $sso_params );
 	}
 
 	/**
