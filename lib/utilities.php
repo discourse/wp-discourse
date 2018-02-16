@@ -482,8 +482,12 @@ class Utilities {
 	}
 
 	public static function sync_sso_user( $sso_params ) {
-		$api_credentials = self::get_api_credentials();
 		$plugin_options = self::get_options();
+		if ( empty( $plugin_options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
+		}
+		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
 
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
@@ -512,24 +516,49 @@ class Utilities {
 
 		$response = json_decode( wp_remote_retrieve_body( $response ) );
 
-		write_log('response', $response );
+		return wp_remote_retrieve_response_code( $response );
+	}
 
+	/**
+	 * Adds a user to a Discourse groups.
+	 *
+	 * @param int $user_id The user's ID.
+	 * @param string $group_names A comma separated list of group names.
+	 *
+	 * @return int|string
+	 */
+	public static function add_user_to_discourse_group( $user_id, $group_names ) {
+		$options = self::get_options();
+		if ( empty( $options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
+		}
+		$user = get_user_by( 'id', $user_id );
+		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
+		$response = self::sync_sso_user( $sso_params );
 
 		return $response;
 	}
 
-	public static function add_user_to_discourse_group( $user_id, $group_names ) {
-		$user = get_user_by( 'id', $user_id );
-		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
-		$response = self::sync_sso_user( $sso_params );
-		write_log( 'add user to group response', $response );
-	}
-
+	/**
+	 * Removes a user from Discourse groups.
+	 *
+	 * @param int $user_id The user's ID.
+	 * @param string $group_names A comma separated list of group names.
+	 *
+	 * @return int|string
+	 */
 	public static function remove_user_from_discourse_group( $user_id, $group_names ) {
+		$options = self::get_options();
+		if ( empty( $options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when SSO is enabled.' );
+		}
 		$user = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params( $user, array( 'remove_groups' => $group_names ) );
 		$response = self::sync_sso_user( $sso_params );
-		write_log( 'remove user from group response', $response );
+
+		return $response;
 	}
 
 	/**
@@ -656,21 +685,26 @@ class Utilities {
 	}
 
 	protected static function get_sso_params( $user, $sso_options ) {
+		$plugin_options = self::get_options();
 		$user_id = $user->ID;
-		// todo: setup the commented params here.
-//		$require_activation = $this->wordpress_email_verifier->is_verified( $user_id ) ? false : true;
-//		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
-//		$force_avatar_update = ! empty( $this->options['force-avatar-update'] );
-//		$avatar_url          = $this->get_avatar_url( $user_id );
-//
-//		if ( ! empty( $this->options['real-name-as-discourse-name'] ) ) {
-//			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
-//			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
-//
-//			if ( $first_name || $last_name ) {
-//				$name = trim( $first_name . ' ' . $last_name );
-//			}
-//		}
+		$require_activation = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
+		$require_activation = apply_filters( 'discourse_email_verification', $require_activation, $user );
+		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
+		$avatar_url = get_avatar_url(
+			$user_id, array(
+				'default' => '404',
+			)
+		);
+		$avatar_url = apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
+
+		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
+			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+
+			if ( $first_name || $last_name ) {
+				$name = trim( $first_name . ' ' . $last_name );
+			}
+		}
 
 		if ( empty( $name ) ) {
 			$name = $user->display_name;
@@ -680,18 +714,17 @@ class Utilities {
 			'external_id' => $user_id,
 			'username' => $user->user_login,
 			'email' => $user->user_email,
-//			'require_activation' => $require_activation ? 'true' : 'false',
+			'require_activation' => $require_activation ? 'true' : 'false',
 			'name' => $name,
 			'about_me' => $user->description,
-//			'avatar_url' => $avatar_url,
-//			'avatar_force_update' => $force_avatar_update ? 'true' : 'false'
+			'avatar_url' => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false'
 		);
 
 		if ( ! empty( $sso_options ) ) {
 			foreach( $sso_options as $option_key => $option_value ) {
 				$params[ $option_key ] = $option_value;
 			}
-
 		}
 
 		return apply_filters( 'wpdc_sso_params', $params, $user );
