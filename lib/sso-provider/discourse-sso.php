@@ -216,7 +216,7 @@ class DiscourseSSO {
 	 */
 	public function logout_from_discourse() {
 		// If SSO is not enabled, don't make the request.
-		if ( empty( $this->options['enable-sso'] ) || 1 !== intval( $this->options['enable-sso'] ) ) {
+		if ( empty( $this->options['enable-sso'] ) ) {
 
 			return null;
 		}
