@@ -226,60 +226,35 @@ class DiscourseSSO {
 		$base_url     = $this->options['url'];
 		$api_key      = $this->options['api-key'];
 		$api_username = $this->options['publish-username'];
-		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
-		// user info on login to WordPress and store it in the user_metadata table.
-		$user_url = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
-		$user_url = add_query_arg(
-			array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-			), $user_url
-		);
+		$discourse_user_id = get_user_meta( $user_id,'discourse_sso_user_id', true );
 
-		$user_data = wp_remote_get( $user_url );
-		if ( ! DiscourseUtilities::validate( $user_data ) ) {
-			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
+		if ( empty( $discourse_user_id ) ) {
+			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			if ( empty( $discourse_user->id ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
+			}
+
+			$discourse_user_id = $discourse_user->id;
+			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
 		}
 
-		$user_data = json_decode( wp_remote_retrieve_body( $user_data ), true );
-		if ( ! empty( $user_data['user'] ) ) {
-			$discourse_user_id = $user_data['user']['id'];
-			if ( isset( $discourse_user_id ) ) {
-				$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
-				$logout_url      = esc_url_raw( $logout_url );
-				$logout_response = wp_remote_post(
-					$logout_url, array(
-						'method' => 'POST',
-						'body'   => array(
-							'api_key'      => $api_key,
-							'api_username' => $api_username,
-						),
-					)
-				);
-				if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
+		$logout_url      = esc_url_raw( $logout_url );
+		$logout_response = wp_remote_post(
+			$logout_url, array(
+				'method' => 'POST',
+				'body'   => array(
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+				),
+			)
+		);
+		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
 
-					return new \WP_Error( 'unable_to_log_out_user', 'There was an error in logging out the current user from Discourse.' );
-				}
-			}
+			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
 		}
 
 		return null;
-	}
-
-	/**
-	 * Make a call to the avatar_url to see if the user has an avatar there.
-	 *
-	 * @param int $user_id The user's ID.
-	 *
-	 * @return false|null|string
-	 */
-	protected function get_avatar_url( $user_id ) {
-		$avatar_url = get_avatar_url(
-			$user_id, array(
-				'default' => '404',
-			)
-		);
-
-		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}
 }
