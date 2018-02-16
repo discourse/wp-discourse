@@ -336,7 +336,7 @@ class Client {
 	 */
 	public function logout_from_discourse() {
 		// If sso-client is not enabled, don't make the request.
-		if ( empty( $this->options['sso-client-enabled'] ) ) {
+		if ( empty( $this->options['sso-client-enabled'] ) || empty( $this->options['sso-client-sync-logout'] ) ) {
 
 			return null;
 		}
