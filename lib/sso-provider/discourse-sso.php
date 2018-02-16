@@ -300,7 +300,7 @@ class DiscourseSSO {
 			'email'               => $user->user_email,
 			'require_activation'  => $require_activation ? 'true' : 'false',
 			'name'                => $name,
-			'about_me'            => $user->description,
+			'bio'            => $user->description,
 			'avatar_url'          => $avatar_url,
 			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
 		);

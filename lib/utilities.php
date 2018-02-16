@@ -691,7 +691,7 @@ class Utilities {
 	 *
 	 * @return array
 	 */
-	protected static function get_sso_params( $user, $sso_options = array() ) {
+	public static function get_sso_params( $user, $sso_options = array() ) {
 		$plugin_options      = self::get_options();
 		$user_id             = $user->ID;
 		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
@@ -723,7 +723,7 @@ class Utilities {
 			'email'               => $user->user_email,
 			'require_activation'  => $require_activation ? 'true' : 'false',
 			'name'                => $name,
-			'about_me'            => $user->description,
+			'bio'            => $user->description,
 			'avatar_url'          => $avatar_url,
 			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
 		);
