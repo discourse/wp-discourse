@@ -341,12 +341,12 @@ class Client {
 			return null;
 		}
 
-		$user         = wp_get_current_user();
-		$user_id      = $user->ID;
-		$base_url     = $this->options['url'];
-		$api_key      = $this->options['api-key'];
-		$api_username = $this->options['publish-username'];
-		$discourse_user_id = get_user_meta( $user_id,'discourse_sso_user_id', true );
+		$user              = wp_get_current_user();
+		$user_id           = $user->ID;
+		$base_url          = $this->options['url'];
+		$api_key           = $this->options['api-key'];
+		$api_username      = $this->options['publish-username'];
+		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
 			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );

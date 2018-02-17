@@ -148,7 +148,7 @@ class Discourse {
 		'sso-client-enabled'           => 0,
 		'sso-client-login-form-change' => 0,
 		'sso-client-sync-by-email'     => 0,
-		'sso-client-sync-logout' => 0,
+		'sso-client-sync-logout'       => 0,
 	);
 
 	/**
