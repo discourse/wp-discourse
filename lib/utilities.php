@@ -602,7 +602,11 @@ class Utilities {
 			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
-		$sso_params = self::get_sso_params( $user, array( 'add_groups' => $group_names ) );
+		$sso_params = self::get_sso_params(
+			$user, array(
+				'add_groups' => $group_names,
+			)
+		);
 
 		return self::sync_sso_record( $sso_params );
 	}
@@ -622,7 +626,11 @@ class Utilities {
 			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when SSO is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
-		$sso_params = self::get_sso_params( $user, array( 'remove_groups' => $group_names ) );
+		$sso_params = self::get_sso_params(
+			$user, array(
+				'remove_groups' => $group_names,
+			)
+		);
 
 		return self::sync_sso_record( $sso_params );
 	}
