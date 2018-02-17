@@ -1,7 +1,7 @@
 {
   "name": "discourse/wp-discourse",
   "type": "wordpress-plugin",
-  "license": "GPLv3",
+  "license": "GPL-3.0-only",
   "description": "WordPress plugin that allows you to use Discourse as a community engine for your WordPress blog.",
   "homepage": "https://github.com/discourse/wp-discourse",
   "authors": [
