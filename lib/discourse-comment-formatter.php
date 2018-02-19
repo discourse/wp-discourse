@@ -106,18 +106,18 @@ class DiscourseCommentFormatter {
 			if ( count( $discourse_info->posts ) > 0 ) {
 				foreach ( $discourse_info->posts as &$post ) {
 
-					$comment_html = wp_kses_post( Templates::comment_html() );
-					$comment_html = str_replace( '{discourse_url}', $discourse_url, $comment_html );
-					$comment_html = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
-					$comment_html = str_replace( '{topic_url}', $permalink, $comment_html );
-					$comment_html = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
-					$avatar_url   = TemplateFunctions::avatar( $post->avatar_template, 64 );
-					$comment_html = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
-					$user_url     = TemplateFunctions::homepage( $options['url'], $post );
-					$comment_html = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
-					$comment_html = str_replace( '{username}', esc_html( $post->username ), $comment_html );
-					$comment_html = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-					$comment_body = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
+					$comment_html   = wp_kses_post( Templates::comment_html() );
+					$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
+					$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
+					$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
+					$comment_html   = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_html );
+					$avatar_url     = TemplateFunctions::avatar( $post->avatar_template, 64 );
+					$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
+					$user_url       = TemplateFunctions::homepage( $options['url'], $post );
+					$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
+					$comment_html   = str_replace( '{username}', esc_html( $post->username ), $comment_html );
+					$comment_html   = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
+					$comment_body   = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 					$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
 					$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
 					$comment_html   = str_replace( '{comment_created_at}', mysql2date( $datetime_format, $post->created_at ), $comment_html );

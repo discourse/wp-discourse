@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.5.6
+ * Version: 1.5.7
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.5.6' );
+define( 'WPDISCOURSE_VERSION', '1.5.7' );
 
 register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
@@ -65,8 +65,8 @@ $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotificat
 new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
 $discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
 new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );
-$wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
-new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
+new WPDiscourse\DiscourseSSO\DiscourseSSO();
 new WPDiscourse\DiscourseUser\DiscourseUser();
 new WPDiscourse\DiscourseWebhookRefresh\DiscourseWebhookRefresh();
 new WPDiscourse\sso\Client();

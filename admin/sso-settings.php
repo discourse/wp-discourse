@@ -113,7 +113,7 @@ class SSOSettings {
 		);
 
 		add_settings_field(
-			'auto_create_sso_user', __( 'Create Discourse User on Login', 'wp-discourse' ), array(
+			'auto_create_sso_user', __( 'Create or Sync Discourse Users on Login', 'wp-discourse' ), array(
 				$this,
 				'auto_create_sso_user_checkbox',
 			), 'discourse_sso_provider', 'discourse_sso_provider_settings_section'
@@ -180,6 +180,13 @@ class SSOSettings {
 				'discourse_enable_sso_sync', __( 'Sync Existing Users by Email', 'wp-discourse' ), array(
 					$this,
 					'sso_client_sync_by_email_checkbox',
+				), 'discourse_sso_client', 'discourse_sso_client_settings_section'
+			);
+
+			add_settings_field(
+				'discourse_sso_client_sync_logout', __( 'Sync Logout with Discourse', 'wp-discourse' ), array(
+					$this,
+					'sso_client_sync_logout_checkbox',
 				), 'discourse_sso_client', 'discourse_sso_client_settings_section'
 			);
 		}
@@ -335,10 +342,9 @@ class SSOSettings {
 	 */
 	public function auto_create_sso_user_checkbox() {
 		$description = __(
-			"After WordPress login, if the user doesn't exist on Discourse, create a Discourse user for them through the API. (If this setting
-			is not enabled, Discourse users will be created when the user first logs into Discourse with SSO.)", 'wp-discourse'
+			"Create a Discourse user after WordPress login. Users who already exist on Discourse will have their Discourse user's data synced with their WordPress data.", 'wp-discourse'
 		);
-		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Automatically create Discourse users.', 'wp-discourse' ), $description );
+		$this->form_helper->checkbox_input( 'auto-create-sso-user', 'discourse_sso_provider', __( 'Sync user data.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -455,6 +461,15 @@ class SSOSettings {
             'Link account with Discourse' link on the user's profile page. Accounts created through the SSO login process
              are automatically synced. Note: WordPress email addresses can be changed without requiring confirmation.", 'wp-discourse'
 			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the sso-client-sync-logout checkbox.
+	 */
+	public function sso_client_sync_logout_checkbox() {
+		$this->form_helper->checkbox_input(
+			'sso-client-sync-logout', 'discourse_sso_client', __( 'Logout users from Discourse when they logout on WordPress.', 'wp-discourse' )
 		);
 	}
 

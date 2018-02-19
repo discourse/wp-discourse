@@ -2,8 +2,8 @@
 Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 4.9.2
-Stable tag: 1.5.6
+Tested up to: 4.9.4
+Stable tag: 1.5.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,13 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.5.7 15/02/2018
+
+- Modify add_user_to_discourse_group and remove_user_from_discourse_group functions to avoid To Many Request issues
+- Allow add_user_to_discourse_group and remove_user_from_discourse_group functions to take multiple comma separated groups (no spaces allowed between groups!)
+- Sync SSO records on every login if Create or Sync Discourse Users on Login option is enabled
+- Add Sync Logout with Discourse option to SSO Client settings
 
 #### 1.5.6 02/02/2018
 

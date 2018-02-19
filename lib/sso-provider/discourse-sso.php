@@ -23,59 +23,30 @@ class DiscourseSSO {
 	protected $options;
 
 	/**
-	 * An email_verifier object that has the `is_verified` and `send_verification_email` methods.
-	 *
-	 * @var object
-	 */
-	protected $wordpress_email_verifier;
-
-	/**
 	 * DiscourseSSO constructor.
-	 *
-	 * @param object $wordpress_email_verifier An object for verifying email addresses.
-	 */
-	public function __construct( $wordpress_email_verifier ) {
-		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
+	 */
+	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );
 		add_action( 'parse_query', array( $this, 'sso_parse_request' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
-		add_action( 'wp_login', array( $this, 'create_discourse_user' ), 10, 2 );
+		add_action( 'wp_login', array( $this, 'sync_sso_record' ), 10, 2 );
 	}
 
 	/**
-	 * Creates a Discourse user and saves their Discourse ID on login.
+	 * Syncs a user with Discourse through the sync_sso route.
 	 *
 	 * @param string   $user_login The user's username.
 	 * @param \WP_User $user The User object.
 	 */
-	public function create_discourse_user( $user_login, $user ) {
+	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$user_id = $user->ID;
+			$params = DiscourseUtilities::get_sso_params( $user );
 
-			// Check if the discourse_sso_user_id has been saved.
-			if ( ! get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
-
-				// Check if the user already exists on Discourse.
-				$discourse_user = DiscourseUtilities::get_discourse_user( $user_id, true );
-
-				if ( ! empty( $discourse_user->id ) ) {
-
-					update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user->id );
-
-				} else {
-					// Create the user.
-					$require_activation = ! $this->wordpress_email_verifier->is_verified( $user_id );
-					$discourse_user_id  = DiscourseUtilities::create_discourse_user( $user, $require_activation );
-					if ( ! empty( $discourse_user_id ) && ! is_wp_error( $discourse_user_id ) ) {
-
-						update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
-					}
-				}
-			}
+			DiscourseUtilities::sync_sso_record( $params );
 		}
 	}
 
@@ -194,31 +165,6 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$current_user       = wp_get_current_user();
-				$user_id            = $current_user->ID;
-				$require_activation = false;
-
-				if ( ! $this->wordpress_email_verifier->is_verified( $user_id ) ) {
-					$require_activation = true;
-				}
-
-				$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user_id );
-				$force_avatar_update = ! empty( $this->options['force-avatar-update'] ) && 1 === intval( $this->options['force-avatar-update'] );
-				$avatar_url          = $this->get_avatar_url( $user_id );
-
-				if ( ! empty( $this->options['real-name-as-discourse-name'] ) && 1 === intval( $this->options['real-name-as-discourse-name'] ) ) {
-					$first_name = ! empty( $current_user->first_name ) ? $current_user->first_name : '';
-					$last_name  = ! empty( $current_user->last_name ) ? $current_user->last_name : '';
-
-					if ( $first_name || $last_name ) {
-						$name = trim( $first_name . ' ' . $last_name );
-					}
-				}
-
-				if ( empty( $name ) ) {
-					$name = $current_user->display_name;
-				}
-
 				// Payload and signature.
 				$payload = $wp->query_vars['sso'];
 				$sig     = $wp->query_vars['sig'];
@@ -235,25 +181,13 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$nonce  = $sso->get_nonce( $payload );
-				$params = array(
-					'nonce'               => $nonce,
-					'name'                => $name,
-					'username'            => $current_user->user_login,
-					'email'               => $current_user->user_email,
-					// 'true' and 'false' are strings so that they are not converted to 1 and 0 by `http_build_query`.
-					'require_activation'  => $require_activation ? 'true' : 'false',
-					'about_me'            => $current_user->description,
-					'external_id'         => $user_id,
-					'avatar_url'          => $avatar_url,
-					'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
-				);
+				$nonce           = $sso->get_nonce( $payload );
+				$current_user    = wp_get_current_user();
+				$params          = DiscourseUtilities::get_sso_params( $current_user );
+				$params['nonce'] = $nonce;
+				$q               = $sso->build_login_string( $params );
 
-				$params = apply_filters( 'wpdc_sso_params', $params, $current_user );
-
-				$q = $sso->build_login_string( $params );
-
-				do_action( 'wpdc_sso_provider_before_sso_redirect', $user_id, $current_user );
+				do_action( 'wpdc_sso_provider_before_sso_redirect', $current_user->ID, $current_user );
 				// Redirect back to Discourse.
 				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
 
@@ -272,70 +206,45 @@ class DiscourseSSO {
 	 */
 	public function logout_from_discourse() {
 		// If SSO is not enabled, don't make the request.
-		if ( empty( $this->options['enable-sso'] ) || 1 !== intval( $this->options['enable-sso'] ) ) {
+		if ( empty( $this->options['enable-sso'] ) ) {
 
 			return null;
 		}
 
-		$user         = wp_get_current_user();
-		$user_id      = $user->ID;
-		$base_url     = $this->options['url'];
-		$api_key      = $this->options['api-key'];
-		$api_username = $this->options['publish-username'];
-		// This section is to retrieve the Discourse user_id. It would also be possible to retrieve Discourse
-		// user info on login to WordPress and store it in the user_metadata table.
-		$user_url = esc_url_raw( $base_url . "/users/by-external/$user_id.json" );
-		$user_url = add_query_arg(
-			array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-			), $user_url
-		);
+		$user              = wp_get_current_user();
+		$user_id           = $user->ID;
+		$base_url          = $this->options['url'];
+		$api_key           = $this->options['api-key'];
+		$api_username      = $this->options['publish-username'];
+		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
-		$user_data = wp_remote_get( $user_url );
-		if ( ! DiscourseUtilities::validate( $user_data ) ) {
-			return new \WP_Error( 'unable_to_retrieve_user_data', 'There was an error in retrieving the current user data from Discourse.' );
+		if ( empty( $discourse_user_id ) ) {
+			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			if ( empty( $discourse_user->id ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
+			}
+
+			$discourse_user_id = $discourse_user->id;
+			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
 		}
 
-		$user_data = json_decode( wp_remote_retrieve_body( $user_data ), true );
-		if ( ! empty( $user_data['user'] ) ) {
-			$discourse_user_id = $user_data['user']['id'];
-			if ( isset( $discourse_user_id ) ) {
-				$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
-				$logout_url      = esc_url_raw( $logout_url );
-				$logout_response = wp_remote_post(
-					$logout_url, array(
-						'method' => 'POST',
-						'body'   => array(
-							'api_key'      => $api_key,
-							'api_username' => $api_username,
-						),
-					)
-				);
-				if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
+		$logout_url      = esc_url_raw( $logout_url );
+		$logout_response = wp_remote_post(
+			$logout_url, array(
+				'method' => 'POST',
+				'body'   => array(
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+				),
+			)
+		);
+		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
 
-					return new \WP_Error( 'unable_to_log_out_user', 'There was an error in logging out the current user from Discourse.' );
-				}
-			}
+			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
 		}
 
 		return null;
-	}
-
-	/**
-	 * Make a call to the avatar_url to see if the user has an avatar there.
-	 *
-	 * @param int $user_id The user's ID.
-	 *
-	 * @return false|null|string
-	 */
-	protected function get_avatar_url( $user_id ) {
-		$avatar_url = get_avatar_url(
-			$user_id, array(
-				'default' => '404',
-			)
-		);
-
-		return apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
 	}
 }

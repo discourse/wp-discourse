@@ -35,6 +35,7 @@ class Client {
 	public function __construct() {
 		add_action( 'init', array( $this, 'parse_request' ), 5 );
 		add_filter( 'wp_login_errors', array( $this, 'handle_login_errors' ) );
+		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 	}
 
 	/**
@@ -323,5 +324,57 @@ class Client {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Log the current user out of Discourse before logging them out of WordPress.
+	 *
+	 * This function hooks into the 'clear_auth_cookie' action. It is the last action hook before logout
+	 * where it is possible to access the user_id.
+	 *
+	 * @return \WP_Error
+	 */
+	public function logout_from_discourse() {
+		// If sso-client is not enabled, don't make the request.
+		if ( empty( $this->options['sso-client-enabled'] ) || empty( $this->options['sso-client-sync-logout'] ) ) {
+
+			return null;
+		}
+
+		$user              = wp_get_current_user();
+		$user_id           = $user->ID;
+		$base_url          = $this->options['url'];
+		$api_key           = $this->options['api-key'];
+		$api_username      = $this->options['publish-username'];
+		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
+
+		if ( empty( $discourse_user_id ) ) {
+			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			if ( empty( $discourse_user->id ) ) {
+
+				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
+			}
+
+			$discourse_user_id = $discourse_user->id;
+			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
+		}
+
+		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
+		$logout_url      = esc_url_raw( $logout_url );
+		$logout_response = wp_remote_post(
+			$logout_url, array(
+				'method' => 'POST',
+				'body'   => array(
+					'api_key'      => $api_key,
+					'api_username' => $api_username,
+				),
+			)
+		);
+		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
+		}
+
+		return null;
 	}
 }

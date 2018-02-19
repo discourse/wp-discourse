@@ -450,108 +450,6 @@ class Utilities {
 	}
 
 	/**
-	 * Adds a WordPress user to a Discourse group.
-	 *
-	 * @param int    $user_id The user id.
-	 * @param string $group_name The Discourse group to add the user to.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group transient.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function add_user_to_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$discourse_id = self::get_discourse_id( $user_id );
-		$group_id     = self::get_discourse_group_id_from_name( $group_name, $force_update );
-
-		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
-
-			return new \WP_Error( 'wpdc_groups_error', 'Cannot add user to group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
-		}
-
-		if ( $discourse_id && $group_id ) {
-			$api_credentials = self::get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
-
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-			}
-
-			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
-
-			$response = wp_remote_post(
-				$group_url, array(
-					'method' => 'PUT',
-					'body'   => array(
-						'user_ids'     => $discourse_id,
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					),
-				)
-			);
-
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( ! empty( $response->errors ) ) {
-
-				return new \WP_Error( 'wpdc_groups_error', $response->errors );
-			} else {
-
-				return $response;
-			}
-		}
-
-		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
-	}
-
-	/**
-	 * Removes a WordPress user from a Discourse group.
-	 *
-	 * @param int    $user_id The WordPress user id.
-	 * @param string $group_name The Discourse group name.
-	 * @param bool   $force_update Whether or not to force an update of the Discourse group data transient.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function remove_user_from_discourse_group( $user_id, $group_name, $force_update = false ) {
-		$discourse_id = self::get_discourse_id( $user_id );
-		$group_id     = self::get_discourse_group_id_from_name( $group_name, $force_update );
-
-		if ( is_wp_error( $discourse_id ) || is_wp_error( $group_id ) ) {
-
-			return new \WP_Error( 'wpdc_groups_error', 'Cannot remove user from group. An error was returned when retrieving either the discourse_id or discourse_group_id.' );
-		}
-
-		if ( $discourse_id && $group_id ) {
-			$api_credentials = self::get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
-
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-			}
-
-			$group_url = esc_url_raw( "{$api_credentials['url']}/admin/groups/{$group_id}/members.json" );
-
-			$response = wp_remote_post(
-				$group_url, array(
-					'method' => 'DELETE',
-					'body'   => array(
-						'user_id'      => $discourse_id,
-						'api_key'      => $api_credentials['api_key'],
-						'api_username' => $api_credentials['api_username'],
-					),
-				)
-			);
-
-			$response = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( ! empty( $response->errors ) ) {
-
-				return new \WP_Error( 'wpdc_groups_error', $response->errors );
-			} else {
-
-				return $response;
-			}
-		}
-
-		return new \WP_Error( 'wpdc_groups_error', 'The user could not be added to the group.' );
-	}
-
-	/**
 	 * Get the Discourse about.json route.
 	 *
 	 * @return array|mixed|object|\WP_Error
@@ -581,6 +479,160 @@ class Utilities {
 		$response = json_decode( wp_remote_retrieve_body( $response ) );
 
 		return $response;
+	}
+
+	/**
+	 * Gets the SSO parametrs for a user.
+	 *
+	 * @param object $user The WordPress user.
+	 * @param array  $sso_options An optional array of extra SSO parameters.
+	 *
+	 * @return array
+	 */
+	public static function get_sso_params( $user, $sso_options = array() ) {
+		$plugin_options      = self::get_options();
+		$user_id             = $user->ID;
+		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
+		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
+		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
+		$avatar_url          = get_avatar_url(
+			$user_id, array(
+				'default' => '404',
+			)
+		);
+		$avatar_url          = apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
+
+		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
+			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+
+			if ( $first_name || $last_name ) {
+				$name = trim( $first_name . ' ' . $last_name );
+			}
+		}
+
+		if ( empty( $name ) ) {
+			$name = $user->display_name;
+		}
+
+		$params = array(
+			'external_id'         => $user_id,
+			'username'            => $user->user_login,
+			'email'               => $user->user_email,
+			'require_activation'  => $require_activation ? 'true' : 'false',
+			'name'                => $name,
+			'bio'                 => $user->description,
+			'avatar_url'          => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
+		);
+
+		if ( ! empty( $sso_options ) ) {
+			foreach ( $sso_options as $option_key => $option_value ) {
+				$params[ $option_key ] = $option_value;
+			}
+		}
+
+		return apply_filters( 'wpdc_sso_params', $params, $user );
+	}
+
+	/**
+	 * Syncs a user with Discourse through SSO.
+	 *
+	 * @param array $sso_params The sso params to sync.
+	 *
+	 * @return int|string|\WP_Error
+	 */
+	public static function sync_sso_record( $sso_params ) {
+		$plugin_options = self::get_options();
+		if ( empty( $plugin_options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
+		}
+		$api_credentials = self::get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$url         = $api_credentials['url'] . '/admin/users/sync_sso';
+		$sso_secret  = $plugin_options['sso-secret'];
+		$sso_payload = base64_encode( http_build_query( $sso_params ) );
+		// Create the signature for Discourse to match against the payload.
+		$sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+
+		$response = wp_remote_post(
+			esc_url_raw( $url ), array(
+				'body' => array(
+					'sso'          => $sso_payload,
+					'sig'          => $sig,
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
+				),
+			)
+		);
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'An error was returned from Discourse while trying to sync the sso record.' );
+		}
+
+		$discourse_user = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( ! empty( $discourse_user->id ) ) {
+			$wordpress_user_id = $sso_params['external_id'];
+			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', $discourse_user->id );
+			update_user_meta( $wordpress_user_id, 'discourse_username', $discourse_user->username );
+		}
+
+		return wp_remote_retrieve_response_code( $response );
+	}
+
+	/**
+	 * Adds a user to a Discourse groups.
+	 *
+	 * @param int    $user_id The user's ID.
+	 * @param string $group_names A comma separated list of group names.
+	 *
+	 * @return int|string
+	 */
+	public static function add_user_to_discourse_group( $user_id, $group_names ) {
+		$options = self::get_options();
+		if ( empty( $options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
+		}
+		$user       = get_user_by( 'id', $user_id );
+		$sso_params = self::get_sso_params(
+			$user, array(
+				'add_groups' => $group_names,
+			)
+		);
+
+		return self::sync_sso_record( $sso_params );
+	}
+
+	/**
+	 * Removes a user from Discourse groups.
+	 *
+	 * @param int    $user_id The user's ID.
+	 * @param string $group_names A comma separated list of group names.
+	 *
+	 * @return int|string
+	 */
+	public static function remove_user_from_discourse_group( $user_id, $group_names ) {
+		$options = self::get_options();
+		if ( empty( $options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when SSO is enabled.' );
+		}
+		$user       = get_user_by( 'id', $user_id );
+		$sso_params = self::get_sso_params(
+			$user, array(
+				'remove_groups' => $group_names,
+			)
+		);
+
+		return self::sync_sso_record( $sso_params );
 	}
 
 	/**
