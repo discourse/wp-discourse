@@ -24,7 +24,6 @@ class DiscourseSSO {
 
 	/**
 	 * DiscourseSSO constructor.
-
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
