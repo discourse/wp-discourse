@@ -23,20 +23,10 @@ class DiscourseSSO {
 	protected $options;
 
 	/**
-	 * An email_verifier object that has the `is_verified` and `send_verification_email` methods.
-	 *
-	 * @var object
-	 */
-	protected $wordpress_email_verifier;
-
-	/**
 	 * DiscourseSSO constructor.
-	 *
-	 * @param object $wordpress_email_verifier An object for verifying email addresses.
-	 */
-	public function __construct( $wordpress_email_verifier ) {
-		$this->wordpress_email_verifier = $wordpress_email_verifier;
 
+	 */
+	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
 		add_filter( 'login_url', array( $this, 'set_login_url' ), 10, 2 );

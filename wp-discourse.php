@@ -65,8 +65,8 @@ $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotificat
 new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
 $discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
 new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );
-$wordpress_email_verifier = new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
-new WPDiscourse\DiscourseSSO\DiscourseSSO( $wordpress_email_verifier );
+new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
+new WPDiscourse\DiscourseSSO\DiscourseSSO();
 new WPDiscourse\DiscourseUser\DiscourseUser();
 new WPDiscourse\DiscourseWebhookRefresh\DiscourseWebhookRefresh();
 new WPDiscourse\sso\Client();
