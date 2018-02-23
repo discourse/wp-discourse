@@ -7,13 +7,13 @@
 
 namespace WPDiscourse\sso;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 use \WPDiscourse\Nonce;
 
 /**
  * Class QueryRedirect
  */
 class QueryRedirect {
+	use \WPDiscourse\Shared\PluginOptions;
 
 	/**
 	 * Gives access to the plugin options.
@@ -36,7 +36,7 @@ class QueryRedirect {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**

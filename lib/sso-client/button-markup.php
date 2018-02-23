@@ -5,7 +5,8 @@
  * @package WPDiscourse
  */
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use \WPDiscourse\Shared\PluginOptions;
+use \WPDiscourse\Shared\PluginUtilities as DiscourseUtilities;
 
 /**
  * Generates the markup for SSO link
@@ -17,7 +18,7 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @return string
  */
 function get_discourse_sso_link_markup( $options = array() ) {
-	$discourse_options = DiscourseUtilities::get_options();
+	$discourse_options = $this->get_options();
 	$is_user_logged_in = is_user_logged_in();
 
 	if ( $is_user_logged_in ) {

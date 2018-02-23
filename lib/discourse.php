@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Discourse;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+//use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class Discourse
  */
 class Discourse {
+	use \WPDiscourse\Shared\PluginOptions;
 
 	/**
 	 * Gives access to the plugin options.
@@ -181,7 +182,7 @@ class Discourse {
 	 */
 	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		// Set the Discourse domain name option.
 		$discourse_url = ! empty( $this->options['url'] ) ? $this->options['url'] : null;

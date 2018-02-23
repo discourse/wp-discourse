@@ -5,8 +5,6 @@
  * @package WPDiscourse
  */
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
-
 /**
  * Shortcode for SSO link
  *

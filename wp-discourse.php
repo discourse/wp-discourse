@@ -38,6 +38,7 @@ define( 'WPDISCOURSE_VERSION', '1.5.7' );
 
 register_activation_hook( __FILE__, 'wpdc_check_requirements' );
 
+require_once __DIR__ . '/lib/plugin-options.php';
 require_once __DIR__ . '/lib/discourse.php';
 require_once __DIR__ . '/lib/discourse-comment.php';
 require_once __DIR__ . '/lib/discourse-publish.php';

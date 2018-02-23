@@ -7,12 +7,46 @@
 
 namespace WPDiscourse\sso;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use \WPDiscourse\Shared\Utilities as DiscourseUtilities;
 
 /**
  * Class Client
  */
 class Client {
+	use \WPDiscourse\Shared\PluginOptions;
+
+	/**
+	 * Returns a single array of options from a given array of arrays.
+	 *
+	 * @return array
+	 */
+	public static function get_options() {
+		static $options = array();
+
+		if ( empty( $options ) ) {
+			$discourse_option_groups = get_option( 'discourse_option_groups' );
+			if ( $discourse_option_groups ) {
+				foreach ( $discourse_option_groups as $option_name ) {
+					if ( get_option( $option_name ) ) {
+						$option  = get_option( $option_name );
+						$options = array_merge( $options, $option );
+					}
+				}
+
+				$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
+				if ( 1 === intval( $multisite_configuration_enabled ) ) {
+					$site_options = get_site_option( 'wpdc_site_options' );
+					foreach ( $site_options as $key => $value ) {
+						$options[ $key ] = $value;
+					}
+				}
+			}
+		}
+
+		return apply_filters( 'wpdc_utilities_options_array', $options );
+	}
+
+
 
 	/**
 	 * Gives access to the plugin options.
@@ -42,7 +76,7 @@ class Client {
 	 * Parse Request Hook
 	 */
 	public function parse_request() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
 			 empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.

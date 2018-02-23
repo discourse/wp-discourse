@@ -5,7 +5,8 @@
  * @package WPDiscourse\DiscourseSSO
  */
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use \WPDiscourse\Shared\PluginUtilities as DiscourseUtilities;
+use \WPDiscourse\Shared\PluginOptions;
 
 /**
  * Decides if checkbox for login form alteration are enabled
@@ -13,7 +14,7 @@ use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @return boolean
  */
 function discourse_sso_auto_inject_button() {
-	$options = DiscourseUtilities::get_options();
+	$options = $this->get_options();
 	return ! empty( $options['sso-client-enabled'] ) && ! empty( $options['sso-client-login-form-change'] );
 }
 
@@ -38,7 +39,7 @@ add_action( 'login_form', 'discourse_sso_alter_login_form' );
  */
 function discourse_sso_alter_user_profile() {
 	$auto_inject_button = discourse_sso_auto_inject_button();
-	$options            = DiscourseUtilities::get_options();
+	$options            = $this->get_options();
 	$link_text          = ! empty( $options['link-to-discourse-text'] ) ? $options['link-to-discourse-text'] : '';
 	$linked_text        = ! empty( $options['linked-to-discourse-text'] ) ? $options['linked-to-discourse-text'] : '';
 
