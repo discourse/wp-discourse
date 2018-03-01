@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class MetaBox
  */
 class MetaBox {
+    use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -44,7 +45,7 @@ class MetaBox {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -80,7 +81,7 @@ class MetaBox {
 							   'draft' === get_post_status( $post_id ) ||
 							   'private' === get_post_status( $post_id ) ||
 							   'pending' === get_post_status( $post_id );
-		$categories          = DiscourseUtilities::get_discourse_categories();
+		$categories          = $this->get_discourse_categories();
 		$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
 
@@ -249,7 +250,7 @@ class MetaBox {
 	 * Outputs the Update Discourse Topic checkbox.
 	 *
 	 * @param string $text The label text.
-	 * @param int    $update_discourse_topic Whether or not the checkbox should be checked.
+	 * @param bool    $update_discourse_topic Whether or not the checkbox should be checked.
 	 */
 	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic = false ) {
 		?>
@@ -289,7 +290,7 @@ class MetaBox {
 
 			return new \WP_Error( 'wpdc_configuration_error', 'An invalid topic URL was supplied when attempting to link post to Discourse topic.' );
 		}
-		$topic = DiscourseUtilities::get_discourse_topic( $topic_url );
+		$topic = $this->get_discourse_topic( $topic_url );
 
 		// Check for the topic->post_stream here just to make sure it's a valid topic.
 		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) ) {
@@ -349,7 +350,7 @@ class MetaBox {
 	 * @return string|\WP_Error
 	 */
 	protected function get_discourse_category_name( $category_id ) {
-		$categories = DiscourseUtilities::get_discourse_categories();
+		$categories = $this->get_discourse_categories();
 		if ( ! is_wp_error( $categories ) ) {
 			foreach ( $categories as $category ) {
 				if ( $category_id === $category['id'] ) {

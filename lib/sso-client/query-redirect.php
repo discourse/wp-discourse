@@ -5,15 +5,15 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\sso;
+namespace WPDiscourse\SSOClient;
 
-use \WPDiscourse\Nonce;
+use \WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class QueryRedirect
  */
 class QueryRedirect {
-	use \WPDiscourse\Shared\PluginOptions;
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.

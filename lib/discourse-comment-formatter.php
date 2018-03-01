@@ -7,14 +7,15 @@
 
 namespace WPDiscourse\DiscourseCommentFormatter;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Templates\TemplateFunctions as TemplateFunctions;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscourseCommentFormatter
  */
 class DiscourseCommentFormatter {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -35,7 +36,7 @@ class DiscourseCommentFormatter {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -54,7 +55,8 @@ class DiscourseCommentFormatter {
 			return wp_kses_post( Templates::bad_response_html() );
 
 		} else {
-			$options                = DiscourseUtilities::get_options();
+			// Getting $options here is unnecessary and is_enable_sso is a weird variable name.
+			$options                = $this->get_options();
 			$is_enable_sso          = ( isset( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) );
 			$redirect_without_login = isset( $options['redirect-without-login'] ) && 1 === intval( $options['redirect-without-login'] );
 			$permalink              = (string) $custom['discourse_permalink'][0];

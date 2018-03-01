@@ -5,48 +5,12 @@
  * @package WPDiscourse\sso
  */
 
-namespace WPDiscourse\sso;
-
-use \WPDiscourse\Shared\Utilities as DiscourseUtilities;
+namespace WPDiscourse\SSOClient;
 
 /**
  * Class Client
  */
-class Client {
-	use \WPDiscourse\Shared\PluginOptions;
-
-	/**
-	 * Returns a single array of options from a given array of arrays.
-	 *
-	 * @return array
-	 */
-	public static function get_options() {
-		static $options = array();
-
-		if ( empty( $options ) ) {
-			$discourse_option_groups = get_option( 'discourse_option_groups' );
-			if ( $discourse_option_groups ) {
-				foreach ( $discourse_option_groups as $option_name ) {
-					if ( get_option( $option_name ) ) {
-						$option  = get_option( $option_name );
-						$options = array_merge( $options, $option );
-					}
-				}
-
-				$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
-				if ( 1 === intval( $multisite_configuration_enabled ) ) {
-					$site_options = get_site_option( 'wpdc_site_options' );
-					foreach ( $site_options as $key => $value ) {
-						$options[ $key ] = $value;
-					}
-				}
-			}
-		}
-
-		return apply_filters( 'wpdc_utilities_options_array', $options );
-	}
-
-
+class Client extends SSOClientBase {
 
 	/**
 	 * Gives access to the plugin options.
@@ -70,6 +34,65 @@ class Client {
 		add_action( 'init', array( $this, 'parse_request' ), 5 );
 		add_filter( 'wp_login_errors', array( $this, 'handle_login_errors' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
+		add_action( 'login_form', array( $this, 'discourse_sso_alter_login_form' ) );
+		add_action( 'show_user_profile', array( $this, 'discourse_sso_alter_user_profile' ) );
+	}
+
+	/**
+	 * Decides if checkbox for login form alteration are enabled
+	 *
+	 * @return boolean
+	 */
+	protected function discourse_sso_auto_inject_button() {
+		return ! empty( $this->options['sso-client-enabled'] ) && ! empty( $this->options['sso-client-login-form-change'] );
+	}
+
+	/**
+	 * Alter the login form
+	 */
+	function discourse_sso_alter_login_form() {
+		if ( ! $this->discourse_sso_auto_inject_button() ) {
+
+			return null;
+		}
+
+		printf( '<p>%s</p><p>&nbsp;</p>', wp_kses_data( $this->get_discourse_sso_link_markup() ) );
+
+		do_action( 'wpdc_sso_client_after_login_link' );
+	}
+
+	/**
+	 * Alter user profile
+	 */
+	function discourse_sso_alter_user_profile() {
+		$auto_inject_button = $this->discourse_sso_auto_inject_button();
+		$link_text   = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
+		$linked_text = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
+		$user        = wp_get_current_user();
+
+		if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
+
+			return null;
+		}
+
+		?>
+		<table class="form-table">
+			<tr>
+				<th><?php echo wp_kses_post( $link_text ); ?></th>
+				<td>
+					<?php
+					if ( $user && get_user_meta( $user->ID, 'discourse_sso_user_id', true ) ) {
+
+						echo wp_kses_post( $linked_text );
+					} else {
+
+						echo wp_kses_data( $this->get_discourse_sso_link_markup() );
+					}
+					?>
+				</td>
+			</tr>
+		</table>
+		<?php
 	}
 
 	/**
@@ -96,9 +119,9 @@ class Client {
 			return;
 		}
 
-		$update_user = $this->update_user( $user_id );
-		if ( is_wp_error( $update_user ) ) {
-			$this->handle_errors( $update_user );
+		$updated_user = $this->update_user( $user_id );
+		if ( is_wp_error( $updated_user ) ) {
+			$this->handle_errors( $updated_user );
 
 			return;
 		}
@@ -111,11 +134,11 @@ class Client {
 	 *
 	 * @param  int $user_id the user ID.
 	 *
-	 * @return int|WP_Error integer if the update was successful, WP_Error otherwise.
+	 * @return int|\WP_Error integer if the update was successful, WP_Error otherwise.
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
-		$nonce = \WPDiscourse\Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
+		$nonce = Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
 
 		if ( ! $nonce ) {
 			return new \WP_Error( 'expired_nonce' );
@@ -155,7 +178,7 @@ class Client {
 	/**
 	 * Handle Login errors
 	 *
-	 * @param  WP_Error $error WP_Error object.
+	 * @param  \WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_failed_login', wp_login_url() );
@@ -170,9 +193,9 @@ class Client {
 	/**
 	 * Add errors on the login form.
 	 *
-	 * @param  WP_Error $errors the WP_Error object.
+	 * @param  \WP_Error $errors the WP_Error object.
 	 *
-	 * @return WP_Error updated errors.
+	 * @return \WP_Error updated errors.
 	 */
 	public function handle_login_errors( $errors ) {
 		if ( isset( $_GET['discourse_sso_error'] ) ) { // Input var okay.
@@ -244,7 +267,7 @@ class Client {
 	/**
 	 * Get user id or create an user
 	 *
-	 * @return int      user id
+	 * @return int|\WP_Error
 	 */
 	private function get_user_id() {
 		if ( is_user_logged_in() ) {
@@ -326,9 +349,9 @@ class Client {
 	/**
 	 * Parse SSO Response
 	 *
-	 * @param string $return_key ss.
+	 * @param string $return_key The key to return.
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	private function get_sso_response( $return_key = '' ) {
 		if ( empty( $_GET['sso'] ) ) { // Input var okay.
@@ -383,7 +406,7 @@ class Client {
 		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
-			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			$discourse_user = $this->get_discourse_user( $user_id );
 			if ( empty( $discourse_user->id ) ) {
 
 				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
@@ -404,7 +427,8 @@ class Client {
 				),
 			)
 		);
-		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+
+		if ( ! $this->validate( $logout_response ) ) {
 
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
 		}

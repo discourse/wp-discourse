@@ -11,7 +11,7 @@
 
 namespace WPDiscourse\Templates;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+//use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 
 /**
  * Class HTMLTemplates
@@ -26,9 +26,9 @@ class HTMLTemplates {
 	 * @return void
 	 */
 	protected static function get_text_options( $option ) {
-		$options = DiscourseUtilities::get_options();
+		$text_options = get_option( 'discourse_configurable_text' );
 
-		echo esc_html( $options[ $option ] );
+		echo esc_html( $text_options[ $option ] );
 	}
 
 	/**
@@ -37,7 +37,8 @@ class HTMLTemplates {
 	 * @return void
 	 */
 	protected static function target() {
-		if ( ! empty( DiscourseUtilities::get_options()['discourse-new-tab'] ) ) {
+	    $comment_options = get_option( 'discourse_comment' );
+		if ( ! empty( $comment_options['discourse-new-tab'] ) ) {
 			echo 'target="_blank"';
 		}
 	}

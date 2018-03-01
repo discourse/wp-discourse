@@ -7,12 +7,12 @@
 
 namespace WPDiscourse\DiscourseWebhookRefresh;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseWebhookRefresh
  */
-class DiscourseWebhookRefresh {
+class DiscourseWebhookRefresh extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.
@@ -43,7 +43,7 @@ class DiscourseWebhookRefresh {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -70,7 +70,7 @@ class DiscourseWebhookRefresh {
 	 * @return null|\WP_Error
 	 */
 	public function update_topic_content( $data ) {
-		$data = DiscourseUtilities::verify_discourse_webhook_request( $data );
+		$data = $this->verify_discourse_webhook_request( $data );
 
 		if ( is_wp_error( $data ) ) {
 
@@ -157,7 +157,7 @@ class DiscourseWebhookRefresh {
 
 		if ( $topic_id && $post_number && $post_title ) {
 
-			$post_ids = DiscourseUtilities::get_post_ids_from_topic_id( $topic_id );
+			$post_ids = $this->get_post_ids_from_topic_id( $topic_id );
 
 			// For matching posts that were published before the plugin was saving the discourse_topic_id as post_metadata.
 			if ( ! $post_ids && ! empty( $this->options['webhook-match-old-topics'] ) ) {
@@ -215,5 +215,31 @@ class DiscourseWebhookRefresh {
 		do_action( 'wpdc_webhook_after_get_page_by_title', $title );
 
 		return $id;
+	}
+
+	/**
+	 * Tries to find a WordPress posts that are associated with a Discourse topic_id.
+	 *
+	 * An array is being returned because it's possible for more than one WordPress post to be associated with a Discourse topic.
+	 *
+	 * @param int $topic_id The topic_id to lookup.
+	 *
+	 * @return array|null
+	 */
+	protected function get_post_ids_from_topic_id( $topic_id ) {
+		global $wpdb;
+
+		$topic_posts = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
+
+		if ( ! empty( $topic_posts ) ) {
+			$topic_post_ids = [];
+			foreach ( $topic_posts as $topic_post ) {
+				$topic_post_ids[] = $topic_post->post_id;
+			}
+
+			return $topic_post_ids;
+		}
+
+		return null;
 	}
 }

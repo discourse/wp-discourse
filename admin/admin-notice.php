@@ -7,13 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class AdminNotice
  */
 class AdminNotice {
-
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -35,7 +35,7 @@ class AdminNotice {
 	 * Sets the plugin options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -112,32 +112,5 @@ class AdminNotice {
 				}
 			}// End if().
 		}// End if().
-
-		// All admin screen notices.
-		if ( is_multisite() && is_main_site() && 'display' === get_option( 'wpdc_141_update_notice' ) ) {
-			$options_moved_notice = __(
-				'<div class="notice notice-warning is-dismissible"><p>As of WP Discourse version 1.4.1, the WP Discourse
-network options have been moved to the Network Admin Dashboard.</p></div>', 'wp-discourse'
-			);
-
-			update_option( 'wpdc_141_update_notice', 'displayed' );
-
-			echo wp_kses_post( $options_moved_notice );
-		}
-
-		// Setting changed notices.
-		$settings_change_notice_seen = get_option( 'wpdc_settings_update_notice_150' );
-		if ( ! empty( $this->options['auto-create-sso-user'] ) && ! $settings_change_notice_seen ) {
-			add_option( 'wpdc_settings_update_notice_150', 1 );
-
-			$settings_changed_notice = __(
-				'<div class="notice notice-warning is-dismissible"><p>As of WP Discourse version 1.5.0, the <strong>Create Discourse User On
-Login</strong> option no longer logs the user into Discourse. If you would like users to be able to login to your forum directly from a
-page on your site, you will need to create an SSO login link with its <code>src</code> in this form: <code>http://community.example.com/session/sso?return_path=/</code>
-with <code>return_path</code> set to the Discourse route you would like users to end up on.</p></div>'
-			);
-
-			echo wp_kses_post( $settings_changed_notice );
-		}
 	}
 }

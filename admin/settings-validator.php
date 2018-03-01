@@ -8,7 +8,7 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class SettingsValidator
@@ -16,6 +16,7 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @package WPDiscourse\Validator
  */
 class SettingsValidator {
+	use PluginUtilities;
 
 	/**
 	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
@@ -166,7 +167,7 @@ class SettingsValidator {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] );
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] );

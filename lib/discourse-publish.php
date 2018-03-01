@@ -8,12 +8,13 @@
 namespace WPDiscourse\DiscoursePublish;
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscoursePublish
  */
 class DiscoursePublish {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -48,7 +49,7 @@ class DiscoursePublish {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -222,7 +223,7 @@ class DiscoursePublish {
 
 		$result = wp_remote_post( $url, $post_options );
 
-		if ( ! DiscourseUtilities::validate( $result ) ) {
+		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
 				$error_code    = null;

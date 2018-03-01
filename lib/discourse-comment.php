@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\DiscourseComment;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscourseComment
  */
 class DiscourseComment {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -51,7 +52,7 @@ class DiscourseComment {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -220,7 +221,7 @@ class DiscourseComment {
 
 					$result = wp_remote_get( $permalink );
 
-					if ( DiscourseUtilities::validate( $result ) ) {
+					if ( $this->validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
 
