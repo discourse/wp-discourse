@@ -11,7 +11,6 @@
 
 namespace WPDiscourse\Templates;
 
-// use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
 /**
  * Class HTMLTemplates
  */

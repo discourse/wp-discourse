@@ -1,6 +1,8 @@
 <?php
 /**
  * Base class for webhooks.
+ *
+ * @package WPDiscourse
  */
 
 namespace WPDiscourse\Webhook;
