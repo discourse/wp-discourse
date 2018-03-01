@@ -13,7 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Class SSOSettings
  */
 class SSOSettings {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.

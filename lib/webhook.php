@@ -1,9 +1,15 @@
 <?php
+/**
+ * Base class for webhooks.
+ */
 
 namespace WPDiscourse\Webhook;
 
 use WPDiscourse\Shared\PluginUtilities;
 
+/**
+ * Class Webhook
+ */
 class Webhook {
 	use PluginUtilities;
 	/**

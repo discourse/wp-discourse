@@ -13,7 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Class MetaBox
  */
 class MetaBox {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -250,7 +250,7 @@ class MetaBox {
 	 * Outputs the Update Discourse Topic checkbox.
 	 *
 	 * @param string $text The label text.
-	 * @param bool    $update_discourse_topic Whether or not the checkbox should be checked.
+	 * @param bool   $update_discourse_topic Whether or not the checkbox should be checked.
 	 */
 	protected function update_discourse_topic_checkbox( $text, $update_discourse_topic = false ) {
 		?>

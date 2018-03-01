@@ -13,7 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Class PublishSettings
  */
 class PublishSettings {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.

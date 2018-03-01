@@ -15,7 +15,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Saves site_options with matching keys to the blog_options to the 'wpdc_site_options' array.
  */
 class NetworkOptions {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * NetworkOptions constructor.

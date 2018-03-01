@@ -7,8 +7,14 @@
 
 namespace WPDiscourse\SSOClient;
 
+/**
+ * Class SSOClientShortcode
+ */
 class SSOClientShortcode extends SSOClientBase {
 
+	/**
+	 * SSOClientShortcode constructor.
+	 */
 	public function __construct() {
 		add_shortcode( 'discourse_sso_client', array( $this, 'discourse_sso_client_shortcode' ) );
 	}
@@ -22,7 +28,7 @@ class SSOClientShortcode extends SSOClientBase {
 	 *
 	 * @return string markup
 	 */
-	function discourse_sso_client_shortcode( $atts = array() ) {
+	public function discourse_sso_client_shortcode( $atts = array() ) {
 		$options = shortcode_atts(
 			array(
 				'login' => null,

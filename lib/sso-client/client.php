@@ -50,7 +50,7 @@ class Client extends SSOClientBase {
 	/**
 	 * Alter the login form
 	 */
-	function discourse_sso_alter_login_form() {
+	public function discourse_sso_alter_login_form() {
 		if ( ! $this->discourse_sso_auto_inject_button() ) {
 
 			return null;
@@ -64,11 +64,11 @@ class Client extends SSOClientBase {
 	/**
 	 * Alter user profile
 	 */
-	function discourse_sso_alter_user_profile() {
+	public function discourse_sso_alter_user_profile() {
 		$auto_inject_button = $this->discourse_sso_auto_inject_button();
-		$link_text   = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
-		$linked_text = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
-		$user        = wp_get_current_user();
+		$link_text          = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
+		$linked_text        = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
+		$user               = wp_get_current_user();
 
 		if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
 

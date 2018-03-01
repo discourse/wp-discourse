@@ -13,7 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Class FormHelper
  */
 class FormHelper {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * Used for containing a single instance of the FormHelper class throughout a request.

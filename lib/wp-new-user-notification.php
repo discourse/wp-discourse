@@ -25,7 +25,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 	 */
 
 	// Only override the default function if SSO is enabled.
-    $sso_options = get_option( 'discourse_sso_provider' );
+	$sso_options = get_option( 'discourse_sso_provider' );
 	if ( ! empty( $sso_options['enable-sso'] ) ) {
 
 		function wp_new_user_notification( $user_id, $deprecated = null, $notify = '' ) {

@@ -13,7 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  * Class ConfigurableTextSettings
  */
 class ConfigurableTextSettings {
-    use PluginUtilities;
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.
