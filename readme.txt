@@ -131,6 +131,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 #### 1.5.8 01/03/2018
 
 - Update API static methods
+- Fix SSO Client nicename error when a full name is in the Discourse name field
 
 #### 1.5.7 15/02/2018
 
