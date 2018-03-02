@@ -144,21 +144,31 @@ class Client extends SSOClientBase {
 			return new \WP_Error( 'expired_nonce' );
 		}
 
-		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
+		$username = $query['username'];
+		$email = $query['email'];
+		$first_name = null;
+
+		if ( ! empty( $query['name'] ) ) {
+		    $first_name = explode( ' ', $query['name'] )[0];
+		    $name = $query['name'];
+        } else {
+		    $name = $username;
+        }
 
 		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
 		$wp_user = get_user_by( 'ID', $user_id );
-		if ( $wp_user->user_login !== $query['username'] && $wp_user->user_email !== $query['email'] ) {
+		if ( $wp_user->user_login !== $username && $wp_user->user_email !== $email ) {
+
 			return new \WP_Error( 'mismatched_users' );
 		}
 
 		$updated_user = array(
 			'ID'            => $user_id,
-			'user_login'    => $query['username'],
-			'user_email'    => $query['email'],
-			'user_nicename' => $name,
+			'user_login'    => $username,
+			'user_email'    => $email,
+			'user_nicename' => $first_name,
 			'display_name'  => $name,
-			'first_name'    => $name,
+			'first_name'    => $first_name,
 		);
 
 		$updated_user = apply_filters( 'wpdc_sso_client_updated_user', $updated_user, $query );
@@ -166,7 +176,8 @@ class Client extends SSOClientBase {
 		$update = wp_update_user( $updated_user );
 
 		if ( ! is_wp_error( $update ) ) {
-			update_user_meta( $user_id, 'discourse_username', $query['username'] );
+			update_user_meta( $user_id, 'discourse_username', $username );
+
 			if ( ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 				update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
 			}
