@@ -114,6 +114,11 @@ class DiscourseComment {
 			wp_enqueue_script( 'load_comments_js' );
 			wp_localize_script( 'load_comments_js', 'wpdc', $data );
 		}
+
+		if ( ! empty( $this->options['load-comment-css'] ) ) {
+			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
+			wp_enqueue_style( 'comment_styles' );
+		}
 	}
 
 	/**

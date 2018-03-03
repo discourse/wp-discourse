@@ -77,6 +77,7 @@ class Discourse {
 		'bypass-trust-level-score'  => 50,
 		'custom-datetime-format'    => '',
 		'only-show-moderator-liked' => 0,
+		'load-comment-css'          => 0,
 	);
 
 	/**
