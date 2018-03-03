@@ -145,7 +145,7 @@ class Client extends SSOClientBase {
 		}
 
 		$username = $query['username'];
-		$email = $query['email'];
+		$email    = $query['email'];
 
 		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
 		$wp_user = get_user_by( 'ID', $user_id );
@@ -163,7 +163,7 @@ class Client extends SSOClientBase {
 
 		if ( ! empty( $query['name'] ) ) {
 			$updated_user['first_name'] = explode( ' ', $query['name'] )[0];
-			$updated_user['name'] = $query['name'];
+			$updated_user['name']       = $query['name'];
 		}
 
 		$updated_user = apply_filters( 'wpdc_sso_client_updated_user', $updated_user, $query );

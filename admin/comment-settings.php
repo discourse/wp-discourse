@@ -56,10 +56,12 @@ class CommentSettings {
 			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
-        add_settings_field( 'discourse_load_comment_css', __( 'Load Comment CSS', 'wp-discourse' ), array(
-		        $this,
-            'load_comment_css_checkbox',
-        ), 'discourse_comment', 'discourse_commenting_settings_section' );
+		add_settings_field(
+			'discourse_load_comment_css', __( 'Load Comment CSS', 'wp-discourse' ), array(
+				$this,
+				'load_comment_css_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
 		add_settings_field(
 			'discourse_new_tab', __( 'Open Links in New Tab', 'wp-discourse' ), array(
@@ -159,10 +161,15 @@ class CommentSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for the load-comment-css checkbox.
+	 */
 	public function load_comment_css_checkbox() {
-	    $this->form_helper->checkbox_input( 'load-comment-css', 'discourse_comment', __( 'Loads a CSS file for styling comments', 'wp-discourse' ),
-            __( 'This is currently adding styles to Discourse oneboxes and quotes.' , 'wp-discourse' ) );
-    }
+		$this->form_helper->checkbox_input(
+			'load-comment-css', 'discourse_comment', __( 'Loads a CSS file for styling comments', 'wp-discourse' ),
+			__( 'This is currently adding styles to Discourse oneboxes and quotes.', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the discourse-new-tab checkbox.
