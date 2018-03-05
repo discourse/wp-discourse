@@ -223,8 +223,6 @@ class DiscoursePublish {
 
 		$result = wp_remote_post( $url, $post_options );
 
-		write_log('publishing response', wp_remote_retrieve_body( $result ) );
-
 		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
@@ -232,8 +230,8 @@ class DiscoursePublish {
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
 				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
-				if ( 404 === $error_code || 500 === $error_code ) {
-					// Publishing to a deleted topic is currently returning a 500 response code.
+				if ( 500 === $error_code ) {
+					// For older versions of Discourse, publishing to a deleted topic is returning a 500 response code.
 					update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
 				}
 			}
@@ -273,9 +271,17 @@ class DiscoursePublish {
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
 		} elseif ( property_exists( $body, 'post' ) ) {
+
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
 			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
+
+			// Handles deleted topics for recent versions of Discourse.
+			if ( ! empty( $discourse_post->deleted_at ) ) {
+				update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
+
+				return new \WP_Error( 'discourse_publishing_response_error', 'The Discourse topic associated with this post has been deleted.' );
+			}
 
 			if ( $topic_slug && $topic_id ) {
 				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
