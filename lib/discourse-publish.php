@@ -223,6 +223,8 @@ class DiscoursePublish {
 
 		$result = wp_remote_post( $url, $post_options );
 
+		write_log('publishing response', wp_remote_retrieve_body( $result ) );
+
 		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
@@ -251,6 +253,7 @@ class DiscoursePublish {
 				$topic_slug = $body->topic_slug;
 				$topic_id   = $body->topic_id;
 
+				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
@@ -275,6 +278,7 @@ class DiscoursePublish {
 			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
 
 			if ( $topic_slug && $topic_id ) {
+				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
