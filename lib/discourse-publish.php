@@ -183,6 +183,7 @@ class DiscoursePublish {
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
+
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$data = array(
@@ -261,6 +262,27 @@ class DiscoursePublish {
 				if ( $use_multisite_configuration ) {
 					$blog_id = get_current_blog_id();
 					$this->save_topic_blog_id( $body->topic_id, $blog_id );
+				}
+
+				// Pin the topic.
+				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
+				if ( ! empty( $pin_until ) ) {
+					$status_url = esc_url( $options['url'] . "/t/$topic_id/status" );
+					$data = array(
+						'api_key' => $options['api-key'],
+						'api_username' => $options['publish-username'],
+						'status' => 'pinned',
+						'enabled' => 'true',
+						'until' => $pin_until,
+					);
+					$post_options = array(
+						'timeout' => 30,
+						'method' => 'PUT',
+						'body' => http_build_query( $data ),
+					);
+
+					$response = wp_remote_post( $status_url, $post_options );
+					write_log('pinned response', wp_remote_retrieve_body( $response ) );
 				}
 
 				// The topic has been created and its associated post's metadata has been updated.

@@ -122,7 +122,10 @@ class MetaBox {
 						$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
 						echo '<br>';
+
 						$this->category_select_input( $publish_category_id, $categories );
+						echo '<br>';
+						$this->pin_topic_input();
 						?>
 						<br>
 					</div>
@@ -194,6 +197,12 @@ class MetaBox {
 		} else {
 			update_post_meta( $post_id, 'update_discourse_topic', 0 );
 		}
+
+		if ( isset( $_POST['pin_discourse_topic'] ) ) { // Input var okay.
+            $pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic'] ) );
+            update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
+
+        }
 
 		// Delete all Discourse metadata that could be associated with a post.
 		if ( isset( $_POST['unlink_from_discourse'] ) ) { // Input var okay.
@@ -271,6 +280,21 @@ class MetaBox {
 		</label>
 		<?php
 	}
+	
+	protected function pin_topic_input() {
+	    ?>
+        <label for="wpdc_pin_topic_checkbox">
+            <?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
+            <input type="checkbox" name="wpdc_pin_topic_checkbox" id="wpdc_pin_topic_checkbox">
+        </label>
+        <div class="wpdc-pin-topic hidden">
+            <label for="pin_discourse_topic">
+		        <?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
+                <input type="date" name="pin_discourse_topic">
+            </label>
+        </div>
+        <?php
+    }
 
 	/**
 	 * Links a WordPress post to a Discourse topic.

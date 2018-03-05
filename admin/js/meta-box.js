@@ -19,4 +19,8 @@
 			}
 		}
 	);
+
+	$( '#wpdc_pin_topic_checkbox').change( function() {
+		$( '.wpdc-pin-topic').toggleClass( 'hidden' );
+	});
 })( jQuery );

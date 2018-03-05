@@ -86,3 +86,7 @@ ul.wpdc-documentation-list {
 #discourse-publish-meta-box a {
 	overflow-wrap: break-word;
 }
+
+.wpdc-pin-topic.hidden {
+	display: none;
+}
