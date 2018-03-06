@@ -263,29 +263,11 @@ class DiscoursePublish {
 					$this->save_topic_blog_id( $body->topic_id, $blog_id );
 				}
 
-				// Pin the topic.
 				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
 				if ( ! empty( $pin_until ) ) {
-					$status_url   = esc_url( $options['url'] . "/t/$topic_id/status" );
-					$data         = array(
-						'api_key'      => $options['api-key'],
-						'api_username' => $options['publish-username'],
-						'status'       => 'pinned',
-						'enabled'      => 'true',
-						'until'        => $pin_until,
-					);
-					$post_options = array(
-						'timeout' => 30,
-						'method'  => 'PUT',
-						'body'    => http_build_query( $data ),
-					);
+					$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
 
-					$response = wp_remote_post( $status_url, $post_options );
-					delete_post_meta( $post_id, 'wpdc_pin_until' );
-					if ( ! $this->validate( $response ) ) {
-
-						return new \WP_Error( 'discourse_publishing_response_error', 'The topic could not be pinned on Discourse.' );
-					}
+					return $pin_response;
 				}
 
 				// The topic has been created and its associated post's metadata has been updated.
@@ -335,6 +317,42 @@ class DiscoursePublish {
 		$this->create_bad_response_notifications( $current_post, $post_id );
 
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+	}
+
+	/**
+	 * Pins a Discourse topic.
+	 *
+	 * @param int $post_id The WordPress id of the pinned post.
+	 * @param int $topic_id The Discourse topic_id of the pinned post.
+	 * @param string $pin_until A string that sets the pin_until date.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
+		$status_url   = esc_url( $this->options['url'] . "/t/$topic_id/status" );
+		$data         = array(
+			'api_key'      => $this->options['api-key'],
+			'api_username' => $this->options['publish-username'],
+			'status'       => 'pinned',
+			'enabled'      => 'true',
+			'until'        => $pin_until,
+		);
+		$post_options = array(
+			'timeout' => 30,
+			'method'  => 'PUT',
+			'body'    => http_build_query( $data ),
+		);
+
+		$response = wp_remote_post( $status_url, $post_options );
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'discourse_publishing_response_error', 'The topic could not be pinned on Discourse.' );
+		}
+
+		delete_post_meta( $post_id, 'wpdc_pin_until' );
+
+		return null;
 	}
 
 	/**
