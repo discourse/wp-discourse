@@ -20,8 +20,8 @@
 		}
 	);
 
-	$( '#wpdc_pin_topic_checkbox').change( function() {
-		$( '.wpdc-pin-topic').toggleClass( 'hidden' );
+	$( '#pin_discourse_topic').change( function() {
+		$( '.wpdc-pin-topic-time').toggleClass( 'hidden' );
 	});
 
 	$( '.wpdc-advanced-options-toggle' ).click( function() {

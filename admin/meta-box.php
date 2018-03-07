@@ -194,11 +194,19 @@ class MetaBox {
 			update_post_meta( $post_id, 'update_discourse_topic', 0 );
 		}
 
-		// Todo: check that pin_topic checkbox is selected
-		if ( isset( $_POST['pin_discourse_topic'] ) ) { // Input var okay.
-            $pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic'] ) );
-            update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
+		if ( ! empty( $_POST['pin_discourse_topic'] ) ) { // Input var okay.
+		    if ( ! empty( $_POST['pin_discourse_topic_until'] ) ) { // Input var okay.
+		        $pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic_until'] ) ); // Input var okay.
+		    } else {
+		        $now = new \DateTime( 'now' );
+		        try {
+		            $pin_until = $now->add( new \DateInterval( 'P2D' ) )->format( 'Y-m-d' );
+		        } catch ( \Exception $e ) {
+		            $pin_until = null;
+		        }
+		    }
 
+            update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
         }
 
 		// Delete all Discourse metadata that could be associated with a post.
@@ -280,14 +288,14 @@ class MetaBox {
 	
 	protected function pin_topic_input() {
 	    ?>
-        <label for="wpdc_pin_topic_checkbox">
+        <label for="pin_discourse_topic">
             <?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
-            <input type="checkbox" name="wpdc_pin_topic_checkbox" id="wpdc_pin_topic_checkbox">
+            <input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic">
         </label>
-        <div class="wpdc-pin-topic hidden">
-            <label for="pin_discourse_topic">
+        <div class="wpdc-pin-topic-time hidden">
+            <label for="pin_discourse_topic_until">
 		        <?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
-                <input type="date" name="pin_discourse_topic">
+                <input type="date" name="pin_discourse_topic_until">
             </label>
         </div>
         <?php
