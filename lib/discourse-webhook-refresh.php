@@ -154,6 +154,7 @@ class DiscourseWebhookRefresh extends Webhook {
 		$post_number    = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
 		$post_title     = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
 		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? $post_data['topic_posts_count'] - 1 : null;
+		$post_type = ! empty( $post_data['post_type'] ) ? $post_data['post_type'] : null;
 
 		if ( $topic_id && $post_number && $post_title ) {
 
@@ -181,9 +182,49 @@ class DiscourseWebhookRefresh extends Webhook {
 							update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
 						}
 					}
+
+					$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+					if ( ! empty( $unlisted && $comments_count > 0 && 1 === $post_type ) ) {
+						$this->list_topic( $post_id, $topic_id );
+					}
 				}
 			}
 		}
+
+		return null;
+	}
+
+	/**
+	 * Changes a post's Discourse topic status from unlisted to listed.
+	 *
+	 * @param int $post_id The id of the post that needs to be listed.
+	 * @param int $topic_id The id of the topic that needs to be listed.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function list_topic( $post_id, $topic_id ) {
+		$url = $this->options['url'];
+		$status_url = esc_url( "{$url}/t/{$topic_id}/status");
+		$data = array(
+			'api_key' => $this->options['api-key'],
+			'api_username' => $this->options['publish-username'],
+			'status' => 'visible',
+			'enabled' => 'true',
+		);
+		$post_options = array(
+			'timeout' => 30,
+			'method' => 'PUT',
+			'body' => http_build_query( $data ),
+		);
+
+		$response = wp_remote_post( $status_url, $post_options );
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'discourse_response_error', 'Unable to unlist the Discourse topic.' );
+		}
+
+		delete_post_meta( $post_id, 'wpdc_unlisted_topic' );
 
 		return null;
 	}
