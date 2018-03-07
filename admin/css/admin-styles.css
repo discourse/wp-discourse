@@ -90,3 +90,28 @@ ul.wpdc-documentation-list {
 .wpdc-pin-topic.hidden {
 	display: none;
 }
+
+.wpdc-advanced-options.hidden {
+	display: none;
+}
+
+.wpdc-advanced-options-toggle:hover{
+	cursor: pointer;
+}
+
+.wpdc-advanced-options-toggle:before {
+	content: "\f111";
+	font: 400 20px/1 dashicons;
+	color: #82878c;
+	speak: none;
+	display: inline-block;
+	margin-left: -1px;
+	padding-right: 3px;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.wpdc-advanced-options-toggle:hover:before {
+	color: #444444;
+}

@@ -122,14 +122,10 @@ class MetaBox {
 						$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
 						echo '<br>';
-
 						$this->category_select_input( $publish_category_id, $categories );
 						echo '<br>';
-						$this->pin_topic_input();
-						?>
-						<br>
-					</div>
-					<?php
+                        $this->advanced_options_input();
+                        echo '</div>';
 				}
 				echo '<div class="wpdc-link-to-topic hidden">';
 				echo '<hr>';
@@ -198,6 +194,7 @@ class MetaBox {
 			update_post_meta( $post_id, 'update_discourse_topic', 0 );
 		}
 
+		// Todo: check that pin_topic checkbox is selected
 		if ( isset( $_POST['pin_discourse_topic'] ) ) { // Input var okay.
             $pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic'] ) );
             update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
@@ -293,6 +290,13 @@ class MetaBox {
                 <input type="date" name="pin_discourse_topic">
             </label>
         </div>
+        <?php
+    }
+
+    protected function advanced_options_input() {
+	    ?>
+        <span class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></span>
+        <div class="wpdc-advanced-options hidden"><?php $this->pin_topic_input(); ?></div>
         <?php
     }
 

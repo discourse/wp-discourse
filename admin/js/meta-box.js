@@ -23,4 +23,8 @@
 	$( '#wpdc_pin_topic_checkbox').change( function() {
 		$( '.wpdc-pin-topic').toggleClass( 'hidden' );
 	});
+
+	$( '.wpdc-advanced-options-toggle' ).click( function() {
+		$( '.wpdc-advanced-options' ).toggleClass( 'hidden' );
+	});
 })( jQuery );
