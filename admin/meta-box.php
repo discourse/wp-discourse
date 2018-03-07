@@ -86,6 +86,7 @@ class MetaBox {
 		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
 		$pin_topic = get_post_meta( $post_id, 'wpdc_pin_topic', true );
 		$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
+		$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
@@ -125,8 +126,8 @@ class MetaBox {
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
 						echo '<br>';
 						$this->category_select_input( $publish_category_id, $categories );
-						echo '<br>';
-                        $this->advanced_options_input( $pin_topic, $pin_until );
+						echo '<hr>';
+                        $this->advanced_options_input( $pin_topic, $pin_until, $unlisted );
                         echo '</div>';
 				}
 				echo '<div class="wpdc-link-to-topic hidden">';
@@ -210,6 +211,10 @@ class MetaBox {
 
             update_post_meta( $post_id, 'wpdc_pin_topic', 1 );
             update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
+        }
+
+        if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
+		    update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
         }
 
 		// Delete all Discourse metadata that could be associated with a post.
@@ -305,10 +310,23 @@ class MetaBox {
         <?php
     }
 
-    protected function advanced_options_input( $pin_topic, $pin_until ) {
+    protected function unlisted_topic_checkbox( $unlisted ) {
 	    ?>
-        <span class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></span>
-        <div class="wpdc-advanced-options hidden"><?php $this->pin_topic_input( $pin_topic, $pin_until ); ?></div>
+	    <label for="unlist_discourse_topic">
+	        <?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
+	        <input type="checkbox" name="unlist_discourse_topic" value="1"
+	            <?php checked( $unlisted ); ?> >
+        </label>
+	    <?php
+    }
+
+    protected function advanced_options_input( $pin_topic, $pin_until, $unlisted ) {
+	    ?>
+        <div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
+        <div class="wpdc-advanced-options hidden">
+            <?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
+            <?php $this->unlisted_topic_checkbox( $unlisted ); ?>
+        </div>
         <?php
     }
 
