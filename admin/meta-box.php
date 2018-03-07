@@ -84,6 +84,8 @@ class MetaBox {
 		$categories          = $this->get_discourse_categories();
 		$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
+		$pin_topic = get_post_meta( $post_id, 'wpdc_pin_topic', true );
+		$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
@@ -124,7 +126,7 @@ class MetaBox {
 						echo '<br>';
 						$this->category_select_input( $publish_category_id, $categories );
 						echo '<br>';
-                        $this->advanced_options_input();
+                        $this->advanced_options_input( $pin_topic, $pin_until );
                         echo '</div>';
 				}
 				echo '<div class="wpdc-link-to-topic hidden">';
@@ -206,6 +208,7 @@ class MetaBox {
 		        }
 		    }
 
+            update_post_meta( $post_id, 'wpdc_pin_topic', 1 );
             update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
         }
 
@@ -286,25 +289,26 @@ class MetaBox {
 		<?php
 	}
 	
-	protected function pin_topic_input() {
+	protected function pin_topic_input( $pin_topic, $pin_until ) {
 	    ?>
         <label for="pin_discourse_topic">
             <?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
-            <input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic">
+            <input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic" value="1"
+                <?php checked( $pin_topic ); ?> >
         </label>
-        <div class="wpdc-pin-topic-time hidden">
+        <div class="wpdc-pin-topic-time">
             <label for="pin_discourse_topic_until">
 		        <?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
-                <input type="date" name="pin_discourse_topic_until">
+                <input type="date" name="pin_discourse_topic_until" value="<?php esc_attr_e( $pin_until ); ?>">
             </label>
         </div>
         <?php
     }
 
-    protected function advanced_options_input() {
+    protected function advanced_options_input( $pin_topic, $pin_until ) {
 	    ?>
         <span class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></span>
-        <div class="wpdc-advanced-options hidden"><?php $this->pin_topic_input(); ?></div>
+        <div class="wpdc-advanced-options hidden"><?php $this->pin_topic_input( $pin_topic, $pin_until ); ?></div>
         <?php
     }
 

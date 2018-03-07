@@ -20,10 +20,6 @@
 		}
 	);
 
-	$( '#pin_discourse_topic').change( function() {
-		$( '.wpdc-pin-topic-time').toggleClass( 'hidden' );
-	});
-
 	$( '.wpdc-advanced-options-toggle' ).click( function() {
 		$( '.wpdc-advanced-options' ).toggleClass( 'hidden' );
 	});
