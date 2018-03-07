@@ -84,9 +84,9 @@ class MetaBox {
 		$categories          = $this->get_discourse_categories();
 		$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
-		$pin_topic = get_post_meta( $post_id, 'wpdc_pin_topic', true );
-		$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
-		$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+		$pin_topic           = get_post_meta( $post_id, 'wpdc_pin_topic', true );
+		$pin_until           = get_post_meta( $post_id, 'wpdc_pin_until', true );
+		$unlisted            = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
@@ -127,8 +127,8 @@ class MetaBox {
 						echo '<br>';
 						$this->category_select_input( $publish_category_id, $categories );
 						echo '<hr>';
-                        $this->advanced_options_input( $pin_topic, $pin_until, $unlisted );
-                        echo '</div>';
+						$this->advanced_options_input( $pin_topic, $pin_until, $unlisted );
+						echo '</div>';
 				}
 				echo '<div class="wpdc-link-to-topic hidden">';
 				echo '<hr>';
@@ -198,24 +198,24 @@ class MetaBox {
 		}
 
 		if ( ! empty( $_POST['pin_discourse_topic'] ) ) { // Input var okay.
-		    if ( ! empty( $_POST['pin_discourse_topic_until'] ) ) { // Input var okay.
-		        $pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic_until'] ) ); // Input var okay.
-		    } else {
-		        $now = new \DateTime( 'now' );
-		        try {
-		            $pin_until = $now->add( new \DateInterval( 'P2D' ) )->format( 'Y-m-d' );
-		        } catch ( \Exception $e ) {
-		            $pin_until = null;
-		        }
-		    }
+			if ( ! empty( $_POST['pin_discourse_topic_until'] ) ) { // Input var okay.
+				$pin_until = sanitize_text_field( wp_unslash( $_POST['pin_discourse_topic_until'] ) ); // Input var okay.
+			} else {
+				$now = new \DateTime( 'now' );
+				try {
+					$pin_until = $now->add( new \DateInterval( 'P2D' ) )->format( 'Y-m-d' );
+				} catch ( \Exception $e ) {
+					$pin_until = null;
+				}
+			}
 
-            update_post_meta( $post_id, 'wpdc_pin_topic', 1 );
-            update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
-        }
+			update_post_meta( $post_id, 'wpdc_pin_topic', 1 );
+			update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
+		}
 
-        if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
-		    update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
-        }
+		if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
+			update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
+		}
 
 		// Delete all Discourse metadata that could be associated with a post.
 		if ( isset( $_POST['unlink_from_discourse'] ) ) { // Input var okay.
@@ -293,42 +293,43 @@ class MetaBox {
 		</label>
 		<?php
 	}
-	
+
+
 	protected function pin_topic_input( $pin_topic, $pin_until ) {
-	    ?>
-        <label for="pin_discourse_topic">
-            <?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
-            <input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic" value="1"
-                <?php checked( $pin_topic ); ?> >
-        </label>
-        <div class="wpdc-pin-topic-time">
-            <label for="pin_discourse_topic_until">
-		        <?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
-                <input type="date" name="pin_discourse_topic_until" value="<?php esc_attr_e( $pin_until ); ?>">
-            </label>
-        </div>
-        <?php
-    }
+		?>
+		<label for="pin_discourse_topic">
+			<?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
+			<input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic" value="1"
+				<?php checked( $pin_topic ); ?> >
+		</label>
+		<div class="wpdc-pin-topic-time">
+			<label for="pin_discourse_topic_until">
+				<?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
+				<input type="date" name="pin_discourse_topic_until" value="<?php esc_attr_e( $pin_until ); ?>">
+			</label>
+		</div>
+		<?php
+	}
 
-    protected function unlisted_topic_checkbox( $unlisted ) {
-	    ?>
-	    <label for="unlist_discourse_topic">
-	        <?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
-	        <input type="checkbox" name="unlist_discourse_topic" value="1"
-	            <?php checked( $unlisted ); ?> >
-        </label>
-	    <?php
-    }
+	protected function unlisted_topic_checkbox( $unlisted ) {
+		?>
+		<label for="unlist_discourse_topic">
+			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
+			<input type="checkbox" name="unlist_discourse_topic" value="1"
+				<?php checked( $unlisted ); ?> >
+		</label>
+		<?php
+	}
 
-    protected function advanced_options_input( $pin_topic, $pin_until, $unlisted ) {
-	    ?>
-        <div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
-        <div class="wpdc-advanced-options hidden">
-            <?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
-            <?php $this->unlisted_topic_checkbox( $unlisted ); ?>
-        </div>
-        <?php
-    }
+	protected function advanced_options_input( $pin_topic, $pin_until, $unlisted ) {
+		?>
+		<div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
+		<div class="wpdc-advanced-options hidden">
+			<?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
+			<?php $this->unlisted_topic_checkbox( $unlisted ); ?>
+		</div>
+		<?php
+	}
 
 	/**
 	 * Links a WordPress post to a Discourse topic.
