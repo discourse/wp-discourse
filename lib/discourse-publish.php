@@ -185,6 +185,7 @@ class DiscoursePublish {
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
+			$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 			$data = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
@@ -195,6 +196,7 @@ class DiscoursePublish {
 				'category'         => $category,
 				'skip_validations' => 'true',
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
+				'visible' => ! empty( $unlisted ) ? 'false' : 'true',
 			);
 			$url  = $options['url'] . '/posts';
 			// Use key 'http' even if you send the request to https://.
