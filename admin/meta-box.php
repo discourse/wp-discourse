@@ -294,7 +294,12 @@ class MetaBox {
 		<?php
 	}
 
-
+	/**
+	 * Outputs the pin_topic checkbox.
+	 *
+	 * @param  int|bool    $pin_topic Whether or not the pin_topic checkbox has been checked.
+	 * @param string|null $pin_until When to pin until.
+	 */
 	protected function pin_topic_input( $pin_topic, $pin_until ) {
 		?>
 		<label for="pin_discourse_topic">
@@ -311,6 +316,11 @@ class MetaBox {
 		<?php
 	}
 
+	/**
+	 * Outputs the markup for the unlisted_topic checkbox.
+	 *
+	 * @param int|bool $unlisted Whether or not the checkbox has been checked.
+	 */
 	protected function unlisted_topic_checkbox( $unlisted ) {
 		?>
 		<label for="unlist_discourse_topic">
@@ -321,6 +331,13 @@ class MetaBox {
 		<?php
 	}
 
+	/**
+	 * Outputs the markup for the advanced publishing options.
+	 *
+	 * @param int|bool    $pin_topic Whether or not to pin the topic.
+	 * @param string|null $pin_until When to pin the topic until.
+	 * @param int|bool    $unlisted Whether or not the topic is unlisted.
+	 */
 	protected function advanced_options_input( $pin_topic, $pin_until, $unlisted ) {
 		?>
 		<div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
