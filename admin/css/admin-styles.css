@@ -83,6 +83,10 @@ ul.wpdc-documentation-list {
 	padding: 6px 10px 8px 0;
 }
 
+#discourse-publish-meta-box label[for="wpdc_publish_option"] {
+	padding: 0;
+}
+
 .wpdc-new-discourse-topic.hidden,
 .wpdc-link-to-top.hidden {
 	display: none;
