@@ -322,11 +322,17 @@ class MetaBox {
 	 * @param int|bool $unlisted Whether or not the checkbox has been checked.
 	 */
 	protected function unlisted_topic_checkbox( $unlisted ) {
+	    $webhook_url = admin_url( '/admin.php?page=webhook_options' );
+	    $webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
+	    $info_message = sprintf(
+	            __( '<em>If you have configured the %1s, unlisted topics will be listed after they receive a comment.</em>', 'wp-discourse' ), $webhook_options_link
+	    )
 		?>
 		<label for="unlist_discourse_topic">
 			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
-				<?php checked( $unlisted ); ?> >
+				<?php checked( $unlisted ); ?> ><br>
+				<?php echo wp_kses_post( $info_message ); ?>
 		</label>
 		<?php
 	}
