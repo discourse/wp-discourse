@@ -47,7 +47,7 @@ class MetaBox {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = $this->get_options();
+		$this->options    = $this->get_options();
 		$this->categories = $this->get_discourse_categories();
 	}
 
@@ -75,39 +75,35 @@ class MetaBox {
 	 * @param object $post The current Post object.
 	 */
 	public function render_meta_box( $post ) {
-		$post_id             = $post->ID;
-		$published           = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error    = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
-		$force_publish       = ! empty( $this->options['force-publish'] );
-		$saved               = 'publish' === get_post_status( $post_id ) ||
+		$post_id              = $post->ID;
+		$published            = get_post_meta( $post_id, 'discourse_post_id', true );
+		$publishing_error     = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
+		$force_publish        = ! empty( $this->options['force-publish'] );
+		$saved                = 'publish' === get_post_status( $post_id ) ||
 							   'future' === get_post_status( $post_id ) ||
 							   'draft' === get_post_status( $post_id ) ||
 							   'private' === get_post_status( $post_id ) ||
 							   'pending' === get_post_status( $post_id );
-		//$categories          = $this->get_discourse_categories();
-		//$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
-		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
-		$pin_topic           = get_post_meta( $post_id, 'wpdc_pin_topic', true );
-		$pin_until           = get_post_meta( $post_id, 'wpdc_pin_until', true );
-		$unlisted            = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+		$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
+		$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
+		$default_category_id  = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
+		$pin_topic            = get_post_meta( $post_id, 'wpdc_pin_topic', true );
+		$pin_until            = get_post_meta( $post_id, 'wpdc_pin_until', true );
+		$unlisted             = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
 		if ( ! $published ) {
 			if ( $force_publish ) {
-			    $this->force_publish_markup( $default_category_id );
+				$this->force_publish_markup( $default_category_id );
 			} else {
-				$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
-				$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
 				?>
-
 				<label for="wpdc_publish_option">
 					<input type="radio" name="wpdc_publish_options" value="new" checked><?php esc_html_e( 'Create new Topic' ); ?>
 				</label><br>
 				<label for="wpdc_publish_options">
 					<input type="radio" name="wpdc_publish_options" value="link"><?php esc_html_e( 'Link to Existing Topic' ); ?>
 				</label>
-
 				<?php
 				if ( is_wp_error( $this->categories ) ) {
 					echo '<hr>';
@@ -119,17 +115,18 @@ class MetaBox {
 						<?php
 						$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
-						echo '<br>';
-						$this->category_select_input( $publish_category_id );
-						echo '<hr>';
-						$this->advanced_options_input( $pin_topic, $pin_until, $unlisted );
-						echo '</div>';
+						?>
+						<br>
+						<?php $this->category_select_input( $publish_category_id ); ?>
+						<hr>
+						<?php $this->advanced_options_input( $pin_topic, $pin_until, $unlisted ); ?>
+					</div>
+					<div class="wpdc-link-to-topic hidden">
+						<hr>
+						<?php $this->link_to_discourse_topic_input(); ?>
+					</div>
+					<?php
 				}
-				echo '<div class="wpdc-link-to-topic hidden">';
-				echo '<hr>';
-				$this->link_to_discourse_topic_input();
-				echo '</div>';
-
 			} // End if().
 		} else {
 			// The post has already been published to Discourse.
@@ -237,8 +234,8 @@ class MetaBox {
 	}
 
 	protected function force_publish_markup( $default_category_id ) {
-	    $category_name = $this->get_discourse_category_name( $default_category_id );
-	    // translators: Discourse force-publish message. Placeholder: category_name.
+		$category_name = $this->get_discourse_category_name( $default_category_id );
+		// translators: Discourse force-publish message. Placeholder: category_name.
 		$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
 		$allowed = array( 'strong' => array() );
 		echo wp_kses( $message, $allowed );
@@ -325,11 +322,11 @@ class MetaBox {
 	 * @param int|bool $unlisted Whether or not the checkbox has been checked.
 	 */
 	protected function unlisted_topic_checkbox( $unlisted ) {
-	    $webhook_url = admin_url( '/admin.php?page=webhook_options' );
-	    $webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
-	    $info_message = sprintf(
-	            __( '<em>If you have configured the %1s, unlisted topics will be listed after they receive a comment.</em>', 'wp-discourse' ), $webhook_options_link
-	    )
+		$webhook_url          = admin_url( '/admin.php?page=webhook_options' );
+		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
+		$info_message         = sprintf(
+			__( '<em>If you have configured the %1s, unlisted topics will be listed after they receive a comment.</em>', 'wp-discourse' ), $webhook_options_link
+		)
 		?>
 		<label for="unlist_discourse_topic">
 			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
@@ -412,7 +409,7 @@ class MetaBox {
 	 * @param array $categories The array of Discourse category data.
 	 */
 	protected function category_select_input( $publish_category_id ) {
-	    $categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );
+		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );
 		?>
 		<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
 			<select name="publish_post_category" id="publish_post_category">
