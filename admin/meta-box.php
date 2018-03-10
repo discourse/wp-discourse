@@ -23,6 +23,8 @@ class MetaBox {
 	 */
 	protected $options;
 
+	protected $categories;
+
 	/**
 	 * MetaBox constructor.
 	 */
@@ -46,6 +48,7 @@ class MetaBox {
 	 */
 	public function setup_options() {
 		$this->options = $this->get_options();
+		$this->categories = $this->get_discourse_categories();
 	}
 
 	/**
@@ -81,8 +84,8 @@ class MetaBox {
 							   'draft' === get_post_status( $post_id ) ||
 							   'private' === get_post_status( $post_id ) ||
 							   'pending' === get_post_status( $post_id );
-		$categories          = $this->get_discourse_categories();
-		$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
+		//$categories          = $this->get_discourse_categories();
+		//$categories          = apply_filters( 'wp_discourse_publish_categories', $categories, $post );
 		$default_category_id = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
 		$pin_topic           = get_post_meta( $post_id, 'wpdc_pin_topic', true );
 		$pin_until           = get_post_meta( $post_id, 'wpdc_pin_until', true );
@@ -92,15 +95,7 @@ class MetaBox {
 
 		if ( ! $published ) {
 			if ( $force_publish ) {
-
-				$category_name = $this->get_discourse_category_name( $default_category_id );
-				// translators: Discourse force-publish message. Placeholder: category_name.
-				$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
-				$allowed = array(
-					'strong' => array(),
-				);
-				echo wp_kses( $message, $allowed );
-
+			    $this->force_publish_markup( $default_category_id );
 			} else {
 				$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
 				$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
@@ -114,7 +109,7 @@ class MetaBox {
 				</label>
 
 				<?php
-				if ( is_wp_error( $categories ) ) {
+				if ( is_wp_error( $this->categories ) ) {
 					echo '<hr>';
 					$this->category_error_markup( $default_category_id );
 				} else {
@@ -125,7 +120,7 @@ class MetaBox {
 						$publish_text = __( 'Publish post to Discourse', 'wp-discourse' );
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
 						echo '<br>';
-						$this->category_select_input( $publish_category_id, $categories );
+						$this->category_select_input( $publish_category_id );
 						echo '<hr>';
 						$this->advanced_options_input( $pin_topic, $pin_until, $unlisted );
 						echo '</div>';
@@ -239,6 +234,14 @@ class MetaBox {
 		}
 
 		return $post_id;
+	}
+
+	protected function force_publish_markup( $default_category_id ) {
+	    $category_name = $this->get_discourse_category_name( $default_category_id );
+	    // translators: Discourse force-publish message. Placeholder: category_name.
+		$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
+		$allowed = array( 'strong' => array() );
+		echo wp_kses( $message, $allowed );
 	}
 
 	/**
@@ -408,7 +411,8 @@ class MetaBox {
 	 * @param int   $publish_category_id The Discourse category_id.
 	 * @param array $categories The array of Discourse category data.
 	 */
-	protected function category_select_input( $publish_category_id, $categories ) {
+	protected function category_select_input( $publish_category_id ) {
+	    $categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );
 		?>
 		<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
 			<select name="publish_post_category" id="publish_post_category">
@@ -432,7 +436,7 @@ class MetaBox {
 	 * @return string|\WP_Error
 	 */
 	protected function get_discourse_category_name( $category_id ) {
-		$categories = $this->get_discourse_categories();
+		$categories = $this->categories;
 		if ( ! is_wp_error( $categories ) ) {
 			foreach ( $categories as $category ) {
 				if ( $category_id === $category['id'] ) {
