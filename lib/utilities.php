@@ -101,8 +101,6 @@ class Utilities {
 			return new \WP_Error( 'wpdc_user_not_set_error', 'The Discourse user you are attempting to create does not exist on WordPress.' );
 		}
 
-		$user_id = $user->ID;
-
 		$require_activation = apply_filters( 'wpdc_auto_create_user_require_activation', $require_activation, $user );
 		$create_user_url    = esc_url_raw( "{$api_credentials['url']}/users" );
 		$username           = $user->user_login;
