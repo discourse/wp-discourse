@@ -184,7 +184,7 @@ class DiscourseWebhookRefresh extends Webhook {
 					}
 
 					$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
-					if ( ! empty( $unlisted && $comments_count > 0 && 1 === $post_type ) ) {
+					if ( ! empty( $unlisted ) && $comments_count > 0 && 1 === $post_type ) {
 						$this->list_topic( $post_id, $topic_id );
 					}
 				}
