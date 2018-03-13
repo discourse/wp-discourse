@@ -149,7 +149,7 @@ class DiscoursePublish {
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
-			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw, $current_post, $options  );
+			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw, $current_post, $options );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
 				$wp_excerpt = apply_filters( 'get_the_excerpt', $current_post->post_excerpt );
