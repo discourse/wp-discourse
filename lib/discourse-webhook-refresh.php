@@ -154,7 +154,7 @@ class DiscourseWebhookRefresh extends Webhook {
 		$post_number    = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
 		$post_title     = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
 		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? $post_data['topic_posts_count'] - 1 : null;
-		$post_type = ! empty( $post_data['post_type'] ) ? $post_data['post_type'] : null;
+		$post_type      = ! empty( $post_data['post_type'] ) ? $post_data['post_type'] : null;
 
 		if ( $topic_id && $post_number && $post_title ) {
 
@@ -203,18 +203,18 @@ class DiscourseWebhookRefresh extends Webhook {
 	 * @return null|\WP_Error
 	 */
 	protected function list_topic( $post_id, $topic_id ) {
-		$url = $this->options['url'];
-		$status_url = esc_url( "{$url}/t/{$topic_id}/status");
-		$data = array(
-			'api_key' => $this->options['api-key'],
+		$url          = $this->options['url'];
+		$status_url   = esc_url( "{$url}/t/{$topic_id}/status" );
+		$data         = array(
+			'api_key'      => $this->options['api-key'],
 			'api_username' => $this->options['publish-username'],
-			'status' => 'visible',
-			'enabled' => 'true',
+			'status'       => 'visible',
+			'enabled'      => 'true',
 		);
 		$post_options = array(
 			'timeout' => 30,
-			'method' => 'PUT',
-			'body' => http_build_query( $data ),
+			'method'  => 'PUT',
+			'body'    => http_build_query( $data ),
 		);
 
 		$response = wp_remote_post( $status_url, $post_options );

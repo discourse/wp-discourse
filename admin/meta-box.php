@@ -23,6 +23,12 @@ class MetaBox {
 	 */
 	protected $options;
 
+	/**
+	 * The Discourse categories.
+	 *
+	 * @access protected
+	 * @var mixed|void
+	 */
 	protected $categories;
 
 	/**
@@ -233,6 +239,11 @@ class MetaBox {
 		return $post_id;
 	}
 
+	/**
+	 * Outputs the markup that is displayed when the force_publish option is enabled.
+	 *
+	 * @param int $default_category_id The category_id to publish to.
+	 */
 	protected function force_publish_markup( $default_category_id ) {
 		$category_name = $this->get_discourse_category_name( $default_category_id );
 		// translators: Discourse force-publish message. Placeholder: category_name.
@@ -310,7 +321,7 @@ class MetaBox {
 		<div class="wpdc-pin-topic-time">
 			<label for="pin_discourse_topic_until">
 				<?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
-				<input type="date" name="pin_discourse_topic_until" value="<?php esc_attr_e( $pin_until ); ?>">
+				<input type="date" name="pin_discourse_topic_until" value="<?php echo esc_attr( $pin_until ); ?>">
 			</label>
 		</div>
 		<?php
@@ -325,6 +336,7 @@ class MetaBox {
 		$webhook_url          = admin_url( '/admin.php?page=webhook_options' );
 		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
 		$info_message         = sprintf(
+			// translators: Unlisted topic option description. Placeholder: webhook options link.
 			__( '<em>If you have configured the %1s, unlisted topics will be listed after they receive a comment.</em>', 'wp-discourse' ), $webhook_options_link
 		)
 		?>
@@ -405,8 +417,7 @@ class MetaBox {
 	/**
 	 * Outputs the category select input.
 	 *
-	 * @param int   $publish_category_id The Discourse category_id.
-	 * @param array $categories The array of Discourse category data.
+	 * @param int $publish_category_id The Discourse category_id.
 	 */
 	protected function category_select_input( $publish_category_id ) {
 		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );

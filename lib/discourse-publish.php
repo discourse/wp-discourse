@@ -186,7 +186,7 @@ class DiscoursePublish {
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
-			$data = array(
+			$data     = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
@@ -196,9 +196,9 @@ class DiscoursePublish {
 				'category'         => $category,
 				'skip_validations' => 'true',
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
-				'visible' => ! empty( $unlisted ) ? 'false' : 'true',
+				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
 			);
-			$url  = $options['url'] . '/posts';
+			$url      = $options['url'] . '/posts';
 			// Use key 'http' even if you send the request to https://.
 			$post_options = array(
 				'timeout' => 30,
@@ -324,8 +324,8 @@ class DiscoursePublish {
 	/**
 	 * Pins a Discourse topic.
 	 *
-	 * @param int $post_id The WordPress id of the pinned post.
-	 * @param int $topic_id The Discourse topic_id of the pinned post.
+	 * @param int    $post_id The WordPress id of the pinned post.
+	 * @param int    $topic_id The Discourse topic_id of the pinned post.
 	 * @param string $pin_until A string that sets the pin_until date.
 	 *
 	 * @return null|\WP_Error
