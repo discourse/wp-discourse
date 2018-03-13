@@ -130,6 +130,8 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 #### 1.5.8 01/03/2018
 
+- Add option for publishing posts as unlisted Discourse topics
+- Add option for publishing posts as pinned topics
 - Update API static methods
 - Fix SSO Client nicename error when a full name is in the Discourse name field
 - Add an optional stylesheet for fixing oneboxes and quotes in comments
