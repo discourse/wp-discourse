@@ -137,8 +137,6 @@ class Utilities {
 		}
 
 		if ( isset( $user_data->user_id ) ) {
-			update_user_meta( $user_id, 'discourse_sso_user_id', $user_data->user_id );
-			update_user_meta( $user_id, 'discourse_username', $username );
 
 			return $user_data->user_id;
 		}
