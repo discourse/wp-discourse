@@ -256,7 +256,7 @@ class DiscourseSSO {
 	 * @return array
 	 */
 	protected function get_sso_params( $user, $sso_options = array() ) {
-		$plugin_options      = $this->get_options();
+		$plugin_options      = $this->options;
 		$user_id             = $user->ID;
 		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
@@ -309,7 +309,7 @@ class DiscourseSSO {
 	 * @return int|string|\WP_Error
 	 */
 	protected function sync_sso( $sso_params ) {
-		$plugin_options = $this->get_options();
+		$plugin_options = $this->options;
 		if ( empty( $plugin_options['enable-sso'] ) ) {
 
 			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
