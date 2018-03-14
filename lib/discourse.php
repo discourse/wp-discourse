@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Discourse;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class Discourse
  */
 class Discourse {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -76,6 +77,7 @@ class Discourse {
 		'bypass-trust-level-score'  => 50,
 		'custom-datetime-format'    => '',
 		'only-show-moderator-liked' => 0,
+		'load-comment-css'          => 0,
 	);
 
 	/**
@@ -181,7 +183,7 @@ class Discourse {
 	 */
 	public function initialize_plugin() {
 		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		// Set the Discourse domain name option.
 		$discourse_url = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
@@ -189,38 +191,6 @@ class Discourse {
 		update_option( 'wpdc_discourse_domain', $domain_name );
 
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
-
-		// For updating from 1.4.0 to 1.4.1.
-		if ( ! empty( $this->options['multisite-configuration'] ) && is_multisite() && is_main_site() ) {
-			add_option( 'wpdc_141_update_notice', 'display' );
-			// Transfer the multisite-configuration option to the new site_option multisite-configuration-enabled.
-			$connection_options = get_option( 'discourse_connect' );
-			unset( $connection_options['multisite-configuration'] );
-			update_option( 'discourse_connect', $connection_options );
-			$site_options                                    = get_site_option( 'wpdc_site_options' ) ? get_site_option( 'wpdc_site_options' ) : array();
-			$site_options['multisite-configuration-enabled'] = 1;
-			$site_options['url']                             = $this->options['url'];
-			$site_options['api-key']                         = $this->options['api-key'];
-			$site_options['publish-username']                = $this->options['publish-username'];
-			$site_options['use-discourse-webhook']           = $this->options['use-discourse-webhook'];
-			$site_options['webhook-secret']                  = $this->options['webhook-secret'];
-			$site_options['enable-sso']                      = $this->options['enable-sso'];
-			$site_options['sso-secret']                      = $this->options['sso-secret'];
-			update_site_option( 'wpdc_site_options', $site_options );
-		}
-
-		// The 'discourse_sso' option has been moved into three separate arrays. If the plugin is being updated
-		// from a previous version, transfer the 'discourse_sso' options into the new arrays.
-		if ( get_option( 'discourse_sso' ) ) {
-			$this->transfer_options(
-				'discourse_sso', array(
-					'discourse_sso_common',
-					'discourse_sso_provider',
-					'discourse_sso_client',
-				)
-			);
-			delete_option( 'discourse_sso' );
-		}
 
 		foreach ( $this->discourse_option_groups as $group_name ) {
 			if ( 'discourse_configurable_text' === $group_name && get_option( 'discourse_configurable_text' ) ) {
@@ -268,37 +238,5 @@ class Discourse {
 		);
 
 		return $allowedposttags;
-	}
-
-	/**
-	 * Used to transfer data from the 'discourse' options array to the new option_group arrays.
-	 *
-	 * @param string $old_option The name of the old option_group.
-	 * @param array  $transferable_option_groups The array of transferable_option_group names.
-	 */
-	protected function transfer_options( $old_option, $transferable_option_groups ) {
-		$discourse_options = get_option( $old_option );
-
-		foreach ( $transferable_option_groups as $group_name ) {
-			$this->transfer_option_group( $discourse_options, $group_name );
-		}
-	}
-
-	/**
-	 * Transfers saved option values to the new options group.
-	 *
-	 * @param array  $existing_options The old 'discourse' options array.
-	 * @param string $group_name The name of the current options group.
-	 */
-	protected function transfer_option_group( $existing_options, $group_name ) {
-		$transferred_options = array();
-
-		foreach ( $this->$group_name as $key => $value ) {
-			if ( isset( $existing_options[ $key ] ) ) {
-				$transferred_options[ $key ] = $existing_options[ $key ];
-			}
-		}
-
-		add_option( $group_name, $transferred_options );
 	}
 }

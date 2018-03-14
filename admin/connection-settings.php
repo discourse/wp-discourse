@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class ConnectionSettings
  */
 class ConnectionSettings {
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.
@@ -53,7 +54,7 @@ class ConnectionSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_connection_settings() {
-		$this->options                    = DiscourseUtilities::get_options();
+		$this->options                    = $this->get_options();
 		$this->display_connection_options = ! is_multisite() || empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(

@@ -53,7 +53,7 @@ class SSO {
 	 * @param string $payload A Base64 encoded string.
 	 *
 	 * @return mixed
-	 * @throws Exception Thrown when the nonce in not found in the payload.
+	 * @throws \Exception Thrown when the nonce in not found in the payload.
 	 */
 	public function get_nonce( $payload ) {
 		$payload = urldecode( $payload );
@@ -62,7 +62,7 @@ class SSO {
 		if ( isset( $query['nonce'] ) ) {
 			return $query['nonce'];
 		} else {
-			throw new Exception( 'Nonce not found in payload!' );
+			throw new \Exception( 'Nonce not found in payload!' );
 		}
 	}
 
@@ -72,17 +72,17 @@ class SSO {
 	 * @param array $params The array of parameters to send.
 	 *
 	 * @return string
-	 * @throws Exception Thrown when the required params aren't present.
+	 * @throws \Exception Thrown when the required params aren't present.
 	 */
 	public function build_login_string( $params ) {
 		if ( ! isset( $params['external_id'] ) ) {
-			throw new Exception( "Missing required parameter 'external_id'" );
+			throw new \Exception( "Missing required parameter 'external_id'" );
 		}
 		if ( ! isset( $params['nonce'] ) ) {
-			throw new Exception( "Missing required parameter 'nonce'" );
+			throw new \Exception( "Missing required parameter 'nonce'" );
 		}
 		if ( ! isset( $params['email'] ) ) {
-			throw new Exception( "Missing required parameter 'email'" );
+			throw new \Exception( "Missing required parameter 'email'" );
 		}
 		$payload = base64_encode( http_build_query( $params ) );
 		$sig     = hash_hmac( 'sha256', $payload, $this->sso_secret );

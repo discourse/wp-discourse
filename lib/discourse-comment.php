@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\DiscourseComment;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscourseComment
  */
 class DiscourseComment {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -51,7 +52,7 @@ class DiscourseComment {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -112,6 +113,11 @@ class DiscourseComment {
 			);
 			wp_enqueue_script( 'load_comments_js' );
 			wp_localize_script( 'load_comments_js', 'wpdc', $data );
+		}
+
+		if ( ! empty( $this->options['load-comment-css'] ) ) {
+			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
+			wp_enqueue_style( 'comment_styles' );
 		}
 	}
 
@@ -220,7 +226,7 @@ class DiscourseComment {
 
 					$result = wp_remote_get( $permalink );
 
-					if ( DiscourseUtilities::validate( $result ) ) {
+					if ( $this->validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
 

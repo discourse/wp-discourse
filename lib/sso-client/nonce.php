@@ -5,7 +5,7 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse;
+namespace WPDiscourse\SSOClient;
 
 /**
  * Nonce generator
@@ -53,7 +53,7 @@ class Nonce {
 	 *
 	 * @method get_instance
 	 *
-	 * @return \WPDiscourse\Nonce       the instance.
+	 * @return \WPDiscourse\SSOClient\Nonce       the instance.
 	 */
 	public static function get_instance() {
 		if ( is_null( self::$instance ) ) {

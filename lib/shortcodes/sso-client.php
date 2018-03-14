@@ -5,26 +5,37 @@
  * @package WPDiscourse
  */
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+namespace WPDiscourse\SSOClient;
 
 /**
- * Shortcode for SSO link
- *
- * @method discourse_sso_client_shortcode
- *
- * @param  array $atts shortcode params.
- *
- * @return string markup
+ * Class SSOClientShortcode
  */
-function discourse_sso_client_shortcode( $atts = array() ) {
-	$options = shortcode_atts(
-		array(
-			'login' => null,
-			'link'  => null,
-		), $atts
-	);
+class SSOClientShortcode extends SSOClientBase {
 
-	return get_discourse_sso_link_markup( $options );
+	/**
+	 * SSOClientShortcode constructor.
+	 */
+	public function __construct() {
+		add_shortcode( 'discourse_sso_client', array( $this, 'discourse_sso_client_shortcode' ) );
+	}
+
+	/**
+	 * Shortcode for SSO link
+	 *
+	 * @method discourse_sso_client_shortcode
+	 *
+	 * @param  array $atts shortcode params.
+	 *
+	 * @return string markup
+	 */
+	public function discourse_sso_client_shortcode( $atts = array() ) {
+		$options = shortcode_atts(
+			array(
+				'login' => null,
+				'link'  => null,
+			), $atts
+		);
+
+		return $this->get_discourse_sso_link_markup( $options );
+	}
 }
-
-add_shortcode( 'discourse_sso_client', 'discourse_sso_client_shortcode' );

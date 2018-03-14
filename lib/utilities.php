@@ -46,35 +46,6 @@ class Utilities {
 	}
 
 	/**
-	 * Checks the connection status to Discourse.
-	 *
-	 * @return int|\WP_Error
-	 */
-	public static function check_connection_status() {
-		$options      = self::get_options();
-		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
-
-		if ( ! ( $url && $api_key && $api_username ) ) {
-
-			return 0;
-		}
-
-		$url = add_query_arg(
-			array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-			), $url . '/users/' . $api_username . '.json'
-		);
-
-		$url      = esc_url_raw( $url );
-		$response = wp_remote_get( $url );
-
-		return self::validate( $response );
-	}
-
-	/**
 	 * Validates the response from `wp_remote_get` or `wp_remote_post`.
 	 *
 	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
@@ -102,197 +73,11 @@ class Utilities {
 	/**
 	 * Gets the Discourse categories.
 	 *
-	 * @return array|\WP_Error
+	 * @return array
 	 */
 	public static function get_discourse_categories() {
-		$options      = self::get_options();
-		$force_update = false;
 
-		$categories = get_option( 'wpdc_discourse_categories' );
-
-		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
-			$force_update = true;
-		}
-
-		if ( $force_update ) {
-			$base_url     = ! empty( $options['url'] ) ? $options['url'] : null;
-			$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-			$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
-
-			if ( ! ( $base_url && $api_key && $api_username ) ) {
-
-				return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
-			}
-
-			$site_url = esc_url_raw( "{$base_url}/site.json" );
-			$site_url = add_query_arg(
-				array(
-					'api_key'      => $api_key,
-					'api_username' => $api_username,
-				), $site_url
-			);
-
-			$remote = wp_remote_get( $site_url );
-
-			if ( ! self::validate( $remote ) ) {
-
-				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
-			}
-
-			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
-			if ( array_key_exists( 'categories', $remote ) ) {
-				$categories = $remote['categories'];
-				if ( empty( $options['display-subcategories'] ) ) {
-					foreach ( $categories as $category => $values ) {
-						if ( array_key_exists( 'parent_category_id', $values ) ) {
-							unset( $categories[ $category ] );
-						}
-					}
-				}
-				update_option( 'wpdc_discourse_categories', $categories );
-			} else {
-
-				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
-			}
-		}// End if().
-
-		return $categories;
-	}
-
-	/**
-	 * Tries to find a WordPress posts that are associated with a Discourse topic_id.
-	 *
-	 * An array is being returned because it's possible for more than one WordPress post to be associated with a Discourse topic.
-	 *
-	 * @param int $topic_id The topic_id to lookup.
-	 *
-	 * @return array|null
-	 */
-	public static function get_post_ids_from_topic_id( $topic_id ) {
-		global $wpdb;
-
-		$topic_posts = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
-
-		if ( ! empty( $topic_posts ) ) {
-			$topic_post_ids = [];
-			foreach ( $topic_posts as $topic_post ) {
-				$topic_post_ids[] = $topic_post->post_id;
-			}
-
-			return $topic_post_ids;
-		}
-
-		return null;
-	}
-
-	/**
-	 * Check if an user is linked to a discourse instance
-	 *
-	 * @return boolean
-	 */
-	public static function user_is_linked_to_sso() {
-		$user = wp_get_current_user();
-
-		if ( ! $user ) {
-			return false;
-		}
-
-		return get_user_meta( $user->ID, 'discourse_sso_user_id', true );
-	}
-
-	/**
-	 * Get a Discourse user object.
-	 *
-	 * @param int  $user_id The WordPress user_id.
-	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function get_discourse_user( $user_id, $match_by_email = false ) {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
-		}
-
-		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
-		$external_user_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
-				), $external_user_url
-			)
-		);
-
-		$response = wp_remote_get( $external_user_url );
-
-		if ( self::validate( $response ) ) {
-
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( isset( $body->user ) ) {
-
-				return $body->user;
-			}
-		}
-
-		if ( $match_by_email ) {
-			$user = get_user_by( 'id', $user_id );
-
-			if ( ! empty( $user ) && ! is_wp_error( $user ) ) {
-
-				return self::get_discourse_user_by_email( $user->user_email );
-			} else {
-
-				return new \WP_Error( 'wpdc_param_error', 'There is no WordPress user with the supplied id.' );
-			}
-		}
-
-		return new \WP_Error( 'wpdc_response_error', 'The Discourse user could not be retrieved.' );
-	}
-
-	/**
-	 * Gets a Discourse user by their email address.
-	 *
-	 * @param string $email The email address to search for.
-	 *
-	 * @return object \WP_Error
-	 */
-	public static function get_discourse_user_by_email( $email ) {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
-		$users_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'email'        => rawurlencode_deep( $email ),
-					'filter'       => rawurlencode_deep( $email ),
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
-				), $users_url
-			)
-		);
-
-		$response = wp_remote_get( $users_url );
-		if ( self::validate( $response ) ) {
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			// The reqest returns a valid response even if the user isn't found, so check for empty.
-			if ( ! empty( $body ) && ! empty( $body[0] ) ) {
-
-				return $body[0];
-			} else {
-
-				// A valid response was returned, but the user wasn't found.
-				return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
-			}
-		} else {
-
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
-		}
+		return get_option( 'wpdc_discourse_categories' );
 	}
 
 	/**
@@ -304,8 +89,6 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
-		// Keeps track of the number of attempts to create a unique username. Set to a max of 3.
-		static $username_instance = 0;
 
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
@@ -318,11 +101,9 @@ class Utilities {
 			return new \WP_Error( 'wpdc_user_not_set_error', 'The Discourse user you are attempting to create does not exist on WordPress.' );
 		}
 
-		$user_id = $user->ID;
-
 		$require_activation = apply_filters( 'wpdc_auto_create_user_require_activation', $require_activation, $user );
 		$create_user_url    = esc_url_raw( "{$api_credentials['url']}/users" );
-		$username           = 0 === $username_instance ? $user->user_login : $user->user_login . $username_instance;
+		$username           = $user->user_login;
 		$name               = $user->display_name;
 		$email              = $user->user_email;
 		$password           = wp_generate_password( 20 );
@@ -344,59 +125,21 @@ class Utilities {
 
 		if ( ! self::validate( $response ) ) {
 
-			return new \WP_Error( 'wpdc_response_error', 'An error was returned from Discourse when attempting to create a user.' );
+			return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'An error was returned from Discourse when attempting to create a user.' );
 		}
 
 		$user_data = json_decode( wp_remote_retrieve_body( $response ) );
+		if ( empty( $user_data->success ) ) {
 
-		// The username is taken on Discourse.
-		if ( ! empty( $user_data->errors ) && ! empty( $user_data->errors->username ) && $username_instance < 2 ) {
-			$username_instance ++;
-			self::create_discourse_user( $user, $require_activation );
-
-			return new \WP_Error( 'wpdc_username_taken_error', 'The Discourse username is already taken. Attempting to create another user.' );
+			return new \WP_Error( 'wpdc_response_error', $user_data->message );
 		}
 
 		if ( isset( $user_data->user_id ) ) {
-			update_user_meta( $user_id, 'discourse_sso_user_id', $user_data->user_id );
-			update_user_meta( $user_id, 'discourse_username', $username );
 
 			return $user_data->user_id;
 		}
 
-		return new \WP_Error( 'wpdc_response_error', 'The Discourse user could not be created.' );
-	}
-
-	/**
-	 * Gets a Discourse topic's json from its URL.
-	 *
-	 * @param string $topic_url The Discourse topic URL.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function get_discourse_topic( $topic_url ) {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$topic_url = esc_url_raw( "{$topic_url}.json" );
-		$topic_url = add_query_arg(
-			array(
-				'api_key'      => $api_credentials['api_key'],
-				'api_username' => $api_credentials['api_username'],
-			), $topic_url
-		);
-
-		$response = wp_remote_get( $topic_url );
-
-		if ( ! self::validate( $response ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'The topic could not be retrieved from Discourse.' );
-		}
-
-		return json_decode( wp_remote_retrieve_body( $response ) );
+		return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'The Discourse user could not be created.' );
 	}
 
 	/**
@@ -450,39 +193,7 @@ class Utilities {
 	}
 
 	/**
-	 * Get the Discourse about.json route.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function get_discourse_stats() {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$about_url = esc_url_raw( "{$api_credentials['url']}/about.json" );
-		$about_url = add_query_arg(
-			array(
-				'api_key'      => $api_credentials['api_key'],
-				'api_username' => $api_credentials['api_username'],
-			), $about_url
-		);
-
-		$response = wp_remote_get( $about_url );
-
-		if ( ! self::validate( $response ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'The Discourse stats could not be returned.' );
-		}
-
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		return $response;
-	}
-
-	/**
-	 * Gets the SSO parametrs for a user.
+	 * Gets the SSO parameters for a user.
 	 *
 	 * @param object $user The WordPress user.
 	 * @param array  $sso_options An optional array of extra SSO parameters.
@@ -636,6 +347,124 @@ class Utilities {
 	}
 
 	/**
+	 * Get a Discourse user object.
+	 *
+	 * @param int  $user_id The WordPress user_id.
+	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
+	 *
+	 * @return array|mixed|object|\WP_Error
+	 */
+	public static function get_discourse_user( $user_id, $match_by_email = false ) {
+		$api_credentials = self::get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
+		}
+
+		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
+		$external_user_url = esc_url_raw(
+			add_query_arg(
+				array(
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
+				), $external_user_url
+			)
+		);
+
+		$response = wp_remote_get( $external_user_url );
+
+		if ( self::validate( $response ) ) {
+
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+			if ( isset( $body->user ) ) {
+
+				return $body->user;
+			}
+		}
+
+		if ( $match_by_email ) {
+			$user = get_user_by( 'id', $user_id );
+
+			if ( ! empty( $user ) && ! is_wp_error( $user ) ) {
+
+				return self::get_discourse_user_by_email( $user->user_email );
+			} else {
+
+				return new \WP_Error( 'wpdc_param_error', 'There is no WordPress user with the supplied id.' );
+			}
+		}
+
+		return new \WP_Error( 'wpdc_response_error', 'The Discourse user could not be retrieved.' );
+	}
+
+	/**
+	 * Gets a Discourse user by their email address.
+	 *
+	 * @param string $email The email address to search for.
+	 *
+	 * @return object \WP_Error
+	 */
+	public static function get_discourse_user_by_email( $email ) {
+		$api_credentials = self::get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
+		$users_url = esc_url_raw(
+			add_query_arg(
+				array(
+					'email'        => rawurlencode_deep( $email ),
+					'filter'       => rawurlencode_deep( $email ),
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
+				), $users_url
+			)
+		);
+
+		$response = wp_remote_get( $users_url );
+		if ( self::validate( $response ) ) {
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+			// The reqest returns a valid response even if the user isn't found, so check for empty.
+			if ( ! empty( $body ) && ! empty( $body[0] ) ) {
+
+				return $body[0];
+			} else {
+
+				// A valid response was returned, but the user wasn't found.
+				return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
+			}
+		} else {
+
+			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
+		}
+	}
+
+	/**
+	 * Gets the Discourse API credentials from the options array.
+	 *
+	 * @return array|\WP_Error
+	 */
+	protected static function get_api_credentials() {
+		$options      = self::get_options();
+		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
+		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
+		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
+
+		if ( ! ( $url && $api_key && $api_username ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse configuration options have not been set.' );
+		}
+
+		return array(
+			'url'          => $url,
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+		);
+	}
+
+	/**
 	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
 	 *
 	 * @param \WP_REST_Request $data The WP_REST_Request object.
@@ -667,94 +496,5 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
-	}
-
-	/**
-	 * Gets the Discourse group_id from the group name.
-	 *
-	 * @param string $group_name The Discourse group name.
-	 * @param bool   $force_update Whether or not to force an update of the groups data transient.
-	 *
-	 * @return \WP_Error
-	 */
-	protected static function get_discourse_group_id_from_name( $group_name, $force_update = false ) {
-		$discourse_groups = get_transient( 'wpdc_non_automatic_groups' );
-		if ( empty( $discourse_groups ) || $force_update ) {
-			$discourse_groups = self::get_discourse_groups();
-
-			if ( empty( $discourse_groups ) || is_wp_error( $discourse_groups ) ) {
-
-				return new \WP_Error( 'wpdc_response_error', 'The groups data could not be returned from Discourse.' );
-			}
-		}
-
-		foreach ( $discourse_groups as $group ) {
-			if ( $group->name === $group_name ) {
-
-				return $group->id;
-			}
-		}
-
-		return new \WP_Error( 'wpdc_group_not_found', 'A Discourse group was not found with the name you provided.' );
-	}
-
-	/**
-	 * Gets the Discourse user id from the WordPress user id.
-	 *
-	 * @param int $user_id The WordPress user id.
-	 *
-	 * @return int|mixed|\WP_Error
-	 */
-	protected static function get_discourse_id( $user_id ) {
-		$discourse_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
-		if ( empty( $discourse_id ) ) {
-
-			$discourse_user = self::get_discourse_user( $user_id, true );
-			if ( ! empty( $discourse_user ) && ! is_wp_error( $discourse_user ) ) {
-
-				$discourse_id = $discourse_user->id;
-				update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id );
-			} else {
-
-				$require_activation = ( 1 === intval( get_user_meta( $user_id, 'discourse_email_not_verified', true ) ) );
-				$user               = get_user_by( 'id', $user_id );
-				if ( empty( $user ) || is_wp_error( $user ) ) {
-
-					return new \WP_Error( 'wpdc_user_does_not_exist_error', 'The user you are trying to add to a Discourse group does not exist on WordPress.' );
-				}
-
-				$discourse_id = self::create_discourse_user( $user, $require_activation );
-
-				if ( empty( $discourse_id ) || is_wp_error( $discourse_id ) ) {
-
-					return new \WP_Error( 'wpdc_response_error', 'Unable to create a Discourse user to add to the group.' );
-				}
-			}
-		}
-
-		return $discourse_id;
-	}
-
-	/**
-	 * Gets the Discourse API credentials from the options array.
-	 *
-	 * @return array|\WP_Error
-	 */
-	protected static function get_api_credentials() {
-		$options      = self::get_options();
-		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
-
-		if ( ! ( $url && $api_key && $api_username ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse configuration options have not been set.' );
-		}
-
-		return array(
-			'url'          => $url,
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-		);
 	}
 }

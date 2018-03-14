@@ -7,12 +7,12 @@
 
 namespace WPDiscourse\DiscourseUser;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseUser
  */
-class DiscourseUser {
+class DiscourseUser extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.
@@ -35,7 +35,7 @@ class DiscourseUser {
 	 * Setup the plugin options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -90,7 +90,7 @@ class DiscourseUser {
 			return new \WP_Error( 'discourse_webhook_error', __( 'The Discourse User webhook is not enabled for your site.' ) );
 		}
 
-		$data = DiscourseUtilities::verify_discourse_webhook_request( $data );
+		$data = $this->verify_discourse_webhook_request( $data );
 		if ( is_wp_error( $data ) ) {
 
 			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse User webhook.', 'wp-discourse' ) );

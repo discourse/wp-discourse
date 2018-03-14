@@ -8,12 +8,13 @@
 namespace WPDiscourse\DiscoursePublish;
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscoursePublish
  */
 class DiscoursePublish {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -48,7 +49,7 @@ class DiscoursePublish {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -184,7 +185,8 @@ class DiscoursePublish {
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
-			$data = array(
+			$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+			$data     = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
@@ -194,8 +196,9 @@ class DiscoursePublish {
 				'category'         => $category,
 				'skip_validations' => 'true',
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
+				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
 			);
-			$url  = $options['url'] . '/posts';
+			$url      = $options['url'] . '/posts';
 			// Use key 'http' even if you send the request to https://.
 			$post_options = array(
 				'timeout' => 30,
@@ -222,15 +225,15 @@ class DiscoursePublish {
 
 		$result = wp_remote_post( $url, $post_options );
 
-		if ( ! DiscourseUtilities::validate( $result ) ) {
+		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
 				$error_code    = null;
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
 				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
-				if ( 404 === $error_code || 500 === $error_code ) {
-					// Publishing to a deleted topic is currently returning a 500 response code.
+				if ( 500 === $error_code ) {
+					// For older versions of Discourse, publishing to a deleted topic is returning a 500 response code.
 					update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
 				}
 			}
@@ -250,6 +253,7 @@ class DiscoursePublish {
 				$topic_slug = $body->topic_slug;
 				$topic_id   = $body->topic_id;
 
+				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
@@ -261,6 +265,13 @@ class DiscoursePublish {
 					$this->save_topic_blog_id( $body->topic_id, $blog_id );
 				}
 
+				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
+				if ( ! empty( $pin_until ) ) {
+					$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
+
+					return $pin_response;
+				}
+
 				// The topic has been created and its associated post's metadata has been updated.
 				return null;
 			} else {
@@ -269,11 +280,20 @@ class DiscoursePublish {
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
 		} elseif ( property_exists( $body, 'post' ) ) {
+
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
 			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
 
+			// Handles deleted topics for recent versions of Discourse.
+			if ( ! empty( $discourse_post->deleted_at ) ) {
+				update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
+
+				return new \WP_Error( 'discourse_publishing_response_error', 'The Discourse topic associated with this post has been deleted.' );
+			}
+
 			if ( $topic_slug && $topic_id ) {
+				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
@@ -299,6 +319,42 @@ class DiscoursePublish {
 		$this->create_bad_response_notifications( $current_post, $post_id );
 
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+	}
+
+	/**
+	 * Pins a Discourse topic.
+	 *
+	 * @param int    $post_id The WordPress id of the pinned post.
+	 * @param int    $topic_id The Discourse topic_id of the pinned post.
+	 * @param string $pin_until A string that sets the pin_until date.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
+		$status_url   = esc_url( $this->options['url'] . "/t/$topic_id/status" );
+		$data         = array(
+			'api_key'      => $this->options['api-key'],
+			'api_username' => $this->options['publish-username'],
+			'status'       => 'pinned',
+			'enabled'      => 'true',
+			'until'        => $pin_until,
+		);
+		$post_options = array(
+			'timeout' => 30,
+			'method'  => 'PUT',
+			'body'    => http_build_query( $data ),
+		);
+
+		$response = wp_remote_post( $status_url, $post_options );
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'discourse_publishing_response_error', 'The topic could not be pinned on Discourse.' );
+		}
+
+		delete_post_meta( $post_id, 'wpdc_pin_until' );
+
+		return null;
 	}
 
 	/**

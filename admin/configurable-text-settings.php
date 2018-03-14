@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class ConfigurableTextSettings
  */
 class ConfigurableTextSettings {
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.
@@ -47,7 +48,7 @@ class ConfigurableTextSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_text_settings() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		add_settings_section(
 			'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(

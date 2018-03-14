@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\DiscourseSSO;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use \WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class DiscourseSSO
  */
 class DiscourseSSO {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -43,9 +44,9 @@ class DiscourseSSO {
 	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$params = DiscourseUtilities::get_sso_params( $user );
+			$params = $this->get_sso_params( $user );
 
-			DiscourseUtilities::sync_sso_record( $params );
+			$this->sync_sso( $params );
 		}
 	}
 
@@ -53,7 +54,7 @@ class DiscourseSSO {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -120,8 +121,7 @@ class DiscourseSSO {
 		 * To make this work, enter a URL of the form "http://my-wp-blog.com/?request=logout" in the "logout redirect"
 		 * field in your Discourse admin
 		 */
-		if ( isset( $this->options['enable-sso'] ) &&
-			 1 === intval( $this->options['enable-sso'] ) &&
+		if ( ! empty( $this->options['enable-sso'] ) &&
 			 isset( $_GET['request'] ) && // Input var okay.
 			 'logout' === $_GET['request'] // Input var okay.
 		) {
@@ -132,8 +132,7 @@ class DiscourseSSO {
 			exit;
 		}
 		// End logout processing.
-		if ( isset( $this->options['enable-sso'] ) &&
-			 1 === intval( $this->options['enable-sso'] ) &&
+		if ( ! empty( $this->options['enable-sso'] ) &&
 			 array_key_exists( 'sso', $wp->query_vars ) &&
 			 array_key_exists( 'sig', $wp->query_vars )
 		) {
@@ -177,12 +176,13 @@ class DiscourseSSO {
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
+
 					exit;
 				}
 
 				$nonce           = $sso->get_nonce( $payload );
 				$current_user    = wp_get_current_user();
-				$params          = DiscourseUtilities::get_sso_params( $current_user );
+				$params          = $this->get_sso_params( $current_user );
 				$params['nonce'] = $nonce;
 				$q               = $sso->build_login_string( $params );
 
@@ -218,7 +218,7 @@ class DiscourseSSO {
 		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
-			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			$discourse_user = $this->get_discourse_user( $user_id );
 			if ( empty( $discourse_user->id ) ) {
 
 				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
@@ -239,11 +239,117 @@ class DiscourseSSO {
 				),
 			)
 		);
-		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+		if ( ! $this->validate( $logout_response ) ) {
 
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
 		}
 
 		return null;
+	}
+
+	/**
+	 * Gets the SSO parametrs for a user.
+	 *
+	 * @param object $user The WordPress user.
+	 * @param array  $sso_options An optional array of extra SSO parameters.
+	 *
+	 * @return array
+	 */
+	protected function get_sso_params( $user, $sso_options = array() ) {
+		$plugin_options      = $this->options;
+		$user_id             = $user->ID;
+		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
+		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
+		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
+		$avatar_url          = get_avatar_url(
+			$user_id, array(
+				'default' => '404',
+			)
+		);
+		$avatar_url          = apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
+
+		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
+			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+
+			if ( $first_name || $last_name ) {
+				$name = trim( $first_name . ' ' . $last_name );
+			}
+		}
+
+		if ( empty( $name ) ) {
+			$name = $user->display_name;
+		}
+
+		$params = array(
+			'external_id'         => $user_id,
+			'username'            => $user->user_login,
+			'email'               => $user->user_email,
+			'require_activation'  => $require_activation ? 'true' : 'false',
+			'name'                => $name,
+			'bio'                 => $user->description,
+			'avatar_url'          => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
+		);
+
+		if ( ! empty( $sso_options ) ) {
+			foreach ( $sso_options as $option_key => $option_value ) {
+				$params[ $option_key ] = $option_value;
+			}
+		}
+
+		return apply_filters( 'wpdc_sso_params', $params, $user );
+	}
+
+	/**
+	 * Syncs a user with Discourse through SSO.
+	 *
+	 * @param array $sso_params The sso params to sync.
+	 *
+	 * @return int|string|\WP_Error
+	 */
+	protected function sync_sso( $sso_params ) {
+		$plugin_options = $this->options;
+		if ( empty( $plugin_options['enable-sso'] ) ) {
+
+			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
+		}
+		$api_credentials = $this->get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$url         = $api_credentials['url'] . '/admin/users/sync_sso';
+		$sso_secret  = $plugin_options['sso-secret'];
+		$sso_payload = base64_encode( http_build_query( $sso_params ) );
+		// Create the signature for Discourse to match against the payload.
+		$sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+
+		$response = wp_remote_post(
+			esc_url_raw( $url ), array(
+				'body' => array(
+					'sso'          => $sso_payload,
+					'sig'          => $sig,
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
+				),
+			)
+		);
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'An error was returned from Discourse while trying to sync the sso record.' );
+		}
+
+		$discourse_user = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( ! empty( $discourse_user->id ) ) {
+			$wordpress_user_id = $sso_params['external_id'];
+			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', $discourse_user->id );
+			update_user_meta( $wordpress_user_id, 'discourse_username', $discourse_user->username );
+		}
+
+		return wp_remote_retrieve_response_code( $response );
 	}
 }

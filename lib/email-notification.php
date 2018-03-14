@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\EmailNotification;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class EmailNotification
  */
 class EmailNotification {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -33,7 +34,7 @@ class EmailNotification {
 	 * Setup the plugin options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**

@@ -8,7 +8,7 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class SettingsValidator
@@ -16,6 +16,7 @@ use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
  * @package WPDiscourse\Validator
  */
 class SettingsValidator {
+	use PluginUtilities;
 
 	/**
 	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
@@ -100,6 +101,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_load_comment_css', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_discourse_new_tab', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_show_existing_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_existing_comments_heading', array( $this, 'validate_existing_comments_heading' ) );
@@ -166,7 +168,7 @@ class SettingsValidator {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		$this->sso_provider_enabled = ! empty( $this->options['enable-sso'] );
 		$this->sso_client_enabled   = ! empty( $this->options['sso-client-enabled'] );

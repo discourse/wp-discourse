@@ -5,14 +5,12 @@
  * @package WPDiscourse\sso
  */
 
-namespace WPDiscourse\sso;
-
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+namespace WPDiscourse\SSOClient;
 
 /**
  * Class Client
  */
-class Client {
+class Client extends SSOClientBase {
 
 	/**
 	 * Gives access to the plugin options.
@@ -36,13 +34,72 @@ class Client {
 		add_action( 'init', array( $this, 'parse_request' ), 5 );
 		add_filter( 'wp_login_errors', array( $this, 'handle_login_errors' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
+		add_action( 'login_form', array( $this, 'discourse_sso_alter_login_form' ) );
+		add_action( 'show_user_profile', array( $this, 'discourse_sso_alter_user_profile' ) );
+	}
+
+	/**
+	 * Decides if checkbox for login form alteration are enabled
+	 *
+	 * @return boolean
+	 */
+	protected function discourse_sso_auto_inject_button() {
+		return ! empty( $this->options['sso-client-enabled'] ) && ! empty( $this->options['sso-client-login-form-change'] );
+	}
+
+	/**
+	 * Alter the login form
+	 */
+	public function discourse_sso_alter_login_form() {
+		if ( ! $this->discourse_sso_auto_inject_button() ) {
+
+			return null;
+		}
+
+		printf( '<p>%s</p><p>&nbsp;</p>', wp_kses_data( $this->get_discourse_sso_link_markup() ) );
+
+		do_action( 'wpdc_sso_client_after_login_link' );
+	}
+
+	/**
+	 * Alter user profile
+	 */
+	public function discourse_sso_alter_user_profile() {
+		$auto_inject_button = $this->discourse_sso_auto_inject_button();
+		$link_text          = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
+		$linked_text        = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
+		$user               = wp_get_current_user();
+
+		if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
+
+			return null;
+		}
+
+		?>
+		<table class="form-table">
+			<tr>
+				<th><?php echo wp_kses_post( $link_text ); ?></th>
+				<td>
+					<?php
+					if ( $user && get_user_meta( $user->ID, 'discourse_sso_user_id', true ) ) {
+
+						echo wp_kses_post( $linked_text );
+					} else {
+
+						echo wp_kses_data( $this->get_discourse_sso_link_markup() );
+					}
+					?>
+				</td>
+			</tr>
+		</table>
+		<?php
 	}
 
 	/**
 	 * Parse Request Hook
 	 */
 	public function parse_request() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 
 		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
 			 empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.
@@ -62,9 +119,9 @@ class Client {
 			return;
 		}
 
-		$update_user = $this->update_user( $user_id );
-		if ( is_wp_error( $update_user ) ) {
-			$this->handle_errors( $update_user );
+		$updated_user = $this->update_user( $user_id );
+		if ( is_wp_error( $updated_user ) ) {
+			$this->handle_errors( $updated_user );
 
 			return;
 		}
@@ -77,39 +134,45 @@ class Client {
 	 *
 	 * @param  int $user_id the user ID.
 	 *
-	 * @return int|WP_Error integer if the update was successful, WP_Error otherwise.
+	 * @return int|\WP_Error integer if the update was successful, WP_Error otherwise.
 	 */
 	private function update_user( $user_id ) {
 		$query = $this->get_sso_response();
-		$nonce = \WPDiscourse\Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
+		$nonce = Nonce::get_instance()->verify( $query['nonce'], '_discourse_sso' );
 
 		if ( ! $nonce ) {
 			return new \WP_Error( 'expired_nonce' );
 		}
 
-		$name = ! empty( $query['name'] ) ? $query['name'] : $query['username'];
+		$username = $query['username'];
+		$email    = $query['email'];
 
 		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
 		$wp_user = get_user_by( 'ID', $user_id );
-		if ( $wp_user->user_login !== $query['username'] && $wp_user->user_email !== $query['email'] ) {
+		if ( $wp_user->user_login !== $username && $wp_user->user_email !== $email ) {
+
 			return new \WP_Error( 'mismatched_users' );
 		}
 
 		$updated_user = array(
 			'ID'            => $user_id,
-			'user_login'    => $query['username'],
-			'user_email'    => $query['email'],
-			'user_nicename' => $name,
-			'display_name'  => $name,
-			'first_name'    => $name,
+			'user_login'    => $username,
+			'user_email'    => $email,
+			'user_nicename' => $username,
 		);
+
+		if ( ! empty( $query['name'] ) ) {
+			$updated_user['first_name'] = explode( ' ', $query['name'] )[0];
+			$updated_user['name']       = $query['name'];
+		}
 
 		$updated_user = apply_filters( 'wpdc_sso_client_updated_user', $updated_user, $query );
 
 		$update = wp_update_user( $updated_user );
 
 		if ( ! is_wp_error( $update ) ) {
-			update_user_meta( $user_id, 'discourse_username', $query['username'] );
+			update_user_meta( $user_id, 'discourse_username', $username );
+
 			if ( ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
 				update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
 			}
@@ -121,7 +184,7 @@ class Client {
 	/**
 	 * Handle Login errors
 	 *
-	 * @param  WP_Error $error WP_Error object.
+	 * @param  \WP_Error $error WP_Error object.
 	 */
 	private function handle_errors( $error ) {
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_failed_login', wp_login_url() );
@@ -136,9 +199,9 @@ class Client {
 	/**
 	 * Add errors on the login form.
 	 *
-	 * @param  WP_Error $errors the WP_Error object.
+	 * @param  \WP_Error $errors the WP_Error object.
 	 *
-	 * @return WP_Error updated errors.
+	 * @return \WP_Error updated errors.
 	 */
 	public function handle_login_errors( $errors ) {
 		if ( isset( $_GET['discourse_sso_error'] ) ) { // Input var okay.
@@ -210,7 +273,7 @@ class Client {
 	/**
 	 * Get user id or create an user
 	 *
-	 * @return int      user id
+	 * @return int|\WP_Error
 	 */
 	private function get_user_id() {
 		if ( is_user_logged_in() ) {
@@ -292,9 +355,9 @@ class Client {
 	/**
 	 * Parse SSO Response
 	 *
-	 * @param string $return_key ss.
+	 * @param string $return_key The key to return.
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	private function get_sso_response( $return_key = '' ) {
 		if ( empty( $_GET['sso'] ) ) { // Input var okay.
@@ -349,7 +412,7 @@ class Client {
 		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
-			$discourse_user = DiscourseUtilities::get_discourse_user( $user_id );
+			$discourse_user = $this->get_discourse_user( $user_id );
 			if ( empty( $discourse_user->id ) ) {
 
 				return new \WP_Error( 'wpdc_response_error', 'The Discourse user_id could not be returned when trying to logout the user.' );
@@ -370,7 +433,8 @@ class Client {
 				),
 			)
 		);
-		if ( ! DiscourseUtilities::validate( $logout_response ) ) {
+
+		if ( ! $this->validate( $logout_response ) ) {
 
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
 		}

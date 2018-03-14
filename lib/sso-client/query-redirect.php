@@ -5,15 +5,15 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\sso;
+namespace WPDiscourse\SSOClient;
 
-use \WPDiscourse\Utilities\Utilities as DiscourseUtilities;
-use \WPDiscourse\Nonce;
+use \WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class QueryRedirect
  */
 class QueryRedirect {
+	use PluginUtilities;
 
 	/**
 	 * Gives access to the plugin options.
@@ -36,7 +36,7 @@ class QueryRedirect {
 	 * Setup options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**

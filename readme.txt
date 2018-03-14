@@ -3,7 +3,7 @@ Contributors: cdck, retlehs, samsaffron, scossar, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 4.9.4
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,14 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.5.8 01/03/2018
+
+- Add option for publishing posts as unlisted Discourse topics
+- Add option for publishing posts as pinned topics
+- Update API static methods
+- Fix SSO Client nicename error when a full name is in the Discourse name field
+- Add an optional stylesheet for fixing oneboxes and quotes in comments
 
 #### 1.5.7 15/02/2018
 

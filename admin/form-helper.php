@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class FormHelper
  */
 class FormHelper {
+	use PluginUtilities;
 
 	/**
 	 * Used for containing a single instance of the FormHelper class throughout a request.
@@ -54,7 +55,7 @@ class FormHelper {
 	 * Sets the plugin options.
 	 */
 	public function setup_options() {
-		$this->options = DiscourseUtilities::get_options();
+		$this->options = $this->get_options();
 	}
 
 	/**
@@ -184,7 +185,7 @@ class FormHelper {
 	public function category_select( $option, $option_group, $description ) {
 		$options = $this->options;
 
-		$categories = DiscourseUtilities::get_discourse_categories();
+		$categories = $this->get_discourse_categories();
 
 		if ( is_wp_error( $categories ) ) {
 			esc_html_e( 'The Discourse category list will be available when you establish a connection with Discourse.', 'wp-discourse' );
@@ -295,8 +296,6 @@ class FormHelper {
 	 * Adds notices to indicate the connection status with Discourse.
 	 *
 	 * This method is called by the `load-{settings_page_hook}` action - see https://codex.wordpress.org/Plugin_API/Action_Reference/load-(page).
-	 *
-	 * Todo: this function should be renamed.
 	 */
 	public function connection_status_notice() {
 		if ( ! empty( $_GET['tab'] ) ) { // Input var okay.
@@ -310,7 +309,7 @@ class FormHelper {
 		if ( $current_page && ( 'sso_provider' === $current_page ) ) {
 			// Check if the user saving the options has an email address on Discourse.
 			$current_user_email = wp_get_current_user()->user_email;
-			$discourse_user     = DiscourseUtilities::get_discourse_user_by_email( $current_user_email );
+			$discourse_user     = $this->get_discourse_user_by_email( $current_user_email );
 			if ( is_wp_error( $discourse_user ) || empty( $discourse_user->admin ) ) {
 				add_action( 'admin_notices', array( $this, 'no_matching_discourse_user' ) );
 			}
@@ -319,7 +318,7 @@ class FormHelper {
 		// Only check the connection status on the main settings tab.
 		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 
-			if ( ! DiscourseUtilities::check_connection_status() ) {
+			if ( ! $this->check_connection_status() ) {
 				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 
 			} else {

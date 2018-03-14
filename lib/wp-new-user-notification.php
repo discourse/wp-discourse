@@ -23,10 +23,10 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 	 * @param string $notify     Optional. Type of notification that should happen. Accepts 'admin' or an empty
 	 *                           string (admin only), or 'both' (admin and user). Default empty.
 	 */
-	$options = \WPDiscourse\Utilities\Utilities::get_options();
 
 	// Only override the default function if SSO is enabled.
-	if ( ! empty( $options['enable-sso'] ) && 1 === intval( $options['enable-sso'] ) ) {
+	$sso_options = get_option( 'discourse_sso_provider' );
+	if ( ! empty( $sso_options['enable-sso'] ) ) {
 
 		function wp_new_user_notification( $user_id, $deprecated = null, $notify = '' ) {
 			if ( $deprecated !== null ) {

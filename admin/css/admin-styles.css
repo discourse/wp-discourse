@@ -78,6 +78,15 @@ ul.wpdc-documentation-list {
 	margin-left: 40px;
 }
 
+#discourse-publish-meta-box label {
+	display: inline-block;
+	padding: 6px 10px 8px 0;
+}
+
+#discourse-publish-meta-box label[for="wpdc_publish_option"] {
+	padding: 0;
+}
+
 .wpdc-new-discourse-topic.hidden,
 .wpdc-link-to-top.hidden {
 	display: none;
@@ -85,4 +94,33 @@ ul.wpdc-documentation-list {
 
 #discourse-publish-meta-box a {
 	overflow-wrap: break-word;
+}
+
+.wpdc-advanced-options.hidden {
+	display: none;
+}
+
+.wpdc-advanced-options {
+	padding-bottom: 8px;
+}
+
+.wpdc-advanced-options-toggle:hover{
+	cursor: pointer;
+}
+
+.wpdc-advanced-options-toggle:before {
+	content: "\f111";
+	font: 400 20px/1 dashicons;
+	color: #82878c;
+	speak: none;
+	display: inline-block;
+	margin-left: -1px;
+	padding-right: 3px;
+	vertical-align: top;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.wpdc-advanced-options-toggle:hover:before {
+	color: #444444;
 }

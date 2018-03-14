@@ -7,12 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
-use WPDiscourse\Utilities\Utilities as DiscourseUtilities;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class SSOSettings
  */
 class SSOSettings {
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.
@@ -71,7 +72,7 @@ class SSOSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_sso_settings() {
-		$this->options                    = DiscourseUtilities::get_options();
+		$this->options                    = $this->get_options();
 		$this->use_network_sso_settings   = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 		$this->remove_sso_client_settings = is_multisite() && empty( $this->options['multisite-configuration-enabled'] );
 
