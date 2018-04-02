@@ -124,3 +124,12 @@ ul.wpdc-documentation-list {
 .wpdc-advanced-options-toggle:hover:before {
 	color: #444444;
 }
+
+/* Make it easier to copy sections. */
+
+code.wpdc-select-all {
+	-webkit-user-select: all;
+	-moz-user-select: all;
+	-ms-user-select: all;
+	user-select: all;
+}
