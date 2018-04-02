@@ -114,8 +114,10 @@ class WebhookSettings {
 	 * Outputs markup for use-discourse-webhook checkbox.
 	 */
 	public function use_discourse_webhook_checkbox() {
-		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-topic-content' );
+		$blog_id = is_multisite() ? get_current_blog_id() : null;
+        $webhook_payload_url = get_rest_url( $blog_id, '/wp-discourse/v1/update-topic-content' );
 		if ( ! empty( $this->options['url'] ) ) {
+
 			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
 									  esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
@@ -126,7 +128,7 @@ class WebhookSettings {
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
 				'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code>%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.', 'wp-discourse'
+ URL <code class="wpdc-select-all">%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.', 'wp-discourse'
 			), $discourse_webhooks_url, $webhook_payload_url
 		);
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.5.8
+ * Version: 1.5.9
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.5.8' );
+define( 'WPDISCOURSE_VERSION', '1.5.9' );
 
 require_once __DIR__ . '/lib/plugin-utilities.php';
 require_once __DIR__ . '/lib/utilities.php';
