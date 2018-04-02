@@ -533,7 +533,7 @@ class SSOSettings {
 			</li>
 			<li>
 				<em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
-				<code><?php echo esc_url( home_url() ); ?></code>
+				<code class="wpdc-select-all"><?php echo esc_url( home_url() ); ?></code>
 				<em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
