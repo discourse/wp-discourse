@@ -3,7 +3,7 @@ Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 4.9.4
-Stable tag: 1.5.9
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.6.0 02/03/2018
+
+- Fix bug in SSO client shortcode that was causing it to display the 'Link your account' text for accounts that were already linked
 
 #### 1.5.9 02/03/2018
 

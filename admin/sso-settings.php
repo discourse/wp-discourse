@@ -603,7 +603,7 @@ class SSOSettings {
 		<h3>SSO Client Shortcode</h3>
 		<p class="wpdc-options-documentation">
 			<em><?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?></em>
-			<code><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
+			<code class="wpdc-select-all"><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
 			<em>
 			<?php
 			esc_html_e(
@@ -619,7 +619,7 @@ class SSOSettings {
 										<?php
 										esc_html_e(
 											"- sets the link text for non-logged in users.
-                (Defaults to 'Link your account to Discourse'.)", 'wp-discourse'
+                (Defaults to 'Log in with Discourse'.)", 'wp-discourse'
 										);
 ?>
 </em>
@@ -628,7 +628,7 @@ class SSOSettings {
 										<?php
 										esc_html_e(
 											"- sets the link text for logged in users who have not
-            yet linked their WordPress account to their Discourse account. (Defaults to 'Log in with Discourse'.)", 'wp-discourse'
+            yet linked their WordPress account to their Discourse account. (Defaults to 'Link your account to Discourse'.)", 'wp-discourse'
 										);
 ?>
 </em>
