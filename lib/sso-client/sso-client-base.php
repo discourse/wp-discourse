@@ -29,7 +29,7 @@ class SSOClientBase {
 		$user_id           = get_current_user_id();
 
 		if ( ! empty( $user_id ) ) {
-			if ( get_user_meta( $user_id, 'discourse_sso_external_id', true ) ) {
+			if ( get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
 
 				return null;
 			}
