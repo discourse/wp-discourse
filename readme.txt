@@ -2,8 +2,8 @@
 Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 4.9.4
-Stable tag: 1.6.0
+Tested up to: 4.9.5
+Stable tag: 1.6.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -128,11 +128,15 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
 
-#### 1.6.0 02/03/2018
+#### 1.6.1 04/04/2018
+
+- If a custom excerpt has been set, check if it's empty before using it as the Discourse post content
+
+#### 1.6.0 02/04/2018
 
 - Fix bug in SSO client shortcode that was causing it to display the 'Link your account' text for accounts that were already linked
 
-#### 1.5.9 02/03/2018
+#### 1.5.9 02/04/2018
 
 - Don't use iconv_strlen for validating settings
 - Provide proper webhook URL for all permalink styles
