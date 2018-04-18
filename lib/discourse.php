@@ -89,7 +89,8 @@ class Discourse {
 	protected $discourse_configurable_text = array(
 		'discourse-link-text'         => '',
 		'start-discussion-text'       => 'Start the discussion at',
-		'continue-discussion-text'    => 'Continue the discussion',
+		'continue-discussion-text'    => 'Continue the discussion at',
+		'join-discussion-text'        => 'Join the discussion at',
 		'notable-replies-text'        => 'Notable Replies',
 		'comments-not-available-text' => 'Comments are not currently available for this post.',
 		'participants-text'           => 'Participants',
