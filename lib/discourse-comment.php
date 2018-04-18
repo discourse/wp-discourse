@@ -345,35 +345,4 @@ class DiscourseComment {
 
 		return $count;
 	}
-
-	protected function get_discourse_comments_number( $post_id ) {
-		$api_key = $this->options['api-key'];
-		$api_username = $this->options['publish-username'];
-		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-
-		if ( empty( $discourse_permalink ) ) {
-
-			return new \WP_Error( 'wpdc_error', 'The comment number cannot be retrieved, because the discourse_permalink has not been set for the post.' );
-		}
-
-		$topic_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'api_key' => $api_key,
-					'api_username' => $api_username,
-				), "{$discourse_permalink}.json"
-			)
-		);
-
-		$response = wp_remote_get( $topic_url );
-
-		if ( ! $this->validate( $response ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'The topic posts_count could not be retrieved from Discourse.' );
-		}
-
-		$topic = json_decode( wp_remote_retrieve_body( $response ) );
-
-		write_log( 'topic', $topic );
-	}
 }
