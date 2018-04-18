@@ -79,6 +79,13 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
+			'discourse_join_discussion_text', __( 'Join Discussion Text', 'wp-discourse' ), array(
+				$this,
+				'join_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_notable_replies_text', __( 'Top Level Comments Heading', 'wp-discourse' ), array(
 				$this,
 				'notable_replies_text',
@@ -178,6 +185,18 @@ class ConfigurableTextSettings {
 			'start-discussion-text', 'discourse_configurable_text', __(
 				'Text used after posts with no comments, for starting a discussion on Discourse.
 		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs the markup for the join-discussion-text input.
+	 */
+	public function join_discussion_text() {
+		$this->form_helper->input(
+			'join-discussion-text', 'discourse_configurable_text', __(
+				"Text used after posts with comments on Discourse, but no comments that are displayed on Discourse.
+	                    This is combined with the 'Discourse link text' to create a link to your forum."
 			)
 		);
 	}
