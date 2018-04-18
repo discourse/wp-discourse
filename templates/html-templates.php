@@ -91,7 +91,8 @@ class HTMLTemplates {
 	 *
 	 * Available tags:
 	 * {comments}, {discourse_url}, {discourse_url_name}, {topic_url}
-	 *
+     *
+	 * @param null/string $discourse_comments_number The number of comments that are displayed on Discourse.
 	 * @static
 	 * @return mixed|void
 	 */
