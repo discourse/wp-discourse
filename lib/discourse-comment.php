@@ -142,7 +142,7 @@ class DiscourseComment {
 	 *
 	 * @param \WP_REST_Request Object $request The WP_REST_Request for Discourse comments.
 	 *
-	 * @return \WP_Error|string
+	 * @return string
 	 */
 	public function get_discourse_comments( $request ) {
 		$post_id = isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'] ) ) : null;
@@ -164,6 +164,17 @@ class DiscourseComment {
 	 */
 	protected function use_discourse_comments( $post_id ) {
 		if ( empty( $this->options['use-discourse-comments'] ) ) {
+
+			return 0;
+		}
+
+		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+
+		return $discourse_post_id > 0;
+	}
+
+	protected function use_join_link( $post_id ) {
+		if ( empty( $this->options['add-join-link'] ) ) {
 
 			return 0;
 		}
@@ -333,5 +344,36 @@ class DiscourseComment {
 		}
 
 		return $count;
+	}
+
+	protected function get_discourse_comments_number( $post_id ) {
+		$api_key = $this->options['api-key'];
+		$api_username = $this->options['publish-username'];
+		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+
+		if ( empty( $discourse_permalink ) ) {
+
+			return new \WP_Error( 'wpdc_error', 'The comment number cannot be retrieved, because the discourse_permalink has not been set for the post.' );
+		}
+
+		$topic_url = esc_url_raw(
+			add_query_arg(
+				array(
+					'api_key' => $api_key,
+					'api_username' => $api_username,
+				), "{$discourse_permalink}.json"
+			)
+		);
+
+		$response = wp_remote_get( $topic_url );
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'The topic posts_count could not be retrieved from Discourse.' );
+		}
+
+		$topic = json_decode( wp_remote_retrieve_body( $response ) );
+
+		write_log( 'topic', $topic );
 	}
 }
