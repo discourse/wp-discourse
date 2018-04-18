@@ -17,7 +17,8 @@
 #setting-error-auto_create_welcome_redirect ~ form #discourse-auto-create-welcome-redirect,
 #setting-error-login_path ~ form #discourse-login-path,
 #setting-error-sso_secret ~ form #discourse-sso-secret,
-#setting-error-webhook_secret ~ form #discourse-webhook-secret {
+#setting-error-webhook_secret ~ form #discourse-webhook-secret,
+#setting-error-add_join_link ~ form #discourse-add-join-link {
 	border-color: #dc3232;
 	border-width: 1px;
 }
