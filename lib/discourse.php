@@ -65,6 +65,7 @@ class Discourse {
 	 */
 	protected $discourse_comment = array(
 		'use-discourse-comments'    => 0,
+		'add-join-link'             => 0,
 		'ajax-load'                 => 0,
 		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,
