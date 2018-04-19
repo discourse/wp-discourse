@@ -79,6 +79,27 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
+		        'discourse_comments_singular_text', __( 'Comments Singular Text', 'wp-discourse' ), array(
+		                $this,
+                    'comments_singular_text',
+            ), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+        );
+
+		add_settings_field(
+		        'discourse_comments_plural_text', __( 'Comments Plural Text', 'wp-discourse' ), array(
+		                $this,
+                    'comments_plural_text',
+            ), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+        );
+
+		add_settings_field(
+		        'discourse_no_comments_text', __( 'No Comments Text', 'wp-discourse' ), array(
+		                $this,
+                    'no_comments_text',
+            ), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+        );
+
+		add_settings_field(
 			'discourse_join_discussion_text', __( 'Join Discussion Text', 'wp-discourse' ), array(
 				$this,
 				'join_discussion_text',
@@ -212,6 +233,39 @@ class ConfigurableTextSettings {
 			)
 		);
 	}
+
+	/**
+	 * Outputs the markup for the comments-singular-text input.
+	 */
+	public function comments_singular_text() {
+	    $this->form_helper->input(
+	            'comments-singular-text', 'discourse_configurable_text', __(
+	                    "Text used in the 'Join Discussion' link.", 'wp-discourse'
+            )
+        );
+    }
+
+	/**
+	 * Outputs the markup for the comments-plural-text input.
+	 */
+    public function comments_plural_text() {
+	    $this->form_helper->input(
+	            'comments-plural-text', 'discourse_configurable_text', __(
+	                    "Text used in the 'Join Discussion' link.", 'wp-discourse'
+            )
+        );
+    }
+
+	/**
+	 * Outputs the markup for the no-comments-text input.
+	 */
+    public function no_comments_text() {
+        $this->form_helper->input(
+                'no-comments-text', 'discourse_configurable_text', __(
+                        "Text used in the 'Join Discussion' link.", 'wp-discourse'
+            )
+        );
+    }
 
 	/**
 	 * Outputs the markup for the notable-replies-text input.
