@@ -214,7 +214,7 @@ class DiscourseComment {
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
-					$comment_count            = intval( $discourse_options['max-comments'] );
+					$comment_count            = $this->use_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -298,8 +298,45 @@ class DiscourseComment {
 			}
 		}
 
+		if ( $this->use_join_link( $post_id ) ) {
+			echo wp_kses_post( $this->join_link( $post_id) );
+
+			return WPDISCOURSE_PATH . 'templates/blank.php';
+		}
+
 		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
+	}
+
+
+	/**
+	 * Displays a link to the associated Discourse topic.
+	 *
+	 * @param int $post_id The post_id that the link is being displayed for.
+	 *
+	 * @return string
+	 */
+	public function join_link( $post_id ) {
+		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		if ( ! empty( $this->options['enable_sso'] ) && ! empty( $this->options['redirect-without-login'] ) ) {
+			$discourse_permalink = $this->options['url'] . '/session/sso?return_path=' . $discourse_permalink;
+		}
+		$comments_count = get_comments_number( $post_id );
+
+		switch ( $comments_count ) {
+			case 0:
+				$link_text = $this->options['no-comments-text'];
+				break;
+			case 1:
+				$link_text = '1 ' . $this->options['comments-singular-text'];
+				break;
+			default:
+				$link_text = $comments_count . ' ' . $this->options['comments-plural-text'];
+		}
+
+		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
+
+		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '">' . esc_html( $link_text ) . '</a></div>';
 	}
 
 	/**
@@ -313,7 +350,7 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	public function get_comments_number( $count, $post_id ) {
-		if ( $this->use_discourse_comments( $post_id ) ) {
+		if ( $this->use_discourse_comments( $post_id ) || $this->use_join_link( $post_id ) ) {
 
 			$single_page = is_single( $post_id ) || is_page( $post_id );
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
