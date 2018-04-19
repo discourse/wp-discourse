@@ -92,6 +92,9 @@ class Discourse {
 		'start-discussion-text'       => 'Start the discussion at',
 		'continue-discussion-text'    => 'Continue the discussion at',
 		'join-discussion-text'        => 'Join the discussion at',
+		'comments-singular-text'      => 'Comment',
+		'comments-plural-text'        => 'Comments',
+		'no-comments-text'            => 'No Comments',
 		'notable-replies-text'        => 'Notable Replies',
 		'comments-not-available-text' => 'Comments are not currently available for this post.',
 		'participants-text'           => 'Participants',
@@ -194,6 +197,7 @@ class Discourse {
 
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 
+		// Todo: make sure default text values are being saved when options have been added.
 		foreach ( $this->discourse_option_groups as $group_name ) {
 			if ( 'discourse_configurable_text' === $group_name && get_option( 'discourse_configurable_text' ) ) {
 				$saved_values   = get_option( 'discourse_configurable_text' );
