@@ -120,6 +120,9 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_start_discussion_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_continue_discussion_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_join_discussion_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_comments_singular_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_comments_plural_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_no_comments_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_notable_replies_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_comments_not_available_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_participants_text', array( $this, 'validate_text_input' ) );
