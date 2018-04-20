@@ -62,18 +62,18 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area discourse-comments-area">
-			<h2 class="comments-title discourse-comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
+			<h2 class="comments-title discourse-comments-title"><?php esc_html_e( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
+					<?php esc_html_e( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
 					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
 				<div class="comment-reply-title">
-					<h4 class="discourse-participants"><?php esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
+					<h4 class="discourse-participants"><?php esc_html_e( self::get_text_options( 'participants-text' ) ); ?></h4>
 					<p>{participants}</p>
 				</div>
 			</div><!-- #respond -->
@@ -104,7 +104,7 @@ class HTMLTemplates {
 					<?php
 					$text = $discourse_comments_number > 0 ? self::get_text_options( 'join-discussion-text' ) : self::get_text_options( 'start-discussion-text' );
 					?>
-					<?php esc_html( $text ) . ' '; ?>
+					<?php esc_html_e( $text ) . ' '; ?>
 					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a></h3>
@@ -131,7 +131,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php esc_html( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
+				<p><?php esc_html_e( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -165,7 +165,7 @@ class HTMLTemplates {
 							 width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
 										 class="url">{username}</a></b>
-						<span class="says screen-reader-text"><?php esc_html( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
+						<span class="says screen-reader-text"><?php esc_html_e( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
@@ -222,7 +222,7 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small><?php esc_html( self::get_text_options( 'published-at-text' ) ); ?>
+		<small><?php esc_html_e( self::get_text_options( 'published-at-text' ) ); ?>
 			{blogurl}
 		</small><br>{excerpt}
 		<?php
