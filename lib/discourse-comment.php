@@ -173,7 +173,7 @@ class DiscourseComment {
 		return $discourse_post_id > 0;
 	}
 
-	protected function use_join_link( $post_id ) {
+	protected function add_join_link( $post_id ) {
 		if ( empty( $this->options['add-join-link'] ) ) {
 
 			return 0;
@@ -214,7 +214,7 @@ class DiscourseComment {
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
-					$comment_count            = $this->use_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
+					$comment_count            = $this->add_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -298,7 +298,7 @@ class DiscourseComment {
 			}
 		}
 
-		if ( $this->use_join_link( $post_id ) ) {
+		if ( $this->add_join_link( $post_id ) ) {
 			echo wp_kses_post( $this->join_link( $post_id) );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
@@ -318,7 +318,13 @@ class DiscourseComment {
 	 */
 	public function join_link( $post_id ) {
 		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-		if ( ! empty( $this->options['enable_sso'] ) && ! empty( $this->options['redirect-without-login'] ) ) {
+
+		if ( empty( $discourse_permalink ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The join link can not be added for the post. It is missing the discourse_permalink metadata.' );
+		}
+
+		if ( ! empty( $this->options['enable-sso'] ) &&  empty( $this->options['redirect-without-login'] ) ) {
 			$discourse_permalink = $this->options['url'] . '/session/sso?return_path=' . $discourse_permalink;
 		}
 		$comments_count = get_comments_number( $post_id );
@@ -350,7 +356,7 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	public function get_comments_number( $count, $post_id ) {
-		if ( $this->use_discourse_comments( $post_id ) || $this->use_join_link( $post_id ) ) {
+		if ( $this->use_discourse_comments( $post_id ) || $this->add_join_link( $post_id ) ) {
 
 			$single_page = is_single( $post_id ) || is_page( $post_id );
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
