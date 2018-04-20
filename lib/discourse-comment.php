@@ -241,6 +241,7 @@ class DiscourseComment {
 
 						$json = json_decode( $result['body'] );
 
+						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
 						if ( isset( $json->posts_count ) ) {
 							$posts_count = $json->posts_count - 1;
 							if ( $posts_count < 0 ) {
