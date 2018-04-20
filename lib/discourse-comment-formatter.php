@@ -57,7 +57,7 @@ class DiscourseCommentFormatter {
 		} else {
 			$permalink = (string) $custom['discourse_permalink'][0];
 
-			if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['redirect-without-login'] ) ) {
+			if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 				$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 			}
 
