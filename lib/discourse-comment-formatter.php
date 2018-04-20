@@ -102,8 +102,6 @@ class DiscourseCommentFormatter {
 			$topic_id              = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
 			$discourse_posts_count = ! empty( $discourse_info->posts_count ) ? $discourse_info->posts_count : 0;
 
-			write_log( 'discourse info', $discourse_info );
-
 			if ( count( $discourse_info->posts ) > 0 ) {
 				foreach ( $discourse_info->posts as &$post ) {
 
