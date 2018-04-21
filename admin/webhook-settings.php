@@ -114,8 +114,8 @@ class WebhookSettings {
 	 * Outputs markup for use-discourse-webhook checkbox.
 	 */
 	public function use_discourse_webhook_checkbox() {
-		$blog_id = is_multisite() ? get_current_blog_id() : null;
-        $webhook_payload_url = get_rest_url( $blog_id, '/wp-discourse/v1/update-topic-content' );
+		$blog_id             = is_multisite() ? get_current_blog_id() : null;
+		$webhook_payload_url = get_rest_url( $blog_id, '/wp-discourse/v1/update-topic-content' );
 		if ( ! empty( $this->options['url'] ) ) {
 
 			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .

@@ -50,11 +50,11 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-		        'discourse_add_join_link', __( 'Add Join Discussion Link', 'wp-discourse' ), array(
-		                $this,
-                    'add_join_link_checkbox',
-            ), 'discourse_comment', 'discourse_commenting_settings_section'
-        );
+			'discourse_add_join_link', __( 'Add Join Discussion Link', 'wp-discourse' ), array(
+				$this,
+				'add_join_link_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
 
 		add_settings_field(
 			'discourse_ajax_load', __( 'Load Comments With Ajax', 'wp-discourse' ), array(
@@ -158,12 +158,17 @@ class CommentSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for the add-join-link checkbox.
+	 */
 	public function add_join_link_checkbox() {
-	    $this->form_helper->checkbox_input(
-	            'add-join-link', 'discourse_comment', __( "Add a 'Join Discussion' link underneath posts that are published
-	            to Discourse.", 'wp-discourse'), __( 'This setting is used in place of showing Discourse comments underneath the post.', 'wp-discourse' )
-        );
-    }
+		$this->form_helper->checkbox_input(
+			'add-join-link', 'discourse_comment', __(
+				"Add a 'Join Discussion' link underneath posts that are published
+	            to Discourse.", 'wp-discourse'
+			), __( 'This setting is used in place of showing Discourse comments underneath the post.', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the discourse-new-tab checkbox.

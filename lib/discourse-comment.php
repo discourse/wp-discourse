@@ -173,6 +173,13 @@ class DiscourseComment {
 		return $discourse_post_id > 0;
 	}
 
+	/**
+	 * Checks if a post is using the Join Conversation link.
+	 *
+	 * @param int $post_id The ID of the post.
+	 *
+	 * @return bool|int
+	 */
 	protected function add_join_link( $post_id ) {
 		if ( empty( $this->options['add-join-link'] ) ) {
 
@@ -300,7 +307,7 @@ class DiscourseComment {
 		}
 
 		if ( $this->add_join_link( $post_id ) ) {
-			echo wp_kses_post( $this->join_link( $post_id) );
+			echo wp_kses_post( $this->join_link( $post_id ) );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
@@ -325,7 +332,7 @@ class DiscourseComment {
 			return new \WP_Error( 'wpdc_configuration_error', 'The join link can not be added for the post. It is missing the discourse_permalink metadata.' );
 		}
 
-		if ( ! empty( $this->options['enable-sso'] ) &&  empty( $this->options['redirect-without-login'] ) ) {
+		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$discourse_permalink = $this->options['url'] . '/session/sso?return_path=' . $discourse_permalink;
 		}
 		$comments_count = get_comments_number( $post_id );
