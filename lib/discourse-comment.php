@@ -142,7 +142,7 @@ class DiscourseComment {
 	 *
 	 * @param \WP_REST_Request Object $request The WP_REST_Request for Discourse comments.
 	 *
-	 * @return \WP_Error|string
+	 * @return string
 	 */
 	public function get_discourse_comments( $request ) {
 		$post_id = isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'] ) ) : null;
@@ -164,6 +164,24 @@ class DiscourseComment {
 	 */
 	protected function use_discourse_comments( $post_id ) {
 		if ( empty( $this->options['use-discourse-comments'] ) ) {
+
+			return 0;
+		}
+
+		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+
+		return $discourse_post_id > 0;
+	}
+
+	/**
+	 * Checks if a post is using the Join Conversation link.
+	 *
+	 * @param int $post_id The ID of the post.
+	 *
+	 * @return bool|int
+	 */
+	protected function add_join_link( $post_id ) {
+		if ( empty( $this->options['add-join-link'] ) ) {
 
 			return 0;
 		}
@@ -203,7 +221,7 @@ class DiscourseComment {
 
 				if ( 'publish' === get_post_status( $postid ) ) {
 
-					$comment_count            = intval( $discourse_options['max-comments'] );
+					$comment_count            = $this->add_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -230,6 +248,7 @@ class DiscourseComment {
 
 						$json = json_decode( $result['body'] );
 
+						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
 						if ( isset( $json->posts_count ) ) {
 							$posts_count = $json->posts_count - 1;
 							if ( $posts_count < 0 ) {
@@ -287,8 +306,51 @@ class DiscourseComment {
 			}
 		}
 
+		if ( $this->add_join_link( $post_id ) ) {
+			echo wp_kses_post( $this->join_link( $post_id ) );
+
+			return WPDISCOURSE_PATH . 'templates/blank.php';
+		}
+
 		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
+	}
+
+
+	/**
+	 * Displays a link to the associated Discourse topic.
+	 *
+	 * @param int $post_id The post_id that the link is being displayed for.
+	 *
+	 * @return string
+	 */
+	public function join_link( $post_id ) {
+		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+
+		if ( empty( $discourse_permalink ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The join link can not be added for the post. It is missing the discourse_permalink metadata.' );
+		}
+
+		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
+			$discourse_permalink = $this->options['url'] . '/session/sso?return_path=' . $discourse_permalink;
+		}
+		$comments_count = get_comments_number( $post_id );
+
+		switch ( $comments_count ) {
+			case 0:
+				$link_text = $this->options['no-comments-text'];
+				break;
+			case 1:
+				$link_text = '1 ' . $this->options['comments-singular-text'];
+				break;
+			default:
+				$link_text = $comments_count . ' ' . $this->options['comments-plural-text'];
+		}
+
+		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
+
+		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '">' . esc_html( $link_text ) . '</a></div>';
 	}
 
 	/**
@@ -302,7 +364,7 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	public function get_comments_number( $count, $post_id ) {
-		if ( $this->use_discourse_comments( $post_id ) ) {
+		if ( $this->use_discourse_comments( $post_id ) || $this->add_join_link( $post_id ) ) {
 
 			$single_page = is_single( $post_id ) || is_page( $post_id );
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );

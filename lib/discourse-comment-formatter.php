@@ -57,7 +57,7 @@ class DiscourseCommentFormatter {
 		} else {
 			$permalink = (string) $custom['discourse_permalink'][0];
 
-			if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['redirect-without-login'] ) ) {
+			if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 				$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 			}
 
@@ -101,8 +101,6 @@ class DiscourseCommentFormatter {
 			$participants_html     = '';
 			$topic_id              = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
 			$discourse_posts_count = ! empty( $discourse_info->posts_count ) ? $discourse_info->posts_count : 0;
-
-			write_log( 'discourse info', $discourse_info );
 
 			if ( count( $discourse_info->posts ) > 0 ) {
 				foreach ( $discourse_info->posts as &$post ) {
