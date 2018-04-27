@@ -78,6 +78,7 @@ class DiscourseWebhookRefresh extends Webhook {
 		}
 
 		$json = $data->get_json_params();
+		do_action( 'wpdc_before_webhook_post_update', $json );
 
 		if ( ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
