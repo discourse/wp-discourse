@@ -132,7 +132,9 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 - Add an option to have a link to the Discourse topic instead of displaying comments beneath the post
 - Add a Join Discussion text option for when comments exist on the Discourse topic, but aren't being pulled to WordPress
-- fix error in Redirect Without Login option
+- Fix error in Redirect Without Login option
+- Add wpdc_before_webhook_post_update filter hook that can be used to process Discourse webhooks after they have been validated by the plugin
+- Add excerpt_length and use_full_post options to wp_discourse_excerpt filter
 
 #### 1.6.1 04/04/2018
 
