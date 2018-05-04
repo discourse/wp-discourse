@@ -58,51 +58,51 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
-			'discourse_link_text', __( 'Discourse Link Text', 'wp-discourse' ), array(
+			'discourse_link_text', __( 'Discourse Link', 'wp-discourse' ), array(
 				$this,
 				'discourse_link_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_start_discussion_text', __( 'Start Discussion Text', 'wp-discourse' ), array(
+			'discourse_start_discussion_text', __( 'Start Discussion', 'wp-discourse' ), array(
 				$this,
 				'start_discussion_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_continue_discussion_text', __( 'Continue Discussion Text', 'wp-discourse' ), array(
+			'discourse_continue_discussion_text', __( 'Continue Discussion', 'wp-discourse' ), array(
 				$this,
 				'continue_discussion_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_comments_singular_text', __( 'Comments Singular Text', 'wp-discourse' ), array(
+			'discourse_join_discussion_text', __( 'Join Discussion', 'wp-discourse' ), array(
 				$this,
-				'comments_singular_text',
+				'join_discussion_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_comments_plural_text', __( 'Comments Plural Text', 'wp-discourse' ), array(
-				$this,
-				'comments_plural_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_no_comments_text', __( 'No Comments Text', 'wp-discourse' ), array(
+			'discourse_no_comments_text', __( 'Join Discussion Link: no Comments', 'wp-discourse' ), array(
 				$this,
 				'no_comments_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_join_discussion_text', __( 'Join Discussion Text', 'wp-discourse' ), array(
+			'discourse_comments_singular_text', __( 'Join Discussion Link: Comments Singular', 'wp-discourse' ), array(
 				$this,
-				'join_discussion_text',
+				'comments_singular_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_comments_plural_text', __( 'Join Discussion Link: Comments Plural', 'wp-discourse' ), array(
+				$this,
+				'comments_plural_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
@@ -240,7 +240,7 @@ class ConfigurableTextSettings {
 	public function comments_singular_text() {
 		$this->form_helper->input(
 			'comments-singular-text', 'discourse_configurable_text', __(
-				"Text used in the 'Join Discussion' link.", 'wp-discourse'
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and one comment has been created. (The number 1 will be prepended to the text.)", 'wp-discourse'
 			)
 		);
 	}
@@ -251,7 +251,7 @@ class ConfigurableTextSettings {
 	public function comments_plural_text() {
 		$this->form_helper->input(
 			'comments-plural-text', 'discourse_configurable_text', __(
-				"Text used in the 'Join Discussion' link.", 'wp-discourse'
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and multiple comments have been created. (The number of comments will be prepended to the text.)", 'wp-discourse'
 			)
 		);
 	}
@@ -262,7 +262,7 @@ class ConfigurableTextSettings {
 	public function no_comments_text() {
 		$this->form_helper->input(
 			'no-comments-text', 'discourse_configurable_text', __(
-				"Text used in the 'Join Discussion' link.", 'wp-discourse'
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and no comments have been created.", 'wp-discourse'
 			)
 		);
 	}
