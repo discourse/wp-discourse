@@ -21,24 +21,28 @@ class HTMLTemplates {
 	 *
 	 * @param string $option The option key.
 	 *
-	 * @return void
+	 * @return string
 	 */
 	protected static function get_text_options( $option ) {
 		$text_options = get_option( 'discourse_configurable_text' );
 
-		echo esc_html( $text_options[ $option ] );
+		$text = ! empty( $text_options[ $option ] ) ? $text_options[ $option ] : '';
+
+		return $text;
 	}
 
 	/**
 	 * Sets the target attribute.
 	 *
-	 * @return void
+	 * @return string
 	 */
 	protected static function target() {
 		$comment_options = get_option( 'discourse_comment' );
 		if ( ! empty( $comment_options['discourse-new-tab'] ) ) {
-			echo 'target="_blank"';
+			return 'target="_blank"';
 		}
+
+		return '';
 	}
 
 	/**
@@ -58,18 +62,18 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area discourse-comments-area">
-			<h2 class="comments-title discourse-comments-title"><?php esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
+			<h2 class="comments-title discourse-comments-title"><?php echo esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<?php esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
+					<?php echo esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
 					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
 				<div class="comment-reply-title">
-					<h4 class="discourse-participants"><?php esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
+					<h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
 					<p>{participants}</p>
 				</div>
 			</div><!-- #respond -->
@@ -87,17 +91,21 @@ class HTMLTemplates {
 	 *
 	 * Available tags:
 	 * {comments}, {discourse_url}, {discourse_url_name}, {topic_url}
-	 *
+     *
+	 * @param null/string $discourse_comments_number The number of comments that are displayed on Discourse.
 	 * @static
 	 * @return mixed|void
 	 */
-	public static function no_replies_html() {
+	public static function no_replies_html( $discourse_comments_number = null ) {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area">
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
-					<?php esc_html( self::get_text_options( 'start-discussion-text' ) . ' ' ); ?>
+					<?php
+					$text = $discourse_comments_number > 0 ? self::get_text_options( 'join-discussion-text' ) : self::get_text_options( 'start-discussion-text' );
+					?>
+					<?php echo esc_html( $text ) . ' '; ?>
 					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a></h3>
@@ -124,7 +132,7 @@ class HTMLTemplates {
 		?>
 		<div class="respond comment-respond">
 			<div class="comment-reply-title discourse-no-connection-notice">
-				<p><?php esc_html( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
+				<p><?php echo esc_html( self::get_text_options( 'comments-not-available-text' ) ); ?></p>
 			</div>
 		</div>
 		<?php
@@ -158,7 +166,7 @@ class HTMLTemplates {
 							 width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
 										 class="url">{username}</a></b>
-						<span class="says screen-reader-text"><?php esc_html_e( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
+						<span class="says screen-reader-text"><?php echo esc_html( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<!-- .comment-author -->
 					<div class="comment-metadata">
@@ -215,7 +223,7 @@ class HTMLTemplates {
 	public static function publish_format_html() {
 		ob_start();
 		?>
-		<small><?php esc_html( self::get_text_options( 'published-at-text' ) ); ?>
+		<small><?php echo esc_html( self::get_text_options( 'published-at-text' ) ); ?>
 			{blogurl}
 		</small><br>{excerpt}
 		<?php

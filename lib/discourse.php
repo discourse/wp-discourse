@@ -65,6 +65,7 @@ class Discourse {
 	 */
 	protected $discourse_comment = array(
 		'use-discourse-comments'    => 0,
+		'add-join-link'             => 0,
 		'ajax-load'                 => 0,
 		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,
@@ -89,7 +90,11 @@ class Discourse {
 	protected $discourse_configurable_text = array(
 		'discourse-link-text'         => '',
 		'start-discussion-text'       => 'Start the discussion at',
-		'continue-discussion-text'    => 'Continue the discussion',
+		'continue-discussion-text'    => 'Continue the discussion at',
+		'join-discussion-text'        => 'Join the discussion at',
+		'comments-singular-text'      => 'Comment',
+		'comments-plural-text'        => 'Comments',
+		'no-comments-text'            => 'Join the Discussion',
 		'notable-replies-text'        => 'Notable Replies',
 		'comments-not-available-text' => 'Comments are not currently available for this post.',
 		'participants-text'           => 'Participants',

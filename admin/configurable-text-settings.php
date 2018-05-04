@@ -58,23 +58,51 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
-			'discourse_link_text', __( 'Discourse Link Text', 'wp-discourse' ), array(
+			'discourse_link_text', __( 'Discourse Link', 'wp-discourse' ), array(
 				$this,
 				'discourse_link_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_start_discussion_text', __( 'Start Discussion Text', 'wp-discourse' ), array(
+			'discourse_start_discussion_text', __( 'Start Discussion', 'wp-discourse' ), array(
 				$this,
 				'start_discussion_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_continue_discussion_text', __( 'Continue Discussion Text', 'wp-discourse' ), array(
+			'discourse_continue_discussion_text', __( 'Continue Discussion', 'wp-discourse' ), array(
 				$this,
 				'continue_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_join_discussion_text', __( 'Join Discussion', 'wp-discourse' ), array(
+				$this,
+				'join_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_no_comments_text', __( 'Join Discussion Link: no Comments', 'wp-discourse' ), array(
+				$this,
+				'no_comments_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_comments_singular_text', __( 'Join Discussion Link: Comments Singular', 'wp-discourse' ), array(
+				$this,
+				'comments_singular_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_comments_plural_text', __( 'Join Discussion Link: Comments Plural', 'wp-discourse' ), array(
+				$this,
+				'comments_plural_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
@@ -183,6 +211,18 @@ class ConfigurableTextSettings {
 	}
 
 	/**
+	 * Outputs the markup for the join-discussion-text input.
+	 */
+	public function join_discussion_text() {
+		$this->form_helper->input(
+			'join-discussion-text', 'discourse_configurable_text', __(
+				"Text used after posts with comments on Discourse, but no comments that are displayed on Discourse.
+	                    This is combined with the 'Discourse link text' to create a link to your forum."
+			)
+		);
+	}
+
+	/**
 	 * Outputs the markup for the continue-discussion-text input.
 	 */
 	public function continue_discussion_text() {
@@ -190,6 +230,39 @@ class ConfigurableTextSettings {
 			'continue-discussion-text', 'discourse_configurable_text', __(
 				'Text used after posts that have comments, for continuing the discussion on Discourse.
 		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs the markup for the comments-singular-text input.
+	 */
+	public function comments_singular_text() {
+		$this->form_helper->input(
+			'comments-singular-text', 'discourse_configurable_text', __(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and one comment has been created. (The number 1 will be prepended to the text.)", 'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs the markup for the comments-plural-text input.
+	 */
+	public function comments_plural_text() {
+		$this->form_helper->input(
+			'comments-plural-text', 'discourse_configurable_text', __(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and multiple comments have been created. (The number of comments will be prepended to the text.)", 'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs the markup for the no-comments-text input.
+	 */
+	public function no_comments_text() {
+		$this->form_helper->input(
+			'no-comments-text', 'discourse_configurable_text', __(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and no comments have been created.", 'wp-discourse'
 			)
 		);
 	}

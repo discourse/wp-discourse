@@ -123,8 +123,8 @@ class FormHelper {
 			),
 			'strong' => array(),
 			'code'   => array(
-			        'class' => array(),
-            ),
+				'class' => array(),
+			),
 		);
 		if ( ! empty( $options[ $option ] ) && 1 === intval( $options[ $option ] ) ) {
 			$checked = 'checked="checked"';

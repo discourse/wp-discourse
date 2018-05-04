@@ -150,17 +150,17 @@ class DiscoursePublish {
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
-			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw );
+			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
 				$wp_excerpt = apply_filters( 'get_the_excerpt', $current_post->post_excerpt );
-				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt );
+				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt, $options['custom-excerpt-length'], $use_full_post );
 			}
 
 			// Check empty() here in case the excerpt has been set to an empty string.
 			if ( empty( $excerpt ) ) {
 				$excerpt = apply_filters( 'the_content', $raw );
-				$excerpt = apply_filters( 'wp_discourse_excerpt', wp_trim_words( $excerpt, $options['custom-excerpt-length'] ) );
+				$excerpt = apply_filters( 'wp_discourse_excerpt', wp_trim_words( $excerpt, $options['custom-excerpt-length'] ), $options['custom-excerpt-length'], $use_full_post );
 			}
 		}
 

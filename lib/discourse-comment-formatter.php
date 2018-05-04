@@ -57,7 +57,7 @@ class DiscourseCommentFormatter {
 		} else {
 			$permalink = (string) $custom['discourse_permalink'][0];
 
-			if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['redirect-without-login'] ) ) {
+			if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 				$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 			}
 
@@ -96,10 +96,11 @@ class DiscourseCommentFormatter {
 				$more_replies = $more_replies . ' ' . $more . esc_html( strtolower( $this->options['many-replies-text'] ) );
 			}
 
-			$discourse_url     = esc_url( $this->options['url'] );
-			$comments_html     = '';
-			$participants_html = '';
-			$topic_id          = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
+			$discourse_url         = esc_url( $this->options['url'] );
+			$comments_html         = '';
+			$participants_html     = '';
+			$topic_id              = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
+			$discourse_posts_count = ! empty( $discourse_info->posts_count ) ? $discourse_info->posts_count : 0;
 
 			if ( count( $discourse_info->posts ) > 0 ) {
 				foreach ( $discourse_info->posts as &$post ) {
@@ -136,7 +137,7 @@ class DiscourseCommentFormatter {
 				$discourse_html = wp_kses_post( Templates::replies_html() );
 				$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 			} else {
-				$discourse_html = wp_kses_post( Templates::no_replies_html() );
+				$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 			}// End if().
 			$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 			$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );

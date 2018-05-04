@@ -50,6 +50,13 @@ class CommentSettings {
 		);
 
 		add_settings_field(
+			'discourse_add_join_link', __( 'Link to Comments Without Displaying Them', 'wp-discourse' ), array(
+				$this,
+				'add_join_link_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_ajax_load', __( 'Load Comments With Ajax', 'wp-discourse' ), array(
 				$this,
 				'ajax_load_checkbox',
@@ -152,12 +159,27 @@ class CommentSettings {
 	}
 
 	/**
+	 * Outputs markup for the add-join-link checkbox.
+	 */
+	public function add_join_link_checkbox() {
+		$this->form_helper->checkbox_input(
+			'add-join-link', 'discourse_comment', __(
+				"Add a 'Join Discussion' link underneath posts that are published
+	            to Discourse.", 'wp-discourse'
+			), __( 'This setting is used in place of showing Discourse comments underneath the post.', 'wp-discourse' )
+		);
+	}
+
+	/**
 	 * Outputs markup for the discourse-new-tab checkbox.
 	 */
 	public function ajax_load_checkbox() {
 		$this->form_helper->checkbox_input(
 			'ajax-load', 'discourse_comment', __( 'Load comments with Ajax.', 'wp-discourse' ),
-			__( 'This is useful if page caching is preventing Discourse comments from updating on WordPress.', 'wp-discourse' )
+			__(
+				'This is useful if page caching is preventing Discourse comments from updating on WordPress. When this setting is enabled, old WordPress comments
+			cannot be displayed beneath the Discourse comments.', 'wp-discourse'
+			)
 		);
 	}
 

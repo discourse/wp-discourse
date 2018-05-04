@@ -249,8 +249,8 @@ class MetaBox {
 		// translators: Discourse force-publish message. Placeholder: category_name.
 		$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
 		$allowed = array(
-		        'strong' => array(),
-            );
+			'strong' => array(),
+		);
 		echo wp_kses( $message, $allowed );
 	}
 
