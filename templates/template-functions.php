@@ -114,4 +114,28 @@ class TemplateFunctions {
 
 		return $parsed;
 	}
+
+	/**
+	 * Format the Discourse created_at date based on the WordPress site's timezone.
+	 *
+	 * @param string $string The datetime string returned from Discourse.
+	 * @param string $format The datetime format.
+	 *
+	 * @return false|string
+	 */
+	public static function format_date( $string, $format ) {
+		$tz = get_option( 'timezone_string' );
+		$gmt_offset = get_option( 'gmt_offset' );
+		$localtime = '';
+		if ( $tz ) {
+			$datetime = date_create( $string, new \DateTimeZone( 'UTC' ) );
+			$datetime->setTimezone( new \DateTimeZone( $tz ) );
+			$localtime = $datetime->format( $format );
+		} elseif ( $gmt_offset ) {
+			$timestamp = strtotime( $string ) + ( get_option( 'gmt_offset' ) * HOUR_IN_SECONDS);
+			$localtime = gmdate( $format, $timestamp );
+		}
+
+		return $localtime;
+	}
 }
