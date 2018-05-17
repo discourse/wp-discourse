@@ -118,6 +118,7 @@ class DiscourseCommentFormatter {
 					$comment_html   = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
 					$comment_body   = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 					$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
+					$comment_body   = str_replace( '{comment_url}', $permalink . '/' . $post->post_number, $comment_body );
 					$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
 					$comment_html   = str_replace( '{comment_created_at}', TemplateFunctions::format_date( $post->created_at, $datetime_format ), $comment_html );
 					$comments_html .= $comment_html;
