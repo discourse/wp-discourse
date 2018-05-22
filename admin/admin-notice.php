@@ -79,7 +79,7 @@ class AdminNotice {
 
 				$discourse_linking_response = get_post_meta( $post_id, 'wpdc_linking_response', true );
 				if ( 'error' === $discourse_linking_response ) {
-					$error_message = __( '<div class="notice notice-error is-dismissible"><p>There has been an error linking this post with Discourse. Make sure the URL you supply the URL of existing Discourse topic on your forum.</p></div>', 'wp-discourse' );
+					$error_message = __( '<div class="notice notice-error is-dismissible"><p>There has been an error linking this post with Discourse. Make sure you are supplying the URL of an existing topic on your forum.</p></div>', 'wp-discourse' );
 
 					delete_post_meta( $post_id, 'wpdc_linking_response' );
 					echo wp_kses_post( $error_message );
