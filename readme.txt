@@ -3,7 +3,7 @@ Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 4.9.5
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.6.4 05/25/2018
+
+- Allow comment_url tag to be used in the comment_html template
+- Require confirmation before updating or unlinking post
 
 #### 1.6.3 05/08/2018
 
