@@ -379,6 +379,7 @@ class MetaBox {
 	protected function link_to_discourse_topic( $post_id, $topic_url ) {
 		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
 		delete_post_meta( $post_id, 'publish_to_discourse' );
+		$topic_url = explode( '?', $topic_url )[0];
 
 		$topic_domain = wp_parse_url( $topic_url, PHP_URL_HOST );
 		if ( get_option( 'wpdc_discourse_domain' ) !== $topic_domain ) {
