@@ -99,7 +99,6 @@ class DiscourseUser extends Webhook {
 		$event_type   = $data->get_header( 'x_discourse_event_type' );
 		$event_action = $data->get_header( 'x_discourse_event' );
 		$json         = $data->get_json_params();
-		do_action( 'wpdc_before_webhook_user_update', $json );
 
 		if ( ! empty( $json['user'] ) ) {
 			$discourse_user  = $json['user'];
