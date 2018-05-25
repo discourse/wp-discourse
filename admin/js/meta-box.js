@@ -25,4 +25,26 @@
 				$( '.wpdc-advanced-options' ).toggleClass( 'hidden' );
 		}
 	);
+
+	$( '#update_discourse_topic' ).click(
+		function() {
+			if ( $( this ).is( ':checked' ) ) {
+				var response = confirm( 'Updating the Discourse topic will overwrite the existing topic content on Discourse. Do you wish to proceed?' );
+				if ( ! response ) {
+					$( this ).prop( 'checked', false );
+				}
+			}
+		}
+	);
+
+	$( '#unlink_from_discourse' ).click(
+		function() {
+			if ( $( this ).is( ':checked' ) ) {
+				var response = confirm( 'Unlinking the post will remove all Discourse data from the post. You will need to update the post to complete the unlinking process. Do you wish to proceed?' );
+				if ( ! response ) {
+					$( this ).prop( 'checked', false );
+				}
+			}
+		}
+	);
 })( jQuery );
