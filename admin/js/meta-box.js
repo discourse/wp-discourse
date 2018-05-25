@@ -30,7 +30,7 @@
 		function() {
 			var response;
 			if ( $( this ).is( ':checked' ) ) {
-				response = confirm( 'Updating the Discourse topic will overwrite the existing topic content on Discourse. Do you wish to proceed?' );
+				response = window.confirm( 'Updating the Discourse topic will overwrite the existing topic content on Discourse. Do you wish to proceed?' );
 				if ( ! response ) {
 					$( this ).prop( 'checked', false );
 				}
@@ -42,7 +42,7 @@
 		function() {
 			var response;
 			if ( $( this ).is( ':checked' ) ) {
-				response = confirm( 'Unlinking the post will remove all Discourse data from the post. You will need to update the post to complete the unlinking process. Do you wish to proceed?' );
+				response = window.confirm( 'Unlinking the post will remove all Discourse data from the post. You will need to update the post to complete the unlinking process. Do you wish to proceed?' );
 				if ( ! response ) {
 					$( this ).prop( 'checked', false );
 				}
