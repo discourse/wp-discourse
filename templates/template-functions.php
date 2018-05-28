@@ -138,4 +138,44 @@ class TemplateFunctions {
 
 		return $localtime;
 	}
+
+	public static function add_poll_links( $cooked, $url ) {
+		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
+		$use_internal_errors = libxml_use_internal_errors( true );
+
+		$doc = new \DOMDocument( '1.0', 'utf-8' );
+		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
+
+		$finder   = new \DOMXPath( $doc );
+		$polls = $finder->query( "//*[contains(@class, 'poll')]" );
+		if ( $polls->length) {
+			write_log('we have a poll', $cooked );
+			foreach ($polls as $poll) {
+				//$status = $poll->getAttribute( 'data-poll-status');
+				//write_log('poll status', $status );
+				//$text = 'open' === $status ? 'vote' : 'view';
+				$link = $doc->createElement( 'a' );
+				$link->setAttribute( 'class', 'wpdc-poll-link' );
+				$link->setAttribute( 'href', $url );
+				$link_text = $doc->createTextNode( 'View Poll' );
+				$link->appendChild( $link_text );
+
+				$poll->parentNode->replaceChild( $link, $poll );
+			}
+
+			// Clear the libxml error buffer.
+			libxml_clear_errors();
+			// Restore the previous value of libxml_use_internal_errors.
+			libxml_use_internal_errors( $use_internal_errors );
+
+			$parsed = $doc->saveHTML( $doc->documentElement );
+
+			// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
+			$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
+
+			return $parsed;
+		}
+
+		return $cooked;
+	}
 }
