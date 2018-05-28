@@ -149,7 +149,7 @@ class TemplateFunctions {
 		$finder   = new \DOMXPath( $doc );
 		$polls = $finder->query( "//*[contains(@class, 'poll')]" );
 		if ( $polls->length) {
-			write_log('we have a poll', $cooked );
+
 			foreach ($polls as $poll) {
 				//$status = $poll->getAttribute( 'data-poll-status');
 				//write_log('poll status', $status );

@@ -68,9 +68,9 @@ class DiscourseCommentFormatter {
 			}
 
 			if ( isset( $custom['discourse_comments_raw'] ) ) {
-				$discourse_info = json_decode( $custom['discourse_comments_raw'][0] );
+				$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
 			} else {
-				$discourse_info = array();
+				$topic_data = array();
 			}
 
 			$defaults = array(
@@ -83,10 +83,10 @@ class DiscourseCommentFormatter {
 			$datetime_format = empty( $this->options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $this->options['custom-datetime-format'];
 
 			// Add some protection in the event our metadata doesn't look how we expect it to.
-			$discourse_info = (object) wp_parse_args( (array) $discourse_info, $defaults );
+			$topic_data = (object) wp_parse_args( (array) $topic_data, $defaults );
 
-			$more_replies = intval( ( $discourse_info->posts_count - count( $discourse_info->posts ) - 1 ) );
-			$more         = ( 0 === count( $discourse_info->posts ) ) ? '' : esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
+			$more_replies = intval( ( $topic_data->posts_count - count( $topic_data->posts ) - 1 ) );
+			$more         = ( 0 === count( $topic_data->posts ) ) ? '' : esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
 
 			if ( 0 === $more_replies ) {
 				$more_replies = '';
@@ -99,11 +99,14 @@ class DiscourseCommentFormatter {
 			$discourse_url         = esc_url( $this->options['url'] );
 			$comments_html         = '';
 			$participants_html     = '';
-			$topic_id              = ! empty( $discourse_info->id ) ? $discourse_info->id : null;
-			$discourse_posts_count = ! empty( $discourse_info->posts_count ) ? $discourse_info->posts_count : 0;
+			$topic_id              = ! empty( $topic_data->id ) ? $topic_data->id : null;
+			$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 
-			if ( count( $discourse_info->posts ) > 0 ) {
-				foreach ( $discourse_info->posts as &$post ) {
+			$posts = $topic_data->posts;
+			$participants = $topic_data->participants;
+
+			if ( count( $posts ) > 0 ) {
+				foreach ( $posts as $post ) {
 					$comment_html   = wp_kses_post( Templates::comment_html() );
 					$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 					$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
@@ -123,7 +126,7 @@ class DiscourseCommentFormatter {
 					$comment_html   = str_replace( '{comment_created_at}', TemplateFunctions::format_date( $post->created_at, $datetime_format ), $comment_html );
 					$comments_html .= $comment_html;
 				}
-				foreach ( $discourse_info->participants as &$participant ) {
+				foreach ( $participants as $participant ) {
 					$participant_html   = wp_kses_post( Templates::participant_html() );
 					$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 					$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
