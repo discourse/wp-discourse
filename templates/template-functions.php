@@ -163,11 +163,6 @@ class TemplateFunctions {
 				$poll->parentNode->replaceChild( $link, $poll );
 			}
 
-			// Clear the libxml error buffer.
-			libxml_clear_errors();
-			// Restore the previous value of libxml_use_internal_errors.
-			libxml_use_internal_errors( $use_internal_errors );
-
 			$parsed = $doc->saveHTML( $doc->documentElement );
 
 			// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
@@ -175,6 +170,11 @@ class TemplateFunctions {
 
 			return $parsed;
 		}
+
+		// Clear the libxml error buffer.
+		libxml_clear_errors();
+		// Restore the previous value of libxml_use_internal_errors.
+		libxml_use_internal_errors( $use_internal_errors );
 
 		return $cooked;
 	}
