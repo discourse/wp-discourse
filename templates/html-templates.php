@@ -154,10 +154,10 @@ class HTMLTemplates {
 	 * @static
 	 * @return mixed|void
 	 */
-	public static function comment_html() {
+	public static function comment_html( $even = true ) {
 		ob_start();
 		?>
-		<li class="comment even thread-even depth-1">
+		<li class="comment <?php echo $even ? 'even' : 'odd'; ?> depth-1">
 			<article class="comment-body">
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
