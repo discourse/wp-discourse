@@ -54,8 +54,8 @@ require_once __DIR__ . '/lib/sso-client/nonce.php';
 require_once __DIR__ . '/lib/sso-client/client.php';
 require_once __DIR__ . '/lib/sso-client/query-redirect.php';
 require_once __DIR__ . '/lib/shortcodes/sso-client.php';
+require_once __DIR__ . '/lib/template-functions.php';
 require_once __DIR__ . '/templates/html-templates.php';
-require_once __DIR__ . '/templates/template-functions.php';
 require_once __DIR__ . '/admin/admin.php';
 
 new WPDiscourse\Discourse\Discourse();
