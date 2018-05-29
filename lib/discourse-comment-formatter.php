@@ -8,7 +8,7 @@
 namespace WPDiscourse\DiscourseCommentFormatter;
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Templates\TemplateFunctions as TemplateFunctions;
+use WPDiscourse\Shared\TemplateFunctions;
 use WPDiscourse\Shared\PluginUtilities;
 
 /**
@@ -16,6 +16,7 @@ use WPDiscourse\Shared\PluginUtilities;
  */
 class DiscourseCommentFormatter {
 	use PluginUtilities;
+	use TemplateFunctions;
 
 	/**
 	 * Gives access to the plugin options.
@@ -100,18 +101,18 @@ class DiscourseCommentFormatter {
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 				$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
 				$comment_html   = str_replace( '{comment_url}', $post_url, $comment_html );
-				$avatar_url     = TemplateFunctions::avatar( $post->avatar_template, 64 );
+				$avatar_url     = $this->avatar( $post->avatar_template, 64 );
 				$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
-				$user_url       = TemplateFunctions::homepage( $this->options['url'], $post );
+				$user_url       = $this->homepage( $this->options['url'], $post );
 				$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 				$comment_html   = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 				$comment_html   = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
-				$comment_body   = TemplateFunctions::convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
-				$comment_body   = TemplateFunctions::add_poll_links( $comment_body, $post_url );
+				$comment_body   = $this->convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
+				$comment_body   = $this->add_poll_links( $comment_body, $post_url );
 				$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
 				$comment_body   = str_replace( '{comment_url}', $post_url, $comment_body );
 				$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
-				$comment_html   = str_replace( '{comment_created_at}', TemplateFunctions::format_date( $post->created_at, $datetime_format ), $comment_html );
+				$comment_html   = str_replace( '{comment_created_at}', $this->format_date( $post->created_at, $datetime_format ), $comment_html );
 				$comments_html .= $comment_html;
 			}
 			foreach ( $participants as $participant ) {
@@ -119,9 +120,9 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 				$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 				$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
-				$avatar_url         = TemplateFunctions::avatar( $participant->avatar_template, 64 );
+				$avatar_url         = $this->avatar( $participant->avatar_template, 64 );
 				$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
-				$user_url           = TemplateFunctions::homepage( $this->options['url'], $participant );
+				$user_url           = $this->homepage( $this->options['url'], $participant );
 				$participant_html   = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
