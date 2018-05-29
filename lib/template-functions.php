@@ -5,12 +5,12 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\Templates;
+namespace WPDiscourse\Shared;
 
 /**
- * Class TemplateFunctions
+ * Trait TemplateFunctions
  */
-class TemplateFunctions {
+trait TemplateFunctions {
 
 	/**
 	 * Returns the user's Discourse homepage.
@@ -20,7 +20,7 @@ class TemplateFunctions {
 	 *
 	 * @return string
 	 */
-	public static function homepage( $url, $post ) {
+	protected function homepage( $url, $post ) {
 		return $url . '/users/' . strtolower( $post->username );
 	}
 
@@ -32,7 +32,7 @@ class TemplateFunctions {
 	 *
 	 * @return mixed
 	 */
-	public static function avatar( $template, $size ) {
+	protected function avatar( $template, $size ) {
 		return str_replace( '{size}', $size, $template );
 	}
 
@@ -47,7 +47,7 @@ class TemplateFunctions {
 	 *
 	 * @return mixed
 	 */
-	public static function convert_relative_img_src_to_absolute( $url, $content ) {
+	protected function convert_relative_img_src_to_absolute( $url, $content ) {
 		if ( preg_match( "/<img\s*src\s*=\s*[\'\"]?(https?:)?\/\//i", $content ) ) {
 			return $content;
 		}
@@ -68,10 +68,10 @@ class TemplateFunctions {
 	 *
 	 * @return mixed|string
 	 */
-	public static function convert_relative_urls_to_absolute( $url, $content ) {
+	protected function convert_relative_urls_to_absolute( $url, $content ) {
 		if ( ! extension_loaded( 'libxml' ) ) {
 
-			return self::convert_relative_img_src_to_absolute( $url, $content );
+			return $this->convert_relative_img_src_to_absolute( $url, $content );
 		}
 
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
@@ -123,7 +123,7 @@ class TemplateFunctions {
 	 *
 	 * @return false|string
 	 */
-	public static function format_date( $string, $format ) {
+	protected function format_date( $string, $format ) {
 		$tz         = get_option( 'timezone_string' );
 		$gmt_offset = get_option( 'gmt_offset' );
 		$localtime  = '';
@@ -140,7 +140,7 @@ class TemplateFunctions {
 	}
 
 	// Todo: complete this!
-	public static function add_poll_links( $cooked, $url ) {
+	protected function add_poll_links( $cooked, $url ) {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors = libxml_use_internal_errors( true );
 
