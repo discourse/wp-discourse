@@ -37,6 +37,7 @@ define( 'MIN_PHP_VERSION', '5.4.0' );
 define( 'WPDISCOURSE_VERSION', '1.6.5' );
 
 require_once __DIR__ . '/lib/plugin-utilities.php';
+require_once __DIR__ . '/lib/template-functions.php';
 require_once __DIR__ . '/lib/utilities.php';
 require_once __DIR__ . '/lib/discourse.php';
 require_once __DIR__ . '/lib/discourse-comment.php';
@@ -54,7 +55,6 @@ require_once __DIR__ . '/lib/sso-client/nonce.php';
 require_once __DIR__ . '/lib/sso-client/client.php';
 require_once __DIR__ . '/lib/sso-client/query-redirect.php';
 require_once __DIR__ . '/lib/shortcodes/sso-client.php';
-require_once __DIR__ . '/lib/template-functions.php';
 require_once __DIR__ . '/templates/html-templates.php';
 require_once __DIR__ . '/admin/admin.php';
 
