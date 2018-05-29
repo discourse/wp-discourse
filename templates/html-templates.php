@@ -76,7 +76,7 @@ class HTMLTemplates {
 					<h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
 					<p>{participants}</p>
 				</div>
-			</div><!-- #respond -->
+			</div>
 		</div>
 		<?php
 		$output = ob_get_clean();
@@ -109,7 +109,7 @@ class HTMLTemplates {
 					<a <?php self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a></h3>
-			</div><!-- #respond -->
+			</div>
 		</div>
 		<?php
 		$output = ob_get_clean();
@@ -168,17 +168,12 @@ class HTMLTemplates {
 										 class="url">{username}</a></b>
 						<span class="says screen-reader-text"><?php echo esc_html( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
-					<!-- .comment-author -->
 					<div class="comment-metadata">
 						<time pubdate="" datetime="{comment_created_at}">{comment_created_at}</time>
 					</div>
-					<!-- .comment-metadata -->
 				</footer>
-				<!-- .comment-meta -->
 				<div class="comment-content">{comment_body}</div>
-				<!-- .comment-content -->
 			</article>
-			<!-- .comment-body -->
 		</li>
 		<?php
 		$output = ob_get_clean();
