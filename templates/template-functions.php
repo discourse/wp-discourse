@@ -139,6 +139,7 @@ class TemplateFunctions {
 		return $localtime;
 	}
 
+	// Todo: complete this!
 	public static function add_poll_links( $cooked, $url ) {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors = libxml_use_internal_errors( true );
