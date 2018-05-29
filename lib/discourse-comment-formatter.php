@@ -94,9 +94,11 @@ class DiscourseCommentFormatter {
 		$participants          = $topic_data->participants;
 
 		if ( count( $posts ) > 0 ) {
+			$displayed_comment_number = 0;
 			foreach ( $posts as $post ) {
+				$even = 0 === $displayed_comment_number % 2;
 				$post_url       = esc_url( $permalink . '/' . $post->post_number );
-				$comment_html   = wp_kses_post( Templates::comment_html() );
+				$comment_html   = wp_kses_post( Templates::comment_html( $even ) );
 				$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 				$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
@@ -114,6 +116,7 @@ class DiscourseCommentFormatter {
 				$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
 				$comment_html   = str_replace( '{comment_created_at}', $this->format_date( $post->created_at, $datetime_format ), $comment_html );
 				$comments_html .= $comment_html;
+				$displayed_comment_number += 1;
 			}
 			foreach ( $participants as $participant ) {
 				$participant_html   = wp_kses_post( Templates::participant_html() );
