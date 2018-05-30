@@ -28,7 +28,7 @@ trait TemplateFunctions {
 	 * Substitutes the value for `$size` into the template.
 	 *
 	 * @param string $template The avatar template.
-	 * @param int    $size The size of the avarar.
+	 * @param int $size The size of the avarar.
 	 *
 	 * @return mixed
 	 */
@@ -116,12 +116,59 @@ trait TemplateFunctions {
 	}
 
 	/**
+	 * Replaces polls in posts with a link to the post.
+	 *
+	 * @param string $cooked The post's cooked content.
+	 * @param string $url The post's Discourse URL.
+	 *
+	 * @return string
+	 */
+	protected function add_poll_links( $cooked, $url ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+
+			return $cooked;
+		}
+
+		$use_internal_errors = libxml_use_internal_errors( true );
+		$doc                 = new \DOMDocument( '1.0', 'utf-8' );
+		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
+
+		$finder = new \DOMXPath( $doc );
+		// See: http://www.a-basketful-of-papayas.net/2010/04/css-selectors-and-xpath-expressions.html.
+		$polls = $finder->query( "//div[contains(concat(' ', normalize-space(@class), ' '), ' poll ')]" );
+		if ( $polls->length ) {
+			foreach ( $polls as $poll ) {
+				$link = $doc->createElement( 'a' );
+				$link->setAttribute( 'class', 'wpdc-poll-link' );
+				$link->setAttribute( 'href', $url );
+				$link_text = $doc->createTextNode( 'View Poll' );
+				$link->appendChild( $link_text );
+
+				$poll->parentNode->replaceChild( $link, $poll );
+			}
+
+			$parsed = $doc->saveHTML( $doc->documentElement );
+			$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
+
+			libxml_clear_errors();
+			libxml_use_internal_errors( $use_internal_errors );
+
+			return $parsed;
+		}
+
+		libxml_clear_errors();
+		libxml_use_internal_errors( $use_internal_errors );
+
+		return $cooked;
+	}
+
+	/**
 	 * Format the Discourse created_at date based on the WordPress site's timezone.
 	 *
 	 * @param string $string The datetime string returned from Discourse.
 	 * @param string $format The datetime format.
 	 *
-	 * @return false|string
+	 * @return string
 	 */
 	protected function format_date( $string, $format ) {
 		$tz         = get_option( 'timezone_string' );
@@ -137,46 +184,5 @@ trait TemplateFunctions {
 		}
 
 		return $localtime;
-	}
-
-	// Todo: complete this!
-	protected function add_poll_links( $cooked, $url ) {
-		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
-		$use_internal_errors = libxml_use_internal_errors( true );
-
-		$doc = new \DOMDocument( '1.0', 'utf-8' );
-		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
-
-		$finder   = new \DOMXPath( $doc );
-		$polls = $finder->query( "//*[contains(@class, 'poll')]" );
-		if ( $polls->length) {
-
-			foreach ($polls as $poll) {
-				//$status = $poll->getAttribute( 'data-poll-status');
-				//write_log('poll status', $status );
-				//$text = 'open' === $status ? 'vote' : 'view';
-				$link = $doc->createElement( 'a' );
-				$link->setAttribute( 'class', 'wpdc-poll-link' );
-				$link->setAttribute( 'href', $url );
-				$link_text = $doc->createTextNode( 'View Poll' );
-				$link->appendChild( $link_text );
-
-				$poll->parentNode->replaceChild( $link, $poll );
-			}
-
-			$parsed = $doc->saveHTML( $doc->documentElement );
-
-			// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
-			$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
-
-			return $parsed;
-		}
-
-		// Clear the libxml error buffer.
-		libxml_clear_errors();
-		// Restore the previous value of libxml_use_internal_errors.
-		libxml_use_internal_errors( $use_internal_errors );
-
-		return $cooked;
 	}
 }
