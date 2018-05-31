@@ -117,3 +117,19 @@ span.badge-category-bg {
 	margin-right: 5px;
 	margin-left: 5px;
 }
+
+.wpdc-poll-link {
+	display: block;
+}
+
+.wpdc-poll-link:before {
+	font-family: "fontello";
+	font-style: normal;
+	font-weight: normal;
+	speak: none;
+	display: inline-block;
+	width: 1em;
+	margin-right: 0.2em;
+	text-aligh: center;
+	content: '\e800';
+}
