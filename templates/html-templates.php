@@ -91,7 +91,7 @@ class HTMLTemplates {
 	 *
 	 * Available tags:
 	 * {comments}, {discourse_url}, {discourse_url_name}, {topic_url}
-     *
+	 *
 	 * @param null/string $discourse_comments_number The number of comments that are displayed on Discourse.
 	 * @static
 	 * @return mixed|void
@@ -151,6 +151,7 @@ class HTMLTemplates {
 	 * {avatar_url}, {user_url}, {username}, {fullname},
 	 * {comment_body}, {comment_created_at}, {comment_url}
 	 *
+	 * @param bool $even Whether it's an even comment number.
 	 * @static
 	 * @return mixed|void
 	 */

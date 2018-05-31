@@ -28,7 +28,7 @@ trait TemplateFunctions {
 	 * Substitutes the value for `$size` into the template.
 	 *
 	 * @param string $template The avatar template.
-	 * @param int $size The size of the avarar.
+	 * @param int    $size The size of the avarar.
 	 *
 	 * @return mixed
 	 */
@@ -141,7 +141,7 @@ trait TemplateFunctions {
 				$link = $doc->createElement( 'a' );
 				$link->setAttribute( 'class', 'wpdc-poll-link' );
 				$link->setAttribute( 'href', $url );
-				$link_text = $doc->createTextNode( 'View Poll' );
+				$link_text = $doc->createTextNode( __( 'View Poll', 'wp-discourse' ) );
 				$link->appendChild( $link_text );
 
 				$poll->parentNode->replaceChild( $link, $poll );
