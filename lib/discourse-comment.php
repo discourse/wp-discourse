@@ -119,7 +119,7 @@ class DiscourseComment {
 			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
 			wp_enqueue_style( 'comment_styles' );
 
-			wp_register_style( 'fontello_styles', plugins_url( '../assets/fontello/css/fontello.css', __FILE__ ), array(), WPDS_VERSION );
+			wp_register_style( 'fontello_styles', plugins_url( '../assets/fontello/css/fontello.css', __FILE__ ), array(), WPDISCOURSE_VERSION );
 			wp_enqueue_style( 'fontello_styles' );
 		}
 	}
