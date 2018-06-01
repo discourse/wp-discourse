@@ -39,6 +39,7 @@ class MetaBox {
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_meta_box_js' ) );
+		add_action( 'auto-draft_to_draft', array( $this, 'check_for_quickdrafts' ) );
 	}
 
 	/**
@@ -76,9 +77,25 @@ class MetaBox {
 	}
 
 	/**
+	 * If a Quick Draft has been converted to a draft, add the default Discourse metadata to the post.
+	 *
+	 * @param \WP_Post $post The draft post that has transitioned.
+	 */
+	public function check_for_quickdrafts( $post ) {
+		if ( in_array( $post->post_type, $this->options['allowed_post_types'], true ) ) {
+			$post_id          = $post->ID;
+			$default_category = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
+			update_post_meta( $post_id, 'publish_post_category', $default_category );
+			if ( ! empty( $this->options['auto-publish'] ) ) {
+				update_post_meta( $post_id, 'publish_to_discourse', 1 );
+			}
+		}
+	}
+
+	/**
 	 * The callback function for creating the meta box.
 	 *
-	 * @param object $post The current Post object.
+	 * @param \WP_Post $post The current Post object.
 	 */
 	public function render_meta_box( $post ) {
 		$post_id              = $post->ID;
