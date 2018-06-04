@@ -43,20 +43,22 @@ class SSOClientBase {
 		$sso_login_url = $this->get_discourse_sso_url();
 
 		$anchor = apply_filters( 'wpdc_sso_client_login_anchor', $anchor );
-		$button = sprintf( '<a href="%s">%s</a>', $sso_login_url, $anchor );
+		$button = sprintf( '<a class="wpdc-sso-client-login-link" href="%s">%s</a>', $sso_login_url, $anchor );
 
 		return apply_filters( 'wpdc_sso_client_login_button', $button, $sso_login_url, $options );
 	}
 
 	/**
-	 * Gets the auth URL for discourse
+	 * Gets the auth URL for discourse.
 	 *
-	 * @return string.
+	 * @param string|null $redirect The URL to redirect to.
+	 *
+	 * @return string
 	 */
-	protected function get_discourse_sso_url() {
+	protected function get_discourse_sso_url( $redirect = null ) {
 		$is_user_logged_in = is_user_logged_in();
 
-		$redirect_to = get_permalink();
+		$redirect_to = $redirect ? $redirect : get_permalink();
 
 		if ( empty( $redirect_to ) ) {
 			$redirect_to = $is_user_logged_in ? admin_url( 'profile.php' ) : home_url( '/' );
@@ -65,7 +67,7 @@ class SSOClientBase {
 		return add_query_arg(
 			array(
 				'discourse_sso' => 1,
-				'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url', rawurlencode( $redirect_to ), $redirect_to ),
+				'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url', esc_url( $redirect_to ), $redirect_to ),
 			), home_url( '/' )
 		);
 	}

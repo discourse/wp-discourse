@@ -20,19 +20,20 @@ class SSOClientShortcode extends SSOClientBase {
 	}
 
 	/**
-	 * Shortcode for SSO link
+	 * Shortcode for SSO link.
 	 *
 	 * @method discourse_sso_client_shortcode
 	 *
 	 * @param  array $atts shortcode params.
 	 *
-	 * @return string markup
+	 * @return string
 	 */
 	public function discourse_sso_client_shortcode( $atts = array() ) {
 		$options = shortcode_atts(
 			array(
-				'login' => null,
-				'link'  => null,
+				'login'    => null,
+				'link'     => null,
+				'redirect' => null,
 			), $atts
 		);
 
