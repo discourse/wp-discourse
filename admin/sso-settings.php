@@ -608,7 +608,7 @@ class SSOSettings {
 			<?php
 			esc_html_e(
 				'shortcode to your WordPress posts to create a Discourse login link on the front end of your site.
-            The shortcode has two optional attributes: ', 'wp-discourse'
+            The shortcode has three optional attributes: ', 'wp-discourse'
 			);
 ?>
 </em>
@@ -633,9 +633,16 @@ class SSOSettings {
 ?>
 </em>
 			</li>
+            <li>
+                <code><?php esc_html_e( 'redirect', 'wp-discourse' ); ?></code><em>
+                    <?php
+                    esc_html_e( '- sets the page the user is redirected to after logging in. (Defaults to the page the shortcode is embedded on.)', 'wp-discourse' );
+                    ?>
+                </em>
+            </li>
 		</ul>
 		<p class="wpdc-options-documentation">
-			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum']", 'wp-discourse' ); ?></code>
+			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum' redirect=https://example.com/welcome]", 'wp-discourse' ); ?></code>
 		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
 			<p class="wpdc-options-documentation">
