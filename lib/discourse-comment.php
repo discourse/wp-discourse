@@ -239,6 +239,7 @@ class DiscourseComment {
 					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
 					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
+					$topic_id = get_post_meta( $postid, 'discourse_topic_id', true );
 					if ( ! $discourse_permalink ) {
 
 						return 0;
@@ -260,6 +261,10 @@ class DiscourseComment {
 
 							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
 							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							if (isset( $topic_id ) ) {
+								// Delete the cached html.
+								delete_transient( "wpdc_comment_html_{$topic_id}" );
+							}
 						}
 					}
 
@@ -318,7 +323,6 @@ class DiscourseComment {
 		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
 	}
-
 
 	/**
 	 * Displays a link to the associated Discourse topic.

@@ -58,7 +58,22 @@ class DiscourseCommentFormatter {
 
 		}
 
+		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
+		// The topic_id may not be available for posts that were published before version 1.4.0.
+		$topic_id            = get_post_meta( $post_id, 'discourse_topic_id', true );
+
+		if ( ! empty( $topic_id ) ) {
+			$transient_key = "wpdc_comment_html_{$topic_id}";
+			$html = get_transient( $transient_key );
+
+			if ( ! empty( $html ) ) {
+
+				return $html;
+			}
+		}
+
 		$permalink = (string) $custom['discourse_permalink'][0];
+
 
 		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
@@ -69,8 +84,6 @@ class DiscourseCommentFormatter {
 		} else {
 			$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) );
 		}
-
-		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
 
 		// Use custom datetime format string if provided, else global date format.
 		$datetime_format = empty( $this->options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $this->options['custom-datetime-format'];
@@ -88,7 +101,7 @@ class DiscourseCommentFormatter {
 		$discourse_url         = esc_url( $this->options['url'] );
 		$comments_html         = '';
 		$participants_html     = '';
-		$topic_id              = ! empty( $topic_data->id ) ? $topic_data->id : null;
+
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
@@ -143,6 +156,10 @@ class DiscourseCommentFormatter {
 		$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
+
+		if ( isset( $transient_key ) ) {
+			set_transient( $transient_key, $discourse_html );
+		}
 
 		return $discourse_html;
 	}
