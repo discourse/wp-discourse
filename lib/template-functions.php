@@ -141,7 +141,11 @@ trait TemplateFunctions {
 				$link = $doc->createElement( 'a' );
 				$link->setAttribute( 'class', 'wpdc-poll-link' );
 				$link->setAttribute( 'href', $url );
-				$link_text = $doc->createTextNode( __( 'View Poll', 'wp-discourse' ) );
+				$link_text = sprintf(
+					// translators: Poll replacement text. Placeholder: discourse_url.
+					__( 'This post includes a poll. Visit it at %1$s', 'wp-discourse' ), esc_url( $this->options['url'] )
+				);
+				$link_text = $doc->createTextNode( $link_text );
 				$link->appendChild( $link_text );
 
 				$poll->parentNode->replaceChild( $link, $poll );
