@@ -90,7 +90,7 @@ class DiscourseCommentFormatter {
 
 		$more_replies_number = intval( ( $topic_data->posts_count - count( $topic_data->posts ) - 1 ) );
 		$more_text           = esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
-		if ( 0 === $more_replies_number ) {
+		if ( 0 >= $more_replies_number ) {
 			$more_replies = '';
 		} elseif ( 1 === $more_replies_number ) {
 			$more_replies = '1 ' . $more_text . esc_html( strtolower( $this->options['single-reply-text'] ) );
