@@ -60,11 +60,11 @@ class DiscourseCommentFormatter {
 
 		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
 		// The topic_id may not be available for posts that were published before version 1.4.0.
-		$topic_id            = get_post_meta( $post_id, 'discourse_topic_id', true );
+		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
 
 		if ( ! empty( $topic_id ) ) {
 			$transient_key = "wpdc_comment_html_{$topic_id}";
-			$html = get_transient( $transient_key );
+			$html          = get_transient( $transient_key );
 
 			if ( ! empty( $html ) ) {
 
@@ -73,7 +73,6 @@ class DiscourseCommentFormatter {
 		}
 
 		$permalink = (string) $custom['discourse_permalink'][0];
-
 
 		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
@@ -98,9 +97,9 @@ class DiscourseCommentFormatter {
 			$more_replies = $more_replies_number . ' ' . $more_text . esc_html( strtolower( $this->options['many-replies-text'] ) );
 		}
 
-		$discourse_url         = esc_url( $this->options['url'] );
-		$comments_html         = '';
-		$participants_html     = '';
+		$discourse_url     = esc_url( $this->options['url'] );
+		$comments_html     = '';
+		$participants_html = '';
 
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$posts                 = $topic_data->posts;
