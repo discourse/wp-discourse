@@ -197,7 +197,7 @@ class SSOSettings {
 					'sso_client_sync_logout_checkbox',
 				), 'discourse_sso_client', 'discourse_sso_client_settings_section'
 			);
-		}
+		}// End if().
 
 		// If SSO Client is disabled, make sure that discourse_sso_client['sso-client-enabled'] is set to 0.
 		if ( $this->remove_sso_client_settings ) {
