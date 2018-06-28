@@ -142,6 +142,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_sso_client_login_form_redirect', array( $this, 'validate_sso_client_login_form_redirect' ) );
 		add_filter( 'wpdc_validate_sso_client_sync_by_email', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_sso_client_sync_logout', array( $this, 'validate_checkbox' ) );
 
@@ -543,6 +544,36 @@ class SettingsValidator {
 		}
 
 		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validates the sso_client_login_form_redirect redirect text input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_sso_client_login_form_redirect( $input ) {
+		if ( empty( $input ) ) {
+
+			return '';
+		}
+		$regex = '/^(http:|https:)/';
+
+		// Make sure the url starts with a valid protocol.
+		if ( ! preg_match( $regex, $input ) ) {
+			add_settings_error( 'discourse', 'sso_client_login_redirect', __( 'The redirect URL needs to be set to a valid URL that begins with either \'http:\' or \'https:\'.', 'wp-discourse' ) );
+
+			$url = '';
+		} else {
+			$url = untrailingslashit( esc_url_raw( $input ) );
+
+			if ( ! filter_var( $url, FILTER_VALIDATE_URL ) ) {
+				add_settings_error( 'discourse', 'sso_client_login_redirect', __( 'The redirect URL you provided is not a valid URL.', 'wp-discourse' ) );
+			}
+		}
+
+		return $url;
 	}
 
 	/**

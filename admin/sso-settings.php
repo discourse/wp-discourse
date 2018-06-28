@@ -178,6 +178,13 @@ class SSOSettings {
 			);
 
 			add_settings_field(
+				'discourse_sso_login_form_redirect', __( 'Login Link Redirect', 'wp-discourse' ), array(
+					$this,
+					'discourse_sso_login_form_redirect_url_input',
+				), 'discourse_sso_client', 'discourse_sso_client_settings_section'
+			);
+
+			add_settings_field(
 				'discourse_enable_sso_sync', __( 'Sync Existing Users by Email', 'wp-discourse' ), array(
 					$this,
 					'sso_client_sync_by_email_checkbox',
@@ -447,6 +454,17 @@ class SSOSettings {
 				"Clicking on this link will allow users to authenticate themselves through Discourse, instead of through the
             WordPress login process. The text for this link can be customized on the 'Text Content' settings tab.", 'wp-discourse'
 			)
+		);
+	}
+
+	/**
+	 * Outputs markup for sso-client-login-form-redirect.
+	 */
+	public function discourse_sso_login_form_redirect_url_input() {
+		$this->form_helper->input(
+			'sso-client-login-form-redirect', 'discourse_sso_client',
+			__( "The full URL of the WordPress page that users will be redirected to after logging in through Discourse.
+			(Leave this setting empty to redirect to your home page.)", 'wp-discourse' ), 'url'
 		);
 	}
 

@@ -40,7 +40,8 @@ class SSOClientBase {
 			$anchor     = ! empty( $options['login'] ) ? $options['login'] : $login_text;
 		}
 
-		$sso_login_url = $this->get_discourse_sso_url();
+		$redirect = ! empty( $options['redirect'] ) ? $options['redirect'] : null;
+ 		$sso_login_url = $this->get_discourse_sso_url( $redirect );
 
 		$anchor = apply_filters( 'wpdc_sso_client_login_anchor', $anchor );
 		$button = sprintf( '<a class="wpdc-sso-client-login-link" href="%s">%s</a>', $sso_login_url, $anchor );

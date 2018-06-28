@@ -152,10 +152,11 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_sso_client = array(
-		'sso-client-enabled'           => 0,
-		'sso-client-login-form-change' => 0,
-		'sso-client-sync-by-email'     => 0,
-		'sso-client-sync-logout'       => 0,
+		'sso-client-enabled'             => 0,
+		'sso-client-login-form-change'   => 0,
+		'sso-client-login-form-redirect' => '',
+		'sso-client-sync-by-email'       => 0,
+		'sso-client-sync-logout'         => 0,
 	);
 
 	/**

@@ -56,7 +56,9 @@ class Client extends SSOClientBase {
 			return null;
 		}
 
-		printf( '<p>%s</p><p>&nbsp;</p>', wp_kses_data( $this->get_discourse_sso_link_markup() ) );
+		printf( '<p>%s</p><p>&nbsp;</p>', wp_kses_data( $this->get_discourse_sso_link_markup( array(
+		        'redirect' => $this->options['sso-client-login-form-redirect'],
+        ) ) ) );
 
 		do_action( 'wpdc_sso_client_after_login_link' );
 	}
