@@ -463,8 +463,10 @@ class SSOSettings {
 	public function discourse_sso_login_form_redirect_url_input() {
 		$this->form_helper->input(
 			'sso-client-login-form-redirect', 'discourse_sso_client',
-			__( "The full URL of the WordPress page that users will be redirected to after logging in through Discourse.
-			(Leave this setting empty to redirect to your home page.)", 'wp-discourse' ), 'url'
+			__(
+				'The full URL of the WordPress page that users will be redirected to after logging in through Discourse.
+			(Leave this setting empty to redirect to your home page.)', 'wp-discourse'
+			), 'url'
 		);
 	}
 
@@ -651,13 +653,13 @@ class SSOSettings {
 ?>
 </em>
 			</li>
-            <li>
-                <code><?php esc_html_e( 'redirect', 'wp-discourse' ); ?></code><em>
-                    <?php
-                    esc_html_e( '- sets the page the user is redirected to after logging in. (Defaults to the page the shortcode is embedded on.)', 'wp-discourse' );
-                    ?>
-                </em>
-            </li>
+			<li>
+				<code><?php esc_html_e( 'redirect', 'wp-discourse' ); ?></code><em>
+					<?php
+					esc_html_e( '- sets the page the user is redirected to after logging in. (Defaults to the page the shortcode is embedded on.)', 'wp-discourse' );
+					?>
+				</em>
+			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
 			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum' redirect=https://example.com/welcome]", 'wp-discourse' ); ?></code>
