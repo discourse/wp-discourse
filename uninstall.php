@@ -15,6 +15,7 @@ $discourse_options[] = 'discourse_version';
 $discourse_options[] = 'discourse_option_groups';
 $discourse_options[] = 'wpdc_discourse_domain';
 $discourse_options[] = 'wpdiscourse_nonce_db_version';
+$discourse_options[] = 'wpdc_cached_html_keys';
 
 foreach ( $discourse_options as $option ) {
 	delete_option( $option );
