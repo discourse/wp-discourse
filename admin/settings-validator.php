@@ -2,7 +2,7 @@
 /**
  * Validation methods for the settings page.
  *
- * @link https://github.com/discourse/wp-discourse/blob/master/lib/settings-validator.php
+ * @link    https://github.com/discourse/wp-discourse/blob/master/lib/settings-validator.php
  * @package WPDiscourse
  */
 
@@ -16,13 +16,14 @@ use WPDiscourse\Shared\PluginUtilities;
  * @package WPDiscourse\Validator
  */
 class SettingsValidator {
+
 	use PluginUtilities;
 
 	/**
 	 * Indicates whether or not the "discourse_sso_common['sso-secret']" option has been set.
 	 *
 	 * @access protected
-	 * @var bool|void
+	 * @var    bool|void
 	 */
 	protected $sso_secret_set;
 
@@ -30,7 +31,7 @@ class SettingsValidator {
 	 * Indicates whether or not the "discourse_sso_provider['enable-sso']" option is enabled.
 	 *
 	 * @access protected
-	 * @var bool|void
+	 * @var    bool|void
 	 */
 	protected $sso_provider_enabled;
 
@@ -38,7 +39,7 @@ class SettingsValidator {
 	 * Indicates whether or not the "discourse_sso_client['sso-client-enabled']" option is enabled.
 	 *
 	 * @access protected
-	 * @var bool|void
+	 * @var    bool|void
 	 */
 	protected $sso_client_enabled;
 
@@ -46,7 +47,7 @@ class SettingsValidator {
 	 * Indicates whether or not 'use_discourse_comments' is enabled.
 	 *
 	 * @access protected
-	 * @var bool
+	 * @var    bool
 	 */
 	protected $use_discourse_comments = false;
 
@@ -54,7 +55,7 @@ class SettingsValidator {
 	 * Indicates whether or not 'use_discourse_webhook' is enabled.
 	 *
 	 * @access protected
-	 * @var bool
+	 * @var    bool
 	 */
 	protected $use_discourse_webhook;
 
@@ -62,7 +63,7 @@ class SettingsValidator {
 	 * Indicates whether or not 'use_discourse_user_webhook' is enabled.
 	 *
 	 * @access protected
-	 * @var bool
+	 * @var    bool
 	 */
 	protected $use_discourse_user_webhook;
 
@@ -70,7 +71,7 @@ class SettingsValidator {
 	 * Gives access to the plugin options.
 	 *
 	 * @access protected
-	 * @var array|void
+	 * @var    array|void
 	 */
 	protected $options;
 
@@ -762,12 +763,12 @@ class SettingsValidator {
 	/**
 	 * A helper function to validate and sanitize integers.
 	 *
-	 * @param int    $input The input to be validated.
-	 * @param string $option_id The option being validated.
-	 * @param null   $min The minimum allowed value.
-	 * @param null   $max The maximum allowed value.
+	 * @param int    $input         The input to be validated.
+	 * @param string $option_id     The option being validated.
+	 * @param null   $min           The minimum allowed value.
+	 * @param null   $max           The maximum allowed value.
 	 * @param string $error_message The error message to return.
-	 * @param bool   $add_error Whether or not to add a setting error.
+	 * @param bool   $add_error     Whether or not to add a setting error.
 	 *
 	 * @return mixed
 	 */
@@ -807,7 +808,6 @@ class SettingsValidator {
 		$transient_keys = get_option( 'wpdc_cached_html_keys' );
 		if ( ! empty( $transient_keys ) ) {
 			foreach ( $transient_keys as $transient_key ) {
-				write_log('deleting transient', $transient_key );
 				delete_transient( $transient_key );
 			}
 		}
