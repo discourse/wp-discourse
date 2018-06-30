@@ -101,6 +101,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_add_join_link', array( $this, 'validate_add_join_link' ) );
+		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_load_comment_css', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_discourse_new_tab', array( $this, 'validate_checkbox' ) );
@@ -508,6 +509,11 @@ class SettingsValidator {
 			return 0;
 		}
 
+		// When the SSO Provider option is updated, clear the comment cache to update links to Discourse.
+		if ( ! empty( $this->options['cache-html'] ) ) {
+			$this->clear_cached_html();
+		}
+
 		return $new_value;
 	}
 
@@ -791,6 +797,19 @@ class SettingsValidator {
 		} else {
 			// Valid input.
 			return $input;
+		}
+	}
+
+	/**
+	 * Clears all cached comment HTML.
+	 */
+	protected function clear_cached_html() {
+		$transient_keys = get_option( 'wpdc_cached_html_keys' );
+		if ( ! empty( $transient_keys ) ) {
+			foreach ( $transient_keys as $transient_key ) {
+				write_log('deleting transient', $transient_key );
+				delete_transient( $transient_key );
+			}
 		}
 	}
 }
