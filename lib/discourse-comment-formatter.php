@@ -110,6 +110,7 @@ class DiscourseCommentFormatter {
 			foreach ( $posts as $post ) {
 				$even           = 0 === $displayed_comment_number % 2;
 				$post_url       = esc_url( $permalink . '/' . $post->post_number );
+				$name = ! empty( $post->name ) ? $post->name : '';
 				$comment_html   = wp_kses_post( Templates::comment_html( $even ) );
 				$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
@@ -120,7 +121,7 @@ class DiscourseCommentFormatter {
 				$user_url       = $this->homepage( $this->options['url'], $post );
 				$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 				$comment_html   = str_replace( '{username}', esc_html( $post->username ), $comment_html );
-				$comment_html   = str_replace( '{fullname}', esc_html( $post->name ), $comment_html );
+				$comment_html   = str_replace( '{fullname}', esc_html( $name ), $comment_html );
 				$comment_body   = $this->convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 				$comment_body   = $this->add_poll_links( $comment_body, $post_url );
 				$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
