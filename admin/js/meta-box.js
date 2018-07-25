@@ -49,4 +49,33 @@
 			}
 		}
 	);
+
+	$('#wpdc-tagadd').click(
+		function() {
+			var $tagInput = $('#discourse-topic-tags'),
+				$tagList = $( '#wpdc-tagchecklist' ),
+			    tags = $tagInput.val();
+
+			$tagInput.val('');
+
+			if ( tags ) {
+				tagArr = tags.split(',').map( function(e) {
+					return e.trim();
+				});
+
+				if (tagArr) {
+					tagArr.forEach( function(tag, i) {
+						$tagList.append( '<li id="wpdc-tag-item-' + i + '">' +
+							'<button type="button" class="wpdc-remove-tag" data-wpdc-tag-number="' + i + '" value="x"></button>' +
+							tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
+					});
+				}
+			}
+		}
+	);
+
+	$('.wpdc-advanced-options').on('click', '.wpdc-remove-tag', function() {
+		console.log('you clicked', $( this ).data( 'wpdc-tag-number'));
+		$(this).parent().remove();
+	});
 })( jQuery );
