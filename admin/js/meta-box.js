@@ -75,7 +75,6 @@
 	);
 
 	$('.wpdc-advanced-options').on('click', '.wpdc-remove-tag', function() {
-		console.log('you clicked', $( this ).data( 'wpdc-tag-number'));
 		$(this).parent().remove();
 	});
 })( jQuery );

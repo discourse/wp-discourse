@@ -186,7 +186,9 @@ class DiscoursePublish {
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
-		$tags = explode( ',', get_post_meta( $post_id, 'wpdc_topic_tags', true ) );
+		//$tags = explode( ',', get_post_meta( $post_id, 'wpdc_topic_tags', true ) );
+		$tags = get_post_meta( $post_id, 'wpdc_topic_tags', true );
+		write_log('tags', $tags );
 		$tags_param = '';
 		if ( ! empty( $tags ) ) {
 			foreach ( $tags as $tag ) {
