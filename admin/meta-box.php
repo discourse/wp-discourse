@@ -377,7 +377,7 @@ class MetaBox {
 	protected function tag_topic_input() {
 	    ?>
         <label for="discourse_topic_tags">
-            <?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?>
+            <?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?><br>
             <input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
             <input type="button" class="button" id="wpdc-tagadd" value="Add">
             <ul id="wpdc-tagchecklist"></ul>

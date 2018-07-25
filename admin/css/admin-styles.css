@@ -135,3 +135,48 @@ code.wpdc-select-all {
 	-ms-user-select: all;
 	user-select: all;
 }
+
+#wpdc-tagchecklist {
+	padding-left: 14px;
+}
+
+#wpdc-tagchecklist>li {
+	float: left;
+	margin-right: 25px;
+	font-size: 13px;
+	line-height: 1.8em;
+	max-width: 100%;
+	text-overflow: ellipsis;
+}
+
+button.wpdc-remove-tag {
+	position: absolute;
+	width: 24px;
+	height: 24px;
+	border: none;
+	margin: 0 0 0 -19px;
+	padding: 0;
+	background: 0 0;
+	cursor: pointer;
+	text-indent: 0;
+}
+
+.wpdc-remove-tag-icon::before {
+	margin-left: 2px;
+	border-radius: 50%;
+	color: #0073aa;
+	/*background: 0 0;*/
+	content: "\f153";
+	display: block;
+	font: 400 16px/20px dashicons;
+	speak: none;
+	/*height: 20px;*/
+	/*text-align: center;*/
+	/*width: 20px;*/
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.wpdc-remove-tag-icon::before:hover {
+	color: red;
+}
