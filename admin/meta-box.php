@@ -228,8 +228,8 @@ class MetaBox {
 			update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
 		}
 
-		if ( ! empty( $_POST['tag_discourse_topic'] ) ) { // Input var okay.
-		    $tags = sanitize_text_field( wp_unslash( $_POST['tag_discourse_topic'] ) ); // Input var okay.
+		if ( ! empty( $_POST['wpdc_topic_tags'] ) ) { // Input var okay.
+		    $tags = wp_unslash( $_POST['wpdc_topic_tags'] ); // Input var okay.
             update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
 
         }
@@ -376,9 +376,11 @@ class MetaBox {
 
 	protected function tag_topic_input() {
 	    ?>
-        <label for="tag_discourse_topic">
+        <label for="discourse_topic_tags">
             <?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?>
-            <input type="text" name="tag_discourse_topic">
+            <input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
+            <input type="button" class="button" id="wpdc-tagadd" value="Add">
+            <ul id="wpdc-tagchecklist"></ul>
         </label>
         <?php
     }
