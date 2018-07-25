@@ -186,6 +186,15 @@ class DiscoursePublish {
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 
+		$tags = explode( ',', get_post_meta( $post_id, 'wpdc_topic_tags', true ) );
+		$tags_param = '';
+		if ( ! empty( $tags ) ) {
+			foreach ( $tags as $tag ) {
+				$tag = trim( $tag );
+				$tags_param .= '&tags' . urlencode( '[]' ) . "={$tag}";
+			}
+		}
+
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
@@ -202,11 +211,10 @@ class DiscoursePublish {
 				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
 			);
 			$url      = $options['url'] . '/posts';
-			// Use key 'http' even if you send the request to https://.
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
-				'body'    => http_build_query( $data ),
+				'body'    => http_build_query( $data ) . $tags_param,
 			);
 
 		} else {
