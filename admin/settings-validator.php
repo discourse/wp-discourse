@@ -103,6 +103,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_add_join_link', array( $this, 'validate_add_join_link' ) );
 		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_clear_cached_comment_html', array( $this, 'validate_clear_comments_html' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_load_comment_css', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_discourse_new_tab', array( $this, 'validate_checkbox' ) );
@@ -318,6 +319,21 @@ class SettingsValidator {
 		}
 
 		return $new_value;
+	}
+
+	/**
+	 * Validates the 'clear_cached_comment_html input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_clear_comments_html( $input ) {
+		if ( 1 === intval( $input ) ) {
+			$this->clear_cached_html();
+		}
+
+		return 0;
 	}
 
 	/**

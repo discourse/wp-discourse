@@ -68,6 +68,7 @@ class Discourse {
 		'add-join-link'             => 0,
 		'ajax-load'                 => 0,
 		'cache-html'                => 0,
+		'clear-cached-comment-html' => 0,
 		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,
 		'show-existing-comments'    => 0,
