@@ -228,6 +228,12 @@ class MetaBox {
 			update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
 		}
 
+		if ( ! empty( $_POST['tag_discourse_topic'] ) ) { // Input var okay.
+		    $tags = sanitize_text_field( wp_unslash( $_POST['tag_discourse_topic'] ) ); // Input var okay.
+            update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
+
+        }
+
 		if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
 			update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 		}
@@ -368,6 +374,15 @@ class MetaBox {
 		<?php
 	}
 
+	protected function tag_topic_input() {
+	    ?>
+        <label for="tag_discourse_topic">
+            <?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?>
+            <input type="text" name="tag_discourse_topic">
+        </label>
+        <?php
+    }
+
 	/**
 	 * Outputs the markup for the advanced publishing options.
 	 *
@@ -381,6 +396,7 @@ class MetaBox {
 		<div class="wpdc-advanced-options hidden">
 			<?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
 			<?php $this->unlisted_topic_checkbox( $unlisted ); ?>
+            <?php $this->tag_topic_input(); ?>
 		</div>
 		<?php
 	}
