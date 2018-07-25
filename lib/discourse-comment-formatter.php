@@ -158,7 +158,7 @@ class DiscourseCommentFormatter {
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
 		if ( isset( $transient_key ) ) {
-			set_transient( $transient_key, $discourse_html );
+			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
 			if ( ! in_array( $transient_key, $transient_keys ) ) {
 				$transient_keys[] = $transient_key;
