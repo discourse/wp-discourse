@@ -384,6 +384,7 @@ class MetaBox {
             <input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
             <input type="button" class="button" id="wpdc-tagadd" value="Add">
             <ul id="wpdc-tagchecklist"></ul>
+            <div class="wpdc-taglist-errors"></div>
         </label>
         <?php
     }
