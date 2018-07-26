@@ -55,7 +55,8 @@
 			var $tagInput = $('#discourse-topic-tags'),
 				$tagList = $( '#wpdc-tagchecklist' ),
 			    tags = $tagInput.val(),
-			    maxTags = wpdc.maxTags;
+			    maxTags = wpdc.maxTags,
+			    tooManyTags = false;
 
 			$tagInput.val('');
 
@@ -72,10 +73,13 @@
                                 '<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term:' + tag + '</span></button>' +
                                 '&nbsp;' + tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
 						} else {
-							window.confirm( 'You can have a maximum of ' + maxTags + ' per topic.' );
-							tagArr = [];
+							tooManyTags = true;
 						}
 					});
+
+					if ( tooManyTags ) {
+						$('.wpdc-taglist-errors').append( 'You are only allowed ' + maxTags + ' tags per topic' );
+					}
 				}
 			}
 		}
@@ -83,5 +87,6 @@
 
 	$('.wpdc-advanced-options').on('click', '.wpdc-remove-tag', function() {
 		$(this).parent().remove();
+		$('.wpdc-taglist-errors').empty();
 	});
 })( jQuery );
