@@ -93,6 +93,13 @@ class PublishSettings {
         );
 
 		add_settings_field(
+		        'discourse_max_tags', __( 'Maximum Number of Tags', 'wp-discourse' ), array(
+		                $this,
+                    'max_tags_input',
+            ), 'discourse_publish', 'discourse_publishing_settings_section'
+        );
+
+		add_settings_field(
 			'discourse_full_post_content', __( 'Use Full Post Content', 'wp-discourse' ), array(
 				$this,
 				'full_post_checkbox',
@@ -198,6 +205,10 @@ class PublishSettings {
 	    $this->form_helper->checkbox_input(
 	            'allow-tags', 'discourse_publish', __( 'Allow post authors to add tags to Discourse topic.', 'wp-discourse' )
         );
+    }
+
+    public function max_tags_input() {
+	    $this->form_helper->input( 'max-tags', 'discourse_publish', __( 'The maximum number of tags to allow.', 'wp-discourse' ), 'number', 0 );
     }
 
 	/**
