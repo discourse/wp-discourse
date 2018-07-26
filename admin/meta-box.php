@@ -48,6 +48,9 @@ class MetaBox {
 	public function enqueue_meta_box_js() {
 		wp_register_script( 'meta_box_js', plugins_url( '../admin/js/meta-box.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
 		wp_enqueue_script( 'meta_box_js' );
+		// Todo: this is a new setting, if empty, default to 5, if 0, respect 0
+		$data = array( 'maxTags' => $this->options['max-tags'] );
+		wp_localize_script( 'meta_box_js', 'wpdc', $data );
 	}
 
 	/**
@@ -398,7 +401,7 @@ class MetaBox {
 		<div class="wpdc-advanced-options hidden">
 			<?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
 			<?php $this->unlisted_topic_checkbox( $unlisted ); ?>
-            <?php $this->tag_topic_input(); ?>
+            <?php if ( ! empty( $this->options['allow-tags'] ) ) { $this->tag_topic_input(); } ?>
 		</div>
 		<?php
 	}

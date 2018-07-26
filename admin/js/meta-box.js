@@ -54,21 +54,27 @@
 		function() {
 			var $tagInput = $('#discourse-topic-tags'),
 				$tagList = $( '#wpdc-tagchecklist' ),
-			    tags = $tagInput.val();
+			    tags = $tagInput.val(),
+			    maxTags = wpdc.maxTags;
 
 			$tagInput.val('');
 
 			if ( tags ) {
 				tagArr = tags.split(',').map( function(e) {
-					return e.trim();
+					return e.trim().replace( ' ', '_' );
 				});
 
 				if (tagArr) {
 					tagArr.forEach( function(tag, i) {
-						$tagList.append( '<li class="wpdc-tag-item">' +
-							'<button type="button" class="wpdc-remove-tag">' +
-							'<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term:' + tag + '</span></button>' +
-							'&nbsp;' + tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
+						if ( $tagList.children( 'li' ).length < maxTags ) {
+                            $tagList.append( '<li class="wpdc-tag-item">' +
+                                '<button type="button" class="wpdc-remove-tag">' +
+                                '<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term:' + tag + '</span></button>' +
+                                '&nbsp;' + tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
+						} else {
+							window.confirm( 'You can have a maximum of ' + maxTags + ' per topic.' );
+							tagArr = [];
+						}
 					});
 				}
 			}
