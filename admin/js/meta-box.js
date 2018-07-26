@@ -65,8 +65,8 @@
 
 				if (tagArr) {
 					tagArr.forEach( function(tag, i) {
-						$tagList.append( '<li id="wpdc-tag-item-' + i + '">' +
-							'<button type="button" class="wpdc-remove-tag" data-wpdc-tag-number="' + i + '">' +
+						$tagList.append( '<li class="wpdc-tag-item">' +
+							'<button type="button" class="wpdc-remove-tag">' +
 							'<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term:' + tag + '</span></button>' +
 							'&nbsp;' + tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
 					});
