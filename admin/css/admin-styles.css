@@ -161,22 +161,18 @@ button.wpdc-remove-tag {
 	text-indent: 0;
 }
 
-.wpdc-remove-tag-icon::before {
+.wpdc-remove-tag-icon:before {
 	margin-left: 2px;
 	border-radius: 50%;
 	color: #0073aa;
-	/*background: 0 0;*/
 	content: "\f153";
 	display: block;
 	font: 400 16px/20px dashicons;
 	speak: none;
-	/*height: 20px;*/
-	/*text-align: center;*/
-	/*width: 20px;*/
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
 
-.wpdc-remove-tag-icon::before:hover {
-	color: red;
+button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
+	color: #c00c00;
 }
