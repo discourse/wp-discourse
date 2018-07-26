@@ -54,11 +54,13 @@
 		function() {
 			var $tagInput = $('#discourse-topic-tags'),
 				$tagList = $( '#wpdc-tagchecklist' ),
+				$tagListErrors = $('.wpdc-taglist-errors'),
 			    tags = $tagInput.val(),
 			    maxTags = wpdc.maxTags,
 			    tooManyTags = false;
 
 			$tagInput.val('');
+            $tagListErrors.empty();
 
 			if ( tags ) {
 				tagArr = tags.split(',').map( function(e) {
@@ -78,7 +80,7 @@
 					});
 
 					if ( tooManyTags ) {
-						$('.wpdc-taglist-errors').append( 'You are only allowed ' + maxTags + ' tags per topic' );
+						$tagListErrors.append( 'You are only allowed ' + maxTags + ' tags per topic' );
 					}
 				}
 			}

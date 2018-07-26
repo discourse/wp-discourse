@@ -372,7 +372,7 @@ class MetaBox {
 			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
 				<?php checked( $unlisted ); ?> ><br>
-				<?php echo wp_kses_post( $info_message ); ?>
+<!--				--><?php //echo wp_kses_post( $info_message ); ?>
 		</label>
 		<?php
 	}

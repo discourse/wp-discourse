@@ -140,6 +140,12 @@ code.wpdc-select-all {
 	padding-left: 14px;
 }
 
+#wpdc-tagchecklist:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
 #wpdc-tagchecklist>li {
 	float: left;
 	margin-right: 25px;
