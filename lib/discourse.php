@@ -46,6 +46,7 @@ class Discourse {
 		'publish-category'          => '',
 		'publish-category-update'   => 0,
 		'full-post-content'         => 0,
+		'allow-tags'                => 0,
 		'custom-excerpt-length'     => 55,
 		'add-featured-link'         => 0,
 		'auto-publish'              => 0,

@@ -90,6 +90,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_allow_tags', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_force_publish', array( $this, 'validate_checkbox' ) );
