@@ -43,7 +43,9 @@ class DiscourseSSO {
 	 */
 	public function sync_sso_record( $user_login, $user ) {
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
-		if ( ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
+		$bypass_sync = apply_filters( 'wpdc_bypass_sync_sso', false, $user->ID, $user );
+
+		if ( ! $bypass_sync && ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
 			$params = $this->get_sso_params( $user );
 
 			$this->sync_sso( $params );
