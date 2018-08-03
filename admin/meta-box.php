@@ -50,7 +50,9 @@ class MetaBox {
 		wp_enqueue_script( 'meta_box_js' );
 		$max_tags = $this->options['max-tags'];
 		$max_tags = empty( $max_tags && ! 0 === $max_tags ) ? 5 : $max_tags;
-		$data     = array( 'maxTags' => $max_tags );
+		$data     = array(
+		        'maxTags' => $max_tags,
+            );
 		wp_localize_script( 'meta_box_js', 'wpdc', $data );
 	}
 

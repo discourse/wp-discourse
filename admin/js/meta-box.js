@@ -60,11 +60,11 @@
 			    maxTags = wpdc.maxTags,
 			    tooManyTags = false;
 
-			$tagInput.val('');
+			$tagInput.val( '' );
             $tagListErrors.empty();
 
 			if ( tags ) {
-				tagArr = tags.split(',').map( function( e ) {
+				tagArr = tags.split( ',' ).map( function( e ) {
 					return e.trim().replace( / /g, '-' );
 				});
 
