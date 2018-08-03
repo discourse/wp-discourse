@@ -65,9 +65,9 @@ class CommentSettings {
 
 		add_settings_field(
 			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
-			$this,
-			'clear_cached_comment_html_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'clear_cached_comment_html_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		add_settings_field(
@@ -199,12 +199,12 @@ class CommentSettings {
 	 * Outputs markup for the clear-cached-comment-html checkbox.
 	 */
 	public function clear_cached_comment_html_checkbox() {
-	    $this->form_helper->checkbox_input(
-	            'clear-cached-comment-html', 'discourse_comment', __(
-	                    'Selecting this option will clear all cached comment HTML.', 'wp-discourse'
-            ), __( 'Only enabled for a single request.', 'wp-discourse' )
-        );
-    }
+		$this->form_helper->checkbox_input(
+			'clear-cached-comment-html', 'discourse_comment', __(
+				'Selecting this option will clear all cached comment HTML.', 'wp-discourse'
+			), __( 'Only enabled for a single request.', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the discourse-new-tab checkbox.

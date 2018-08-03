@@ -185,6 +185,8 @@ class DiscoursePublish {
 		// This would be used if a post is published through XML-RPC. I'm not sure what it should default to if it hasn't been set.
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
+		$tags = get_post_meta( $post_id, 'wpdc_topic_tags', true );
+		$tags_param = $this->tags_param( $tags );
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
@@ -202,11 +204,10 @@ class DiscoursePublish {
 				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
 			);
 			$url      = $options['url'] . '/posts';
-			// Use key 'http' even if you send the request to https://.
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
-				'body'    => http_build_query( $data ),
+				'body'    => http_build_query( $data ) . $tags_param,
 			);
 
 		} else {
@@ -322,6 +323,25 @@ class DiscoursePublish {
 		$this->create_bad_response_notifications( $current_post, $post_id );
 
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+	}
+
+	/**
+	 * Generates the tags parameter in the form that is required by Discourse.
+	 *
+	 * @param array $tags The array of tags for the topic.
+	 *
+	 * @return string
+	 */
+	protected function tags_param( $tags ) {
+		$tags_string = '';
+		if ( ! empty( $tags ) ) {
+			foreach ( $tags as $tag ) {
+				$tag = trim( $tag );
+				$tags_string .= '&tags' . urlencode( '[]' ) . "={$tag}";
+			}
+		}
+
+		return $tags_string;
 	}
 
 	/**

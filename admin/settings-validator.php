@@ -90,6 +90,8 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_allow_tags', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_max_tags', array( $this, 'validate_max_tags' ) );
 		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_force_publish', array( $this, 'validate_checkbox' ) );
@@ -436,6 +438,17 @@ class SettingsValidator {
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 			true
 		);
+	}
+
+	/**
+	 * Validates the 'max_tags' input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
+	public function validate_max_tags( $input ) {
+		return $this->validate_int( $input );
 	}
 
 	/**
@@ -788,7 +801,7 @@ class SettingsValidator {
 	 *
 	 * @return mixed
 	 */
-	protected function validate_int( $input, $option_id, $min = null, $max = null, $error_message = '', $add_error = false ) {
+	protected function validate_int( $input, $option_id = null, $min = null, $max = null, $error_message = '', $add_error = false ) {
 		$options = array();
 
 		if ( isset( $min ) ) {

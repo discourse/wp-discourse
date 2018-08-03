@@ -86,6 +86,20 @@ class PublishSettings {
 		);
 
 		add_settings_field(
+			'discourse_allow_tags', __( 'Allow Tags', 'wp-discourse' ), array(
+				$this,
+				'allow_tags_checkbox',
+			), 'discourse_publish', 'discourse_publishing_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_max_tags', __( 'Maximum Number of Tags', 'wp-discourse' ), array(
+				$this,
+				'max_tags_input',
+			), 'discourse_publish', 'discourse_publishing_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_full_post_content', __( 'Use Full Post Content', 'wp-discourse' ), array(
 				$this,
 				'full_post_checkbox',
@@ -185,6 +199,22 @@ class PublishSettings {
 		your posts will be published on Discourse. (This can be changed in the 'Publish to Discourse' meta-box when you create a post.)", 'wp-discourse'
 			)
 		);
+	}
+
+	/**
+	 * Outputs markup for the allow-tags checkbox.
+	 */
+	public function allow_tags_checkbox() {
+		$this->form_helper->checkbox_input(
+			'allow-tags', 'discourse_publish', __( 'Allow post authors to add tags to Discourse topic.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the max-tags input.
+	 */
+	public function max_tags_input() {
+		$this->form_helper->input( 'max-tags', 'discourse_publish', __( 'The maximum number of tags to allow.', 'wp-discourse' ), 'number', 0 );
 	}
 
 	/**
