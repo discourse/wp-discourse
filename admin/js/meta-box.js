@@ -58,13 +58,14 @@
 				$tagListErrors = $( '.wpdc-taglist-errors' ),
 			    tags = $tagInput.val(),
 			    maxTags = wpdc.maxTags,
-			    tooManyTags = false;
+			    tooManyTags = false,
+                tagArr;
 
 			$tagInput.val( '' );
             $tagListErrors.empty();
 
 			if ( tags ) {
-				var tagArr = tags.split( ',' ).map( function( e ) {
+				tagArr = tags.split( ',' ).map( function( e ) {
 					return e.trim().replace( / /g, '-' );
 				});
 
