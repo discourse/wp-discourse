@@ -48,8 +48,9 @@ class MetaBox {
 	public function enqueue_meta_box_js() {
 		wp_register_script( 'meta_box_js', plugins_url( '../admin/js/meta-box.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
 		wp_enqueue_script( 'meta_box_js' );
-		// Todo: this is a new setting, if empty, default to 5, if 0, respect 0
-		$data = array( 'maxTags' => $this->options['max-tags'] );
+		$max_tags = $this->options['max-tags'];
+		$max_tags = empty( $max_tags && ! 0 === $max_tags ) ? 5 : $max_tags;
+		$data     = array( 'maxTags' => $max_tags );
 		wp_localize_script( 'meta_box_js', 'wpdc', $data );
 	}
 
@@ -232,10 +233,9 @@ class MetaBox {
 		}
 
 		if ( ! empty( $_POST['wpdc_topic_tags'] ) ) { // Input var okay.
-		    $tags = wp_unslash( $_POST['wpdc_topic_tags'] ); // Input var okay.
-            update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
-
-        }
+			$tags = array_map( 'sanitize_text_field', wp_unslash( $_POST['wpdc_topic_tags'] ) ); // Input var okay.
+			update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
+		}
 
 		if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
 			update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
@@ -365,29 +365,32 @@ class MetaBox {
 		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
 		$info_message         = sprintf(
 			// translators: Unlisted topic option description. Placeholder: webhook options link.
-			__( '<em>If you have configured the %1s, unlisted topics will be listed after they receive a comment.</em>', 'wp-discourse' ), $webhook_options_link
+			__( 'If you have configured the %1s, unlisted topics will be listed on Discourse after they receive a comment.', 'wp-discourse' ), $webhook_options_link
 		)
 		?>
 		<label for="unlist_discourse_topic">
 			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
-				<?php checked( $unlisted ); ?> ><br>
-<!--				--><?php //echo wp_kses_post( $info_message ); ?>
+				<?php checked( $unlisted ); ?> ><span class="wpdc-info-icon wpdc-tooltip">
+			<span class="wpdc-tooltip-text"><?php echo wp_kses_post( $info_message ); ?></span></span>
 		</label>
 		<?php
 	}
 
+	/**
+	 * Outputs the tag_topic input.
+	 */
 	protected function tag_topic_input() {
-	    ?>
-        <label for="discourse_topic_tags">
-            <?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?><br>
-            <input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
-            <input type="button" class="button" id="wpdc-tagadd" value="Add">
-            <ul id="wpdc-tagchecklist"></ul>
-            <div class="wpdc-taglist-errors"></div>
-        </label>
-        <?php
-    }
+		?>
+		<label for="discourse_topic_tags">
+			<?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?><br>
+			<input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
+			<input type="button" class="button" id="wpdc-tagadd" value="Add">
+			<ul id="wpdc-tagchecklist"></ul>
+			<div class="wpdc-taglist-errors"></div>
+		</label>
+		<?php
+	}
 
 	/**
 	 * Outputs the markup for the advanced publishing options.
@@ -401,8 +404,12 @@ class MetaBox {
 		<div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
 		<div class="wpdc-advanced-options hidden">
 			<?php $this->pin_topic_input( $pin_topic, $pin_until ); ?>
-			<?php $this->unlisted_topic_checkbox( $unlisted ); ?>
-            <?php if ( ! empty( $this->options['allow-tags'] ) ) { $this->tag_topic_input(); } ?>
+			<?php $this->unlisted_topic_checkbox( $unlisted ); ?><br>
+			<?php
+			if ( ! empty( $this->options['allow-tags'] ) ) {
+				$this->tag_topic_input();
+			}
+		?>
 		</div>
 		<?php
 	}

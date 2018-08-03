@@ -1,3 +1,4 @@
+/* globals wpdc */
 /**
  * Toggles the 'hidden' class for the publishing_options metabox.
  *
@@ -50,11 +51,11 @@
 		}
 	);
 
-	$('#wpdc-tagadd').click(
+	$( '#wpdc-tagadd' ).click(
 		function() {
-			var $tagInput = $('#discourse-topic-tags'),
+			var $tagInput = $( '#discourse-topic-tags' ),
 				$tagList = $( '#wpdc-tagchecklist' ),
-				$tagListErrors = $('.wpdc-taglist-errors'),
+				$tagListErrors = $( '.wpdc-taglist-errors' ),
 			    tags = $tagInput.val(),
 			    maxTags = wpdc.maxTags,
 			    tooManyTags = false;
@@ -63,16 +64,15 @@
             $tagListErrors.empty();
 
 			if ( tags ) {
-				tagArr = tags.split(',').map( function(e) {
-					return e.trim().replace( ' ', '_' );
+				tagArr = tags.split(',').map( function( e ) {
+					return e.trim().replace( / /g, '-' );
 				});
 
-				if (tagArr) {
-					tagArr.forEach( function(tag, i) {
+				if ( tagArr ) {
+					tagArr.forEach( function( tag ) {
 						if ( $tagList.children( 'li' ).length < maxTags ) {
-                            $tagList.append( '<li class="wpdc-tag-item">' +
-                                '<button type="button" class="wpdc-remove-tag">' +
-                                '<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term:' + tag + '</span></button>' +
+                            $tagList.append( '<li class="wpdc-tag-item"><button type="button" class="wpdc-remove-tag">' +
+                                '<span class="wpdc-remove-tag-icon" aria-hidden="true"></span><span class="screen-reader-text">Remove term: ' + tag + '</span></button>' +
                                 '&nbsp;' + tag + '<input name="wpdc_topic_tags[]" type="hidden" value="' + tag + '"></li>' );
 						} else {
 							tooManyTags = true;
@@ -80,15 +80,15 @@
 					});
 
 					if ( tooManyTags ) {
-						$tagListErrors.append( 'You are only allowed ' + maxTags + ' tags per topic' );
+						$tagListErrors.append( 'You are only allowed ' + maxTags + ' tags per topic.' );
 					}
 				}
 			}
 		}
 	);
 
-	$('.wpdc-advanced-options').on('click', '.wpdc-remove-tag', function() {
-		$(this).parent().remove();
-		$('.wpdc-taglist-errors').empty();
+	$( '.wpdc-advanced-options' ).on( 'click', '.wpdc-remove-tag', function() {
+		$( this ).parent().remove();
+		$( '.wpdc-taglist-errors' ).empty();
 	});
 })( jQuery );

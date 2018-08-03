@@ -182,3 +182,55 @@ button.wpdc-remove-tag {
 button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 	color: #c00c00;
 }
+
+.wpdc-info-icon:before {
+	margin-left: 2px;
+	content: "?";
+	font-size: 18px;
+	font-weight: bold;
+	color: #444444;
+	position: absolute;
+	bottom: 0;
+}
+
+.wpdc-tooltip {
+	position: relative;
+}
+
+.wpdc-tooltip .wpdc-tooltip-text {
+	visibility: hidden;
+	width: 150px;
+	background-color: #555555;
+	color: #fff;
+	text-align: left;
+	padding: 5px 10px 5px 10px;
+	position: absolute;
+	z-index: 1;
+	bottom: 150%;
+	left: 50%;
+	margin-left: -78px;
+	opacity: 0;
+	transition: opacity 0.3s;
+}
+
+.wpdc-tooltip .wpdc-tooltip-text a {
+	color: #ffffff;
+	font-size: 13px;
+}
+
+/* Creates a triangle that points to the info icon. */
+.wpdc-tooltip .wpdc-tooltip-text::after {
+	content: "";
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	margin-left: -5px;
+	border-width: 5px;
+	border-style: solid;
+	border-color: #555555 transparent transparent transparent;
+}
+
+.wpdc-tooltip:hover .wpdc-tooltip-text {
+	visibility: visible;
+	opacity: 1;
+}

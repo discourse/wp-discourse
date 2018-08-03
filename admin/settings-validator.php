@@ -440,6 +440,13 @@ class SettingsValidator {
 		);
 	}
 
+	/**
+	 * Validates the 'max_tags' input.
+	 *
+	 * @param int $input The input to be validated.
+	 *
+	 * @return mixed
+	 */
 	public function validate_max_tags( $input ) {
 		return $this->validate_int( $input );
 	}
