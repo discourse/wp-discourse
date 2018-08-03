@@ -64,7 +64,7 @@
             $tagListErrors.empty();
 
 			if ( tags ) {
-				tagArr = tags.split( ',' ).map( function( e ) {
+				var tagArr = tags.split( ',' ).map( function( e ) {
 					return e.trim().replace( / /g, '-' );
 				});
 
