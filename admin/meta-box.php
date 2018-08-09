@@ -344,13 +344,13 @@ class MetaBox {
 	protected function pin_topic_input( $pin_topic, $pin_until ) {
 		?>
 		<label for="pin_discourse_topic">
-			<?php esc_html_e( 'Pin Topic on Discourse', 'wp-discourse' ); ?>
+			<?php esc_html_e( 'Pin Topic', 'wp-discourse' ); ?>
 			<input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic" value="1"
 				<?php checked( $pin_topic ); ?> >
-		</label>
-		<div class="wpdc-pin-topic-time">
+		</label><br>
+		<div class="wpdc-pin-topic-time hidden">
 			<label for="pin_discourse_topic_until">
-				<?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?>
+				<?php esc_html_e( 'Pin Until', 'wp-discourse' ); ?><br>
 				<input type="date" name="pin_discourse_topic_until" value="<?php echo esc_attr( $pin_until ); ?>">
 			</label>
 		</div>
@@ -371,7 +371,7 @@ class MetaBox {
 		)
 		?>
 		<label for="unlist_discourse_topic">
-			<?php esc_html_e( 'Publish as Unlisted Topic', 'wp-discourse' ); ?>
+			<?php esc_html_e( 'Publish as Unlisted', 'wp-discourse' ); ?>
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
 				<?php checked( $unlisted ); ?> ><span class="wpdc-info-icon wpdc-tooltip">
 			<span class="wpdc-tooltip-text"><?php echo wp_kses_post( $info_message ); ?></span></span>
