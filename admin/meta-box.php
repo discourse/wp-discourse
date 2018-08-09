@@ -290,9 +290,10 @@ class MetaBox {
 	 */
 	protected function publish_to_discourse_checkbox( $text, $publish_to_discourse ) {
 		?>
-		<label for="publish_to_discourse"><?php echo esc_html( $text ); ?>
+		<label for="publish_to_discourse">
 			<input type="checkbox" name="publish_to_discourse" id="publish_to_discourse" value="1"
 				<?php checked( $publish_to_discourse ); ?> >
+			<?php echo esc_html( $text ); ?>
 		</label>
 		<?php
 	}
@@ -344,9 +345,10 @@ class MetaBox {
 	protected function pin_topic_input( $pin_topic, $pin_until ) {
 		?>
 		<label for="pin_discourse_topic">
-			<?php esc_html_e( 'Pin Topic', 'wp-discourse' ); ?>
+
 			<input type="checkbox" name="pin_discourse_topic" id="pin_discourse_topic" value="1"
 				<?php checked( $pin_topic ); ?> >
+			<?php esc_html_e( 'Pin Topic', 'wp-discourse' ); ?>
 		</label><br>
 		<div class="wpdc-pin-topic-time hidden">
 			<label for="pin_discourse_topic_until">
@@ -367,14 +369,15 @@ class MetaBox {
 		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
 		$info_message         = sprintf(
 			// translators: Unlisted topic option description. Placeholder: webhook options link.
-			__( 'If you have configured the %1s, unlisted topics will be listed on Discourse after they receive a comment.', 'wp-discourse' ), $webhook_options_link
+			__( 'If you have configured the %1s, topics will be listed when they receive a comment.', 'wp-discourse' ), $webhook_options_link
 		)
 		?>
 		<label for="unlist_discourse_topic">
-			<?php esc_html_e( 'Publish as Unlisted', 'wp-discourse' ); ?>
+
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
-				<?php checked( $unlisted ); ?> ><span class="wpdc-info-icon wpdc-tooltip">
-			<span class="wpdc-tooltip-text"><?php echo wp_kses_post( $info_message ); ?></span></span>
+				<?php checked( $unlisted ); ?> >
+            <?php esc_html_e( 'Publish as Unlisted', 'wp-discourse' ); ?><br>
+            <div class="wpdc-publish-info"><?php echo wp_kses_post( $info_message ); ?></div>
 		</label>
 		<?php
 	}
@@ -474,7 +477,7 @@ class MetaBox {
 		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );
 		?>
 		<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
-			<select name="publish_post_category" id="publish_post_category">
+			<select class="widefat" name="publish_post_category" id="publish_post_category">
 				<?php foreach ( $categories as $category ) : ?>
 					<option
 							value="<?php echo( esc_attr( $category['id'] ) ); ?>"
