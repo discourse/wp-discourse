@@ -80,6 +80,14 @@ ul.wpdc-documentation-list {
 	margin-left: 40px;
 }
 
+/* Make it easier to copy sections. */
+code.wpdc-select-all {
+	-webkit-user-select: all;
+	-moz-user-select: all;
+	-ms-user-select: all;
+	user-select: all;
+}
+
 #discourse-publish-meta-box label {
 	display: inline-block;
 	padding: 6px 10px 8px 0;
@@ -127,13 +135,8 @@ ul.wpdc-documentation-list {
 	color: #444444;
 }
 
-/* Make it easier to copy sections. */
-
-code.wpdc-select-all {
-	-webkit-user-select: all;
-	-moz-user-select: all;
-	-ms-user-select: all;
-	user-select: all;
+.wpdc-pin-topic-time.hidden {
+	display: none;
 }
 
 #wpdc-tagchecklist {

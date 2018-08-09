@@ -51,6 +51,13 @@
 		}
 	);
 
+	$( '#pin_discourse_topic' ).click(
+		function() {
+			var $pinUntil = $( '.wpdc-pin-topic-time' );
+			$( this ).is( ':checked' ) ? $pinUntil.show() : $pinUntil.hide();
+		}
+	);
+
 	$( '#wpdc-tagadd' ).click(
 		function() {
 			var $tagInput = $( '#discourse-topic-tags' ),
