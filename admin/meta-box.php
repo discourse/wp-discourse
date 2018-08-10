@@ -51,8 +51,8 @@ class MetaBox {
 		$max_tags = $this->options['max-tags'];
 		$max_tags = empty( $max_tags ) && 0 !== $max_tags ? 5 : $max_tags;
 		$data     = array(
-		        'maxTags' => $max_tags,
-            );
+			'maxTags' => $max_tags,
+		);
 		wp_localize_script( 'meta_box_js', 'wpdc', $data );
 	}
 
@@ -376,8 +376,8 @@ class MetaBox {
 
 			<input type="checkbox" name="unlist_discourse_topic" value="1"
 				<?php checked( $unlisted ); ?> >
-            <?php esc_html_e( 'Publish as Unlisted', 'wp-discourse' ); ?><br>
-            <div class="wpdc-publish-info"><?php echo wp_kses_post( $info_message ); ?></div>
+			<?php esc_html_e( 'Publish as Unlisted', 'wp-discourse' ); ?><br>
+			<div class="wpdc-publish-info"><?php echo wp_kses_post( $info_message ); ?></div>
 		</label>
 		<?php
 	}

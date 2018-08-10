@@ -185,13 +185,13 @@ class DiscoursePublish {
 		// This would be used if a post is published through XML-RPC. I'm not sure what it should default to if it hasn't been set.
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
-		$tags = get_post_meta( $post_id, 'wpdc_topic_tags', true );
-		$tags_param = $this->tags_param( $tags );
+		$tags             = get_post_meta( $post_id, 'wpdc_topic_tags', true );
+		$tags_param       = $this->tags_param( $tags );
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
-			$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
-			$data     = array(
+			$unlisted     = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+			$data         = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
@@ -203,7 +203,7 @@ class DiscoursePublish {
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
 			);
-			$url      = $options['url'] . '/posts';
+			$url          = $options['url'] . '/posts';
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
@@ -336,8 +336,8 @@ class DiscoursePublish {
 		$tags_string = '';
 		if ( ! empty( $tags ) ) {
 			foreach ( $tags as $tag ) {
-				$tag = trim( $tag );
-				$tags_string .= '&tags' . urlencode( '[]' ) . "={$tag}";
+				$tag          = trim( $tag );
+				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
 			}
 		}
 

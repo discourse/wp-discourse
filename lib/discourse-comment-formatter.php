@@ -110,7 +110,7 @@ class DiscourseCommentFormatter {
 			foreach ( $posts as $post ) {
 				$even           = 0 === $displayed_comment_number % 2;
 				$post_url       = esc_url( $permalink . '/' . $post->post_number );
-				$name = ! empty( $post->name ) ? $post->name : '';
+				$name           = ! empty( $post->name ) ? $post->name : '';
 				$comment_html   = wp_kses_post( Templates::comment_html( $even ) );
 				$comment_html   = str_replace( '{discourse_url}', $discourse_url, $comment_html );
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
@@ -160,7 +160,7 @@ class DiscourseCommentFormatter {
 		if ( isset( $transient_key ) ) {
 			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
-			if ( ! in_array( $transient_key, $transient_keys ) ) {
+			if ( ! in_array( $transient_key, $transient_keys, true ) ) {
 				$transient_keys[] = $transient_key;
 				update_option( 'wpdc_cached_html_keys', $transient_keys );
 			}
