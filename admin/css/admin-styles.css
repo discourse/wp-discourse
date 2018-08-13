@@ -98,7 +98,7 @@ code.wpdc-select-all {
 }
 
 .wpdc-new-discourse-topic.hidden,
-.wpdc-link-to-top.hidden {
+.wpdc-link-to-topic.hidden {
 	display: none;
 }
 
