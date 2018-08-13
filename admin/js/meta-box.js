@@ -14,7 +14,7 @@
 			if ( 'new' === val ) {
 				$newTopicOptions.removeClass( 'hidden' );
 				$linkPostOptions.addClass( 'hidden' );
-			} else {
+			} else if ( 'link' === val ) {
 				$newTopicOptions.addClass( 'hidden' );
 				$linkPostOptions.removeClass( 'hidden' );
 			}
