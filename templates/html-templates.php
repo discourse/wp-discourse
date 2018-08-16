@@ -103,7 +103,7 @@ class HTMLTemplates {
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
 					<?php
-					$text = $discourse_comments_number > 0 ? self::get_text_options( 'join-discussion-text' ) : self::get_text_options( 'start-discussion-text' );
+					$text = $discourse_comments_number > 1 ? self::get_text_options( 'join-discussion-text' ) : self::get_text_options( 'start-discussion-text' );
 					?>
 					<?php echo esc_html( $text ) . ' '; ?>
 					<a <?php self::target(); ?> href="{topic_url}">
