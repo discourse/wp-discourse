@@ -116,7 +116,7 @@ class DiscourseCommentFormatter {
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 				$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
 				$comment_html   = str_replace( '{comment_url}', $post_url, $comment_html );
-				$avatar_url     = $this->avatar( $post->avatar_template, 64 );
+				$avatar_url     = $this->avatar( $post->avatar_template, apply_filters( 'discourse_post_avatar_template_size', 64 ) );
 				$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
 				$user_url       = $this->homepage( $this->options['url'], $post );
 				$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
@@ -136,7 +136,7 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 				$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 				$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
-				$avatar_url         = $this->avatar( $participant->avatar_template, 64 );
+				$avatar_url         = $this->avatar( $participant->avatar_template, apply_filters( 'discourse_participant_avatar_template_size', 64 ) );
 				$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
 				$user_url           = $this->homepage( $this->options['url'], $participant );
 				$participant_html   = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
