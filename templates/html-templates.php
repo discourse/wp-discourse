@@ -67,7 +67,7 @@ class HTMLTemplates {
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
 					<?php echo esc_html( self::get_text_options( 'continue-discussion-text' ) . ' ' ); ?>
-					<a <?php self::target(); ?> href="{topic_url}">
+					<a <?php echo self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a>
 				</h3>
@@ -106,7 +106,7 @@ class HTMLTemplates {
 					$text = $discourse_comments_number > 0 ? self::get_text_options( 'join-discussion-text' ) : self::get_text_options( 'start-discussion-text' );
 					?>
 					<?php echo esc_html( $text ) . ' '; ?>
-					<a <?php self::target(); ?> href="{topic_url}">
+					<a <?php echo self::target(); ?> href="{topic_url}">
 						{discourse_url_name}
 					</a></h3>
 			</div>
