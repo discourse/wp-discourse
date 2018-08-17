@@ -115,7 +115,7 @@ class MetaBox {
 							   'pending' === get_post_status( $post_id );
 		$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
 		$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
-		$default_category_id  = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
+		$default_category_id  = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : null;
 		$pin_topic            = get_post_meta( $post_id, 'wpdc_pin_topic', true );
 		$pin_until            = get_post_meta( $post_id, 'wpdc_pin_until', true );
 		$unlisted             = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
@@ -136,7 +136,7 @@ class MetaBox {
 				<?php
 				if ( is_wp_error( $this->categories ) ) {
 					echo '<hr>';
-					$this->category_error_markup( $default_category_id );
+					$this->category_error_markup();
 				} else {
 					?>
 					<div class="wpdc-new-discourse-topic">
@@ -274,12 +274,17 @@ class MetaBox {
 	 */
 	protected function force_publish_markup( $default_category_id ) {
 		$category_name = $this->get_discourse_category_name( $default_category_id );
-		// translators: Discourse force-publish message. Placeholder: category_name.
-		$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
-		$allowed = array(
-			'strong' => array(),
-		);
-		echo wp_kses( $message, $allowed );
+		if ( ! is_wp_error( $category_name ) ) {
+			// translators: Discourse force-publish message. Placeholder: category_name.
+			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
+        } else {
+		    $publishing_url = admin_url( '/admin.php?page=publishing_options' );
+		    $publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
+            // translators: Discourse force-publish-category-not-set message. Placeholder: publishing_options_link.
+		    $message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled, but you have not set a default publishing category. You can set that category on your %1s tab.', 'wp-discourse' ), $publishing_link );
+
+        }
+		echo wp_kses_post( $message );
 	}
 
 	/**
@@ -515,12 +520,8 @@ class MetaBox {
 
 	/**
 	 * The markup that is displayed when the categories can't be retrieved.
-	 *
-	 * This function should never need to be called.
-	 *
-	 * @param int $default_category_id The default publish category.
 	 */
-	protected function category_error_markup( $default_category_id ) {
+	protected function category_error_markup() {
 		?>
 		<div class="warning">
 			<p>
@@ -532,10 +533,7 @@ class MetaBox {
 				?>
 			</p>
 		</div>
-		<?php // For a new post when the category list can't be displayed, publish to the default category. ?>
-		<input type="hidden" name="publish_post_category"
-			   value="<?php echo esc_attr( $default_category_id ); ?>">
-		<?php
+        <?php
 	}
 
 	/**
