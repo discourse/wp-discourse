@@ -3,7 +3,7 @@ Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 4.9.8
-Stable tag: 1.7.1
+Stable tag: 1.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,13 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.7.2 08/17/2018
+
+- Fix target attribute not being set when Open Links in New Tab option selected
+- Fix Start Discussion text not being set when no comments are displayed on WordPress
+- Add discourse_post_avatar_template_size filter
+- Add discourse_participant_avatar_template_size filter
 
 #### 1.7.1 08/13/2018
 
