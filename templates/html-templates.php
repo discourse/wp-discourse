@@ -39,7 +39,7 @@ class HTMLTemplates {
 	protected static function new_tab() {
 		$comment_options = get_option( 'discourse_comment' );
 
-		return ! empty( $comment_options['discourse-new-tab'] ) ? true : false;
+		return ! empty( $comment_options['discourse-new-tab'] );
 	}
 
 	/**
