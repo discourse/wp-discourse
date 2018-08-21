@@ -48,8 +48,7 @@ class MetaBox {
 	public function enqueue_meta_box_js() {
 		wp_register_script( 'meta_box_js', plugins_url( '../admin/js/meta-box.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
 		wp_enqueue_script( 'meta_box_js' );
-		$max_tags = $this->options['max-tags'];
-		$max_tags = empty( $max_tags ) && 0 !== $max_tags ? 5 : $max_tags;
+		$max_tags = ! isset( $this->options['max-tags'] ) ? 5 : $this->options['max-tags'];
 		$data     = array(
 			'maxTags' => $max_tags,
 		);
