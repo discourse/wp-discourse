@@ -48,7 +48,7 @@ class DiscourseSSO {
 		if ( ! $bypass_sync && ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
 			$params = $this->get_sso_params( $user );
 
-			$this->sync_sso( $params );
+			$this->sync_sso( $params, $user->ID );
 		}
 	}
 
@@ -307,10 +307,11 @@ class DiscourseSSO {
 	 * Syncs a user with Discourse through SSO.
 	 *
 	 * @param array $sso_params The sso params to sync.
+	 * @param int $user_id The WordPress user's ID.
 	 *
 	 * @return int|string|\WP_Error
 	 */
-	protected function sync_sso( $sso_params ) {
+	protected function sync_sso( $sso_params, $user_id = null ) {
 		$plugin_options = $this->options;
 		if ( empty( $plugin_options['enable-sso'] ) ) {
 
@@ -350,6 +351,8 @@ class DiscourseSSO {
 			$wordpress_user_id = $sso_params['external_id'];
 			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', $discourse_user->id );
 			update_user_meta( $wordpress_user_id, 'discourse_username', $discourse_user->username );
+
+			do_action( 'wpdc_after_sync_sso', $discourse_user, $user_id );
 		}
 
 		return wp_remote_retrieve_response_code( $response );
