@@ -74,7 +74,8 @@ class DiscoursePublish {
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 
-		if ( 'publish' === get_post_status( $post_id ) ) {
+		$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
+		if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 			if ( $force_publish || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 				$this->sync_to_discourse( $post_id, $title, $post->post_content );
 			}

@@ -219,7 +219,8 @@ class DiscourseComment {
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
-				if ( 'publish' === get_post_status( $postid ) ) {
+				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $postid );
+				if ( 'publish' === get_post_status( $postid ) || $publish_private ) {
 
 					$comment_count            = $this->add_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
