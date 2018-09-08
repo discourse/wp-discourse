@@ -307,7 +307,7 @@ class DiscourseSSO {
 	 * Syncs a user with Discourse through SSO.
 	 *
 	 * @param array $sso_params The sso params to sync.
-	 * @param int $user_id The WordPress user's ID.
+	 * @param int   $user_id The WordPress user's ID.
 	 *
 	 * @return int|string|\WP_Error
 	 */
