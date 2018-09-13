@@ -46,9 +46,16 @@ class DiscourseSSO {
 		$bypass_sync = apply_filters( 'wpdc_bypass_sync_sso', false, $user->ID, $user );
 
 		if ( ! $bypass_sync && ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
-			$params = $this->get_sso_params( $user );
+			// Make sure the login hasn't been initiated by clicking on a SSO login link.
+			$query_string = parse_url( wp_get_referer(), PHP_URL_QUERY );
+			$query_params = [];
+			parse_str( $query_string, $query_params );
+			$sso_referer = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
+			if ( ! $sso_referer ) {
+				$params = $this->get_sso_params( $user );
 
-			$this->sync_sso( $params, $user->ID );
+				$this->sync_sso( $params, $user->ID );
+			}
 		}
 	}
 
