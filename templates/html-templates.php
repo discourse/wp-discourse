@@ -242,4 +242,25 @@ class HTMLTemplates {
 			<?php
 		}
 	}
+
+	/**
+	 * HTML template for each popular link
+	 *
+	 * Can be customized from within a theme using the filter provided.
+	 *
+	 * Available tags:
+	 * {popular_link}
+	 *
+	 * @static
+	 * @return mixed|void
+	 */
+	public static function popular_link_html() {
+		ob_start();
+		?>
+		<a class="popular-link" href={popular_link}>{popular_link}</a>
+		<?php
+		$output = ob_get_clean();
+
+		return apply_filters( 'discourse_popular_link_html', $output );
+	}
 }

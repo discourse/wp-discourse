@@ -105,6 +105,9 @@ class DiscourseCommentFormatter {
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
 
+		$links_in_posts = 0;
+		$popular_links = $this->get_popular_links( $discourse_info->posts );
+
 		if ( count( $posts ) > 0 ) {
 			$displayed_comment_number = 0;
 			foreach ( $posts as $post ) {
@@ -148,6 +151,27 @@ class DiscourseCommentFormatter {
 		} else {
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
+		if ( count( $popular_links ) > 0 ) {
+			foreach ( $popular_links as &$p_link ) {
+				$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
+				$popular_link_html   = str_replace( '{popular_link}', "https:".$p_link, $popular_link_html );
+				$popular_links_html .= $popular_link_html;
+			}
+		}// End if().
+
+		$discourse_html = str_replace( '{replies_count}', count( $discourse_info->posts ), $discourse_html );
+		$discourse_html = str_replace( '{participants_count}', count( $discourse_info->participants ), $discourse_html );
+		$discourse_html = str_replace( '{links_count}', $links_in_posts, $discourse_html );
+
+		$last_reply = end($discourse_info->posts);
+		$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($last_reply->created_at), $discourse_html );
+		$discourse_html = str_replace( '{last_reply_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
+		$discourse_html = str_replace( '{last_reply_user_username}', $last_reply->username, $discourse_html );
+
+		$post = $discourse_info->posts[0];
+		$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($post->created_at), $discourse_html );
+		$discourse_html = str_replace( '{post_created_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
+		$discourse_html = str_replace( '{post_created_user_username}', $post->username, $discourse_html );
 
 		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
