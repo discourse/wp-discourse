@@ -403,8 +403,7 @@ trait PluginUtilities {
 				 $popular_links[] = $item->getAttribute('href');
 			}
 		}
-		//Remove duplicates
-		$popular_links = array_unique($popular_links);
+		
 		return $popular_links;
 	}
 }
