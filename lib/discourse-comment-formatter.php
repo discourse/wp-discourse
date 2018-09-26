@@ -106,7 +106,10 @@ class DiscourseCommentFormatter {
 		$participants          = $topic_data->participants;
 
 		$links_in_posts = 0;
-		$popular_links = $this->get_popular_links( $discourse_info->posts );
+		//Remove duplicates
+		$popular_links = $this->get_popular_links( $posts );
+		$links_in_posts = count( $popular_links );
+		$popular_links = array_unique($popular_links);
 
 		if ( count( $posts ) > 0 ) {
 			$displayed_comment_number = 0;
@@ -159,8 +162,8 @@ class DiscourseCommentFormatter {
 			}
 		}// End if().
 
-		$discourse_html = str_replace( '{replies_count}', count( $discourse_info->posts ), $discourse_html );
-		$discourse_html = str_replace( '{participants_count}', count( $discourse_info->participants ), $discourse_html );
+		$discourse_html = str_replace( '{replies_count}', count( $posts ), $discourse_html );
+		$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
 		$discourse_html = str_replace( '{links_count}', $links_in_posts, $discourse_html );
 
 		$last_reply = end($discourse_info->posts);
@@ -178,6 +181,7 @@ class DiscourseCommentFormatter {
 		$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
 		$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 		$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
+		$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
