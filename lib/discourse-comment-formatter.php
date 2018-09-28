@@ -166,12 +166,12 @@ class DiscourseCommentFormatter {
 		$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
 		$discourse_html = str_replace( '{links_count}', $links_in_posts, $discourse_html );
 
-		$last_reply = end($discourse_info->posts);
+		$last_reply = end($posts);
 		$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($last_reply->created_at), $discourse_html );
 		$discourse_html = str_replace( '{last_reply_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
 		$discourse_html = str_replace( '{last_reply_user_username}', $last_reply->username, $discourse_html );
 
-		$post = $discourse_info->posts[0];
+		$post = $posts[0];
 		$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($post->created_at), $discourse_html );
 		$discourse_html = str_replace( '{post_created_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
 		$discourse_html = str_replace( '{post_created_user_username}', $post->username, $discourse_html );
@@ -197,3 +197,4 @@ class DiscourseCommentFormatter {
 		return $discourse_html;
 	}
 }
+
