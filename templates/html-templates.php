@@ -16,16 +16,6 @@ namespace WPDiscourse\Templates;
  */
 class HTMLTemplates {
 
-    protected static function get_option( $option_group, $option_name ) {
-        $group = get_option( $option_group );
-        if ( ! empty( $group ) && ! empty( $group[ $option_name ] ) ) {
-
-            return $group[ $option_name ];
-        }
-
-        return null;
-    }
-
 	/**
 	 * Gets the 'discourse_configurable_text' options.
 	 *
