@@ -119,6 +119,13 @@ class DiscourseComment {
 			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
 			wp_enqueue_style( 'comment_styles' );
 		}
+
+		if ( ! empty( $this->options['include-topic-map'] ) ) {
+			wp_register_style( 'topic_map_styles', WPDISCOURSE_URL . '/css/topic-map.css', array(), WPDISCOURSE_VERSION );
+			wp_enqueue_style( 'topic_map_styles' );
+			wp_register_script( 'topic_map_js', WPDISCOURSE_URL . '/js/topic-map.js', array( 'jquery' ), WPDISCOURSE_VERSION, true );
+			wp_enqueue_script( 'topic_map_js' );
+		}
 	}
 
 	/**
