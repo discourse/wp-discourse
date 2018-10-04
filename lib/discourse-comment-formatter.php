@@ -149,7 +149,8 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
 			}
-			$discourse_html = wp_kses_post( Templates::replies_html() );
+			$discourse_html = ! empty( $this->options['include-topic-map'] ) ? wp_kses_post( Templates::topic_map_html() ) : "";
+			$discourse_html .= wp_kses_post( Templates::replies_html() );
 			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 		} else {
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
