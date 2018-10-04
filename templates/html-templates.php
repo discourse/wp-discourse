@@ -262,7 +262,7 @@ class HTMLTemplates {
 	 * {popular_link}
 	 *
 	 * @static
-	 * @return mixed|void
+	 * @return string
 	 */
 	public static function popular_link_html() {
 		ob_start();
@@ -286,7 +286,7 @@ class HTMLTemplates {
                 </nav>
                 <ul class="clearfix">
                     <li>
-                        <h4>created</h4>
+                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-created-text' ) ); ?></h4>
                         <div class="topic-map-post created-at">
                             <a class="trigger-user-card">
                                 <img alt="" width="20" height="20" src="{post_created_user_avatar}"
@@ -297,7 +297,7 @@ class HTMLTemplates {
                     </li>
                     <li>
                         <div>
-                            <h4>last reply</h4>
+                            <h4><?php echo esc_html( self::get_text_options( 'topic-map-last-reply-text' ) ); ?></h4>
                             <div class="topic-map-post last-reply">
                                 <a class="trigger-user-card">
                                     <img alt="" width="20" height="20" src="{last_reply_user_avatar}"
@@ -309,25 +309,25 @@ class HTMLTemplates {
                     </li>
                     <li>
                         <span class="number">{replies_count}</span>
-                        <h4>replies</h4>
+                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-replies-text' ) ); ?></h4>
                     </li>
                     <li class="secondary">
                         <span class="number">{participants_count}</span>
-                        <h4>users</h4>
+                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-users-text' ) ); ?></h4>
                     </li>
                     <li class="secondary">
                         <span class="number">{links_count}</span>
-                        <h4>links</h4>
+                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-links-text' ) ); ?></h4>
                     </li>
                 </ul>
             </section>
             <section class="map-expanded" id="map-expanded" style="display:none">
                 <div class="frequent-posters">
-                    <span class="topic-map-span">Frequent Posters</span>
+                    <span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-frequent-posters-text' ) ); ?></span>
                     <p>{participants}</p>
                 </div>
                 <div class="popular-links">
-                    <span class="topic-map-span">Popular Links</span>
+                    <span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-popular-links-text' ) ); ?></span>
                     <p class="popular-links-p">{popular_links}</p>
                 </div>
             </section>
