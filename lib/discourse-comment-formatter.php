@@ -105,7 +105,7 @@ class DiscourseCommentFormatter {
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
 
-		$links_in_posts = 0;
+		//$links_in_posts = 0;
 		//Remove duplicates
 		$popular_links = $this->get_popular_links( $posts );
 		$links_in_posts = count( $popular_links );
@@ -154,10 +154,12 @@ class DiscourseCommentFormatter {
 		} else {
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
+		$popular_links_html = '';
 		if ( count( $popular_links ) > 0 ) {
 			foreach ( $popular_links as &$p_link ) {
 				$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
-				$popular_link_html   = str_replace( '{popular_link}', "https:".$p_link, $popular_link_html );
+				// Todo: check for protocol in the get_popular_links function.
+				$popular_link_html   = str_replace( '{popular_link}', $p_link, $popular_link_html );
 				$popular_links_html .= $popular_link_html;
 			}
 		}// End if().
@@ -185,6 +187,7 @@ class DiscourseCommentFormatter {
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
+		// Todo: caching the comments is going to break the topic-map times. For now maybe reduce the cache time if topic-map enabled.
 		if ( isset( $transient_key ) ) {
 			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();

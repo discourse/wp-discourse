@@ -104,6 +104,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
 		add_filter( 'wpdc_validate_add_join_link', array( $this, 'validate_add_join_link' ) );
+		add_filter( 'wpdc_validate_include_topic_map', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_clear_cached_comment_html', array( $this, 'validate_clear_comments_html' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );

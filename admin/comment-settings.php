@@ -57,6 +57,13 @@ class CommentSettings {
 		);
 
 		add_settings_field(
+		        'discourse_include_topic_map', __( 'Include Topic Map', 'wp-discourse' ), array(
+		                $this,
+                    'include_topic_map_checkbox',
+            ), 'discourse_comment', 'discourse_commenting_settings_section'
+        );
+
+		add_settings_field(
 			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
 				$this,
 				'cache_html_checkbox',
@@ -183,6 +190,12 @@ class CommentSettings {
 			), __( 'This setting is used in place of showing Discourse comments underneath the post.', 'wp-discourse' )
 		);
 	}
+
+	public function include_topic_map_checkbox() {
+	    $this->form_helper->checkbox_input(
+	            'include-topic-map', 'discourse_comment', __( 'Include topic map.', 'wp-discourse' )
+        );
+    }
 
 	/**
 	 * Outputs markup for the cache-html checkbox.
