@@ -110,6 +110,13 @@ class Discourse {
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
 		'linked-to-discourse-text'    => "You're already linked to Discourse!",
+		'topic-map-created-text'      => 'created',
+		'topic-map-last-reply-text'   => 'last reply',
+		'topic-map-replies-text'      => 'replies',
+		'topic-map-users-text'        => 'users',
+		'topic-map-links-text'        => 'links',
+		'topic-map-posters-text'      => 'Frequent Posters',
+		'topic-map-popular-links-text' => 'Popular Links',
 	);
 
 	/**
