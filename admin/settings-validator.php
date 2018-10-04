@@ -139,6 +139,13 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_external_login_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_link_to_discourse_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_linked_to_discourse_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_created_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_last_reply_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_users_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_links_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_frequent_posters_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_popular_links_text', array( $this, 'validate_text_input' ) );
 
 		add_filter( 'wpdc_validate_use_discourse_webhook', array( $this, 'validate_use_discourse_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_match_old_topics', array( $this, 'validate_webhook_match_old_topics' ) );
