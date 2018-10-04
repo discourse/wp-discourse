@@ -1,6 +1,6 @@
 (function($) {
-    console.log('here we are');
-    $( '#wpdc-comments' ).on( 'click', "#toggle-expand", function() {
+    // Todo: The target needs to be changed for when comments are loaded with javascript
+    $( '.topic-map' ).on( 'click', "#toggle-expand", function() {
         var expand_section = $("#map-expanded");
         $(".topic-map #arrow").toggleClass('dashicons dashicons-arrow-down-alt2 dashicons dashicons-arrow-up-alt2');
 
