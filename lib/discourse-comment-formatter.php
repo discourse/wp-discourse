@@ -51,15 +51,12 @@ class DiscourseCommentFormatter {
 		// Sync the comments.
 		do_action( 'wpdc_sync_discourse_comments', $post_id );
 
-		$custom = get_post_custom( $post_id );
-		if ( empty( $custom['discourse_permalink'] ) || empty( $custom['discourse_comments_raw'] ) ) {
+		$topic_data = get_post_meta( $post_id, 'discourse_comments_raw', true );
+		$permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		if ( empty( $topic_data ) || empty( $permalink ) ) {
 
 			return wp_kses_post( Templates::bad_response_html() );
-
 		}
-
-		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
-		$topic_map_data = get_post_meta( $post_id, 'discourse_topic_map_data', true );
 
 		// The topic_id may not be available for posts that were published before version 1.4.0.
 		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
@@ -73,8 +70,6 @@ class DiscourseCommentFormatter {
 				return $html;
 			}
 		}
-
-		$permalink = (string) $custom['discourse_permalink'][0];
 
 		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
