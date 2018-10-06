@@ -84,6 +84,7 @@ class DiscourseCommentFormatter {
 		// Use custom datetime format string if provided, else global date format.
 		$datetime_format = empty( $this->options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $this->options['custom-datetime-format'];
 
+		// Todo: clean up use of $topic_data->posts_count.
 		$more_replies_number = intval( ( $topic_data->posts_count - count( $topic_data->posts ) - 1 ) );
 		$more_text           = esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
 		if ( 0 >= $more_replies_number ) {
@@ -101,12 +102,8 @@ class DiscourseCommentFormatter {
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
-
-		//$links_in_posts = 0;
-		//Remove duplicates
-		$popular_links = $this->get_popular_links( $posts );
-		$links_in_posts = count( $popular_links );
-		$popular_links = array_unique($popular_links);
+		$popular_links = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : NULL;
+		$popular_links_count = count( $popular_links );
 
 		if ( count( $posts ) > 0 ) {
 			$displayed_comment_number = 0;
@@ -152,29 +149,34 @@ class DiscourseCommentFormatter {
 		} else {
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
+
+		// Todo: only include if $this->options['include-topic-map']
 		$popular_links_html = '';
-		if ( count( $popular_links ) > 0 ) {
-			foreach ( $popular_links as &$p_link ) {
+		if ( $popular_links_count > 0 ) {
+			foreach ( $popular_links as $link ) {
 				$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
-				// Todo: check for protocol in the get_popular_links function.
-				$popular_link_html   = str_replace( '{popular_link}', $p_link, $popular_link_html );
+				$popular_link_html   = str_replace( '{popular_link}', $link->url, $popular_link_html );
 				$popular_links_html .= $popular_link_html;
 			}
 		}// End if().
 
-		$discourse_html = str_replace( '{replies_count}', count( $posts ), $discourse_html );
+		// Todo: Topic-map template. Only include if option set and the required data is present.
+		$discourse_html = str_replace( '{replies_count}', $discourse_posts_count - 1, $discourse_html );
 		$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
-		$discourse_html = str_replace( '{links_count}', $links_in_posts, $discourse_html );
-
-		$last_reply = end($posts);
-		$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($last_reply->created_at), $discourse_html );
-		$discourse_html = str_replace( '{last_reply_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
-		$discourse_html = str_replace( '{last_reply_user_username}', $last_reply->username, $discourse_html );
-
-		$post = $posts[0];
-		$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($post->created_at), $discourse_html );
-		$discourse_html = str_replace( '{post_created_user_avatar}', str_replace('{size}', 20, $last_reply->avatar_template), $discourse_html );
-		$discourse_html = str_replace( '{post_created_user_username}', $post->username, $discourse_html );
+		$discourse_html = str_replace( '{links_count}', $popular_links_count, $discourse_html );
+		//$last_reply = end($posts);
+		$last_poster = $topic_data->last_poster;
+		$original_poster = $topic_data->created_by;
+		$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($topic_data->last_posted_at), $discourse_html );
+		// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
+		$discourse_html = str_replace( '{last_reply_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $last_poster->avatar_template), $discourse_html );
+		$discourse_html = str_replace( '{last_reply_user_username}', $last_poster->username, $discourse_html );
+		//$post = $posts[0];
+		$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($topic_data->created_at), $discourse_html );
+		// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
+		$discourse_html = str_replace( '{post_created_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $original_poster->avatar_template), $discourse_html );
+		$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
+        // End topic-map template
 
 		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
