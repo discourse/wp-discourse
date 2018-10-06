@@ -1,4 +1,13 @@
+/* globals wpdc */
+/**
+ * Toggles the hidden topic-map content.
+ *
+ * @package WPDiscourse
+ */
+
 (function($) {
+    var ajaxLoad = dctm.ajaxLoad;
+    console.log('ajax load', ajaxLoad);
     // Todo: The target needs to be changed for when comments are loaded with javascript
     $( '.topic-map' ).on( 'click', "#toggle-expand", function() {
         var expand_section = $("#map-expanded");
