@@ -260,14 +260,18 @@ class DiscourseComment {
 						if ( ! empty( $this->options['include-topic-map'] ) ) {
 							// Todo: get_discourse_topic expects a URL, it should be changed to accept topic_id instead.
 							$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
-							$data = $this->get_discourse_topic( $topic_url );
-							if ( ! is_wp_error( $data ) ) {
+							$topic_data = $this->get_discourse_topic( $topic_url );
+							if ( ! is_wp_error( $topic_data ) ) {
 								// Todo: Add some error checking here.
-								//$like_count = $data->like_count;
-								//$views = $data->views;
-								$created_by = $data->details->created_by;
-								$popular_links = $data->details->links;
+								$created_at = $topic_data->created_at;
+								$last_posted_at = $topic_data->last_posted_at;
+								$created_by = $topic_data->details->created_by;
+								$last_poster = $topic_data->details->last_poster;
+								$popular_links = $topic_data->details->links;
+								$body->{'created_at'} = $created_at;
+								$body->{'last_posted_at'} = $last_posted_at;
 								$body->{'created_by'} = $created_by;
+								$body->{'last_poster'} = $last_poster;
 								$body->{'popular_links'} = $popular_links;
 							}
 						}
@@ -277,7 +281,6 @@ class DiscourseComment {
 
 						update_post_meta( $post_id, 'discourse_comments_count', $posts_count );
 						update_post_meta( $post_id, 'discourse_comments_raw', $body );
-						write_log('updated body', $body );
 						if ( isset( $topic_id ) ) {
 							// Delete the cached html.
 							delete_transient( "wpdc_comment_html_{$topic_id}" );
