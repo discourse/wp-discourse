@@ -131,6 +131,7 @@ class DiscourseCommentFormatter {
 				$comments_html .= $comment_html;
 				$displayed_comment_number++;
 			}
+			// Should the participants section be included if the topic-map is being used?
 			foreach ( $participants as $participant ) {
 				$participant_html   = wp_kses_post( Templates::participant_html() );
 				$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
@@ -147,47 +148,45 @@ class DiscourseCommentFormatter {
 			$discourse_html .= wp_kses_post( Templates::replies_html() );
 			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 		} else {
+			//Todo: Should the topic map be included if there are no replies? On Discourse it isn't, but maybe should be on WordPress.
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
 
-		// Todo: only include if $this->options['include-topic-map']
-		$popular_links_html = '';
-		if ( $popular_links_count > 0 ) {
-			foreach ( $popular_links as $link ) {
-				$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
-				$popular_link_html   = str_replace( '{popular_link}', $link->url, $popular_link_html );
-				$popular_links_html .= $popular_link_html;
+		if ( ! empty( $this->options['include-topic-map'] ) ) {
+			$popular_links_html = '';
+			if ( $popular_links_count > 0 ) {
+				foreach ( $popular_links as $link ) {
+					$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
+					$popular_link_html   = str_replace( '{popular_link}', $link->url, $popular_link_html );
+					$popular_links_html .= $popular_link_html;
+				}
 			}
-		}// End if().
 
-		// Todo: Topic-map template. Only include if option set and the required data is present.
-		$discourse_html = str_replace( '{replies_count}', $discourse_posts_count - 1, $discourse_html );
-		$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
-		$discourse_html = str_replace( '{links_count}', $popular_links_count, $discourse_html );
-		//$last_reply = end($posts);
-		$last_poster = $topic_data->last_poster;
-		$original_poster = $topic_data->created_by;
-		$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($topic_data->last_posted_at), $discourse_html );
-		// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
-		$discourse_html = str_replace( '{last_reply_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $last_poster->avatar_template), $discourse_html );
-		$discourse_html = str_replace( '{last_reply_user_username}', $last_poster->username, $discourse_html );
-		//$post = $posts[0];
-		$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($topic_data->created_at), $discourse_html );
-		// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
-		$discourse_html = str_replace( '{post_created_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $original_poster->avatar_template), $discourse_html );
-		$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
-        // End topic-map template
+			$discourse_html = str_replace( '{replies_count}', $discourse_posts_count - 1, $discourse_html );
+			$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
+			$discourse_html = str_replace( '{links_count}', $popular_links_count, $discourse_html );
+			$last_poster = $topic_data->last_poster;
+			$original_poster = $topic_data->created_by;
+			$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($topic_data->last_posted_at), $discourse_html );
+			// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
+			$discourse_html = str_replace( '{last_reply_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $last_poster->avatar_template), $discourse_html );
+			$discourse_html = str_replace( '{last_reply_user_username}', $last_poster->username, $discourse_html );
+			$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($topic_data->created_at), $discourse_html );
+			// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
+			$discourse_html = str_replace( '{post_created_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $original_poster->avatar_template), $discourse_html );
+			$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
+			$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
+		}// End if().
 
 		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
 		$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
 		$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
 		$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
-		$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
-		// Todo: caching the comments is going to break the topic-map times. For now maybe reduce the cache time if topic-map enabled.
+		// Todo: caching the comments is going to break the topic-map times. Don't cache the topic map?
 		if ( isset( $transient_key ) ) {
 			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
