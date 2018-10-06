@@ -201,11 +201,11 @@ class DiscourseComment {
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int $postid The WordPress post id.
+	 * @param int $post_id The WordPress post id.
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $postid ) {
+	public function sync_comments( $post_id ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -214,11 +214,11 @@ class DiscourseComment {
 
 		if ( ! $use_discourse_webhook ) {
 			// Every 10 minutes do a json call to sync comment count and top comments.
-			$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
-			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
+			$last_sync   = (int) get_post_meta( $post_id, 'discourse_last_sync', true );
+			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $post_id );
 			$sync_post   = $last_sync + $sync_period < $time;
 		} else {
-			$sync_post = ( 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) ) );
+			$sync_post = ( 1 === intval( get_post_meta( $post_id, 'wpdc_sync_post_comments', true ) ) );
 		}
 
 		if ( $sync_post ) {
@@ -226,10 +226,10 @@ class DiscourseComment {
 			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
 			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
 
-				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $postid );
-				if ( 'publish' === get_post_status( $postid ) || $publish_private ) {
+				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
+				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 
-					$comment_count            = $this->add_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
+					$comment_count            = $this->add_join_link( $post_id ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -243,8 +243,8 @@ class DiscourseComment {
 					}
 					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
-					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
-					$topic_id            = get_post_meta( $postid, 'discourse_topic_id', true );
+					$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+					$topic_id            = get_post_meta( $post_id, 'discourse_topic_id', true );
 					if ( ! $discourse_permalink ) {
 
 						return 0;
@@ -275,8 +275,8 @@ class DiscourseComment {
                         // Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
 						$posts_count = isset( $body->posts_count ) && $body->posts_count > 0 ? $body->posts_count - 1 : 0;
 
-						update_post_meta( $postid, 'discourse_comments_count', $posts_count );
-						update_post_meta( $postid, 'discourse_comments_raw', $body );
+						update_post_meta( $post_id, 'discourse_comments_count', $posts_count );
+						update_post_meta( $post_id, 'discourse_comments_raw', $body );
 						write_log('updated body', $body );
 						if ( isset( $topic_id ) ) {
 							// Delete the cached html.
@@ -284,8 +284,8 @@ class DiscourseComment {
 						}
 					}
 
-					update_post_meta( $postid, 'discourse_last_sync', $time );
-					update_post_meta( $postid, 'wpdc_sync_post_comments', 0 );
+					update_post_meta( $post_id, 'discourse_last_sync', $time );
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 0 );
 				}// End if().
 			}// End if().
 
