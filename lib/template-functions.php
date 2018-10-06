@@ -262,35 +262,4 @@ trait TemplateFunctions {
 			return date('F d', $ts);
 		}
 	}
-
-	/**
-	 * Returns links in the post.
-	 *
-	 * @param array array of posts
-	 *
-	 * @return array array of links
-	 */
-	public function get_popular_links($posts) {
-		$popular_links = [];
-		if ( ! extension_loaded( 'libxml' ) ) {
-
-			return $popular_links;
-		}
-
-		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
-		$use_internal_errors = libxml_use_internal_errors( true );
-
-		foreach ($posts as $post) {
-			$dom = new \DomDocument();
-			$dom->loadHTML($post->cooked);
-			foreach ($dom->getElementsByTagName('a') as $item) {
-				$popular_links[] = $item->getAttribute('href');
-			}
-		}
-
-		libxml_clear_errors();
-		libxml_use_internal_errors( $use_internal_errors );
-
-		return $popular_links;
-	}
 }
