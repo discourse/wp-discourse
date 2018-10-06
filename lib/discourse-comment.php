@@ -250,43 +250,37 @@ class DiscourseComment {
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
-
 					$result = wp_remote_get( $permalink );
 
 					if ( $this->validate( $result ) ) {
 
-						$json = json_decode( $result['body'] );
-						// Todo: this will need to be refined. Results should be returned from Discourse without making separate query. If not, make sure $topic_id is set.
-						// Todo: make sure include-topic-map is set before making the query.
-						$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
-						$data = $this->get_discourse_topic( $topic_url );
-						if ( ! is_wp_error( $data ) ) {
-							// Todo: Probably don't use likes or views in the topic-map - they will get out of sync with Discourse.
-							//$like_count = $data->like_count;
-							//$views = $data->views;
-							$created_by = $data->details->created_by;
-							$links = $data->details->links;
-							$topic_data = array(
-								'created_by' => $created_by,
-								'links' => $links,
-							);
+						$body = json_decode( wp_remote_retrieve_body( $result ) );
 
-							update_post_meta( $postid, 'discourse_topic_map_data', $topic_data );
+						// Todo: update Discourse WordPress serializer to include this data. If present, don't run this query.
+						if ( ! empty( $this->options['include-topic-map'] ) ) {
+							// Todo: get_discourse_topic expects a URL, it should be changed to accept topic_id instead.
+							$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
+							$data = $this->get_discourse_topic( $topic_url );
+							if ( ! is_wp_error( $data ) ) {
+								// Todo: Add some error checking here.
+								//$like_count = $data->like_count;
+								//$views = $data->views;
+								$created_by = $data->details->created_by;
+								$popular_links = $data->details->links;
+								$body->{'created_by'} = $created_by;
+								$body->{'popular_links'} = $popular_links;
+							}
 						}
 
-						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
-						if ( isset( $json->posts_count ) ) {
-							$posts_count = $json->posts_count - 1;
-							if ( $posts_count < 0 ) {
-								$posts_count = 0;
-							}
+                        // Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
+						$posts_count = isset( $body->posts_count ) && $body->posts_count > 0 ? $body->posts_count - 1 : 0;
 
-							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
-							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
-							if ( isset( $topic_id ) ) {
-								// Delete the cached html.
-								delete_transient( "wpdc_comment_html_{$topic_id}" );
-							}
+						update_post_meta( $postid, 'discourse_comments_count', $posts_count );
+						update_post_meta( $postid, 'discourse_comments_raw', $body );
+						write_log('updated body', $body );
+						if ( isset( $topic_id ) ) {
+							// Delete the cached html.
+							delete_transient( "wpdc_comment_html_{$topic_id}" );
 						}
 					}
 
