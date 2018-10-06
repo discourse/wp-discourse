@@ -256,6 +256,23 @@ class DiscourseComment {
 					if ( $this->validate( $result ) ) {
 
 						$json = json_decode( $result['body'] );
+						// Todo: this will need to be refined. Results should be returned from Discourse without making separate query. If not, make sure $topic_id is set.
+						// Todo: make sure include-topic-map is set before making the query.
+						$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
+						$data = $this->get_discourse_topic( $topic_url );
+						if ( ! is_wp_error( $data ) ) {
+							// Todo: Probably don't use likes or views in the topic-map - they will get out of sync with Discourse.
+							//$like_count = $data->like_count;
+							//$views = $data->views;
+							$created_by = $data->details->created_by;
+							$links = $data->details->links;
+							$topic_data = array(
+								'created_by' => $created_by,
+								'links' => $links,
+							);
+
+							update_post_meta( $postid, 'discourse_topic_map_data', $topic_data );
+						}
 
 						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
 						if ( isset( $json->posts_count ) ) {

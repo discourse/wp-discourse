@@ -59,6 +59,8 @@ class DiscourseCommentFormatter {
 		}
 
 		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );
+		$topic_map_data = get_post_meta( $post_id, 'discourse_topic_map_data', true );
+
 		// The topic_id may not be available for posts that were published before version 1.4.0.
 		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
 
