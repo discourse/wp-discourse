@@ -266,7 +266,6 @@ class DiscourseComment {
 							$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
 							$topic_data = $this->get_discourse_topic( $topic_url );
 							if ( ! is_wp_error( $topic_data ) ) {
-								write_log('topic data', $topic_data);
 								// Todo: Add some error checking here.
 								$created_at = $topic_data->created_at;
 								$last_posted_at = $topic_data->last_posted_at;
