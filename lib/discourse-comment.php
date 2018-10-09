@@ -318,6 +318,12 @@ class DiscourseComment {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
+		// Don't display the WordPress comments template for posts not published to Discourse if comments have been enabled sitewide.
+		if ( ! empty( $this->options['hide-wordpress-comments'] ) ) {
+
+			return WPDISCOURSE_PATH . 'templates/blank.php';
+		}
+
 		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
 	}

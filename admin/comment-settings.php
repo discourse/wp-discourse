@@ -92,6 +92,13 @@ class CommentSettings {
 		);
 
 		add_settings_field(
+			'discourse_hide_wordpress_comments', __( 'Hide WordPress Comments', 'wp-discourse' ), array(
+				$this,
+				'discourse_hide_wordpress_comments_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_show_existing_comments', __( 'Show Existing WP Comments', 'wp-discourse' ), array(
 				$this,
 				'show_existing_comments_checkbox',
@@ -235,6 +242,20 @@ class CommentSettings {
 	public function discourse_new_tab_checkbox() {
 		$this->form_helper->checkbox_input(
 			'discourse-new-tab', 'discourse_comment', __( 'Open links to Discourse in a new tab.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse-hide-wordpress comments checkbox.
+	 */
+	public function discourse_hide_wordpress_comments_checkbox() {
+		$this->form_helper->checkbox_input(
+			'hide-wordpress-comments', 'discourse_comment',
+			__( 'Hide existing WordPress comments and comment form for posts that are not Published to Discourse.', 'wp-discourse' ),
+			__(
+				'The WP Discourse plugin requires comments to be enabled in order to display Discourse comments.
+            Enable this setting to keep the WordPress comment area from appearing beneath posts that have not been published to Discourse.', 'wp-discourse'
+			)
 		);
 	}
 

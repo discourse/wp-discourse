@@ -73,6 +73,7 @@ class Discourse {
 		'clear-cached-comment-html' => 0,
 		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,
+		'hide-wordpress-comments'   => 0,
 		'show-existing-comments'    => 0,
 		'existing-comments-heading' => '',
 		'max-comments'              => 5,
