@@ -102,8 +102,6 @@ class DiscourseCommentFormatter {
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
-		//$popular_links = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : NULL;
-		//$popular_links_count = count( $popular_links );
 
 		if ( count( $posts ) > 0 ) {
 			$displayed_comment_number = 0;
@@ -144,38 +142,11 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
 			}
-			//$discourse_html = ! empty( $this->options['include-topic-map'] ) ? wp_kses_post( Templates::topic_map_html() ) : "";
 			$discourse_html = wp_kses_post( Templates::replies_html() );
 			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 		} else {
-			//Todo: Should the topic map be included if there are no replies? On Discourse it isn't, but maybe should be on WordPress.
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
-
-		/*if ( ! empty( $this->options['include-topic-map'] ) ) {
-			$popular_links_html = '';
-			if ( $popular_links_count > 0 ) {
-				foreach ( $popular_links as $link ) {
-					$popular_link_html   = wp_kses_post( Templates::popular_link_html() );
-					$popular_link_html   = str_replace( '{popular_link}', $link->url, $popular_link_html );
-					$popular_links_html .= $popular_link_html;
-				}
-			}
-
-			$discourse_html = str_replace( '{replies_count}', $discourse_posts_count - 1, $discourse_html );
-			$discourse_html = str_replace( '{participants_count}', count( $participants ), $discourse_html );
-			$discourse_html = str_replace( '{links_count}', $popular_links_count, $discourse_html );
-			$last_poster = $topic_data->last_poster;
-			$original_poster = $topic_data->created_by;
-			$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($topic_data->last_posted_at), $discourse_html );
-			// Todo: add a filter to the avatar size.
-			$discourse_html = str_replace( '{last_reply_user_avatar}', $this->avatar( $last_poster->avatar_template, 20, $this->options['url']), $discourse_html );
-			$discourse_html = str_replace( '{last_reply_user_username}', $last_poster->username, $discourse_html );
-			$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($topic_data->created_at), $discourse_html );
-			$discourse_html = str_replace( '{post_created_user_avatar}', $this->avatar( $original_poster->avatar_template, 20, $this->options['url'] ), $discourse_html );
-			$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
-			$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
-		}// End if(). */
 
 		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
@@ -185,7 +156,6 @@ class DiscourseCommentFormatter {
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
-		// Todo: caching the comments is going to break the topic-map times. Don't cache the topic map? Or update the times with javascript?
 		if ( isset( $transient_key ) ) {
 			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
