@@ -28,12 +28,19 @@ trait TemplateFunctions {
 	 * Substitutes the value for `$size` into the template.
 	 *
 	 * @param string $template The avatar template.
-	 * @param int    $size The size of the avarar.
+	 * @param int    $size The size of the avatar.
+	 * @param string $base_url The base_url of the Discourse forum.
 	 *
 	 * @return mixed
 	 */
-	protected function avatar( $template, $size ) {
-		return str_replace( '{size}', $size, $template );
+	protected function avatar( $template, $size, $base_url ) {
+		if ( ! preg_match( '/^http/', $template ) ) {
+
+			return $base_url . str_replace( '{size}', $size, $template );
+		} else {
+
+			return str_replace( '{size}', $size, $template );
+		}
 	}
 
 	/**

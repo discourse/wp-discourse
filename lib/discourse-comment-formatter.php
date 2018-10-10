@@ -116,7 +116,7 @@ class DiscourseCommentFormatter {
 				$comment_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $comment_html );
 				$comment_html   = str_replace( '{topic_url}', $permalink, $comment_html );
 				$comment_html   = str_replace( '{comment_url}', $post_url, $comment_html );
-				$avatar_url     = $this->avatar( $post->avatar_template, apply_filters( 'discourse_post_avatar_template_size', 64 ) );
+				$avatar_url     = $this->avatar( $post->avatar_template, apply_filters( 'discourse_post_avatar_template_size', 64 ), $this->options['url'] );
 				$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
 				$user_url       = $this->homepage( $this->options['url'], $post );
 				$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
@@ -137,7 +137,7 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 				$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 				$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
-				$avatar_url         = $this->avatar( $participant->avatar_template, apply_filters( 'discourse_participant_avatar_template_size', 64 ) );
+				$avatar_url         = $this->avatar( $participant->avatar_template, apply_filters( 'discourse_participant_avatar_template_size', 64 ), $this->options['url'] );
 				$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
 				$user_url           = $this->homepage( $this->options['url'], $participant );
 				$participant_html   = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
@@ -168,12 +168,11 @@ class DiscourseCommentFormatter {
 			$last_poster = $topic_data->last_poster;
 			$original_poster = $topic_data->created_by;
 			$discourse_html = str_replace( '{last_reply_relative_time}', $this->relative_time($topic_data->last_posted_at), $discourse_html );
-			// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
-			$discourse_html = str_replace( '{last_reply_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $last_poster->avatar_template), $discourse_html );
+			// Todo: add a filter to the avatar size.
+			$discourse_html = str_replace( '{last_reply_user_avatar}', $this->avatar( $last_poster->avatar_template, 20, $this->options['url']), $discourse_html );
 			$discourse_html = str_replace( '{last_reply_user_username}', $last_poster->username, $discourse_html );
 			$discourse_html = str_replace( '{post_created_relative_time}', $this->relative_time($topic_data->created_at), $discourse_html );
-			// Todo: find a cleaner way of creating the avatar template. Make sure it works for hosted sites!!!
-			$discourse_html = str_replace( '{post_created_user_avatar}', $this->options['url'] . str_replace('{size}', 20, $original_poster->avatar_template), $discourse_html );
+			$discourse_html = str_replace( '{post_created_user_avatar}', $this->avatar( $original_poster->avatar_template, 20, $this->options['url'] ), $discourse_html );
 			$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
 			$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
 		}// End if().
@@ -186,7 +185,7 @@ class DiscourseCommentFormatter {
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
-		// Todo: caching the comments is going to break the topic-map times. Don't cache the topic map?
+		// Todo: caching the comments is going to break the topic-map times. Don't cache the topic map? Or update the times with javascript?
 		if ( isset( $transient_key ) ) {
 			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
