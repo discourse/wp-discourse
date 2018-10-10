@@ -180,6 +180,7 @@ class HTMLTemplates {
 	 * HTML template for each participant
 	 *
 	 * Can be customized from within a theme using the filter provided.
+     *
 	 *
 	 * Available tags:
 	 * {discourse_url}, {discourse_url_name}, {topic_url},
@@ -262,6 +263,30 @@ class HTMLTemplates {
 		$output = ob_get_clean();
 
 		return apply_filters( 'discourse_popular_link_html', $output );
+	}
+
+	/**
+	 * HTML template for each participant
+	 *
+	 * Can be customized from within a theme using the filter provided.
+	 *
+	 *
+	 * Available tags:
+	 * {discourse_url}, {discourse_url_name}, {topic_url},
+	 * {avatar_url}, {user_url}, {username}
+	 *
+	 * @static
+	 * @return string
+	 */
+	public static function frequent_posters_html() {
+		ob_start();
+		?>
+        <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
+             width="25">
+		<?php
+		$output = ob_get_clean();
+
+		return apply_filters( 'discourse_frequent_posters_html', $output );
 	}
 
 	public static function topic_map_html() {
