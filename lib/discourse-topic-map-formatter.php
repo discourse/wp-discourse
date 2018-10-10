@@ -62,7 +62,7 @@ class DiscourseTopicMapFormatter {
 		$participants_html = '';
 
 		foreach ( $participants as $participant ) {
-			$participant_html   = wp_kses_post( Templates::participant_html() );
+			$participant_html   = wp_kses_post( Templates::frequent_posters_html() );
 			$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
 			$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 			$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
