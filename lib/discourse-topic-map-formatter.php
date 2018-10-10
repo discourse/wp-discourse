@@ -39,11 +39,6 @@ class DiscourseTopicMapFormatter {
 		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 		}
-		if ( ! empty( $this->options['discourse-link-text'] ) ) {
-			$discourse_url_name = esc_html( $this->options['discourse-link-text'] );
-		} else {
-			$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) );
-		}
 
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$participants = $topic_data->participants;
@@ -64,7 +59,6 @@ class DiscourseTopicMapFormatter {
 		foreach ( $participants as $participant ) {
 			$participant_html   = wp_kses_post( Templates::frequent_posters_html() );
 			$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
-			$participant_html   = str_replace( '{discourse_url_name}', $discourse_url_name, $participant_html );
 			$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
 			$avatar_url         = $this->avatar( $participant->avatar_template, apply_filters( 'discourse_participant_avatar_template_size', 64 ), $this->options['url'] );
 			$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );

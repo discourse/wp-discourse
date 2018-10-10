@@ -272,7 +272,7 @@ class HTMLTemplates {
 	 *
 	 *
 	 * Available tags:
-	 * {discourse_url}, {discourse_url_name}, {topic_url},
+	 * {discourse_url}, {topic_url},
 	 * {avatar_url}, {user_url}, {username}
 	 *
 	 * @static
