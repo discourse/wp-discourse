@@ -173,7 +173,15 @@ class DiscourseComment {
 			return '';
 		}
 
-		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
+		$discourse_comments = $this->comment_formatter->format( $post_id );
+
+		if ( ! empty( $this->options['include-topic-map'] ) ) {
+			$topic_map = $this->topic_map_formatter->format( $post_id );
+
+			return wp_kses_post( $topic_map ) . wp_kses( $discourse_comments );
+		}
+
+		return wp_kses_post( $discourse_comments );
 	}
 
 	/**
@@ -276,7 +284,7 @@ class DiscourseComment {
 							$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
 							$topic_data = $this->get_discourse_topic( $topic_url );
 							if ( ! is_wp_error( $topic_data ) ) {
-								// Todo: Add some error checking here.
+								// Todo: Add some error checking here. details->links is only set if links are present.
 								$created_at = $topic_data->created_at;
 								$last_posted_at = $topic_data->last_posted_at;
 								$created_by = $topic_data->details->created_by;
