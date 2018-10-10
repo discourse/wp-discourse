@@ -32,12 +32,22 @@ class DiscourseComment {
 	protected $comment_formatter;
 
 	/**
+	 * An instance of the DiscourseTopicMapFormatter class.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\DiscourseTopicMapFormatter\DiscourseTopicMapFormatter DiscourseTopicMapFormatter
+	 */
+	protected $topic_map_formatter;
+
+	/**
 	 * DiscourseComment constructor.
 	 *
 	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter $comment_formatter An instance of DiscourseCommentFormatter.
+	 * @param \WPDiscourse\DiscourseTopicMapFormatter\DiscourseTopicMapFormatter $topic_map_formatter An instance of DiscourseTopicMapFormatter.
 	 */
-	public function __construct( $comment_formatter ) {
+	public function __construct( $comment_formatter, $topic_map_formatter ) {
 		$this->comment_formatter = $comment_formatter;
+		$this->topic_map_formatter = $topic_map_formatter;
 
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
@@ -271,7 +281,7 @@ class DiscourseComment {
 								$last_posted_at = $topic_data->last_posted_at;
 								$created_by = $topic_data->details->created_by;
 								$last_poster = $topic_data->details->last_poster;
-								$popular_links = $topic_data->details->links;
+								$popular_links = ! empty( $topic_data->details->links ) ? $topic_data->details->links : '';
 								$body->{'created_at'} = $created_at;
 								$body->{'last_posted_at'} = $last_posted_at;
 								$body->{'created_by'} = $created_by;
@@ -322,6 +332,9 @@ class DiscourseComment {
 			}
 
 			$discourse_comments = $this->comment_formatter->format( $post_id );
+			if ( ! empty( $this->options['include-topic-map'] ) ) {
+				$discourse_comments = $this->topic_map_formatter->format( $post_id ) . $discourse_comments;
+			}
 
 			// Use $post->comment_count because get_comments_number will return the Discourse comments
 			// number for posts that are published to Discourse.
@@ -338,6 +351,7 @@ class DiscourseComment {
 		}
 
 		if ( $this->add_join_link( $post_id ) ) {
+			// Todo: allow the topic map to be shown here.
 			echo wp_kses_post( $this->join_link( $post_id ) );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';

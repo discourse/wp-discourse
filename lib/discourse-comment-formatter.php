@@ -102,8 +102,8 @@ class DiscourseCommentFormatter {
 		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
-		$popular_links = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : NULL;
-		$popular_links_count = count( $popular_links );
+		//$popular_links = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : NULL;
+		//$popular_links_count = count( $popular_links );
 
 		if ( count( $posts ) > 0 ) {
 			$displayed_comment_number = 0;
@@ -144,15 +144,15 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
 			}
-			$discourse_html = ! empty( $this->options['include-topic-map'] ) ? wp_kses_post( Templates::topic_map_html() ) : "";
-			$discourse_html .= wp_kses_post( Templates::replies_html() );
+			//$discourse_html = ! empty( $this->options['include-topic-map'] ) ? wp_kses_post( Templates::topic_map_html() ) : "";
+			$discourse_html = wp_kses_post( Templates::replies_html() );
 			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
 		} else {
 			//Todo: Should the topic map be included if there are no replies? On Discourse it isn't, but maybe should be on WordPress.
 			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
 		}// End if().
 
-		if ( ! empty( $this->options['include-topic-map'] ) ) {
+		/*if ( ! empty( $this->options['include-topic-map'] ) ) {
 			$popular_links_html = '';
 			if ( $popular_links_count > 0 ) {
 				foreach ( $popular_links as $link ) {
@@ -175,7 +175,7 @@ class DiscourseCommentFormatter {
 			$discourse_html = str_replace( '{post_created_user_avatar}', $this->avatar( $original_poster->avatar_template, 20, $this->options['url'] ), $discourse_html );
 			$discourse_html = str_replace( '{post_created_user_username}', $original_poster->username, $discourse_html );
 			$discourse_html = str_replace( '{popular_links}', $popular_links_html, $discourse_html );
-		}// End if().
+		}// End if(). */
 
 		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
 		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
