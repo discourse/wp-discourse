@@ -200,3 +200,8 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 	font-style: italic;
 	color: #666666;
 }
+
+/* Padding for the Commenting options comment-type radio input. */
+.discourse-comment-type {
+	padding-left: 23px;
+}
