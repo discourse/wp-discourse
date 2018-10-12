@@ -66,8 +66,8 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_comment = array(
-		'use-discourse-comments'    => 0,
-		'add-join-link'             => 0,
+		'enable-discourse-comments' => 0,
+		'comment-type'              => 'display-comments',
 		'ajax-load'                 => 0,
 		'cache-html'                => 0,
 		'clear-cached-comment-html' => 0,
@@ -213,6 +213,16 @@ class Discourse {
 				add_option( $group_name, $this->$group_name );
 			}
 		}
+
+		// Transfer 'use-discourse-comments' and 'add-join-link' options. Plugin version 1.7.7.
+		$commenting_options = get_option( 'discourse_comment' );
+		if ( ! empty( $commenting_options['use-discourse-comments'] ) || ! empty( $commenting_options['add-join-link'] ) ) {
+			$commenting_options['enable-discourse-comments'] = 1;
+			$commenting_options['comment-type']              = ! empty( $this->options['use-discourse-comments'] ) ? 'display-comments' : 'display-comments-link';
+		}
+		unset( $commenting_options['use-discourse-comments'] );
+		unset( $commenting_options['add-join-link'] );
+		update_option( 'discourse_comment', $commenting_options );
 
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );

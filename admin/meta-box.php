@@ -38,21 +38,7 @@ class MetaBox {
 		add_action( 'admin_init', array( $this, 'setup_options' ) );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
 		add_action( 'save_post', array( $this, 'save_meta_box' ), 10, 1 );
-		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_meta_box_js' ) );
 		add_action( 'auto-draft_to_draft', array( $this, 'check_for_quickdrafts' ) );
-	}
-
-	/**
-	 * Enqueue meta_box_js.
-	 */
-	public function enqueue_meta_box_js() {
-		wp_register_script( 'meta_box_js', plugins_url( '../admin/js/meta-box.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
-		wp_enqueue_script( 'meta_box_js' );
-		$max_tags = ! isset( $this->options['max-tags'] ) ? 5 : $this->options['max-tags'];
-		$data     = array(
-			'maxTags' => $max_tags,
-		);
-		wp_localize_script( 'meta_box_js', 'wpdc', $data );
 	}
 
 	/**
@@ -276,13 +262,13 @@ class MetaBox {
 		if ( ! is_wp_error( $category_name ) ) {
 			// translators: Discourse force-publish message. Placeholder: category_name.
 			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
-        } else {
-		    $publishing_url = admin_url( '/admin.php?page=publishing_options' );
-		    $publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
-            // translators: Discourse force-publish-category-not-set message. Placeholder: publishing_options_link.
-		    $message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled, but you have not set a default publishing category. You can set that category on your %1s tab.', 'wp-discourse' ), $publishing_link );
+		} else {
+			$publishing_url  = admin_url( '/admin.php?page=publishing_options' );
+			$publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
+			// translators: Discourse force-publish-category-not-set message. Placeholder: publishing_options_link.
+			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled, but you have not set a default publishing category. You can set that category on your %1s tab.', 'wp-discourse' ), $publishing_link );
 
-        }
+		}
 		echo wp_kses_post( $message );
 	}
 
@@ -532,7 +518,7 @@ class MetaBox {
 				?>
 			</p>
 		</div>
-        <?php
+		<?php
 	}
 
 	/**

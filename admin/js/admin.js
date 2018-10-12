@@ -107,4 +107,11 @@
 			$( '.wpdc-taglist-errors' ).empty();
 		}
 	);
+
+	// Toggle the Commenting Settings comment-type input.
+	$( '#discourse-enable-discourse-comments' ).click(
+		function() {
+				$( '.discourse-comment-type' ).toggleClass( 'hidden' );
+		}
+	);
 })( jQuery );

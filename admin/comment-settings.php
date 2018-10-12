@@ -7,10 +7,13 @@
 
 namespace WPDiscourse\Admin;
 
+use WPDiscourse\Shared\PluginUtilities;
+
 /**
  * Class CommentSettings
  */
 class CommentSettings {
+	use PluginUtilities;
 
 	/**
 	 * An instance of the FormHelper class.
@@ -19,6 +22,14 @@ class CommentSettings {
 	 * @var \WPDiscourse\Admin\FormHelper
 	 */
 	protected $form_helper;
+
+	/**
+	 * Gives access to the plugin options.
+	 *
+	 * @access protected
+	 * @var array|void
+	 */
+	protected $options;
 
 	/**
 	 * CommentSettings constructor.
@@ -35,6 +46,7 @@ class CommentSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_comment_settings() {
+		$this->options = $this->get_options();
 		add_settings_section(
 			'discourse_commenting_settings_section', __( 'Comment Settings', 'wp-discourse' ), array(
 				$this,
@@ -43,16 +55,9 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-			'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array(
+			'discourse_enable_discourse_comments', __( 'Enable Discourse Comments', 'wp-discourse' ), array(
 				$this,
-				'use_discourse_comments_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_add_join_link', __( 'Link to Comments Without Displaying Them', 'wp-discourse' ), array(
-				$this,
-				'add_join_link_checkbox',
+				'enable_discourse_comments_checkbox',
 			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
@@ -170,25 +175,29 @@ class CommentSettings {
 	}
 
 	/**
-	 * Outputs markup for the use-discourse-comments checkbox.
+	 * Outputs markup for the enable-discourse-comments settings.
 	 */
-	public function use_discourse_comments_checkbox() {
-		$this->form_helper->checkbox_input(
-			'use-discourse-comments', 'discourse_comment', __( 'Use Discourse to comment on Discourse published posts.', 'wp-discourse' ),
-			__( 'For Discourse comments to appear on your WordPress site, you must select this setting and enable comments for the WordPress post.', 'wp-discourse' )
-		);
-	}
+	public function enable_discourse_comments_checkbox() {
+		$comment_type = $this->options['comment-type'];
+		$hide_radio   = empty( $this->options['enable-discourse-comments'] );
+		$this->form_helper->checkbox_input( 'enable-discourse-comments', 'discourse_comment', __( 'Enable Discourse Comments', 'wp-discourse' ) );
 
-	/**
-	 * Outputs markup for the add-join-link checkbox.
-	 */
-	public function add_join_link_checkbox() {
-		$this->form_helper->checkbox_input(
-			'add-join-link', 'discourse_comment', __(
-				"Add a 'Join Discussion' link underneath posts that are published
-	            to Discourse.", 'wp-discourse'
-			), __( 'This setting is used in place of showing Discourse comments underneath the post.', 'wp-discourse' )
-		);
+		?>
+		<div class="discourse-comment-type
+		<?php
+		if ( $hide_radio ) {
+			esc_attr_e( ' hidden' ); }
+?>
+">
+		<label for="display-comments">
+		<input type="radio" name="discourse_comment[comment-type]" value="display-comments" <?php checked( 'display-comments', $comment_type ); ?>>
+		<?php esc_html_e( 'Display Discourse comments', 'wp-discourse' ); ?></label><br>
+		<label for="display-comments-link">
+		<input type="radio" name="discourse_comment[comment-type]" value="display-comments-link" <?php checked( 'display-comments-link', $comment_type ); ?>>
+		<?php esc_html_e( 'Display a link to the comments', 'wp-discourse' ); ?></label>
+		</div>
+		<?php
+
 	}
 
 	/**

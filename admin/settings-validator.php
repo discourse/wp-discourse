@@ -102,8 +102,8 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 
-		add_filter( 'wpdc_validate_use_discourse_comments', array( $this, 'validate_use_discourse_comments' ) );
-		add_filter( 'wpdc_validate_add_join_link', array( $this, 'validate_add_join_link' ) );
+		add_filter( 'wpdc_validate_enable_discourse_comments', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_comment_type', array( $this, 'validate_radio_string_value' ) );
 		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_clear_cached_comment_html', array( $this, 'validate_clear_comments_html' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
@@ -708,6 +708,17 @@ class SettingsValidator {
 	 */
 	public function validate_checkbox( $input ) {
 		return $this->sanitize_checkbox( $input );
+	}
+
+	/**
+	 * Validate a radio input that returns a string.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return string
+	 */
+	public function validate_radio_string_value( $input ) {
+		return $this->validate_text_input( $input );
 	}
 
 	/**

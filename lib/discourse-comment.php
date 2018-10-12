@@ -163,7 +163,7 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function use_discourse_comments( $post_id ) {
-		if ( empty( $this->options['use-discourse-comments'] ) ) {
+		if ( empty( $this->options['enable-discourse-comments'] ) || 'display-comments' !== $this->options['comment-type'] ) {
 
 			return 0;
 		}
@@ -181,7 +181,7 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function add_join_link( $post_id ) {
-		if ( empty( $this->options['add-join-link'] ) ) {
+		if ( empty( $this->options['enable-discourse-comments'] ) || 'display-comments-link' !== $this->options['comment-type'] ) {
 
 			return 0;
 		}

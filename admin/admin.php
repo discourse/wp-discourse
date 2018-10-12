@@ -52,6 +52,15 @@ if ( is_admin() ) {
 function enqueue_admin_scripts() {
 	wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
 	wp_enqueue_style( 'wp_discourse_admin' );
+
+	wp_register_script( 'admin_js', plugins_url( '../admin/js/admin.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+	wp_enqueue_script( 'admin_js' );
+	$commenting_options = get_option( 'discourse-comment' );
+	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];
+	$data               = array(
+		'maxTags' => $max_tags,
+	);
+	wp_localize_script( 'admin_js', 'wpdc', $data );
 }
 
 /**
