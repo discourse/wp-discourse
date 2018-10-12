@@ -87,11 +87,12 @@ class MetaBox {
 	 * The callback function for creating the meta box.
 	 *
 	 * @param \WP_Post $post The current Post object.
+	 * @return null
 	 */
 	public function render_meta_box( $post ) {
 		$post_id              = $post->ID;
 		$published            = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error     = intval( get_post_meta( $post_id, 'wpdc_deleted_topic', true ) ) === 1;
+		$publishing_error     = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$force_publish        = ! empty( $this->options['force-publish'] );
 		$saved                = 'publish' === get_post_status( $post_id ) ||
 							   'future' === get_post_status( $post_id ) ||
@@ -108,6 +109,11 @@ class MetaBox {
 		wp_nonce_field( 'publish_to_discourse', 'publish_to_discourse_nonce' );
 
 		if ( ! $published ) {
+			if ( $publishing_error ) {
+				$this->publishing_error_markup( $publishing_error, $force_publish );
+
+				return null;
+			}
 			if ( $force_publish ) {
 				$this->force_publish_markup( $default_category_id );
 			} else {
@@ -144,8 +150,10 @@ class MetaBox {
 			} // End if().
 		} else {
 			// The post has already been published to Discourse.
-			if ( $publishing_error ) {
-				$this->publishing_error_markup( $force_publish );
+			if ( ! empty( $publishing_error ) ) {
+				$this->publishing_error_markup( $publishing_error, $force_publish );
+
+				return null;
 			} else {
 				$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
 				$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . esc_url( $discourse_permalink ) . '</a>';
@@ -162,6 +170,8 @@ class MetaBox {
 				}
 			}
 		} // End if().
+
+		return null;
 	}
 
 	/**
@@ -451,6 +461,7 @@ class MetaBox {
 		update_post_meta( $post_id, 'publish_post_category', $category_id );
 		update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
 		update_post_meta( $post_id, 'discourse_comments_count', $discourse_comments_count );
+		delete_post_meta( $post_id, 'wpdc_publishing_error' );
 		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
 			update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 		}
@@ -524,20 +535,40 @@ class MetaBox {
 	/**
 	 * The message to be displayed when a 404 or 500 error has been returned after publishing a post to Discourse.
 	 *
-	 * @param bool $force_publish Whether or not the force_publish option has been selected.
+	 * @param string $publishing_error The publishing error that has been returned.
+	 * @param bool   $force_publish Whether or not the force_publish option has been selected.
+	 * @return null
 	 */
-	protected function publishing_error_markup( $force_publish ) {
-		esc_html_e(
-			"An error has been returned while trying to republish your post to Discourse. The most likely cause
+	protected function publishing_error_markup( $publishing_error, $force_publish ) {
+		switch ( $publishing_error ) {
+			case 'deleted_topic':
+				esc_html_e(
+					"An error has been returned while trying to republish your post to Discourse. The most likely cause
             is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
             can be republished as a new topic.", 'wp-discourse'
-		);
-		echo '<hr>';
-		$this->unlink_from_discourse_checkbox();
-		if ( ! $force_publish ) {
-			echo '<br>';
-			$publish_text = __( 'Try Updating the Topic', 'wp-discourse' );
-			$this->update_discourse_topic_checkbox( $publish_text );
+				);
+
+				echo '<hr>';
+				$this->unlink_from_discourse_checkbox();
+				if ( ! $force_publish ) {
+					echo '<br>';
+					$publish_text = __( 'Try Updating the Topic', 'wp-discourse' );
+					$this->update_discourse_topic_checkbox( $publish_text );
+				}
+
+				return null;
+
+			case 'queued_topic':
+				esc_html_e(
+					'Your post has been sent to Discourse and added to the approval queue. When it has been approved, you will need to manually link it to
+                        Discourse. To do that, copy the Discourse topic URL, paste the URL into input below, and update the post.', 'wp-discourse'
+				);
+				echo '<hr>';
+				$this->link_to_discourse_topic_input();
+
+				return null;
 		}
+
+		return null;
 	}
 }

@@ -239,7 +239,7 @@ class DiscoursePublish {
 				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
 				if ( 500 === $error_code ) {
 					// For older versions of Discourse, publishing to a deleted topic is returning a 500 response code.
-					update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
+					update_post_meta( $post_id, 'wpdc_publishing_error', 'deleted_topic' );
 				}
 			}
 
@@ -249,42 +249,42 @@ class DiscoursePublish {
 		}
 
 		$body = json_decode( wp_remote_retrieve_body( $result ) );
+		// Check for queued posts. We have already determined that a status code of `200` was returned. A post queued by Discourse will have an empty body.
+		if ( empty( $body ) ) {
+			update_post_meta( $post_id, 'wpdc_publishing_error', 'queued_topic' );
+
+			return new \WP_Error( 'discourse_publishing_response_error', 'The published post has been added to the Discourse approval queue.' );
+		}
 
 		// The response when a topic is first created.
-		if ( property_exists( $body, 'id' ) ) {
-			$discourse_id = (int) $body->id;
-
-			if ( ! empty( $discourse_id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
+		if ( ! empty( $body->id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
+			$discourse_id   = (int) $body->id;
 				$topic_slug = $body->topic_slug;
 				$topic_id   = $body->topic_id;
 
-				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+				delete_post_meta( $post_id, 'wpdc_publishing_error' );
 				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
 
 				// Used for resetting the error notification, if one was being displayed.
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
-				if ( $use_multisite_configuration ) {
-					$blog_id = get_current_blog_id();
-					$this->save_topic_blog_id( $body->topic_id, $blog_id );
-				}
+			if ( $use_multisite_configuration ) {
+				$blog_id = get_current_blog_id();
+				$this->save_topic_blog_id( $body->topic_id, $blog_id );
+			}
 
 				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
-				if ( ! empty( $pin_until ) ) {
-					$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
+			if ( ! empty( $pin_until ) ) {
+				$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
 
-					return $pin_response;
-				}
+				return $pin_response;
+			}
 
 				// The topic has been created and its associated post's metadata has been updated.
 				return null;
-			} else {
-				$this->create_bad_response_notifications( $current_post, $post_id );
 
-				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
-			}
-		} elseif ( property_exists( $body, 'post' ) ) {
+		} elseif ( ! empty( $body->post ) ) {
 
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
@@ -292,13 +292,13 @@ class DiscoursePublish {
 
 			// Handles deleted topics for recent versions of Discourse.
 			if ( ! empty( $discourse_post->deleted_at ) ) {
-				update_post_meta( $post_id, 'wpdc_deleted_topic', 1 );
+				update_post_meta( $post_id, 'wpdc_publishing_error', 'deleted_topic' );
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'The Discourse topic associated with this post has been deleted.' );
 			}
 
 			if ( $topic_slug && $topic_id ) {
-				delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+				delete_post_meta( $post_id, 'wpdc_publishing_error' );
 				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
