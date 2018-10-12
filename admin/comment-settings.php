@@ -180,7 +180,7 @@ class CommentSettings {
 	public function enable_discourse_comments_checkbox() {
 		$comment_type = $this->options['comment-type'];
 		$hide_radio   = empty( $this->options['enable-discourse-comments'] );
-		$this->form_helper->checkbox_input( 'enable-discourse-comments', 'discourse_comment', __( 'Enable Discourse Comments', 'wp-discourse' ) );
+		$this->form_helper->checkbox_input( 'enable-discourse-comments', 'discourse_comment', __( 'Display Discourse comments or a link to the comments on WordPress.', 'wp-discourse' ) );
 
 		?>
 		<div class="discourse-comment-type
@@ -191,7 +191,7 @@ class CommentSettings {
 ">
 		<label for="display-comments">
 		<input type="radio" name="discourse_comment[comment-type]" value="display-comments" <?php checked( 'display-comments', $comment_type ); ?>>
-		<?php esc_html_e( 'Display Discourse comments', 'wp-discourse' ); ?></label><br>
+		<?php esc_html_e( 'Display comments', 'wp-discourse' ); ?></label><br>
 		<label for="display-comments-link">
 		<input type="radio" name="discourse_comment[comment-type]" value="display-comments-link" <?php checked( 'display-comments-link', $comment_type ); ?>>
 		<?php esc_html_e( 'Display a link to the comments', 'wp-discourse' ); ?></label>
