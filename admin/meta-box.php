@@ -139,7 +139,7 @@ class MetaBox {
 						<br>
 						<?php $this->category_select_input( $publish_category_id ); ?>
 						<hr>
-						<?php $this->advanced_options_input( $pin_topic, $pin_until, $unlisted ); ?>
+						<?php $this->advanced_options_input( $pin_topic, $pin_until, $unlisted, $post_id ); ?>
 					</div>
 					<div class="wpdc-link-to-topic hidden">
 						<hr>
@@ -384,14 +384,29 @@ class MetaBox {
 
 	/**
 	 * Outputs the tag_topic input.
+	 *
+	 * @param int $post_id The ID of the post.
 	 */
-	protected function tag_topic_input() {
+	protected function tag_topic_input( $post_id ) {
+		$tags = get_post_meta( $post_id, 'wpdc_topic_tags', true );
 		?>
 		<label for="discourse_topic_tags">
 			<?php esc_html_e( 'Tag Topic', 'wp-discourse' ); ?><br>
 			<input type="text" name="discourse_topic_tags" id="discourse-topic-tags">
 			<input type="button" class="button" id="wpdc-tagadd" value="Add">
-			<ul id="wpdc-tagchecklist"></ul>
+			<ul id="wpdc-tagchecklist">
+				<?php
+				if ( ! empty( $tags ) && is_array( $tags ) ) {
+					foreach ( $tags as $tag ) {
+						?>
+						<li class="wpdc-tag-item"><button type="button" class="wpdc-remove-tag"><span class="wpdc-remove-tag-icon" aria-hidden="true"></span>
+								<span class="screen-reader-text">Remove term: <?php esc_attr_e( $tag ); ?></span></button>&nbsp;
+							<?php esc_attr_e( $tag ); ?> <input name="wpdc_topic_tags[]" type="hidden" value=" <?php esc_attr_e( $tag ); ?>"></li>
+						<?php
+					}
+				}
+				?>
+			</ul>
 			<div class="wpdc-taglist-errors"></div>
 		</label>
 		<?php
@@ -403,8 +418,9 @@ class MetaBox {
 	 * @param int|bool    $pin_topic Whether or not to pin the topic.
 	 * @param string|null $pin_until When to pin the topic until.
 	 * @param int|bool    $unlisted Whether or not the topic is unlisted.
+	 * @param int         $post_id The ID of the post.
 	 */
-	protected function advanced_options_input( $pin_topic, $pin_until, $unlisted ) {
+	protected function advanced_options_input( $pin_topic, $pin_until, $unlisted, $post_id ) {
 		?>
 		<div class="wpdc-advanced-options-toggle"><?php esc_html_e( 'Advanced Options', 'wp-discourse' ); ?></div>
 		<div class="wpdc-advanced-options hidden">
@@ -412,7 +428,7 @@ class MetaBox {
 			<?php $this->unlisted_topic_checkbox( $unlisted ); ?><br>
 			<?php
 			if ( ! empty( $this->options['allow-tags'] ) ) {
-				$this->tag_topic_input();
+				$this->tag_topic_input( $post_id );
 			}
 		?>
 		</div>
