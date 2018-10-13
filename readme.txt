@@ -3,7 +3,7 @@ Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 4.9.8
-Stable tag: 1.7.6
+Stable tag: 1.7.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -127,6 +127,13 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.7.7 10/12/2018
+
+- Add option to not load the WordPress comment template for posts that have not been published to Discourse
+- Improve the UI for choosing comment display options
+- Fix topics added to the Discourse approval queue not being handled correctly on WordPress
+- Fix tags that have been added to draft posts not being saved
 
 #### 1.7.6 09/13/2018
 
