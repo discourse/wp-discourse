@@ -400,8 +400,8 @@ class MetaBox {
 					foreach ( $tags as $tag ) {
 						?>
 						<li class="wpdc-tag-item"><button type="button" class="wpdc-remove-tag"><span class="wpdc-remove-tag-icon" aria-hidden="true"></span>
-								<span class="screen-reader-text">Remove term: <?php esc_attr_e( $tag ); ?></span></button>&nbsp;
-							<?php esc_attr_e( $tag ); ?> <input name="wpdc_topic_tags[]" type="hidden" value=" <?php esc_attr_e( $tag ); ?>"></li>
+								<span class="screen-reader-text">Remove term: <?php echo esc_attr( $tag ); ?></span></button>&nbsp;
+							<?php echo esc_attr( $tag ); ?> <input name="wpdc_topic_tags[]" type="hidden" value=" <?php echo esc_attr( $tag ); ?>"></li>
 						<?php
 					}
 				}
