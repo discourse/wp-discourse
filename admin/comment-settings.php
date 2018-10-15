@@ -62,20 +62,6 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
-				$this,
-				'cache_html_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
-				$this,
-				'clear_cached_comment_html_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_ajax_load', __( 'Load Comments With Ajax', 'wp-discourse' ), array(
 				$this,
 				'ajax_load_checkbox',
@@ -164,6 +150,20 @@ class CommentSettings {
 				$this,
 				'only_show_moderator_liked_checkbox',
 			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
+			$this,
+			'cache_html_checkbox',
+		), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
+			$this,
+			'clear_cached_comment_html_checkbox',
+		), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		register_setting(
