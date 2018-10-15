@@ -73,7 +73,7 @@ class DiscoursePublish {
 		$already_published      = get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
-		$title                  = apply_filters( 'discourse_publish_format_title', $title );
+		$title                  = apply_filters( 'wpdc_publish_format_title', $title );
 
 		$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 		if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
@@ -100,7 +100,7 @@ class DiscoursePublish {
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
 		$title                = $this->sanitize_title( $post->post_title );
-		$title                = apply_filters( 'discourse_publish_format_title', $title );
+		$title                = apply_filters( 'wpdc_publish_format_title', $title );
 
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
