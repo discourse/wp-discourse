@@ -183,7 +183,7 @@ class DiscoursePublish {
 
 		// Get publish category of a post.
 		$publish_post_category = get_post_meta( $post_id, 'publish_post_category', true );
-		// This would be used if a post is published through XML-RPC. I'm not sure what it should default to if it hasn't been set.
+		// This would be used if a post is published through XML-RPC.
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 		$tags             = get_post_meta( $post_id, 'wpdc_topic_tags', true );
@@ -281,8 +281,8 @@ class DiscoursePublish {
 				return $pin_response;
 			}
 
-				// The topic has been created and its associated post's metadata has been updated.
-				return null;
+			// The topic has been created and its associated post's metadata has been updated.
+			return null;
 
 		} elseif ( ! empty( $body->post ) ) {
 
