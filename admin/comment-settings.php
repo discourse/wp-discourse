@@ -83,7 +83,7 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-			'discourse_hide_wordpress_comments', __( 'Hide WordPress Comments', 'wp-discourse' ), array(
+			'discourse_hide_wordpress_comments', __( 'Remove WordPress Comments Template', 'wp-discourse' ), array(
 				$this,
 				'discourse_hide_wordpress_comments_checkbox',
 			), 'discourse_comment', 'discourse_commenting_settings_section'
@@ -260,7 +260,7 @@ class CommentSettings {
 	public function discourse_hide_wordpress_comments_checkbox() {
 		$this->form_helper->checkbox_input(
 			'hide-wordpress-comments', 'discourse_comment',
-			__( 'Hide existing WordPress comments and comment form for posts that are not Published to Discourse.', 'wp-discourse' ),
+			__( 'Do not load the WordPress comments template for posts that are not Published to Discourse.', 'wp-discourse' ),
 			__(
 				'The WP Discourse plugin requires comments to be enabled in order to display Discourse comments.
             Enable this setting to keep the WordPress comment area from appearing beneath posts that have not been published to Discourse.', 'wp-discourse'

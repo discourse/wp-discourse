@@ -576,8 +576,8 @@ class MetaBox {
 
 			case 'queued_topic':
 				esc_html_e(
-					'Your post has been sent to Discourse and added to the approval queue. When it has been approved, you will need to manually link it to
-                        Discourse. To do that, copy the Discourse topic URL, paste the URL into input below, and update the post.', 'wp-discourse'
+					'Your post has been sent to Discourse and added to the approval queue. When it has been approved, manually
+					link it to Discourse by copying its URL into the input box below.', 'wp-discourse'
 				);
 				echo '<hr>';
 				$this->link_to_discourse_topic_input();
