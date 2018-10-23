@@ -61,7 +61,6 @@ class DiscourseWebhookRefresh extends Webhook {
 			);
 		}
 
-
 	}
 
 	/**

@@ -52,7 +52,7 @@ class DiscourseCommentFormatter {
 		do_action( 'wpdc_sync_discourse_comments', $post_id );
 
 		$topic_data = get_post_meta( $post_id, 'discourse_comments_raw', true );
-		$permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		$permalink  = get_post_meta( $post_id, 'discourse_permalink', true );
 		if ( empty( $topic_data ) || empty( $permalink ) ) {
 
 			return wp_kses_post( Templates::bad_response_html() );

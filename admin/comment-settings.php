@@ -55,41 +55,16 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-<<<<<<< HEAD
 			'discourse_enable_discourse_comments', __( 'Enable Discourse Comments', 'wp-discourse' ), array(
-=======
-			'discourse_use_discourse_comments', __( 'Use Discourse Comments', 'wp-discourse' ), array(
-				$this,
-				'use_discourse_comments_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_add_join_link', __( 'Link to Comments Without Displaying Them', 'wp-discourse' ), array(
-				$this,
-				'add_join_link_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
-		        'discourse_include_topic_map', __( 'Include Topic Map', 'wp-discourse' ), array(
-		                $this,
-                    'include_topic_map_checkbox',
-            ), 'discourse_comment', 'discourse_commenting_settings_section'
-        );
-
-		add_settings_field(
-			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
-				$this,
-				'cache_html_checkbox',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
->>>>>>> 23eef38... Add theme code to plugin
 				$this,
 				'enable_discourse_comments_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_include_topic_map', __( 'Include Topic Map', 'wp-discourse' ), array(
+				$this,
+				'include_topic_map_checkbox',
 			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
@@ -186,16 +161,16 @@ class CommentSettings {
 
 		add_settings_field(
 			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
-			$this,
-			'cache_html_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'cache_html_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
-			$this,
-			'clear_cached_comment_html_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'clear_cached_comment_html_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		register_setting(
@@ -232,11 +207,14 @@ class CommentSettings {
 
 	}
 
+	/**
+	 * Outputs markup for the include-topic-map checkbox.
+	 */
 	public function include_topic_map_checkbox() {
-	    $this->form_helper->checkbox_input(
-	            'include-topic-map', 'discourse_comment', __( 'Include topic map.', 'wp-discourse' )
-        );
-    }
+		$this->form_helper->checkbox_input(
+			'include-topic-map', 'discourse_comment', __( 'Include topic map.', 'wp-discourse' )
+		);
+	}
 
 	/**
 	 * Outputs markup for the cache-html checkbox.

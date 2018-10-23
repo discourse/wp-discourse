@@ -42,11 +42,11 @@ class DiscourseComment {
 	/**
 	 * DiscourseComment constructor.
 	 *
-	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter $comment_formatter An instance of DiscourseCommentFormatter.
+	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter   $comment_formatter An instance of DiscourseCommentFormatter.
 	 * @param \WPDiscourse\DiscourseTopicMapFormatter\DiscourseTopicMapFormatter $topic_map_formatter An instance of DiscourseTopicMapFormatter.
 	 */
 	public function __construct( $comment_formatter, $topic_map_formatter ) {
-		$this->comment_formatter = $comment_formatter;
+		$this->comment_formatter   = $comment_formatter;
 		$this->topic_map_formatter = $topic_map_formatter;
 
 		add_action( 'init', array( $this, 'setup_options' ) );
@@ -272,7 +272,7 @@ class DiscourseComment {
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
-					$result = wp_remote_get( $permalink );
+					$result    = wp_remote_get( $permalink );
 
 					if ( $this->validate( $result ) ) {
 
@@ -281,24 +281,24 @@ class DiscourseComment {
 						// Todo: update Discourse WordPress serializer to include this data. If present, don't run this query.
 						if ( ! empty( $this->options['include-topic-map'] ) ) {
 							// Todo: get_discourse_topic expects a URL, it should be changed to accept topic_id instead.
-							$topic_url = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
+							$topic_url  = esc_url_raw( $this->options['url'] . "/t/$topic_id" );
 							$topic_data = $this->get_discourse_topic( $topic_url );
 							if ( ! is_wp_error( $topic_data ) ) {
-								// Todo: Add some error checking here. details->links is only set if links are present.
-								$created_at = $topic_data->created_at;
-								$last_posted_at = $topic_data->last_posted_at;
-								$created_by = $topic_data->details->created_by;
-								$last_poster = $topic_data->details->last_poster;
-								$popular_links = ! empty( $topic_data->details->links ) ? $topic_data->details->links : '';
-								$body->{'created_at'} = $created_at;
+								// Todo: Add some error checking here.
+								$created_at               = $topic_data->created_at;
+								$last_posted_at           = $topic_data->last_posted_at;
+								$created_by               = $topic_data->details->created_by;
+								$last_poster              = $topic_data->details->last_poster;
+								$popular_links            = ! empty( $topic_data->details->links ) ? $topic_data->details->links : '';
+								$body->{'created_at'}     = $created_at;
 								$body->{'last_posted_at'} = $last_posted_at;
-								$body->{'created_by'} = $created_by;
-								$body->{'last_poster'} = $last_poster;
-								$body->{'popular_links'} = $popular_links;
+								$body->{'created_by'}     = $created_by;
+								$body->{'last_poster'}    = $last_poster;
+								$body->{'popular_links'}  = $popular_links;
 							}
 						}
 
-                        // Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
+						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
 						$posts_count = isset( $body->posts_count ) && $body->posts_count > 0 ? $body->posts_count - 1 : 0;
 
 						update_post_meta( $post_id, 'discourse_comments_count', $posts_count );

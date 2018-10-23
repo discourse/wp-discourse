@@ -204,31 +204,26 @@ trait TemplateFunctions {
 	 *
 	 * @return string the relative time
 	 */
-	// Todo: adding times here is going to break comment caching.
-	public function relative_time($ts) {
-		if(!ctype_digit($ts)) {
-			$ts = strtotime($ts);
+	public function relative_time( $ts ) {
+		if ( ! ctype_digit( $ts ) ) {
+			$ts = strtotime( $ts );
 		}
 		$diff = intval( time() - $ts );
-		if( 0 === $diff ) {
+		if ( 0 === $diff ) {
 
 			return __( 'now', 'wp-discourse' );
-		} elseif($diff > 0) {
-			$day_diff = intval( floor($diff / 86400 ) );
-			if($day_diff === 0) {
+		} elseif ( $diff > 0 ) {
+			$day_diff = intval( floor( $diff / 86400 ) );
+			if ( 0 === $day_diff ) {
 				switch ( $day_diff ) {
 					case ( $diff < 60 ):
 						return __( 'just now', 'wp-discourse' );
-						break;
 					case ( $diff < 120 ):
 						return '1 minute ago';
-						break;
 					case ( $diff < 3600 ):
-						return floor($diff / 60) . ' ' . __( 'minutes ago', 'wp-discourse' );
-						break;
+						return floor( $diff / 60 ) . ' ' . __( 'minutes ago', 'wp-discourse' );
 					case ( $diff < 7200 ):
 						return '1 ' . __( 'hour ago', 'wp-discourse' );
-						break;
 					default:
 						return floor( $diff / 3600 ) . ' ' . __( 'hours ago', 'wp-discourse' );
 				}
@@ -236,37 +231,20 @@ trait TemplateFunctions {
 				switch ( $day_diff ) {
 					case ( 1 === $day_diff ):
 						return __( 'yesterday', 'wp-discourse' );
-						break;
 					case ( $day_diff < 7 ):
 						return $day_diff . ' ' . __( 'days ago', 'wp-discourse' );
-						break;
 					case ( $day_diff < 31 ):
-						return ceil($day_diff / 7) . ' ' . __( 'weeks ago', 'wp-discourse' );
-						break;
+						return ceil( $day_diff / 7 ) . ' ' . __( 'weeks ago', 'wp-discourse' );
 					case ( $day_diff < 60 ):
 						return __( 'last month', 'wp-discourse' );
-						break;
 					default:
 						// Todo: use the time format option here?
-						return date('F d', $ts);
+						return date( 'F d', $ts );
 				}
 			}
 		} else {
-			// Todo: could this ever be called? If so, something has gone wrong.
-			$diff = abs($diff);
-			$day_diff = floor($diff / 86400);
-			if($day_diff == 0) {
-				if($diff < 120) { return 'in a minute'; }
-				if($diff < 3600) { return 'in ' . floor($diff / 60) . ' minutes'; }
-				if($diff < 7200) { return 'in an hour'; }
-				if($diff < 86400) { return 'in ' . floor($diff / 3600) . ' hours'; }
-			}
-			if($day_diff == 1) { return 'Tomorrow'; }
-			if($day_diff < 4) { return date('l', $ts); }
-			if($day_diff < 7 + (7 - date('w'))) { return 'next week'; }
-			if(ceil($day_diff / 7) < 4) { return 'in ' . ceil($day_diff / 7) . ' weeks'; }
-			if(date('n', $ts) == date('n') + 1) { return 'next month'; }
-			return date('F d', $ts);
+			// Todo: could this ever be called? If so, something has gone wrong. If we need this code it will need to be fixed.
+			return '';
 		}
 	}
 }

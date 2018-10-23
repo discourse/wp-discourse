@@ -52,177 +52,177 @@ class ConfigurableTextSettings {
 
 		add_settings_section(
 			'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
-			$this,
-			'configurable_text_tab_details',
-		), 'discourse_configurable_text'
+				$this,
+				'configurable_text_tab_details',
+			), 'discourse_configurable_text'
 		);
 
 		add_settings_field(
 			'discourse_link_text', __( 'Discourse Link', 'wp-discourse' ), array(
-			$this,
-			'discourse_link_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'discourse_link_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_start_discussion_text', __( 'Start Discussion', 'wp-discourse' ), array(
-			$this,
-			'start_discussion_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'start_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_continue_discussion_text', __( 'Continue Discussion', 'wp-discourse' ), array(
-			$this,
-			'continue_discussion_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'continue_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_join_discussion_text', __( 'Join Discussion', 'wp-discourse' ), array(
-			$this,
-			'join_discussion_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'join_discussion_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_no_comments_text', __( 'Join Discussion Link: no Comments', 'wp-discourse' ), array(
-			$this,
-			'no_comments_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'no_comments_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_comments_singular_text', __( 'Join Discussion Link: Comments Singular', 'wp-discourse' ), array(
-			$this,
-			'comments_singular_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'comments_singular_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_comments_plural_text', __( 'Join Discussion Link: Comments Plural', 'wp-discourse' ), array(
-			$this,
-			'comments_plural_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'comments_plural_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_notable_replies_text', __( 'Top Level Comments Heading', 'wp-discourse' ), array(
-			$this,
-			'notable_replies_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'notable_replies_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_comments_not_available_text', __( 'Comments Not Available', 'wp-discourse' ), array(
-			$this,
-			'comments_not_available_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'comments_not_available_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_participants_text', __( 'Participants Heading', 'wp-discourse' ), array(
-			$this,
-			'participants_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'participants_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_published_at_text', __( 'Published at Text', 'wp-discourse' ), array(
-			$this,
-			'published_at_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'published_at_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_single_reply_text', __( 'Single Reply', 'wp-discourse' ), array(
-			$this,
-			'single_reply_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'single_reply_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_many_replies_text', __( 'Many Replies', 'wp-discourse' ), array(
-			$this,
-			'many_replies_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'many_replies_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_more_replies_text', __( 'More Replies', 'wp-discourse' ), array(
-			$this,
-			'more_replies_more_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'more_replies_more_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_external_login_text', __( 'External Login Text', 'wp-discourse' ), array(
-			$this,
-			'external_login_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'external_login_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_link_to_discourse_text', __( 'Link Accounts Text', 'wp-discourse' ), array(
-			$this,
-			'link_to_discourse_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'link_to_discourse_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_linked_to_discourse_text', __( 'Account is Linked Text', 'wp-discourse' ), array(
-			$this,
-			'linked_to_discourse_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'linked_to_discourse_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_created_text', __( 'Topic Map Created', 'wp-discourse' ), array(
-			$this,
-			'topic_map_created_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_created_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_last_reply_text', __( 'Topic Map Last Reply', 'wp-discourse' ), array(
-			$this,
-			'topic_map_last_reply_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_last_reply_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_replies_text', __( 'Topic Map Replies', 'wp-discourse' ), array(
-			$this,
-			'topic_map_replies_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_replies_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_users_text', __( 'Topic Map Users', 'wp-discourse' ), array(
-			$this,
-			'topic_map_users_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_users_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_links_text', __( 'Topic Map Links', 'wp-discourse' ), array(
-			$this,
-			'topic_map_links_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_links_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_frequent_posters_text', __( 'Topic Map Frequent Posters', 'wp-discourse' ), array(
-			$this,
-			'topic_map_frequent_posters_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_frequent_posters_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_topic_map_popular_links_text', __( 'Topic Map Popular Links', 'wp-discourse' ), array(
-			$this,
-			'topic_map_popular_links_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_popular_links_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		register_setting(
@@ -240,10 +240,10 @@ class ConfigurableTextSettings {
 		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
 		$this->form_helper->input(
 			'discourse-link-text', 'discourse_configurable_text', __(
-			'The link-text
+				'The link-text
 		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
 		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse'
-		), 'text', null, null, $default
+			), 'text', null, null, $default
 		);
 	}
 
@@ -401,70 +401,91 @@ class ConfigurableTextSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for the topic-map-created text input.
+	 */
 	public function topic_map_created_text() {
-	    $this->form_helper->input(
-	            'topic-map-created-text', 'discourse_configurable_text', __(
-	                    "Topic-map 'created'", 'wp-discourse'
-            )
-        );
-    }
+		$this->form_helper->input(
+			'topic-map-created-text', 'discourse_configurable_text', __(
+				"Topic-map 'created'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_last_reply_text() {
-	    $this->form_helper->input(
-		    'topic-map-last-reply-text', 'discourse_configurable_text', __(
-			    "Topic-map 'last reply'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-last-reply-text input.
+	 */
+	public function topic_map_last_reply_text() {
+		$this->form_helper->input(
+			'topic-map-last-reply-text', 'discourse_configurable_text', __(
+				"Topic-map 'last reply'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_replies_text() {
-	    $this->form_helper->input(
-		    'topic-map-replies-text', 'discourse_configurable_text', __(
-			    "Topic-map 'replies'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-replies-text input.
+	 */
+	public function topic_map_replies_text() {
+		$this->form_helper->input(
+			'topic-map-replies-text', 'discourse_configurable_text', __(
+				"Topic-map 'replies'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_users_text() {
-	    $this->form_helper->input(
-		    'topic-map-users-text', 'discourse_configurable_text', __(
-			    "Topic-map 'users'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-users-text input.
+	 */
+	public function topic_map_users_text() {
+		$this->form_helper->input(
+			'topic-map-users-text', 'discourse_configurable_text', __(
+				"Topic-map 'users'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_links_text() {
-	    $this->form_helper->input(
-		    'topic-map-links-text', 'discourse_configurable_text', __(
-			    "Topic-map 'links'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-links-text input.
+	 */
+	public function topic_map_links_text() {
+		$this->form_helper->input(
+			'topic-map-links-text', 'discourse_configurable_text', __(
+				"Topic-map 'links'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_frequent_posters_text() {
-	    $this->form_helper->input(
-		    'topic-map-frequent-posters-text', 'discourse_configurable_text', __(
-			    "Topic-map 'frequent posters'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-frequent-posters-text input.
+	 */
+	public function topic_map_frequent_posters_text() {
+		$this->form_helper->input(
+			'topic-map-frequent-posters-text', 'discourse_configurable_text', __(
+				"Topic-map 'frequent posters'", 'wp-discourse'
+			)
+		);
+	}
 
-    public function topic_map_popular_links_text() {
-	    $this->form_helper->input(
-		    'topic-map-popular-links-text', 'discourse_configurable_text', __(
-			    "Topic-map 'popular links'", 'wp-discourse'
-		    )
-	    );
-    }
+	/**
+	 * Outputs markup for the topic-map-popular-links-text input.
+	 */
+	public function topic_map_popular_links_text() {
+		$this->form_helper->input(
+			'topic-map-popular-links-text', 'discourse_configurable_text', __(
+				"Topic-map 'popular links'", 'wp-discourse'
+			)
+		);
+	}
 
 	/**
 	 * Details for the 'text_content_options' tab.
 	 */
 	public function configurable_text_tab_details() {
 		?>
-        <p class="wpdc-options-documentation">
-            <em><?php esc_html_e( "This section is for configuring the plugin's user facing text.", 'wp-discourse' ); ?></em>
-        </p>
+		<p class="wpdc-options-documentation">
+			<em><?php esc_html_e( "This section is for configuring the plugin's user facing text.", 'wp-discourse' ); ?></em>
+		</p>
 		<?php
 	}
 
@@ -476,13 +497,13 @@ class ConfigurableTextSettings {
 	public function reset_options_form( $tab ) {
 		if ( 'text_content_options' === $tab ) {
 			?>
-            <form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-                  method="post">
+			<form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
+				  method="post">
 				<?php wp_nonce_field( 'text_options_reset', 'text_options_reset_nonce' ); ?>
 
-                <input type="hidden" name="action" value="text_options_reset">
+				<input type="hidden" name="action" value="text_options_reset">
 				<?php submit_button( 'Reset Default Values', 'secondary', 'discourse_reset_options', false ); ?>
-            </form>
+			</form>
 			<?php
 		}
 	}
@@ -492,7 +513,7 @@ class ConfigurableTextSettings {
 	 */
 	public function process_text_options_reset() {
 		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
 		) {
 
 			exit;
