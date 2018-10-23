@@ -179,7 +179,10 @@ class DiscourseComment {
 		if ( ! empty( $this->options['include-topic-map'] ) ) {
 			$topic_map = $this->topic_map_formatter->format( $post_id );
 
-			return wp_kses_post( $topic_map ) . wp_kses( $discourse_comments );
+			$discourse_comments = $topic_map . $discourse_comments;
+
+			// Todo: check this is ok.
+			//return wp_kses_post( $topic_map ) . wp_kses_post( $discourse_comments );
 		}
 
 		return wp_kses_post( $discourse_comments );
@@ -360,8 +363,12 @@ class DiscourseComment {
 		}
 
 		if ( $this->add_join_link( $post_id ) ) {
+			$discourse_html = $this->join_link( $post_id );
 			// Todo: allow the topic map to be shown here.
-			echo wp_kses_post( $this->join_link( $post_id ) );
+			if ( ! empty( $this->options['include-topic-map'] ) ) {
+				$discourse_html = $this->topic_map_formatter->format( $post_id ) . $discourse_html;
+			}
+			echo wp_kses_post( $discourse_html );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
