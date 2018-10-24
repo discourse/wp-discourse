@@ -302,7 +302,7 @@ class HTMLTemplates {
 		return apply_filters( 'discourse_frequent_posters_html', $output );
 	}
 
-	public static function topic_map_html() {
+	public static function topic_map_html( $replies_count, $users_count, $links_count ) {
 		ob_start();
 		?>
         <div class="topic-map">
@@ -337,15 +337,26 @@ class HTMLTemplates {
                     </li>
                     <li>
                         <span class="number">{replies_count}</span>
-                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-replies-text' ) ); ?></h4>
+                        <h4><?php
+                            1 === $replies_count ? esc_html_e( 'reply', 'wp-discourse' ) : esc_html_e( 'replies', 'wp-discourse' );
+                            ?>
+                        </h4>
                     </li>
                     <li class="secondary">
                         <span class="number">{participants_count}</span>
-                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-users-text' ) ); ?></h4>
+                        <h4>
+                            <?php
+                            1 === $users_count ? esc_html_e( 'user', 'wp-discourse' ) : esc_html_e( 'users', 'wp-discourse' );
+                            ?>
+                        </h4>
                     </li>
                     <li class="secondary">
                         <span class="number">{links_count}</span>
-                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-links-text' ) ); ?></h4>
+                        <h4>
+                            <?php
+                            1 === $links_count ? esc_html_e( 'link', 'wp-discourse' ) : esc_html_e( 'links', 'wp-discourse' );
+                            ?>
+                        </h4>
                     </li>
                 </ul>
             </section>

@@ -52,7 +52,7 @@ class DiscourseTopicMapFormatter {
 
 		$topic_data = get_post_meta( $post_id, 'discourse_comments_raw', true );
 
-		$topic_map_html = wp_kses_post( Templates::topic_map_html() );
+
 
 		$discourse_url = esc_url( $this->options['url'] );
 		$permalink     = get_post_meta( $post_id, 'discourse_permalink', true );
@@ -60,8 +60,9 @@ class DiscourseTopicMapFormatter {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 		}
 
-		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
+		$reply_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count - 1 : 0;
 		$participants          = $topic_data->participants;
+		$user_count = count( $participants );
 		$popular_links         = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : null;
 		$popular_links_count   = count( $popular_links );
 
@@ -73,6 +74,8 @@ class DiscourseTopicMapFormatter {
 				$popular_links_html .= $popular_link_html;
 			}
 		}
+
+		$topic_map_html = wp_kses_post( Templates::topic_map_html( $reply_count, $user_count, $popular_links_count ) );
 
 		$participants_html = '';
 
@@ -88,8 +91,8 @@ class DiscourseTopicMapFormatter {
 			$participants_html .= $participant_html;
 		}
 
-		$topic_map_html  = str_replace( '{replies_count}', $discourse_posts_count - 1, $topic_map_html );
-		$topic_map_html  = str_replace( '{participants_count}', count( $participants ), $topic_map_html );
+		$topic_map_html  = str_replace( '{replies_count}', $reply_count, $topic_map_html );
+		$topic_map_html  = str_replace( '{participants_count}', $user_count, $topic_map_html );
 		$topic_map_html  = str_replace( '{links_count}', $popular_links_count, $topic_map_html );
 		$last_poster     = $topic_data->last_poster;
 		$original_poster = $topic_data->created_by;
