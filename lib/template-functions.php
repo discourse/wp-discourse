@@ -243,8 +243,8 @@ trait TemplateFunctions {
 				}
 			}
 		} else {
-			// Todo: could this ever be called? If so, something has gone wrong. If we need this code it will need to be fixed.
-			return '';
+			// Todo: could this ever be called? If so, something has gone wrong.
+			return __( 'now', 'wp-discourse' );
 		}
 	}
 }
