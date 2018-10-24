@@ -31,6 +31,12 @@ class HTMLTemplates {
 		return $text;
 	}
 
+	protected static function get_option( $option_group, $option_name ) {
+	    $option_group = get_option( $option_group );
+
+	    return $option_group[ $option_name ];
+    }
+
 	/**
 	 * Sets the value of the target attribute.
 	 *
@@ -67,10 +73,17 @@ class HTMLTemplates {
 					<?php self::discourse_topic_link( self::new_tab() ); ?>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
-				<div class="comment-reply-title">
-					<h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
-					<p>{participants}</p>
-				</div>
+                <?php
+                $include_topic_map = self::get_option( 'discourse_comment', 'include-topic-map' );
+                if ( empty( $include_topic_map ) ) {
+                    ?>
+                    <div class="comment-reply-title">
+                        <h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
+                        <p>{participants}</p>
+                    </div>
+                    <?php
+                }
+                ?>
 			</div>
 		</div>
 		<?php

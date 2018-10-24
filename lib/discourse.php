@@ -68,6 +68,7 @@ class Discourse {
 	protected $discourse_comment = array(
 		'enable-discourse-comments' => 0,
 		'comment-type'              => 'display-comments',
+		'include-topic-map'         => 0,
 		'ajax-load'                 => 0,
 		'cache-html'                => 0,
 		'clear-cached-comment-html' => 0,

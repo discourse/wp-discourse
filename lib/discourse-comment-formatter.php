@@ -129,7 +129,18 @@ class DiscourseCommentFormatter {
 				$comments_html .= $comment_html;
 				$displayed_comment_number++;
 			}
-			// Should the participants section be included if the topic-map is being used?
+			$discourse_html = wp_kses_post( Templates::replies_html() );
+			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
+		} else {
+			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
+		}// End if().
+
+		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
+		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
+		$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
+		$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
+
+		if ( empty( $this->options['include-topic-map'] ) ) {
 			foreach ( $participants as $participant ) {
 				$participant_html   = wp_kses_post( Templates::participant_html() );
 				$participant_html   = str_replace( '{discourse_url}', $discourse_url, $participant_html );
@@ -142,17 +153,9 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
 			}
-			$discourse_html = wp_kses_post( Templates::replies_html() );
-			$discourse_html = str_replace( '{more_replies}', $more_replies, $discourse_html );
-		} else {
-			$discourse_html = wp_kses_post( Templates::no_replies_html( $discourse_posts_count ) );
-		}// End if().
 
-		$discourse_html = str_replace( '{discourse_url}', $discourse_url, $discourse_html );
-		$discourse_html = str_replace( '{discourse_url_name}', $discourse_url_name, $discourse_html );
-		$discourse_html = str_replace( '{topic_url}', $permalink, $discourse_html );
-		$discourse_html = str_replace( '{comments}', $comments_html, $discourse_html );
-		$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
+			$discourse_html = str_replace( '{participants}', $participants_html, $discourse_html );
+		}
 
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
