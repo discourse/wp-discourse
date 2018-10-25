@@ -316,7 +316,7 @@ class HTMLTemplates {
                     <li>
                         <h4><?php echo esc_html( self::get_text_options( 'topic-map-created-text' ) ); ?></h4>
                         <div class="topic-map-post created-at">
-                            <a class="trigger-user-card">
+                            <a>
                                 <img alt="" width="20" height="20" src="{post_created_user_avatar}"
                                      title="{post_created_user_username}" class="avatar">
                             </a>
@@ -327,7 +327,7 @@ class HTMLTemplates {
                         <div>
                             <h4><?php echo esc_html( self::get_text_options( 'topic-map-last-reply-text' ) ); ?></h4>
                             <div class="topic-map-post last-reply">
-                                <a class="trigger-user-card">
+                                <a>
                                     <img alt="" width="20" height="20" src="{last_reply_user_avatar}"
                                          title="{last_reply_user_username}" class="avatar">
                                 </a>
