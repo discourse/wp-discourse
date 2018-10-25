@@ -199,9 +199,9 @@ class ConfigurableTextSettings {
 
 		add_settings_field(
 			'discourse_topic_map_reply_text', __( 'Topic Map Reply', 'wp-discourse' ), array(
-			$this,
-			'topic_map_reply_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_reply_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
@@ -213,9 +213,9 @@ class ConfigurableTextSettings {
 
 		add_settings_field(
 			'discourse_topic_map_user_text', __( 'Topic Map User', 'wp-discourse' ), array(
-			$this,
-			'topic_map_user_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_user_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
@@ -227,9 +227,9 @@ class ConfigurableTextSettings {
 
 		add_settings_field(
 			'discourse_topic_map_link_text', __( 'Topic Map Link', 'wp-discourse' ), array(
-			$this,
-			'topic_map_link_text',
-		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+				$this,
+				'topic_map_link_text',
+			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(

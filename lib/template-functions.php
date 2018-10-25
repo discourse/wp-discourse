@@ -200,9 +200,9 @@ trait TemplateFunctions {
 	/**
 	 * Converts time into relative time.
 	 *
-	 * @param string input time
+	 * @param string $ts The time to be formatted.
 	 *
-	 * @return string the relative time
+	 * @return string
 	 */
 	public function relative_time( $ts ) {
 		if ( ! ctype_digit( $ts ) ) {

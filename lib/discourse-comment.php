@@ -177,10 +177,8 @@ class DiscourseComment {
 		if ( ! empty( $this->options['include-topic-map'] ) ) {
 			$topic_map = $this->topic_map_formatter->format( $post_id );
 
+			// Todo: check that this is ok.
 			$discourse_comments = $topic_map . $discourse_comments;
-
-			// Todo: check this is ok.
-			//return wp_kses_post( $topic_map ) . wp_kses_post( $discourse_comments );
 		}
 
 		return wp_kses_post( $discourse_comments );

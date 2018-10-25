@@ -31,11 +31,19 @@ class HTMLTemplates {
 		return $text;
 	}
 
+	/**
+	 * Gets an option from a named option array.
+	 *
+	 * @param string $option_group The name of the option group.
+	 * @param string $option_name The name of the option.
+	 *
+	 * @return mixed
+	 */
 	protected static function get_option( $option_group, $option_name ) {
-	    $option_group = get_option( $option_group );
+		$option_group = get_option( $option_group );
 
-	    return $option_group[ $option_name ];
-    }
+		return $option_group[ $option_name ];
+	}
 
 	/**
 	 * Sets the value of the target attribute.
@@ -73,17 +81,17 @@ class HTMLTemplates {
 					<?php self::discourse_topic_link( self::new_tab() ); ?>
 				</h3>
 				<p class="more-replies">{more_replies}</p>
-                <?php
-                $include_topic_map = self::get_option( 'discourse_comment', 'include-topic-map' );
-                if ( empty( $include_topic_map ) ) {
-                    ?>
-                    <div class="comment-reply-title">
-                        <h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
-                        <p>{participants}</p>
-                    </div>
-                    <?php
-                }
-                ?>
+				<?php
+				$include_topic_map = self::get_option( 'discourse_comment', 'include-topic-map' );
+				if ( empty( $include_topic_map ) ) {
+					?>
+					<div class="comment-reply-title">
+						<h4 class="discourse-participants"><?php echo esc_html( self::get_text_options( 'participants-text' ) ); ?></h4>
+						<p>{participants}</p>
+					</div>
+					<?php
+				}
+				?>
 			</div>
 		</div>
 		<?php
@@ -193,7 +201,7 @@ class HTMLTemplates {
 	 * HTML template for each participant
 	 *
 	 * Can be customized from within a theme using the filter provided.
-     *
+	 *
 	 *
 	 * Available tags:
 	 * {discourse_url}, {discourse_url_name}, {topic_url},
@@ -294,98 +302,108 @@ class HTMLTemplates {
 	public static function frequent_posters_html() {
 		ob_start();
 		?>
-        <img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
-             width="25">
+		<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
+			 width="25">
 		<?php
 		$output = ob_get_clean();
 
 		return apply_filters( 'discourse_frequent_posters_html', $output );
 	}
 
+	/**
+	 * HTML template for the topic-map.
+	 *
+	 * @param int $replies_count The number of replies.
+	 * @param int $users_count The number of users.
+	 * @param int $links_count The number of links.
+	 *
+	 * @return string
+	 */
 	public static function topic_map_html( $replies_count, $users_count, $links_count ) {
 		ob_start();
 		?>
-        <div class="topic-map">
-            <section class="map map-collapsed">
-                <nav class="buttons">
-                    <button class="widget-button btn btn no-text btn-icon" id="toggle-expand">
-                        <span id="arrow" class="dashicons dashicons-arrow-down-alt2"></span>
-                    </button>
-                </nav>
-                <ul class="clearfix">
-                    <li>
-                        <h4><?php echo esc_html( self::get_text_options( 'topic-map-created-text' ) ); ?></h4>
-                        <div class="topic-map-post created-at">
-                            <a>
-                                <img alt="" width="20" height="20" src="{post_created_user_avatar}"
-                                     title="{post_created_user_username}" class="avatar">
-                            </a>
-                            <span class="relative-date">{post_created_relative_time}</span>
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            <h4><?php echo esc_html( self::get_text_options( 'topic-map-last-reply-text' ) ); ?></h4>
-                            <div class="topic-map-post last-reply">
-                                <a>
-                                    <img alt="" width="20" height="20" src="{last_reply_user_avatar}"
-                                         title="{last_reply_user_username}" class="avatar">
-                                </a>
-                                <span class="relative-date">{last_reply_relative_time}</span>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <span class="number">{replies_count}</span>
-                        <h4><?php
-                            if ( 1 === $replies_count ) {
-	                            echo esc_html( self::get_text_options( 'topic-map-reply-text') );
-                            } else {
-	                            echo esc_html( self::get_text_options( 'topic-map-replies-text' ) );
-                            }
-                            ?>
-                        </h4>
-                    </li>
-                    <li class="secondary">
-                        <span class="number">{participants_count}</span>
-                        <h4>
-                            <?php
-                            if ( 1 === $users_count ) {
-                                echo esc_html( self::get_text_options( 'topic-map-user-text' ) );
-                            } else {
-                                echo esc_html( self::get_text_options( 'topic-map-users-text' ) );
-                            }
-                            ?>
-                        </h4>
-                    </li>
-                    <li class="secondary">
-                        <span class="number">{links_count}</span>
-                        <h4>
-                            <?php
-                            if ( 1 === $links_count ) {
-                                echo esc_html( self::get_text_options( 'topic-map-link-text' ) );
-                            } else {
-                                echo esc_html( self::get_text_options( 'topic-map-links-text' ) );
-                            }
-                            ?>
-                        </h4>
-                    </li>
-                </ul>
-            </section>
-            <section class="map-expanded" id="map-expanded" style="display:none">
-                <div class="frequent-posters">
-                    <span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-frequent-posters-text' ) ); ?></span>
-                    <p>{participants}</p>
-                </div>
-                <div class="popular-links">
-                    <span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-popular-links-text' ) ); ?></span>
-                    <p class="popular-links-p">{popular_links}</p>
-                </div>
-            </section>
-        </div>
+		<div class="topic-map">
+			<section class="map map-collapsed">
+				<nav class="buttons">
+					<button class="widget-button btn btn no-text btn-icon" id="toggle-expand">
+						<span id="arrow" class="dashicons dashicons-arrow-down-alt2"></span>
+					</button>
+				</nav>
+				<ul class="clearfix">
+					<li>
+						<h4><?php echo esc_html( self::get_text_options( 'topic-map-created-text' ) ); ?></h4>
+						<div class="topic-map-post created-at">
+							<a>
+								<img alt="" width="20" height="20" src="{post_created_user_avatar}"
+									 title="{post_created_user_username}" class="avatar">
+							</a>
+							<span class="relative-date">{post_created_relative_time}</span>
+						</div>
+					</li>
+					<li>
+						<div>
+							<h4><?php echo esc_html( self::get_text_options( 'topic-map-last-reply-text' ) ); ?></h4>
+							<div class="topic-map-post last-reply">
+								<a>
+									<img alt="" width="20" height="20" src="{last_reply_user_avatar}"
+										 title="{last_reply_user_username}" class="avatar">
+								</a>
+								<span class="relative-date">{last_reply_relative_time}</span>
+							</div>
+						</div>
+					</li>
+					<li>
+						<span class="number">{replies_count}</span>
+						<h4>
+						<?php
+						if ( 1 === $replies_count ) {
+							echo esc_html( self::get_text_options( 'topic-map-reply-text' ) );
+						} else {
+							echo esc_html( self::get_text_options( 'topic-map-replies-text' ) );
+						}
+							?>
+						</h4>
+					</li>
+					<li class="secondary">
+						<span class="number">{participants_count}</span>
+						<h4>
+							<?php
+							if ( 1 === $users_count ) {
+								echo esc_html( self::get_text_options( 'topic-map-user-text' ) );
+							} else {
+								echo esc_html( self::get_text_options( 'topic-map-users-text' ) );
+							}
+							?>
+						</h4>
+					</li>
+					<li class="secondary">
+						<span class="number">{links_count}</span>
+						<h4>
+							<?php
+							if ( 1 === $links_count ) {
+								echo esc_html( self::get_text_options( 'topic-map-link-text' ) );
+							} else {
+								echo esc_html( self::get_text_options( 'topic-map-links-text' ) );
+							}
+							?>
+						</h4>
+					</li>
+				</ul>
+			</section>
+			<section class="map-expanded" id="map-expanded" style="display:none">
+				<div class="frequent-posters">
+					<span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-frequent-posters-text' ) ); ?></span>
+					<p>{participants}</p>
+				</div>
+				<div class="popular-links">
+					<span class="topic-map-span"><?php echo esc_html( self::get_text_options( 'topic-map-popular-links-text' ) ); ?></span>
+					<p class="popular-links-p">{popular_links}</p>
+				</div>
+			</section>
+		</div>
 		<?php
-		$topic_map =  ob_get_clean();
+		$topic_map = ob_get_clean();
 
 		return $topic_map;
-    }
+	}
 }

@@ -52,19 +52,17 @@ class DiscourseTopicMapFormatter {
 
 		$topic_data = get_post_meta( $post_id, 'discourse_comments_raw', true );
 
-
-
 		$discourse_url = esc_url( $this->options['url'] );
 		$permalink     = get_post_meta( $post_id, 'discourse_permalink', true );
 		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
 			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
 		}
 
-		$reply_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count - 1 : 0;
-		$participants          = $topic_data->participants;
-		$user_count = count( $participants );
-		$popular_links         = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : null;
-		$popular_links_count   = count( $popular_links );
+		$reply_count         = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count - 1 : 0;
+		$participants        = $topic_data->participants;
+		$user_count          = count( $participants );
+		$popular_links       = ! empty( $topic_data->popular_links ) ? $topic_data->popular_links : null;
+		$popular_links_count = count( $popular_links );
 
 		$popular_links_html = '';
 		if ( $popular_links_count > 0 ) {
