@@ -132,8 +132,6 @@ class DiscourseComment {
 
 		// Todo: the css for topic-maps can probably be included in comments.css.
 		if ( ! empty( $this->options['include-topic-map'] ) ) {
-			wp_register_style( 'topic_map_styles', WPDISCOURSE_URL . '/css/topic-map.css', array(), WPDISCOURSE_VERSION );
-			wp_enqueue_style( 'topic_map_styles' );
 			wp_register_script( 'topic_map_js', WPDISCOURSE_URL . '/js/topic-map.js', array( 'jquery' ), WPDISCOURSE_VERSION, true );
 			$data = array(
 				'ajaxLoad' => ! empty( $this->options['ajax-load'] ) ? 'true' : 'false',
