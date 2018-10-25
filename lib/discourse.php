@@ -114,8 +114,11 @@ class Discourse {
 		'topic-map-created-text'          => 'created',
 		'topic-map-last-reply-text'       => 'last reply',
 		'topic-map-replies-text'          => 'replies',
+		'topic-map-reply-text'            => 'reply',
 		'topic-map-users-text'            => 'users',
+		'topic-map-user-text'             => 'user',
 		'topic-map-links-text'            => 'links',
+		'topic-map-link-text'             => 'link',
 		'topic-map-frequent-posters-text' => 'Frequent Posters',
 		'topic-map-popular-links-text'    => 'Popular Links',
 	);

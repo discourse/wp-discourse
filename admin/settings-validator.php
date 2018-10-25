@@ -143,8 +143,11 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_topic_map_created_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_last_reply_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_replies_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_reply_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_users_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_user_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_links_text', array( $this, 'validate_text_input' ) );
+		add_filter( 'wpdc_validate_topic_map_link_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_frequent_posters_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_topic_map_popular_links_text', array( $this, 'validate_text_input' ) );
 

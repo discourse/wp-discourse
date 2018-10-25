@@ -338,7 +338,11 @@ class HTMLTemplates {
                     <li>
                         <span class="number">{replies_count}</span>
                         <h4><?php
-                            1 === $replies_count ? esc_html_e( 'reply', 'wp-discourse' ) : esc_html_e( 'replies', 'wp-discourse' );
+                            if ( 1 === $replies_count ) {
+	                            echo esc_html( self::get_text_options( 'topic-map-reply-text') );
+                            } else {
+	                            echo esc_html( self::get_text_options( 'topic-map-replies-text' ) );
+                            }
                             ?>
                         </h4>
                     </li>
@@ -346,7 +350,11 @@ class HTMLTemplates {
                         <span class="number">{participants_count}</span>
                         <h4>
                             <?php
-                            1 === $users_count ? esc_html_e( 'user', 'wp-discourse' ) : esc_html_e( 'users', 'wp-discourse' );
+                            if ( 1 === $users_count ) {
+                                echo esc_html( self::get_text_options( 'topic-map-user-text' ) );
+                            } else {
+                                echo esc_html( self::get_text_options( 'topic-map-users-text' ) );
+                            }
                             ?>
                         </h4>
                     </li>
@@ -354,7 +362,11 @@ class HTMLTemplates {
                         <span class="number">{links_count}</span>
                         <h4>
                             <?php
-                            1 === $links_count ? esc_html_e( 'link', 'wp-discourse' ) : esc_html_e( 'links', 'wp-discourse' );
+                            if ( 1 === $links_count ) {
+                                echo esc_html( self::get_text_options( 'topic-map-link-text' ) );
+                            } else {
+                                echo esc_html( self::get_text_options( 'topic-map-links-text' ) );
+                            }
                             ?>
                         </h4>
                     </li>

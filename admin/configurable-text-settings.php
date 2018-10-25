@@ -198,6 +198,13 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
+			'discourse_topic_map_reply_text', __( 'Topic Map Reply', 'wp-discourse' ), array(
+			$this,
+			'topic_map_reply_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_topic_map_users_text', __( 'Topic Map Users', 'wp-discourse' ), array(
 				$this,
 				'topic_map_users_text',
@@ -205,10 +212,24 @@ class ConfigurableTextSettings {
 		);
 
 		add_settings_field(
+			'discourse_topic_map_user_text', __( 'Topic Map User', 'wp-discourse' ), array(
+			$this,
+			'topic_map_user_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_topic_map_links_text', __( 'Topic Map Links', 'wp-discourse' ), array(
 				$this,
 				'topic_map_links_text',
 			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_topic_map_link_text', __( 'Topic Map Link', 'wp-discourse' ), array(
+			$this,
+			'topic_map_link_text',
+		), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
@@ -435,6 +456,17 @@ class ConfigurableTextSettings {
 	}
 
 	/**
+	 * Outputs markup for the topic-map-reply-text input.
+	 */
+	public function topic_map_reply_text() {
+		$this->form_helper->input(
+			'topic-map-reply-text', 'discourse_configurable_text', __(
+				"Topic-map 'reply'", 'wp-discourse'
+			)
+		);
+	}
+
+	/**
 	 * Outputs markup for the topic-map-users-text input.
 	 */
 	public function topic_map_users_text() {
@@ -446,12 +478,34 @@ class ConfigurableTextSettings {
 	}
 
 	/**
+	 * Outputs markup for the topic-map-user-text input.
+	 */
+	public function topic_map_user_text() {
+		$this->form_helper->input(
+			'topic-map-user-text', 'discourse_configurable_text', __(
+				"Topic-map 'user'", 'wp-discourse'
+			)
+		);
+	}
+
+	/**
 	 * Outputs markup for the topic-map-links-text input.
 	 */
 	public function topic_map_links_text() {
 		$this->form_helper->input(
 			'topic-map-links-text', 'discourse_configurable_text', __(
 				"Topic-map 'links'", 'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the topic-map-link-text input.
+	 */
+	public function topic_map_link_text() {
+		$this->form_helper->input(
+			'topic-map-link-text', 'discourse_configurable_text', __(
+				"Topic-map 'link'", 'wp-discourse'
 			)
 		);
 	}
