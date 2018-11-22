@@ -36,6 +36,27 @@ const iconEl = el('img', {
 
 const buttonClass = 'components-button is-button is-default is-primary is-large wpdc-button';
 const activeButtonClass = 'components-button is-button is-default is-primary is-large wpdc-button active';
+const downArrow = (<svg
+    className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
+    <g>
+        <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
+    </g>
+    <g>
+        <path d={"M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"}/>
+    </g>
+</svg>);
+
+const upArrow = (<svg
+    className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
+    <g>
+        <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
+    </g>
+    <g>
+        <path d={"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"}/>
+    </g>
+</svg>);
 
 class PublishingOptions extends Component {
     constructor(props) {
@@ -192,7 +213,6 @@ class UnlinkFromDiscourse extends Component {
     constructor(props) {
         super(props);
         this.state = {
-//            isBusy: false,
             showPanel: false
         };
         this.handleClick = this.handleClick.bind(this);
@@ -201,20 +221,6 @@ class UnlinkFromDiscourse extends Component {
 
     handleClick(e) {
         this.props.handleUnlinkFromDiscourseChange(e);
-        // this.setState({isBusy: true});
-        // wp.apiRequest({
-        //     path: '/wp-discourse/v1/unlink-topic',
-        //     method: 'POST',
-        //     data: {id: this.props.postId}
-        // }).then(
-        //     (data) => {
-        //         this.setState({isBusy: false});
-        //         return null;
-        //     },
-        //     (err) => {
-        //         return null;
-        //     }
-        // );
     }
 
     togglePanel() {
@@ -223,28 +229,7 @@ class UnlinkFromDiscourse extends Component {
 
     render() {
         if (this.props.published) {
-            const downArrow = (<svg
-                className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
-                <g>
-                    <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
-                </g>
-                <g>
-                    <path d={"M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"}/>
-                </g>
-            </svg>);
-
-            const upArrow = (<svg
-                className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
-                <g>
-                    <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
-                </g>
-                <g>
-                    <path d={"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"}/>
-                </g>
-            </svg>);
-            return (
+             return (
                 <div>
                     <h2 className={"wpdc-panel-section-title"}>
                         <button type="button" aria-expanded="false"
@@ -275,32 +260,33 @@ class UnlinkFromDiscourse extends Component {
 class UpdateDiscourseTopic extends Component {
     constructor(props) {
         super(props);
-        this.state = {isBusy: false};
+        //this.state = {isBusy: false};
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick(e) {
-        this.setState({isBusy: true});
-        wp.apiRequest({
-            path: '/wp-discourse/v1/update-topic',
-            method: 'POST',
-            data: {id: this.props.postId}
-        }).then(
-            (data) => {
-                this.setState({isBusy: false});
-                return null;
-            },
-            (err) => {
-                return null;
-            }
-        );
+        this.props.handleUpdateChange(e);
+        // this.setState({isBusy: true});
+        // wp.apiRequest({
+        //     path: '/wp-discourse/v1/update-topic',
+        //     method: 'POST',
+        //     data: {id: this.props.postId}
+        // }).then(
+        //     (data) => {
+        //         this.setState({isBusy: false});
+        //         return null;
+        //     },
+        //     (err) => {
+        //         return null;
+        //     }
+        // );
 
     }
 
     render() {
         if (this.props.published) {
             return (
-                <button className={this.state.isBusy ? activeButtonClass : buttonClass}
+                <button className={this.props.busy ? activeButtonClass : buttonClass}
                         onClick={this.handleClick}>Update
                     Discourse
                     Topic</button>
@@ -383,7 +369,8 @@ class DiscourseSidebar extends Component {
             wpdc_publishing_response: null,
             linked_topic_url: null,
             //unlink_from_discourse: 0,
-            busyUnlinking: false
+            busyUnlinking: false,
+            busyUpdating: false,
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -392,6 +379,7 @@ class DiscourseSidebar extends Component {
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
         this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
+        this.handleUpdateChange = this.handleUpdateChange.bind(this);
     }
 
     updateStateFromDatabase(postId) {
@@ -467,6 +455,25 @@ class DiscourseSidebar extends Component {
         );
     }
 
+    handleUpdateChange(e) {
+        this.setState({busyUpdating: true});
+        wp.apiRequest({
+            path: '/wp-discourse/v1/update-topic',
+            method: 'POST',
+            data: {id: this.props.postId}
+        }).then(
+            (data) => {
+                this.setState({busyUpdating: false});
+                // Todo: success message
+                return null;
+            },
+            (err) => {
+                // Todo: handle error; Set busyUpdating to false.
+                return null;
+            }
+        );
+    }
+
     componentDidUpdate(prevProps) {
         // Todo: this isn't the best condition to use here.
         if (this.props.post.meta !== prevProps.post.meta) {
@@ -515,11 +522,16 @@ class DiscourseSidebar extends Component {
                         />
                         <UnlinkFromDiscourse
                             published={this.state.published}
-                            postId={this.props.postId}
+                           // postId={this.props.postId}
                             handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
                             busy={this.state.busyUnlinking}
                         />
-                        <UpdateDiscourseTopic published={this.state.published} postId={this.props.postId}/>
+                        <UpdateDiscourseTopic
+                            published={this.state.published}
+                           // postId={this.props.postId}
+                            busy={this.state.busyUpdating}
+                            handleUpdateChange={this.handleUpdateChange}
+                        />
                     </PanelBody>
                 </PluginSidebar>
             </Fragment>
