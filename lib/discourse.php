@@ -187,7 +187,163 @@ class Discourse {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
+		add_action( 'rest_api_init', array( $this, 'register_categories_route' ) );
 	}
+
+	// Todo: functions added for the Gutenberg sidebar. Move these.
+	// Todo: check the security on the update-meta route.
+	public function register_categories_route() {
+		register_rest_route(
+			'wp-discourse/v1', 'get-discourse-categories', array(
+				array(
+					'methods'  => \WP_REST_Server::READABLE,
+					'callback' => array( $this, 'get_discourse_categories' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'update-meta', array(
+				array(
+					'methods'  => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'update_discourse_metadata' ),
+				),
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'update-topic', array(
+				array(
+					'methods'  => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'update_topic' ),
+				)
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'unlink-topic', array(
+				array(
+					'methods'  => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'unlink_topic' ),
+				)
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'link-topic', array(
+				array(
+					'methods'  => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'link_topic' ),
+				)
+			)
+		);
+
+	}
+
+	public function unlink_topic( $data ) {
+		$post_id = $data['id'];
+		delete_post_meta( $post_id, 'discourse_post_id' );
+		delete_post_meta( $post_id, 'discourse_topic_id' );
+		delete_post_meta( $post_id, 'discourse_permalink' );
+		delete_post_meta( $post_id, 'discourse_comments_raw' );
+		delete_post_meta( $post_id, 'discourse_comments_count' );
+		delete_post_meta( $post_id, 'discourse_last_sync' );
+		delete_post_meta( $post_id, 'publish_to_discourse' );
+		delete_post_meta( $post_id, 'publish_post_category' );
+		delete_post_meta( $post_id, 'update_discourse_topic' );
+		delete_post_meta( $post_id, 'wpdc_sync_post_comments' );
+		delete_post_meta( $post_id, 'wpdc_publishing_response' );
+		delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+	}
+
+	public function update_topic( $data ) {
+		write_log( 'post_id', $data['id']);
+		update_post_meta( $data['id'], 'update_discourse_topic', 1 );
+		// Todo: this seems wrong. Should just call the wp-discourse publish method.
+		$update = wp_update_post( array( 'ID' => $data['id'] ) );
+		delete_post_meta( $data['id'], 'update_discourse_topic' );
+
+		return $update;
+	}
+
+	// Todo: can this function be protected?
+	public function update_discourse_metadata( $data ) {
+		$post_id = $data['id'];
+		if ( $data['linked_topic_url'] && empty( $data['unlink_from_discourse'] ) ) {
+			//$discourse_url = $data['linked_topic_url'];
+			//$response      = $this->link_to_discourse_topic( $data['id'], $discourse_url );
+		} elseif ( empty ( $data['unlink_from_discourse'] ) ) {
+			write_log( 'if this is called, the post should be published' );
+			update_post_meta( $data['id'], 'publish_to_discourse', $data['publish_to_discourse'] );
+			update_post_meta( $data['id'], 'publish_post_category', $data['publish_post_category'] );
+		}
+
+	}
+
+	public function get_discourse_categories() {
+
+		return get_option( 'wpdc_discourse_categories' );
+	}
+
+	/**
+	 * Links a WordPress post to a Discourse topic.
+	 *
+	 * @param int $post_id The WordPress post_id to link to.
+	 * @param string $topic_url The Discourse topic URL.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public function link_topic( $data ) {
+		write_log('linking topic', $data['id'], $data['topic_url']);
+		$post_id = $data['id'];
+		$topic_url = $data['topic_url'];
+		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
+		delete_post_meta( $post_id, 'publish_to_discourse' );
+		$topic_url = explode( '?', $topic_url )[0];
+
+		$topic_domain = wp_parse_url( $topic_url, PHP_URL_HOST );
+		if ( get_option( 'wpdc_discourse_domain' ) !== $topic_domain ) {
+			update_post_meta( $post_id, 'wpdc_linking_response', 'invalid_url' );
+
+			return new \WP_Error( 'wpdc_configuration_error', 'An invalid topic URL was supplied when attempting to link post to Discourse topic.' );
+		}
+		$topic = $this->get_discourse_topic( $topic_url );
+
+		// Check for the topic->post_stream here just to make sure it's a valid topic.
+		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) ) {
+			update_post_meta( $post_id, 'wpdc_linking_response', 'error' );
+
+			return new \WP_Error( 'wpdc_response_error', 'Unable to link to Discourse topic.' );
+		}
+
+		update_post_meta( $post_id, 'wpdc_linking_response', 'success' );
+
+		$discourse_post_id        = $topic->post_stream->stream[0];
+		$topic_id                 = $topic->id;
+		$category_id              = $topic->category_id;
+		$discourse_comments_count = $topic->posts_count - 1;
+		$topic_slug               = $topic->slug;
+		$discourse_permalink      = esc_url_raw( "{$this->options['url']}/t/{$topic_slug}/{$topic_id}" );
+
+		update_post_meta( $post_id, 'discourse_post_id', $discourse_post_id );
+		update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
+		update_post_meta( $post_id, 'publish_post_category', $category_id );
+		update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
+		update_post_meta( $post_id, 'discourse_comments_count', $discourse_comments_count );
+		delete_post_meta( $post_id, 'wpdc_publishing_error' );
+		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
+			update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
+		}
+
+//		return array(
+//			'discourse_permalink' => $discourse_permalink,
+//			'discourse_post_id'   => $discourse_post_id,
+//			'discourse_topic_id'  => $topic_id
+//
+//		);
+	}
+
+	// Todo: end of functions added for Gutenberg
 
 	/**
 	 * Initializes the plugin configuration, loads the text domain etc.
@@ -227,6 +383,39 @@ class Discourse {
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
 		update_option( 'discourse_version', WPDISCOURSE_VERSION );
+
+		//Todo: metadata registered for the Gutenberg sidebar. Possibly this should be moved.
+		register_meta( 'post', 'publish_to_discourse', array(
+			'type'         => 'integer',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		register_meta( 'post', 'publish_post_category', array(
+			'type'         => 'integer',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		register_meta( 'post', 'discourse_post_id', array(
+			'type'         => 'integer',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		register_meta( 'post', 'discourse_topic_id', array(
+			'type'         => 'integer',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		register_meta( 'post', 'discourse_permalink', array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		register_meta( 'post', 'wpdc_publishing_response', array(
+			'type'         => 'string',
+			'single'       => true,
+			'show_in_rest' => true,
+		) );
+		// Todo: end of register_meta.
 	}
 
 	/**

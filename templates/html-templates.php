@@ -59,7 +59,9 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area discourse-comments-area">
-			<h2 class="comments-title discourse-comments-title"><?php echo esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
+            <div class="comments-title-wrap">
+                <h2 class="comments-title discourse-comments-title"><?php echo esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
+            </div>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">

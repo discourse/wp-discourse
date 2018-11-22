@@ -62,7 +62,7 @@ class MetaBox {
 				'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
 					$this,
 					'render_meta_box',
-				), null, 'side', 'high', null
+				), null, 'side', 'high', array( '__block_editor_compatible_meta_box' => false )
 			);
 		}
 	}

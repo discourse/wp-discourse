@@ -22,6 +22,7 @@ if ( is_admin() ) {
 	require_once __DIR__ . '/webhook-settings.php';
 	require_once __DIR__ . '/admin-notice.php';
 	require_once __DIR__ . '/meta-box.php';
+	require_once __DIR__ . '/discourse-sidebar/discourse-sidebar.php';
 
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();
