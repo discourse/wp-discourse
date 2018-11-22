@@ -224,13 +224,13 @@ class UnlinkFromDiscourse extends Component {
     }
 
     togglePanel() {
-        this.setState({showPanel: !this.state.showPanel})
+        this.setState({showPanel: !this.state.showPanel});
     }
 
     render() {
         if (this.props.published) {
              return (
-                <div>
+                <div className={"wpdc-component-panel-body"}>
                     <h2 className={"wpdc-panel-section-title"}>
                         <button type="button" aria-expanded="false"
                                 className={"components-button components-panel__body-toggle"}
@@ -246,7 +246,7 @@ class UnlinkFromDiscourse extends Component {
                             {__('Unlinking the post from Discourse will remove all Discourse metadata from the post.', 'wp-discourse')}
                         </p>
                         <button className={this.props.busy ? activeButtonClass : buttonClass}
-                                onClick={this.handleClick}>{__('Unlink From Discourse', 'wp-discourse')}
+                                onClick={this.handleClick}>{__('Unlink Post', 'wp-discourse')}
                         </button>
                     </div>
                 </div>
@@ -260,36 +260,43 @@ class UnlinkFromDiscourse extends Component {
 class UpdateDiscourseTopic extends Component {
     constructor(props) {
         super(props);
-        //this.state = {isBusy: false};
+        this.state = {showPanel: false};
         this.handleClick = this.handleClick.bind(this);
+        this.togglePanel = this.togglePanel.bind(this);
+    }
+
+    togglePanel() {
+        this.setState({showPanel: !this.state.showPanel});
     }
 
     handleClick(e) {
         this.props.handleUpdateChange(e);
-        // this.setState({isBusy: true});
-        // wp.apiRequest({
-        //     path: '/wp-discourse/v1/update-topic',
-        //     method: 'POST',
-        //     data: {id: this.props.postId}
-        // }).then(
-        //     (data) => {
-        //         this.setState({isBusy: false});
-        //         return null;
-        //     },
-        //     (err) => {
-        //         return null;
-        //     }
-        // );
-
     }
 
     render() {
         if (this.props.published) {
             return (
-                <button className={this.props.busy ? activeButtonClass : buttonClass}
-                        onClick={this.handleClick}>Update
-                    Discourse
-                    Topic</button>
+            <div className={"wpdc-component-panel-body"}>
+                <h2 className={"wpdc-panel-section-title"}>
+                    <button type="button" aria-expanded="false"
+                            className={"components-button components-panel__body-toggle"}
+                            onClick={this.togglePanel}>
+                            <span aria-hidden="true">
+                                {this.state.showPanel ? upArrow : downArrow}
+                            </span>
+                        {__('Update Discourse Topic', 'wp-discourse')}
+                    </button>
+                </h2>
+                <div className={!this.state.showPanel ? 'hidden' : ''}>
+                    <p className={'wpdc-info'}>
+                        {__('Update the Discourse topic to the lastest saved version of the post.', 'wp-discourse')}
+                    </p>
+                    <button className={this.props.busy ? activeButtonClass : buttonClass}
+                            onClick={this.handleClick}>
+                        {__('Update Topic', 'wp-discourse')}
+                        </button>
+                </div>
+            </div>
             );
         } else {
             return '';

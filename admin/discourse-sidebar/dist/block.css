@@ -14,6 +14,9 @@ button.components-button.is-button.is-default.is-primary.is-large.active {
   animation-play-state: running;
   opacity: 1; }
 
+.wpdc-button {
+  margin-bottom: 16px; }
+
 .wpdc-publishing-options {
   margin-bottom: 16px; }
 
@@ -23,9 +26,6 @@ button.components-button.is-button.is-default.is-primary.is-large.active {
 .wpdc-sidebar-title {
   margin-top: 0;
   margin-bottom: 8px; }
-
-.wpdc-publishing-response {
-  border-bottom: 1px solid #e2e4e7; }
 
 .wpdc-publishing-method {
   display: block;
@@ -41,4 +41,10 @@ h2.wpdc-panel-section-title {
   font-size: inherit;
   margin-top: 0;
   margin-bottom: 0;
-  transition: .1s background ease-in-out; }
+  margin-left: -15px;
+  margin-right: -15px;
+  transition: .1s background ease-in-out;
+  border-top: 1px solid #e2e4e7; }
+
+h2.wpdc-panel-section-title:hover {
+  background: #f8f9f9; }
