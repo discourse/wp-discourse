@@ -45,7 +45,6 @@ class PublishingOptions extends Component {
     }
 
     handleChange(e) {
-        console.log('radio val', e.target.value);
         this.props.handlePublishMethodChange(e.target.value)
     }
 
@@ -79,15 +78,22 @@ class PublishToDiscourseCheckBox extends Component {
     constructor(props) {
         super(props);
 
+        this.state = {info: this.publishingMessage(this.props.publish_to_discourse) };
         this.handleChange = this.handleChange.bind(this);
     }
 
+    publishingMessage(publishToDiscourse) {
+        return publishToDiscourse ? __( 'Your post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse' ) : '';
+    }
+
     handleChange(e) {
+        this.setState({info: this.publishingMessage(e.target.checked)});
         this.props.handlePublishChange(e.target.checked);
     }
 
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
+
         if (!this.props.published && this.props.publishingMethod === 'publish_post') {
             return (
                 <div className={'wpdc-publish-topic'}>
@@ -95,6 +101,7 @@ class PublishToDiscourseCheckBox extends Component {
                     <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                            checked={publishToDiscourse} onChange={this.handleChange}/>
                     {__('Publish Post to Discourse', 'wp-discourse')}
+                    <span className={'wpdc-publishing-method'}>{this.state.info}</span>
                 </div>
             );
         } else {
@@ -188,7 +195,6 @@ class UnlinkFromDiscourse extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
-    // Todo: check the returned data.
     handleClick(e) {
         this.setState({isBusy: true});
         wp.apiRequest({
@@ -225,7 +231,6 @@ class UpdateDiscourseTopic extends Component {
         this.handleClick = this.handleClick.bind(this);
     }
 
-    // Todo: check the returned data.
     handleClick(e) {
         this.setState({isBusy: true});
         wp.apiRequest({
@@ -317,8 +322,6 @@ class DiscourseSidebar extends Component {
     constructor(props) {
         super(props);
 
-        // Todo: set the category_id from pluginOptions object.
-        // Todo: check the 'auto publish' option to get the initial state for publish_to_discourse.
         this.state = {
             published: false,
             publishingMethod: 'publish_post',
@@ -332,92 +335,71 @@ class DiscourseSidebar extends Component {
             unlink_from_discourse: 0,
         };
 
-        wp.apiFetch({path: `/wp/v2/posts/${this.props.postId}`, method: 'GET'}).then(
+        this.updateStateFromDatabase(this.props.postId);
+
+        this.handlePublishChange = this.handlePublishChange.bind(this);
+        this.handleCategoryChange = this.handleCategoryChange.bind(this);
+        this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
+        this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
+    }
+
+    updateStateFromDatabase(postId) {
+        wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
             (data) => {
                 const meta = data.meta;
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     publish_to_discourse: meta.publish_to_discourse,
-                    publish_post_category: meta.publish_post_category,
+                    publish_post_category: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                     discourse_post_id: meta.discourse_post_id,
                     discourse_topic_id: meta.discourse_topic_id,
                     discourse_permalink: meta.discourse_permalink,
                     wpdc_publishing_response: meta.wpdc_publishing_response,
-                    //updatingDiscourseTopic: false
+                    unlink_from_discourse: 0
                 });
-                return data;
+                return null;
             },
             (err) => {
                 return err;
             }
         );
-
-        this.handlePublishChange = this.handlePublishChange.bind(this);
-        this.handleCategoryChange = this.handleCategoryChange.bind(this);
-        //this.handleLinkedTopicUrlChange = this.handleLinkedTopicUrlChange.bind(this);
-        this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
-        // this.handleUpdateDiscourseTopic = this.handleUpdateDiscourseTopic.bind(this);
-        this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
     }
 
-    handlePublishMethodChange(publishMethod) {
-        this.setState({publishingMethod: publishMethod});
+    handlePublishMethodChange(publishingMethod) {
+        this.setState({publishingMethod: publishingMethod});
     }
 
     handlePublishChange(publishToDiscourse) {
-        this.setState({publish_to_discourse: publishToDiscourse ? 1 : 0});
+        this.setState({publish_to_discourse: publishToDiscourse ? 1 : 0}, () => {
+            wp.apiRequest({
+                path: '/wp-discourse/v1/set-publishing-options',
+                method: 'POST',
+                data: {id: this.props.postId, publish_to_discourse: this.state.publish_to_discourse, publish_post_category: this.state.publish_post_category}
+            }).then(
+                (data) => {
+                    return null;
+                },
+                (err) => {
+                    return null;
+                }
+            );
+        });
     }
 
     handleCategoryChange(category_id) {
-        this.setState({publish_post_category: category_id});
+        this.setState({publish_post_category: category_id}, () => {
+            this.handlePublishChange(this.state.publish_to_discourse);
+        });
     }
 
     handleUnlinkFromDiscourseChange(unlink_state) {
         this.setState({unlink_from_discourse: unlink_state ? 1 : 0});
     }
 
-    static getDerivedStateFromProps(nextProps, state) {
-        if ((nextProps.isPublishing || nextProps.isSaving) && !nextProps.isAutoSaving) {
-            wp.apiRequest({
-                path: `/wp-discourse/v1/update-meta?id=${nextProps.postId}`,
-                method: 'POST',
-                data: state
-            }).then(
-                // Return null so that the state isn't updated. It seems that this is returning too late to update the state.
-                (data) => {
-                    return null;
-                },
-                (err) => {
-                    return null;
-                }
-            );
-        }
-    }
-
     componentDidUpdate(prevProps) {
         // Todo: this isn't the best condition to use here.
         if (this.props.post.meta !== prevProps.post.meta) {
-            const meta = this.props.post.meta;
-            wp.apiFetch({path: `/wp/v2/posts/${this.props.postId}`, method: 'GET'}).then(
-                (data) => {
-                    const meta = data.meta;
-                    // Todo: can I reset unlink_from_discourse here, or will it work to just not display the field?
-                    this.setState({
-                        published: meta.discourse_post_id > 0,
-                        publish_to_discourse: meta.publish_to_discourse,
-                        publish_post_category: meta.publish_post_category,
-                        discourse_post_id: meta.discourse_post_id,
-                        discourse_topic_id: meta.discourse_topic_id,
-                        discourse_permalink: meta.discourse_permalink,
-                        wpdc_publishing_response: meta.wpdc_publishing_response,
-                        unlink_from_discourse: 0
-                    });
-                    return data;
-                },
-                (err) => {
-                    return err;
-                }
-            );
+            this.updateStateFromDatabase(this.props.postId);
         }
     }
 
@@ -471,16 +453,10 @@ const HOC = withSelect((select, {forceIsSaving}) => {
     const {
         getCurrentPostId,
         getCurrentPost,
-        isSavingPost,
-        isPublishingPost,
-        isAutosavingPost,
     } = select('core/editor');
     return {
         postId: getCurrentPostId(),
         post: getCurrentPost(),
-        isSaving: forceIsSaving || isSavingPost(),
-        isAutoSaving: isAutosavingPost(),
-        isPublishing: isPublishingPost(),
     };
 })(DiscourseSidebar);
 
