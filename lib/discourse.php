@@ -249,6 +249,7 @@ class Discourse {
 	}
 
 	public function set_publishing_options( $data ) {
+		write_log('setting publishing options. postId:', $data['id'], 'category', $data['publish_post_category'], 'publish to discourse', $data['publish_to_discourse']);
 		$post_id = $data['id'];
 		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
 		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
