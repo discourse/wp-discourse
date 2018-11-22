@@ -33,3 +33,15 @@ button.wpdc-button {
 .wpdc-publishing-method {
   display: block;
   font-style: italic; }
+
+.wpdc-info {
+  font-style: italic; }
+
+h2.wpdc-panel-section-title {
+  color: #555d66;
+  display: block;
+  padding: 0;
+  font-size: inherit;
+  margin-top: 0;
+  margin-bottom: 0;
+  transition: .1s background ease-in-out; }

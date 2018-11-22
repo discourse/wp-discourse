@@ -78,12 +78,12 @@ class PublishToDiscourseCheckBox extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {info: this.publishingMessage(this.props.publish_to_discourse) };
+        this.state = {info: this.publishingMessage(this.props.publish_to_discourse)};
         this.handleChange = this.handleChange.bind(this);
     }
 
     publishingMessage(publishToDiscourse) {
-        return publishToDiscourse ? __( 'Your post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse' ) : '';
+        return publishToDiscourse ? __('Your post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse') : '';
     }
 
     handleChange(e) {
@@ -191,8 +191,12 @@ class PublishingResponse extends Component {
 class UnlinkFromDiscourse extends Component {
     constructor(props) {
         super(props);
-        this.state = {isBusy: false};
+        this.state = {
+            isBusy: false,
+            showPanel: false
+        };
         this.handleClick = this.handleClick.bind(this);
+        this.togglePanel = this.togglePanel.bind(this);
     }
 
     handleClick(e) {
@@ -212,11 +216,55 @@ class UnlinkFromDiscourse extends Component {
         );
     }
 
+    togglePanel() {
+        this.setState({showPanel: !this.state.showPanel})
+    }
+
     render() {
         if (this.props.published) {
+            const downArrow = (<svg
+                className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
+                <g>
+                    <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
+                </g>
+                <g>
+                    <path d={"M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z"}/>
+                </g>
+            </svg>);
+
+            const upArrow = (<svg
+                className={"components-panel__arrow"} width="24px" height="24px" viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" focusable="false">
+                <g>
+                    <path fill={"none"} d={"M0,0h24v24H0V0z"}/>
+                </g>
+                <g>
+                    <path d={"M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z"}/>
+                </g>
+            </svg>);
             return (
-                <button className={this.state.isBusy ? activeButtonClass : buttonClass} onClick={this.handleClick}>Unlink From
-                    Discourse</button>
+                <div>
+                    <h2 className={"wpdc-panel-section-title"}>
+                        <button type="button" aria-expanded="false"
+                                className={"components-button components-panel__body-toggle"}
+                                onClick={this.togglePanel}>
+                            <span aria-hidden="true">
+                                {this.state.showPanel ? upArrow : downArrow}
+                            </span>
+                            {__('Unlink From Discourse', 'wp-discourse')}
+                        </button>
+                    </h2>
+                    <div className={!this.state.showPanel ? 'hidden' : ''}>
+                        <p className={'wpdc-info'}>
+                            {__('Unlinking the post from Discourse will remove all Discourse metadata from the post.', 'wp-discourse')}
+                        </p>
+                        <button className={this.state.isBusy ? activeButtonClass : buttonClass}
+                                onClick={this.handleClick}>Unlink From
+                            Discourse
+                        </button>
+                    </div>
+                </div>
             );
         } else {
             return '';
@@ -252,7 +300,8 @@ class UpdateDiscourseTopic extends Component {
     render() {
         if (this.props.published) {
             return (
-                <button className={this.state.isBusy ? activeButtonClass : buttonClass} onClick={this.handleClick}>Update
+                <button className={this.state.isBusy ? activeButtonClass : buttonClass}
+                        onClick={this.handleClick}>Update
                     Discourse
                     Topic</button>
             );
@@ -305,7 +354,8 @@ class LinkToDiscourseTopic extends Component {
                         <input type="url" className={'widefat'}
                                onChange={this.handleChange}/>
 
-                        <button className={this.state.isBusy ? activeButtonClass : buttonClass} onClick={this.handleClick}>
+                        <button className={this.state.isBusy ? activeButtonClass : buttonClass}
+                                onClick={this.handleClick}>
                             {__('Link With Discourse', 'wp-discourse')}
                         </button>
                     </label>
@@ -374,7 +424,11 @@ class DiscourseSidebar extends Component {
             wp.apiRequest({
                 path: '/wp-discourse/v1/set-publishing-options',
                 method: 'POST',
-                data: {id: this.props.postId, publish_to_discourse: this.state.publish_to_discourse, publish_post_category: this.state.publish_post_category}
+                data: {
+                    id: this.props.postId,
+                    publish_to_discourse: this.state.publish_to_discourse,
+                    publish_post_category: this.state.publish_post_category
+                }
             }).then(
                 (data) => {
                     return null;
