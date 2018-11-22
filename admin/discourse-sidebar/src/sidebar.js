@@ -192,7 +192,7 @@ class UnlinkFromDiscourse extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isBusy: false,
+//            isBusy: false,
             showPanel: false
         };
         this.handleClick = this.handleClick.bind(this);
@@ -200,20 +200,21 @@ class UnlinkFromDiscourse extends Component {
     }
 
     handleClick(e) {
-        this.setState({isBusy: true});
-        wp.apiRequest({
-            path: '/wp-discourse/v1/unlink-topic',
-            method: 'POST',
-            data: {id: this.props.postId}
-        }).then(
-            (data) => {
-                this.setState({isBusy: false});
-                return null;
-            },
-            (err) => {
-                return null;
-            }
-        );
+        this.props.handleUnlinkFromDiscourseChange(e);
+        // this.setState({isBusy: true});
+        // wp.apiRequest({
+        //     path: '/wp-discourse/v1/unlink-topic',
+        //     method: 'POST',
+        //     data: {id: this.props.postId}
+        // }).then(
+        //     (data) => {
+        //         this.setState({isBusy: false});
+        //         return null;
+        //     },
+        //     (err) => {
+        //         return null;
+        //     }
+        // );
     }
 
     togglePanel() {
@@ -259,9 +260,8 @@ class UnlinkFromDiscourse extends Component {
                         <p className={'wpdc-info'}>
                             {__('Unlinking the post from Discourse will remove all Discourse metadata from the post.', 'wp-discourse')}
                         </p>
-                        <button className={this.state.isBusy ? activeButtonClass : buttonClass}
-                                onClick={this.handleClick}>Unlink From
-                            Discourse
+                        <button className={this.props.busy ? activeButtonClass : buttonClass}
+                                onClick={this.handleClick}>{__('Unlink From Discourse', 'wp-discourse')}
                         </button>
                     </div>
                 </div>
@@ -382,7 +382,8 @@ class DiscourseSidebar extends Component {
             discourse_permalink: null,
             wpdc_publishing_response: null,
             linked_topic_url: null,
-            unlink_from_discourse: 0,
+            //unlink_from_discourse: 0,
+            busyUnlinking: false
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -447,7 +448,23 @@ class DiscourseSidebar extends Component {
     }
 
     handleUnlinkFromDiscourseChange(unlink_state) {
-        this.setState({unlink_from_discourse: unlink_state ? 1 : 0});
+        this.setState({busyUnlinking: true});
+        wp.apiRequest({
+            path: '/wp-discourse/v1/unlink-topic',
+            method: 'POST',
+            data: {id: this.props.postId}
+        }).then(
+            (data) => {
+                this.setState({
+                    busyUnlinking: false,
+                    published: false,
+                });
+                return null;
+            },
+            (err) => {
+                return null;
+            }
+        );
     }
 
     componentDidUpdate(prevProps) {
@@ -482,10 +499,12 @@ class DiscourseSidebar extends Component {
                                 publishingMethod={this.state.publishingMethod}
                                 published={this.state.published}
                                 category_id={this.state.publish_post_category || pluginOptions.defaultCategory}
-                                handleCategoryChange={this.handleCategoryChange}/>
+                                handleCategoryChange={this.handleCategoryChange}
+                            />
                             <div class="wpdc-link-to-topic">
                                 <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
-                                                      published={this.state.published} postId={this.props.postId}/>
+                                                      published={this.state.published} postId={this.props.postId}
+                                />
                             </div>
                         </div>
                         <PublishingResponse
@@ -494,7 +513,12 @@ class DiscourseSidebar extends Component {
                             wpdc_publishing_response={this.state.wpdc_publishing_response}
                             discourse_permalink={this.state.discourse_permalink}
                         />
-                        <UnlinkFromDiscourse published={this.state.published} postId={this.props.postId}/>
+                        <UnlinkFromDiscourse
+                            published={this.state.published}
+                            postId={this.props.postId}
+                            handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
+                            busy={this.state.busyUnlinking}
+                        />
                         <UpdateDiscourseTopic published={this.state.published} postId={this.props.postId}/>
                     </PanelBody>
                 </PluginSidebar>
