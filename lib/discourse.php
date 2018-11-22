@@ -238,6 +238,20 @@ class Discourse {
 			)
 		);
 
+		register_rest_route(
+			'wp-discourse/v1', 'set-publishing-options', array(
+				array(
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'set_publishing_options' ),
+				)
+			)
+		);
+	}
+
+	public function set_publishing_options( $data ) {
+		$post_id = $data['id'];
+		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
+		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
 	}
 
 	public function unlink_topic( $data ) {
