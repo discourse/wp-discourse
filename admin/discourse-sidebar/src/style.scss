@@ -1,0 +1,37 @@
+button.components-button.is-button.is-default.is-primary.is-large.active {
+	color: #fff;
+	background-size: 100px 100%;
+	background-image: linear-gradient(-45deg,#0085ba 28%,#005d82 28%,#005d82 72%,#0085ba 72%);
+	border-color: #00435d;
+	animation: components-button__busy-animation 2.5s infinite linear;
+	animation-name: components-button__busy-animation;
+	animation-duration: 2.5s;
+	animation-timing-function: linear;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-fill-mode: none;
+	animation-play-state: running;
+	opacity: 1;
+}
+
+button.wpdc-button {
+	margin-top: 16px;
+}
+
+.wpdc-publishing-options {
+	margin-bottom: 16px;
+}
+
+.wpdc-category-select {
+	margin-top: 8px;
+}
+
+.wpdc-sidebar-title {
+	margin-top: 0;
+	margin-bottom: 8px;
+}
+
+.wpdc-publishing-response {
+	border-bottom: 1px solid #e2e4e7;
+}
