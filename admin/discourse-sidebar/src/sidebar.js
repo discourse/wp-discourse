@@ -59,6 +59,57 @@ const upArrow = (<svg
     </g>
 </svg>);
 
+class PublishingResponse extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const response = this.props.wpdcPublishingResponse,
+            error = this.props.wpdcPublishingError;
+        let message;
+
+        if (this.props.published && this.props.discoursePermalink) {
+            const permalink = encodeURI(this.props.discoursePermalink);
+            const link = <a href={permalink} className={'wpdc-discourse-permalink'} target={'_blank'}>{permalink}</a>;
+            message = <span
+                className={'wpdc-publishing-success'}>{__('Your post has been published to', 'wp-discourse')} {link}</span>;
+        } else if (error && !this.props.published) {
+            switch (error) {
+                case 'deleted_topic':
+                    message =
+                        <span className={'wpdc-publishing-error'}>
+                            {__('Your post could not be published to Discourse. A previous version' +
+                                'of the post may have been deleted from Discourse. If so, unlink the post so that it can be published again as a new topic.', 'wp-discourse')}
+                        </span>;
+                    break;
+                case 'queued_topic':
+                    message =
+                        <span className={'wpdc-publishing-error'}>
+                                {__("Your post has been added to the Discourse approval queue. When it has been approved, you will need to link it to Discourse by" +
+                                    "selecting the 'Link to Existing Topic' option.", 'wp-discourse')}
+                        </span>;
+                    break;
+                default:
+                    message =
+                        <span className={'wpdc-publishing-error'}>
+                            {__('There has been an error publishing your post to Discourse: ', 'wp-discourse') + error}
+                        </span>;
+            }
+        }
+
+        if (message) {
+            return (
+                <div className={'wpdc-publishing-response'}>
+                    {message}
+                </div>
+            );
+        } else {
+            return '';
+        }
+    }
+}
+
 class PublishingOptions extends Component {
     constructor(props) {
         super(props);
@@ -227,37 +278,7 @@ class LinkToDiscourseTopic extends Component {
     }
 }
 
-class PublishingResponse extends Component {
-    constructor(props) {
-        super(props);
-    }
 
-    render() {
-        const response = this.props.wpdcPublishingResponse,
-            error=this.props.wpdcPublishingError;
-        let permalink = this.props.discoursePermalink,
-            message;
-
-        if (this.props.published) {
-            if (permalink) {
-                permalink = encodeURI(permalink);
-                const link = <a href={permalink} className={'wpdc-discourse-permalink'} target={'_blank'}>{permalink}</a>;
-
-                message = <p>Your post has been published to {link}.</p>
-            } else {
-                message = <p>There was an error publishing your post to Discourse.</p>
-            }
-
-            return (
-                <div className={'wpdc-publishing-response'}>
-                    {message}
-                </div>
-            );
-        } else {
-            return '';
-        }
-    }
-}
 
 class UnlinkFromDiscourse extends Component {
     constructor(props) {
@@ -394,7 +415,6 @@ class DiscourseSidebar extends Component {
         wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
             (data) => {
                 const meta = data.meta;
-                // Todo: remove unused states; normalize state names
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     publishToDiscourse: meta.publish_to_discourse,
@@ -407,7 +427,7 @@ class DiscourseSidebar extends Component {
                 return null;
             },
             (err) => {
-                return err;
+                return null;
             }
         );
     }
@@ -540,6 +560,13 @@ class DiscourseSidebar extends Component {
                 >
                     <PanelBody>
                         <div className={'wpdc-sidebar'}>
+                            <PublishingResponse
+                                published={this.state.published}
+                                discoursePostId={this.state.discoursePostId}
+                                wpdcPublishingResponse={this.state.wpdcPublishingResponse}
+                                wpdcPublishingError={this.state.wpdcPublishingError}
+                                discoursePermalink={this.state.discoursePermalink}
+                            />
                             <PublishingOptions published={this.state.published}
                                                handlePublishMethodChange={this.handlePublishMethodChange}
                                                publishingMethod={this.state.publishingMethod}/>
@@ -560,13 +587,7 @@ class DiscourseSidebar extends Component {
                                                   handleLinkTopicClick={this.handleLinkTopicClick}
                             />
                             <div className={'wpdc-published-post'}>
-                                <PublishingResponse
-                                    published={this.state.published}
-                                    discoursePostId={this.state.discoursePostId}
-                                    wpdcPublishingResponse={this.state.wpdcPublishingResponse}
-                                    wpdcPublishingError={this.state.wpdcPublishingError}
-                                    discoursePermalink={this.state.discoursePermalink}
-                                />
+
                                 <UnlinkFromDiscourse
                                     published={this.state.published}
                                     // postId={this.props.postId}

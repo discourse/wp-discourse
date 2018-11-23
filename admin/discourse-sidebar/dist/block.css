@@ -33,6 +33,13 @@ input.wpdc-topic-url-input {
   margin-top: 0;
   margin-bottom: 8px; }
 
+.wpdc-publishing-response {
+  margin-bottom: 16px;
+  padding: 4px;
+  color: #555d66;
+  border: 1px solid #e2e4e7;
+  background: #f8f9f9; }
+
 .wpdc-publishing-method {
   display: block;
   font-style: italic; }
