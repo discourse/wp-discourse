@@ -42,12 +42,10 @@ class DiscourseSidebar {
 	public function setup_options() {
 		$this->options = $this->get_options();
 		$allowed_post_types = $this->options['allowed_post_types'];
-		// Todo: remove 'discourse_topic_id'.
 		$meta_keys = array(
 			'publish_to_discourse',
 			'publish_post_category',
 			'discourse_post_id',
-			'discourse_topic_id',
 			'discourse_permalink',
 			'wpdc_publishing_response',
 			'wpdc_publishing_error',
