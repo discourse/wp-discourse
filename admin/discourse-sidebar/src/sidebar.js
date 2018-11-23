@@ -551,34 +551,34 @@ class DiscourseSidebar extends Component {
                                 category_id={this.state.publishPostCategory}
                                 handleCategoryChange={this.handleCategoryChange}
                             />
-                            <div class="wpdc-link-to-topic">
-                                <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
-                                                      published={this.state.published}
-                                                      postId={this.props.postId}
-                                                      busy={this.state.busyLinking}
-                                                      handleLinkTopicClick={this.handleLinkTopicClick}
+                            <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
+                                                  published={this.state.published}
+                                                  postId={this.props.postId}
+                                                  busy={this.state.busyLinking}
+                                                  handleLinkTopicClick={this.handleLinkTopicClick}
+                            />
+                            <div className={'wpdc-published-post'}>
+                                <PublishingResponse
+                                    published={this.state.published}
+                                    discoursePostId={this.state.discoursePostId}
+                                    wpdcPublishingResponse={this.state.wpdcPublishingResponse}
+                                    discoursePermalink={this.state.discoursePermalink}
+                                />
+                                <UnlinkFromDiscourse
+                                    published={this.state.published}
+                                    // postId={this.props.postId}
+                                    handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
+                                    busy={this.state.busyUnlinking}
+                                />
+                                <UpdateDiscourseTopic
+                                    published={this.state.published}
+                                    // postId={this.props.postId}
+                                    busy={this.state.busyUpdating}
+                                    handleUpdateChange={this.handleUpdateChange}
+                                    updateSuccessMessage={this.state.updateSuccessMessage}
                                 />
                             </div>
                         </div>
-                        <PublishingResponse
-                            published={this.state.published}
-                            discoursePostId={this.state.discoursePostId}
-                            wpdcPublishingResponse={this.state.wpdcPublishingResponse}
-                            discoursePermalink={this.state.discoursePermalink}
-                        />
-                        <UnlinkFromDiscourse
-                            published={this.state.published}
-                            // postId={this.props.postId}
-                            handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
-                            busy={this.state.busyUnlinking}
-                        />
-                        <UpdateDiscourseTopic
-                            published={this.state.published}
-                            // postId={this.props.postId}
-                            busy={this.state.busyUpdating}
-                            handleUpdateChange={this.handleUpdateChange}
-                            updateSuccessMessage={this.state.updateSuccessMessage}
-                        />
                     </PanelBody>
                 </PluginSidebar>
             </Fragment>
