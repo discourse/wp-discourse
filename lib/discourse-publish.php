@@ -46,6 +46,19 @@ class DiscoursePublish {
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 	}
 
+	protected function register_api_meta($meta_keys, $post_types) {
+		foreach( $meta_keys as $meta_key ) {
+			foreach ( $post_types as $post_type ) {
+				// Todo: I'm not sure if 'type' needs to be set here. As it is, they will default to string?
+				register_meta( $post_type, $meta_key, array(
+					'single' => true,
+					'show_in_rest' => true,
+				));
+			}
+		}
+
+	}
+
 	public function register_sidebar_routes() {
 		write_log('is it too late to register routes');
 		register_rest_route(
@@ -215,6 +228,17 @@ class DiscoursePublish {
 	 */
 	public function setup_options() {
 		$this->options = $this->get_options();
+		$meta_keys = array(
+			'publish_to_discourse',
+			'publish_post_category',
+			'discourse_post_id',
+			'discourse_topic_id',
+			'discourse_permalink',
+			'wpdc_publishing_response',
+		);
+		$allowed_post_types = $this->options['allowed_post_types'];
+		$this->register_api_meta( $meta_keys, $allowed_post_types );
+
 	}
 
 	/**
