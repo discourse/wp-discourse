@@ -233,14 +233,17 @@ class PublishingResponse extends Component {
     }
 
     render() {
-        const response = this.props.wpdcPublishingResponse;
-        const permalink = this.props.discoursePermalink;
-        let message;
+        const response = this.props.wpdcPublishingResponse,
+            error=this.props.wpdcPublishingError;
+        let permalink = this.props.discoursePermalink,
+            message;
 
         if (this.props.published) {
             if (permalink) {
-                // Todo: turn this into a link.
-                message = <p>Your post has been published to {permalink}.</p>
+                permalink = encodeURI(permalink);
+                const link = <a href={permalink} className={'wpdc-discourse-permalink'} target={'_blank'}>{permalink}</a>;
+
+                message = <p>Your post has been published to {link}.</p>
             } else {
                 message = <p>There was an error publishing your post to Discourse.</p>
             }
@@ -524,7 +527,6 @@ class DiscourseSidebar extends Component {
     }
 
     render() {
-        // Todo: it looks like there's a weird div in here
         return (
             <Fragment>
                 <PluginSidebarMoreMenuItem
@@ -562,6 +564,7 @@ class DiscourseSidebar extends Component {
                                     published={this.state.published}
                                     discoursePostId={this.state.discoursePostId}
                                     wpdcPublishingResponse={this.state.wpdcPublishingResponse}
+                                    wpdcPublishingError={this.state.wpdcPublishingError}
                                     discoursePermalink={this.state.discoursePermalink}
                                 />
                                 <UnlinkFromDiscourse
