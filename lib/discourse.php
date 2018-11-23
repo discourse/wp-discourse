@@ -350,12 +350,9 @@ class Discourse {
 			update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
 		}
 
-//		return array(
-//			'discourse_permalink' => $discourse_permalink,
-//			'discourse_post_id'   => $discourse_post_id,
-//			'discourse_topic_id'  => $topic_id
-//
-//		);
+		return array(
+			'discourse_permalink' => $discourse_permalink,
+		);
 	}
 
 	// Todo: end of functions added for Gutenberg
