@@ -278,7 +278,7 @@ class UnlinkFromDiscourse extends Component {
 
     render() {
         if (this.props.published) {
-             return (
+            return (
                 <div className={"wpdc-component-panel-body"}>
                     <h2 className={"wpdc-panel-section-title"}>
                         <button type="button" aria-expanded="false"
@@ -327,37 +327,36 @@ class UpdateDiscourseTopic extends Component {
     render() {
         if (this.props.published) {
             return (
-            <div className={"wpdc-component-panel-body"}>
-                <h2 className={"wpdc-panel-section-title"}>
-                    <button type="button" aria-expanded="false"
-                            className={"components-button components-panel__body-toggle"}
-                            onClick={this.togglePanel}>
+                <div className={"wpdc-component-panel-body"}>
+                    <h2 className={"wpdc-panel-section-title"}>
+                        <button type="button" aria-expanded="false"
+                                className={"components-button components-panel__body-toggle"}
+                                onClick={this.togglePanel}>
                             <span aria-hidden="true">
                                 {this.state.showPanel ? upArrow : downArrow}
                             </span>
-                        {__('Update Discourse Topic', 'wp-discourse')}
-                    </button>
-                </h2>
-                <div className={!this.state.showPanel ? 'hidden' : ''}>
-                    <p className={'wpdc-info'}>
-                        {__('Update the Discourse topic to the lastest saved version of the post.', 'wp-discourse')}
-                    </p>
-                    <button className={this.props.busy ? activeButtonClass : buttonClass}
-                            onClick={this.handleClick}>
-                        {__('Update Topic', 'wp-discourse')}
+                            {__('Update Discourse Topic', 'wp-discourse')}
                         </button>
-                    <p className={'wpdc-info-success'}>
-                        {this.props.updateSuccessMessage}
-                    </p>
+                    </h2>
+                    <div className={!this.state.showPanel ? 'hidden' : ''}>
+                        <p className={'wpdc-info'}>
+                            {__('Update the Discourse topic to the lastest saved version of the post.', 'wp-discourse')}
+                        </p>
+                        <button className={this.props.busy ? activeButtonClass : buttonClass}
+                                onClick={this.handleClick}>
+                            {__('Update Topic', 'wp-discourse')}
+                        </button>
+                        <p className={'wpdc-info-success'}>
+                            {this.props.updateSuccessMessage}
+                        </p>
+                    </div>
                 </div>
-            </div>
             );
         } else {
             return '';
         }
     }
 }
-
 
 
 class DiscourseSidebar extends Component {
@@ -374,8 +373,8 @@ class DiscourseSidebar extends Component {
             discourse_topic_id: null,
             discourse_permalink: null,
             wpdc_publishing_response: null,
+            wpdc_publishing_error: null,
             linked_topic_url: null,
-            //unlink_from_discourse: 0,
             busyUnlinking: false,
             busyUpdating: false,
             busyLinking: false,
@@ -396,7 +395,6 @@ class DiscourseSidebar extends Component {
         wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
             (data) => {
                 const meta = data.meta;
-                console.log('updating state', data);
                 // Todo: remove unused states; normalize state names
                 this.setState({
                     published: meta.discourse_post_id > 0,
@@ -406,7 +404,7 @@ class DiscourseSidebar extends Component {
                     discourse_topic_id: meta.discourse_topic_id,
                     discourse_permalink: meta.discourse_permalink,
                     wpdc_publishing_response: meta.wpdc_publishing_response,
-                    unlink_from_discourse: 0
+                    wpdc_publishing_error: meta.wpdc_publishing_error,
                 });
                 return null;
             },
@@ -455,7 +453,6 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId, topic_url: topicUrl}
         }).then(
             (data) => {
-                console.log('linked topic data', data);
                 // Todo: look at the data to make sure it's worked.
                 this.setState({
                     busyLinking: false,
@@ -473,7 +470,7 @@ class DiscourseSidebar extends Component {
     handleUnlinkFromDiscourseChange(unlink_state) {
         this.setState({busyUnlinking: true});
         wp.apiRequest({
-            path: '/wp-discourse/v1/unlink-topic',
+            path: '/wp-discourse/v1/unlink-post',
             method: 'POST',
             data: {id: this.props.postId}
         }).then(
@@ -501,6 +498,7 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId}
         }).then(
             (data) => {
+                // Todo: don't set the success message here. Check the metatdata and add message to publishing notificion area.
                 this.setState({
                     busyUpdating: false,
                     updateSuccessMessage: __('The Discourse topic has been updated!', 'wp-discourse'),
@@ -508,18 +506,23 @@ class DiscourseSidebar extends Component {
                 return null;
             },
             (err) => {
-                // Todo: handle error; Set busyUpdating to false.
+                this.setState({busyUpdating: false});
                 return null;
             }
         );
     }
 
     componentDidUpdate(prevProps) {
-        const meta = this.props.post.meta;
-        if (meta.discourse_post_id !== prevProps.post.meta.discourse_post_id) {
+        const meta = this.props.post.meta,
+            prevMeta = prevProps.post.meta;
+        if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
+            meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
+            meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
             this.setState({
                 discourse_post_id: meta.post_id,
                 discourse_permalink: meta.discourse_permalink,
+                wpdc_publishing_response: meta.wpdc_publishing_response,
+                wpdc_publishing_error: meta.wpdc_publishing_error,
             });
         }
     }
@@ -569,13 +572,13 @@ class DiscourseSidebar extends Component {
                         />
                         <UnlinkFromDiscourse
                             published={this.state.published}
-                           // postId={this.props.postId}
+                            // postId={this.props.postId}
                             handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
                             busy={this.state.busyUnlinking}
                         />
                         <UpdateDiscourseTopic
                             published={this.state.published}
-                           // postId={this.props.postId}
+                            // postId={this.props.postId}
                             busy={this.state.busyUpdating}
                             handleUpdateChange={this.handleUpdateChange}
                             updateSuccessMessage={this.state.updateSuccessMessage}
