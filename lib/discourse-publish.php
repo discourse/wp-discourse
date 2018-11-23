@@ -239,6 +239,7 @@ class DiscoursePublish {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
 				$error_code    = null;
+				update_post_meta( $post_id,'wpdc_publishing_error', $error_message );
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
 				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
@@ -246,6 +247,7 @@ class DiscoursePublish {
 					// For older versions of Discourse, publishing to a deleted topic is returning a 500 response code.
 					update_post_meta( $post_id, 'wpdc_publishing_error', 'deleted_topic' );
 				}
+				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			}
 
 			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
