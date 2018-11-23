@@ -99,16 +99,16 @@ class PublishToDiscourseCheckBox extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {info: this.publishingMessage(this.props.publish_to_discourse)};
+        this.state = {info: PublishToDiscourseCheckBox.publishingMessage(this.props.publish_to_discourse)};
         this.handleChange = this.handleChange.bind(this);
     }
 
-    publishingMessage(publishToDiscourse) {
+    static publishingMessage(publishToDiscourse) {
         return publishToDiscourse ? __('Your post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse') : '';
     }
 
     handleChange(e) {
-        this.setState({info: this.publishingMessage(e.target.checked)});
+        this.setState({info: PublishToDiscourseCheckBox.publishingMessage(e.target.checked)});
         this.props.handlePublishChange(e.target.checked);
     }
 
@@ -260,7 +260,9 @@ class UnlinkFromDiscourse extends Component {
 class UpdateDiscourseTopic extends Component {
     constructor(props) {
         super(props);
-        this.state = {showPanel: false};
+        this.state = {
+            showPanel: false,
+        };
         this.handleClick = this.handleClick.bind(this);
         this.togglePanel = this.togglePanel.bind(this);
     }
@@ -295,6 +297,9 @@ class UpdateDiscourseTopic extends Component {
                             onClick={this.handleClick}>
                         {__('Update Topic', 'wp-discourse')}
                         </button>
+                    <p className={'wpdc-info-success'}>
+                        {this.props.updateSuccessMessage}
+                    </p>
                 </div>
             </div>
             );
@@ -378,6 +383,7 @@ class DiscourseSidebar extends Component {
             //unlink_from_discourse: 0,
             busyUnlinking: false,
             busyUpdating: false,
+            updateSuccessMessage: '',
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -463,15 +469,20 @@ class DiscourseSidebar extends Component {
     }
 
     handleUpdateChange(e) {
-        this.setState({busyUpdating: true});
+        this.setState({
+            busyUpdating: true,
+            updateSuccessMessage: '',
+        });
         wp.apiRequest({
             path: '/wp-discourse/v1/update-topic',
             method: 'POST',
             data: {id: this.props.postId}
         }).then(
             (data) => {
-                this.setState({busyUpdating: false});
-                // Todo: success message
+                this.setState({
+                    busyUpdating: false,
+                    updateSuccessMessage: __('The Discourse topic has been updated!', 'wp-discourse'),
+                });
                 return null;
             },
             (err) => {
@@ -538,6 +549,7 @@ class DiscourseSidebar extends Component {
                            // postId={this.props.postId}
                             busy={this.state.busyUpdating}
                             handleUpdateChange={this.handleUpdateChange}
+                            updateSuccessMessage={this.state.updateSuccessMessage}
                         />
                     </PanelBody>
                 </PluginSidebar>
