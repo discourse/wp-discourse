@@ -178,6 +178,67 @@ class DiscourseCategorySelect extends Component {
     }
 }
 
+class LinkToDiscourseTopic extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            isBusy: false,
+            topicUrl: null,
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleChange(e) {
+        this.setState({topicUrl: e.target.value})
+    }
+
+    handleClick(e) {
+        this.props.handleLinkTopicClick(this.state.topicUrl);
+        // this.setState({isBusy: true});
+        // wp.apiRequest({
+        //     path: '/wp-discourse/v1/link-topic',
+        //     method: 'POST',
+        //     data: {id: this.props.postId, topic_url: this.state.topicUrl}
+        // }).then(
+        //     (data) => {
+        //         this.setState({isBusy: false});
+        //         return null;
+        //     },
+        //     (err) => {
+        //         return null;
+        //     }
+        // );
+    }
+
+    render() {
+        if (!this.props.published && this.props.publishingMethod === 'link_post') {
+            return (
+                <div className="wpdc-link-post">
+                    <label>
+                        {__('Topic URL:', 'wp-discourse')}
+                        <input
+                            type="url"
+                            className={'widefat wpdc-topic-url-input'}
+                            onChange={this.handleChange}
+                            value={this.state.linkedTopicUrl}
+                        />
+
+                        <button className={this.props.busy ? activeButtonClass : buttonClass}
+                                onClick={this.handleClick}>
+                            {__('Link With Discourse', 'wp-discourse')}
+                        </button>
+                    </label>
+                </div>
+            )
+        } else {
+            return '';
+        }
+    }
+}
+
 class PublishingResponse extends Component {
     constructor(props) {
         super(props);
@@ -309,61 +370,7 @@ class UpdateDiscourseTopic extends Component {
     }
 }
 
-class LinkToDiscourseTopic extends Component {
-    constructor(props) {
-        super(props);
 
-        this.state = {
-            isBusy: false,
-            topicUrl: null
-        };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleClick = this.handleClick.bind(this);
-    }
-
-    handleChange(e) {
-        this.setState({topicUrl: e.target.value})
-    }
-
-    handleClick(e) {
-        this.setState({isBusy: true});
-        wp.apiRequest({
-            path: '/wp-discourse/v1/link-topic',
-            method: 'POST',
-            data: {id: this.props.postId, topic_url: this.state.topicUrl}
-        }).then(
-            (data) => {
-                this.setState({isBusy: false});
-                return null;
-            },
-            (err) => {
-                return null;
-            }
-        );
-    }
-
-    render() {
-        if (!this.props.published && this.props.publishingMethod === 'link_post') {
-            return (
-                <div className="wpdc-link-post">
-                    <label>
-                        {__('Topic URL:', 'wp-discourse')}
-                        <input type="url" className={'widefat'}
-                               onChange={this.handleChange}/>
-
-                        <button className={this.state.isBusy ? activeButtonClass : buttonClass}
-                                onClick={this.handleClick}>
-                            {__('Link With Discourse', 'wp-discourse')}
-                        </button>
-                    </label>
-                </div>
-            )
-        } else {
-            return '';
-        }
-    }
-}
 
 class DiscourseSidebar extends Component {
 
@@ -383,6 +390,7 @@ class DiscourseSidebar extends Component {
             //unlink_from_discourse: 0,
             busyUnlinking: false,
             busyUpdating: false,
+            busyLinking: false,
             updateSuccessMessage: '',
         };
 
@@ -393,6 +401,7 @@ class DiscourseSidebar extends Component {
         this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
         this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
         this.handleUpdateChange = this.handleUpdateChange.bind(this);
+        this.handleLinkTopicClick = this.handleLinkTopicClick.bind(this);
     }
 
     updateStateFromDatabase(postId) {
@@ -446,6 +455,29 @@ class DiscourseSidebar extends Component {
         this.setState({publish_post_category: category_id}, () => {
             this.handlePublishChange(this.state.publish_to_discourse);
         });
+    }
+
+    handleLinkTopicClick(topicUrl) {
+        this.setState({busyLinking: true});
+        wp.apiRequest({
+            path: '/wp-discourse/v1/link-topic',
+            method: 'POST',
+            data: {id: this.props.postId, topic_url: topicUrl}
+        }).then(
+            (data) => {
+                console.log('linked topic data', data);
+                // Todo: look at the data to make sure it's worked.
+                this.setState({
+                    busyLinking: false,
+                    published: true,
+                    discourse_permalink: data.discourse_permalink,
+                });
+                return null;
+            },
+            (err) => {
+                return null;
+            }
+        );
     }
 
     handleUnlinkFromDiscourseChange(unlink_state) {
@@ -528,7 +560,10 @@ class DiscourseSidebar extends Component {
                             />
                             <div class="wpdc-link-to-topic">
                                 <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
-                                                      published={this.state.published} postId={this.props.postId}
+                                                      published={this.state.published}
+                                                      postId={this.props.postId}
+                                                      busy={this.state.busyLinking}
+                                                      handleLinkTopicClick={this.handleLinkTopicClick}
                                 />
                             </div>
                         </div>
