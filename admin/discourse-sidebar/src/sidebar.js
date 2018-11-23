@@ -515,11 +515,12 @@ class DiscourseSidebar extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        // Todo: this isn't the best condition to use here.
-        // Todo: probably meta.discourse_post_id would work.
-        if (this.props.post.meta !== prevProps.post.meta) {
-            // Todo: you don't need to call this here! Just update from props.post.meta
-            this.updateStateFromDatabase(this.props.postId);
+        const meta = this.props.post.meta;
+        if (meta.discourse_post_id !== prevProps.post.meta.discourse_post_id) {
+            this.setState({
+                discourse_post_id: meta.post_id,
+                discourse_permalink: meta.discourse_permalink,
+            });
         }
     }
 
