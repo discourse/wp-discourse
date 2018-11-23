@@ -197,20 +197,6 @@ class LinkToDiscourseTopic extends Component {
 
     handleClick(e) {
         this.props.handleLinkTopicClick(this.state.topicUrl);
-        // this.setState({isBusy: true});
-        // wp.apiRequest({
-        //     path: '/wp-discourse/v1/link-topic',
-        //     method: 'POST',
-        //     data: {id: this.props.postId, topic_url: this.state.topicUrl}
-        // }).then(
-        //     (data) => {
-        //         this.setState({isBusy: false});
-        //         return null;
-        //     },
-        //     (err) => {
-        //         return null;
-        //     }
-        // );
     }
 
     render() {
@@ -408,6 +394,7 @@ class DiscourseSidebar extends Component {
         wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
             (data) => {
                 const meta = data.meta;
+                console.log('updating state', data);
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     publish_to_discourse: meta.publish_to_discourse,
