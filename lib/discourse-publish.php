@@ -39,188 +39,11 @@ class DiscoursePublish {
 	 */
 	public function __construct( $email_notifier ) {
 		$this->email_notifier = $email_notifier;
-		add_action( 'rest_api_init', array( $this, 'register_sidebar_routes' ) );
+
 		add_action( 'init', array( $this, 'setup_options' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
-	}
-
-	protected function register_api_meta($meta_keys, $post_types) {
-		foreach( $meta_keys as $meta_key ) {
-			foreach ( $post_types as $post_type ) {
-				// Todo: I'm not sure if 'type' needs to be set here. As it is, they will default to string?
-				register_meta( $post_type, $meta_key, array(
-					'single' => true,
-					'show_in_rest' => true,
-				));
-			}
-		}
-
-	}
-
-	public function register_sidebar_routes() {
-		write_log('is it too late to register routes');
-		register_rest_route(
-			'wp-discourse/v1', 'get-discourse-categories', array(
-				array(
-					'methods'  => \WP_REST_Server::READABLE,
-					'callback' => array( $this, 'get_discourse_categories' ),
-				),
-			)
-		);
-
-		register_rest_route(
-			'wp-discourse/v1', 'update-meta', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'update_discourse_metadata' ),
-				),
-			)
-		);
-
-		register_rest_route(
-			'wp-discourse/v1', 'update-topic', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'update_topic' ),
-				)
-			)
-		);
-
-		register_rest_route(
-			'wp-discourse/v1', 'unlink-topic', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'unlink_topic' ),
-				)
-			)
-		);
-
-		register_rest_route(
-			'wp-discourse/v1', 'link-topic', array(
-				array(
-					'methods'  => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'link_topic' ),
-				)
-			)
-		);
-
-		register_rest_route(
-			'wp-discourse/v1', 'set-publishing-options', array(
-				array(
-					'methods' => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'set_publishing_options' ),
-				)
-			)
-		);
-	}
-
-	public function set_publishing_options( $data ) {
-		write_log('setting publishing options. postId:', $data['id'], 'category', $data['publish_post_category'], 'publish to discourse', $data['publish_to_discourse']);
-		$post_id = $data['id'];
-		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
-		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
-	}
-
-	public function unlink_topic( $data ) {
-		$post_id = $data['id'];
-		delete_post_meta( $post_id, 'discourse_post_id' );
-		delete_post_meta( $post_id, 'discourse_topic_id' );
-		delete_post_meta( $post_id, 'discourse_permalink' );
-		delete_post_meta( $post_id, 'discourse_comments_raw' );
-		delete_post_meta( $post_id, 'discourse_comments_count' );
-		delete_post_meta( $post_id, 'discourse_last_sync' );
-		delete_post_meta( $post_id, 'publish_to_discourse' );
-		delete_post_meta( $post_id, 'publish_post_category' );
-		delete_post_meta( $post_id, 'update_discourse_topic' );
-		delete_post_meta( $post_id, 'wpdc_sync_post_comments' );
-		delete_post_meta( $post_id, 'wpdc_publishing_response' );
-		delete_post_meta( $post_id, 'wpdc_deleted_topic' );
-	}
-
-	public function update_topic( $data ) {
-		write_log( 'post_id', $data['id']);
-		update_post_meta( $data['id'], 'update_discourse_topic', 1 );
-		// Todo: this seems wrong. Should just call the wp-discourse publish method.
-		$update = wp_update_post( array( 'ID' => $data['id'] ) );
-		delete_post_meta( $data['id'], 'update_discourse_topic' );
-
-		return $update;
-	}
-
-	// Todo: can this function be protected?
-	public function update_discourse_metadata( $data ) {
-		$post_id = $data['id'];
-		if ( $data['linked_topic_url'] && empty( $data['unlink_from_discourse'] ) ) {
-			//$discourse_url = $data['linked_topic_url'];
-			//$response      = $this->link_to_discourse_topic( $data['id'], $discourse_url );
-		} elseif ( empty ( $data['unlink_from_discourse'] ) ) {
-			write_log( 'if this is called, the post should be published' );
-			update_post_meta( $data['id'], 'publish_to_discourse', $data['publish_to_discourse'] );
-			update_post_meta( $data['id'], 'publish_post_category', $data['publish_post_category'] );
-		}
-
-	}
-
-	public function get_discourse_categories() {
-
-		return get_option( 'wpdc_discourse_categories' );
-	}
-
-	/**
-	 * Links a WordPress post to a Discourse topic.
-	 *
-	 * @param int $post_id The WordPress post_id to link to.
-	 * @param string $topic_url The Discourse topic URL.
-	 *
-	 * @return array|\WP_Error
-	 */
-	public function link_topic( $data ) {
-		write_log('linking topic', $data['id'], $data['topic_url']);
-		$post_id = $data['id'];
-		$topic_url = $data['topic_url'];
-		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
-		delete_post_meta( $post_id, 'publish_to_discourse' );
-		$topic_url = explode( '?', $topic_url )[0];
-
-		$topic_domain = wp_parse_url( $topic_url, PHP_URL_HOST );
-		if ( get_option( 'wpdc_discourse_domain' ) !== $topic_domain ) {
-			update_post_meta( $post_id, 'wpdc_linking_response', 'invalid_url' );
-
-			return new \WP_Error( 'wpdc_configuration_error', 'An invalid topic URL was supplied when attempting to link post to Discourse topic.' );
-		}
-		$topic = $this->get_discourse_topic( $topic_url );
-
-		// Check for the topic->post_stream here just to make sure it's a valid topic.
-		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) ) {
-			update_post_meta( $post_id, 'wpdc_linking_response', 'error' );
-
-			return new \WP_Error( 'wpdc_response_error', 'Unable to link to Discourse topic.' );
-		}
-
-		update_post_meta( $post_id, 'wpdc_linking_response', 'success' );
-
-		$discourse_post_id        = $topic->post_stream->stream[0];
-		$topic_id                 = $topic->id;
-		$category_id              = $topic->category_id;
-		$discourse_comments_count = $topic->posts_count - 1;
-		$topic_slug               = $topic->slug;
-		$discourse_permalink      = esc_url_raw( "{$this->options['url']}/t/{$topic_slug}/{$topic_id}" );
-
-		update_post_meta( $post_id, 'discourse_post_id', $discourse_post_id );
-		update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
-		update_post_meta( $post_id, 'publish_post_category', $category_id );
-		update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
-		update_post_meta( $post_id, 'discourse_comments_count', $discourse_comments_count );
-		delete_post_meta( $post_id, 'wpdc_publishing_error' );
-		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
-			update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
-		}
-
-		return array(
-			'discourse_permalink' => $discourse_permalink,
-		);
 	}
 
 	/**
@@ -228,17 +51,6 @@ class DiscoursePublish {
 	 */
 	public function setup_options() {
 		$this->options = $this->get_options();
-		$meta_keys = array(
-			'publish_to_discourse',
-			'publish_post_category',
-			'discourse_post_id',
-			'discourse_topic_id',
-			'discourse_permalink',
-			'wpdc_publishing_response',
-		);
-		$allowed_post_types = $this->options['allowed_post_types'];
-		$this->register_api_meta( $meta_keys, $allowed_post_types );
-
 	}
 
 	/**
@@ -342,7 +154,8 @@ class DiscoursePublish {
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
-			$excerpt = apply_filters( 'wp_discourse_excerpt', $raw, $options['custom-excerpt-length'], $use_full_post );
+			$excerpt = apply_filters( 'the_content', $raw );
+			$excerpt = apply_filters( 'wp_discourse_excerpt', $excerpt, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
 				$wp_excerpt = apply_filters( 'get_the_excerpt', $current_post->post_excerpt );
