@@ -187,7 +187,7 @@ class Discourse {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
-		add_action( 'rest_api_init', array( $this, 'register_categories_route' ) );
+		//add_action( 'rest_api_init', array( $this, 'register_categories_route' ) );
 	}
 
 	// Todo: functions added for the Gutenberg sidebar. Move these.
@@ -397,36 +397,36 @@ class Discourse {
 		update_option( 'discourse_version', WPDISCOURSE_VERSION );
 
 		//Todo: metadata registered for the Gutenberg sidebar. Possibly this should be moved.
-		register_meta( 'post', 'publish_to_discourse', array(
-			'type'         => 'integer',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
-		register_meta( 'post', 'publish_post_category', array(
-			'type'         => 'integer',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
-		register_meta( 'post', 'discourse_post_id', array(
-			'type'         => 'integer',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
-		register_meta( 'post', 'discourse_topic_id', array(
-			'type'         => 'integer',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
-		register_meta( 'post', 'discourse_permalink', array(
-			'type'         => 'string',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
-		register_meta( 'post', 'wpdc_publishing_response', array(
-			'type'         => 'string',
-			'single'       => true,
-			'show_in_rest' => true,
-		) );
+//		register_meta( 'post', 'publish_to_discourse', array(
+//			'type'         => 'integer',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
+//		register_meta( 'post', 'publish_post_category', array(
+//			'type'         => 'integer',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
+//		register_meta( 'post', 'discourse_post_id', array(
+//			'type'         => 'integer',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
+//		register_meta( 'post', 'discourse_topic_id', array(
+//			'type'         => 'integer',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
+//		register_meta( 'post', 'discourse_permalink', array(
+//			'type'         => 'string',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
+//		register_meta( 'post', 'wpdc_publishing_response', array(
+//			'type'         => 'string',
+//			'single'       => true,
+//			'show_in_rest' => true,
+//		) );
 		// Todo: end of register_meta.
 	}
 
