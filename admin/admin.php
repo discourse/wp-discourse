@@ -39,6 +39,7 @@ if ( is_admin() ) {
 	new SettingsValidator();
 	new AdminNotice();
 	new MetaBox();
+	new DiscourseSidebar();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 	if ( is_multisite() ) {
