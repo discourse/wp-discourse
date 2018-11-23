@@ -100,7 +100,7 @@ class PublishToDiscourseCheckBox extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {info: PublishToDiscourseCheckBox.publishingMessage(this.props.publish_to_discourse)};
+        this.state = {info: PublishToDiscourseCheckBox.publishingMessage(this.props.publishToDiscourse)};
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -211,7 +211,7 @@ class LinkToDiscourseTopic extends Component {
                             type="url"
                             className={'widefat wpdc-topic-url-input'}
                             onChange={this.handleChange}
-                            value={this.state.linkedTopicUrl}
+                            value={this.state.topicUrl}
                         />
 
                         <button className={this.props.busy ? activeButtonClass : buttonClass}
@@ -233,10 +233,8 @@ class PublishingResponse extends Component {
     }
 
     render() {
-        // Todo: wpdc_publishing_response is currently being cleared after a successful request, so it can't be used as a condition.
-        // Todo: if the publishing response is present, use it to create the message.
-        const response = this.props.wpdc_publishing_response;
-        const permalink = this.props.discourse_permalink;
+        const response = this.props.wpdcPublishingResponse;
+        const permalink = this.props.discoursePermalink;
         let message;
 
         if (this.props.published) {
@@ -367,14 +365,12 @@ class DiscourseSidebar extends Component {
         this.state = {
             published: false,
             publishingMethod: 'publish_post',
-            publish_to_discourse: 0,
-            publish_post_category: pluginOptions.defaultCategory,
-            discourse_post_id: null,
-            discourse_topic_id: null,
-            discourse_permalink: null,
-            wpdc_publishing_response: null,
-            wpdc_publishing_error: null,
-            linked_topic_url: null,
+            publishToDiscourse: 0,
+            publishPostCategory: pluginOptions.defaultCategory,
+            discoursePostId: null,
+            discoursePermalink: null,
+            wpdcPublishingResponse: null,
+            wpdcPublishingError: null,
             busyUnlinking: false,
             busyUpdating: false,
             busyLinking: false,
@@ -398,13 +394,12 @@ class DiscourseSidebar extends Component {
                 // Todo: remove unused states; normalize state names
                 this.setState({
                     published: meta.discourse_post_id > 0,
-                    publish_to_discourse: meta.publish_to_discourse,
-                    publish_post_category: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
-                    discourse_post_id: meta.discourse_post_id,
-                    discourse_topic_id: meta.discourse_topic_id,
-                    discourse_permalink: meta.discourse_permalink,
-                    wpdc_publishing_response: meta.wpdc_publishing_response,
-                    wpdc_publishing_error: meta.wpdc_publishing_error,
+                    publishToDiscourse: meta.publish_to_discourse,
+                    publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
+                    discoursePostId: meta.discourse_post_id,
+                    discoursePermalink: meta.discourse_permalink,
+                    wpdcPublishingResponse: meta.wpdc_publishing_response,
+                    wpdcPublishingError: meta.wpdc_publishing_error,
                 });
                 return null;
             },
@@ -419,14 +414,14 @@ class DiscourseSidebar extends Component {
     }
 
     handlePublishChange(publishToDiscourse) {
-        this.setState({publish_to_discourse: publishToDiscourse ? 1 : 0}, () => {
+        this.setState({publishToDiscourse: publishToDiscourse ? 1 : 0}, () => {
             wp.apiRequest({
                 path: '/wp-discourse/v1/set-publishing-options',
                 method: 'POST',
                 data: {
                     id: this.props.postId,
-                    publish_to_discourse: this.state.publish_to_discourse,
-                    publish_post_category: this.state.publish_post_category
+                    publish_to_discourse: this.state.publishToDiscourse,
+                    publish_post_category: this.state.publishPostCategory
                 }
             }).then(
                 (data) => {
@@ -440,8 +435,8 @@ class DiscourseSidebar extends Component {
     }
 
     handleCategoryChange(category_id) {
-        this.setState({publish_post_category: category_id}, () => {
-            this.handlePublishChange(this.state.publish_to_discourse);
+        this.setState({publishPostCategory: category_id}, () => {
+            this.handlePublishChange(this.state.publishToDiscourse);
         });
     }
 
@@ -457,7 +452,7 @@ class DiscourseSidebar extends Component {
                 this.setState({
                     busyLinking: false,
                     published: true,
-                    discourse_permalink: data.discourse_permalink,
+                    discoursePermalink: data.discourse_permalink,
                 });
                 return null;
             },
@@ -519,10 +514,11 @@ class DiscourseSidebar extends Component {
             meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
             meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
             this.setState({
-                discourse_post_id: meta.post_id,
-                discourse_permalink: meta.discourse_permalink,
-                wpdc_publishing_response: meta.wpdc_publishing_response,
-                wpdc_publishing_error: meta.wpdc_publishing_error,
+                published: meta.discourse_post_id > 0,
+                discoursePostId: meta.discourse_post_id,
+                discoursePermalink: meta.discourse_permalink,
+                wpdcPublishingResponse: meta.wpdc_publishing_response,
+                wpdcPublishingError: meta.wpdc_publishing_error,
             });
         }
     }
@@ -547,12 +543,12 @@ class DiscourseSidebar extends Component {
                                                publishingMethod={this.state.publishingMethod}/>
                             <PublishToDiscourseCheckBox publishingMethod={this.state.publishingMethod}
                                                         published={this.state.published}
-                                                        publishToDiscourse={this.state.publish_to_discourse}
+                                                        publishToDiscourse={this.state.publishToDiscourse}
                                                         handlePublishChange={this.handlePublishChange}/>
                             <DiscourseCategorySelect
                                 publishingMethod={this.state.publishingMethod}
                                 published={this.state.published}
-                                category_id={this.state.publish_post_category || pluginOptions.defaultCategory}
+                                category_id={this.state.publishPostCategory}
                                 handleCategoryChange={this.handleCategoryChange}
                             />
                             <div class="wpdc-link-to-topic">
@@ -566,9 +562,9 @@ class DiscourseSidebar extends Component {
                         </div>
                         <PublishingResponse
                             published={this.state.published}
-                            discourse_post_id={this.state.discourse_post_id}
-                            wpdc_publishing_response={this.state.wpdc_publishing_response}
-                            discourse_permalink={this.state.discourse_permalink}
+                            discoursePostId={this.state.discoursePostId}
+                            wpdcPublishingResponse={this.state.wpdcPublishingResponse}
+                            discoursePermalink={this.state.discoursePermalink}
                         />
                         <UnlinkFromDiscourse
                             published={this.state.published}
