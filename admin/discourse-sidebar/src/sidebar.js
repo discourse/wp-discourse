@@ -64,16 +64,26 @@ class PublishingResponse extends Component {
     }
 
     render() {
-        const error = this.props.wpdcPublishingError;
-        let message;
+        return (
+            <div>
+                <ErrorMessage publishingError={this.props.publishingError}/>
+                <DiscourseLink discoursePermalink={this.props.discoursePermalink}/>
+            </div>
+        );
+    }
+}
 
-        if (this.props.published && this.props.discoursePermalink && !error) {
-            const permalink = encodeURI(this.props.discoursePermalink);
-            const link = <a href={permalink} className={'wpdc-permalink'} target={'_blank'}>{permalink}</a>;
-            message = <span
-                className={'wpdc-publishing-success'}>{__('Your post is linked to', 'wp-discourse')} {link}</span>;
-        } else if (error) {
-            switch (error) {
+class ErrorMessage extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const publishingError = this.props.publishingError;
+
+        if (publishingError) {
+            let message = 'test message';
+            switch (publishingError) {
                 case 'deleted_topic':
                     message =
                         <span className={'wpdc-publishing-error'}>
@@ -98,20 +108,32 @@ class PublishingResponse extends Component {
                 default:
                     message =
                         <span className={'wpdc-publishing-error'}>
-                            {__('There has been an error publishing your post to Discourse: ', 'wp-discourse') + error}
+                            {__('There has been an error publishing your post to Discourse: ', 'wp-discourse') + publishingError}
                         </span>;
             }
-        }
 
-        if (message) {
+            console.log('message', message);
+
             return (
-                <div className={'wpdc-publishing-response'}>
-                    {message}
-                </div>
+                <div className={'wpdc-publishing-response error'}>{message}</div>
             );
-        } else {
-            return '';
         }
+        return '';
+    }
+}
+
+class DiscourseLink extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        if (this.props.discoursePermalink) {
+            const permalink = encodeURI(this.props.discoursePermalink);
+            const link = <a href={permalink} className={'wpdc-permalink'} target={'_blank'}>{permalink}</a>;
+            return <span>{__('Your post is linked with', 'wp-discourse')} {link}</span>;
+        }
+        return '';
     }
 }
 
@@ -173,7 +195,8 @@ class PublishToDiscourse extends Component {
         let message;
 
         if (publishToDiscourse) {
-            message = <span className={'wpdc-info'}>{__('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse')}</span>;
+            message = <span
+                className={'wpdc-info'}>{__('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse')}</span>;
         } else {
             message = '';
         }
@@ -299,7 +322,6 @@ class LinkToDiscourseTopic extends Component {
 }
 
 
-
 class UnlinkFromDiscourse extends Component {
     constructor(props) {
         super(props);
@@ -388,9 +410,6 @@ class UpdateDiscourseTopic extends Component {
                                 onClick={this.handleClick}>
                             {__('Update Topic', 'wp-discourse')}
                         </button>
-                        <p className={'wpdc-info-success'}>
-                            {this.props.updateSuccessMessage}
-                        </p>
                     </div>
                 </div>
             );
@@ -411,12 +430,12 @@ class DiscourseSidebar extends Component {
             publishPostCategory: pluginOptions.defaultCategory,
             discoursePostId: null,
             discoursePermalink: null,
-            wpdcPublishingError: null,
+            publishingError: null,
             busyUnlinking: false,
             busyUpdating: false,
             busyLinking: false,
             busyPublishing: false,
-            updateSuccessMessage: null,
+            statusMessage: 'This is a test...',
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -443,7 +462,7 @@ class DiscourseSidebar extends Component {
                         publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                         discoursePostId: meta.discourse_post_id,
                         discoursePermalink: meta.discourse_permalink,
-                        wpdcPublishingError: meta.wpdc_publishing_error,
+                        publishingError: meta.wpdc_publishing_error,
                     });
                     return null;
                 },
@@ -545,15 +564,17 @@ class DiscourseSidebar extends Component {
                 const success = 'success' === data.publish_response;
                 let message;
                 if (success) {
-                    message = <span className={'wpdc-info'}>{__('The Discourse topic has been published!', 'wp-discourse')}</span>;
+                    message = <span
+                        className={'wpdc-info'}>{__('The Discourse topic has been published!', 'wp-discourse')}</span>;
                 } else {
                     // Todo: give more details here.
-                    message = <span className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>;
+                    message = <span
+                        className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>;
                 }
                 this.setState({
                     busyPublishing: false,
                     published: success,
-                    updateSuccessMessage: message,
+                    updateStatusMessage: message,
                 });
                 return null;
             },
@@ -561,7 +582,8 @@ class DiscourseSidebar extends Component {
                 this.setState({
                     busyPublishing: false,
                     published: false,
-                    updateSuccessMessage: <span className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>,
+                    updateStatusMessage: <span
+                        className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>,
                 });
                 return null;
             }
@@ -571,7 +593,7 @@ class DiscourseSidebar extends Component {
     handleUpdateChange(e) {
         this.setState({
             busyUpdating: true,
-            updateSuccessMessage: '',
+            updateStatusMessage: '',
         });
         wp.apiRequest({
             path: '/wp-discourse/v1/update-topic',
@@ -582,14 +604,16 @@ class DiscourseSidebar extends Component {
                 const response = data.update_response;
                 let message;
                 if ('success' === response) {
-                    message = <span className={'wpdc-info'}>{__('The Discourse topic has been updated!', 'wp-discourse')}</span>;
+                    message = <span
+                        className={'wpdc-info'}>{__('The Discourse topic has been updated!', 'wp-discourse')}</span>;
                 } else {
                     // Todo: give more details here.
-                    message = <span className={'wpdc-info'}>{__('There was an error updating the Discourse topic.', 'wp-discourse')}</span>;
+                    message = <span
+                        className={'wpdc-info'}>{__('There was an error updating the Discourse topic.', 'wp-discourse')}</span>;
                 }
                 this.setState({
                     busyUpdating: false,
-                    updateSuccessMessage: message,
+                    updateStatusMessage: message,
                 });
                 return null;
             },
@@ -616,7 +640,7 @@ class DiscourseSidebar extends Component {
                     publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                     discoursePostId: meta.discourse_post_id,
                     discoursePermalink: meta.discourse_permalink,
-                    wpdcPublishingError: meta.wpdc_publishing_error,
+                    publishingError: meta.wpdc_publishing_error,
                 });
             }
         }
@@ -640,8 +664,9 @@ class DiscourseSidebar extends Component {
                                 <PublishingResponse
                                     published={this.state.published}
                                     discoursePostId={this.state.discoursePostId}
-                                    wpdcPublishingError={this.state.wpdcPublishingError}
+                                    publishingError={this.state.publishingError}
                                     discoursePermalink={this.state.discoursePermalink}
+                                    updateStatusMessage={this.state.updateStatusMessage}
                                 />
                                 <PublishingOptions published={this.state.published}
                                                    handlePublishMethodChange={this.handlePublishMethodChange}
@@ -654,12 +679,12 @@ class DiscourseSidebar extends Component {
                                     handleCategoryChange={this.handleCategoryChange}
                                 />
                                 <PublishToDiscourse publishingMethod={this.state.publishingMethod}
-                                                            published={this.state.published}
-                                                            postStatus={this.state.postStatus}
-                                                            publishToDiscourse={this.state.publishToDiscourse}
-                                                            handleToBePublishedChange={this.handleToBePublishedChange}
-                                                            handlePublishChange={this.handlePublishChange}
-                                                            busy={this.state.busyPublishing}
+                                                    published={this.state.published}
+                                                    postStatus={this.state.postStatus}
+                                                    publishToDiscourse={this.state.publishToDiscourse}
+                                                    handleToBePublishedChange={this.handleToBePublishedChange}
+                                                    handlePublishChange={this.handlePublishChange}
+                                                    busy={this.state.busyPublishing}
                                 />
                                 <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
                                                       published={this.state.published}
@@ -678,7 +703,6 @@ class DiscourseSidebar extends Component {
                                         published={this.state.published}
                                         busy={this.state.busyUpdating}
                                         handleUpdateChange={this.handleUpdateChange}
-                                        updateSuccessMessage={this.state.updateSuccessMessage}
                                     />
                                 </div>
                             </div>
