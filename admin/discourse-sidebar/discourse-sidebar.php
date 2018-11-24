@@ -265,7 +265,7 @@ class DiscourseSidebar {
 	 */
 	public function link_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
-		$topic_url = esc_url_raw( wp_unslash( $_POST['link_to_discourse_topic'] ) ); // Input var okay.
+		$topic_url = esc_url_raw( wp_unslash( $data['topic_url'] ) ); // Input var okay.
 		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
 		delete_post_meta( $post_id, 'publish_to_discourse' );
 		$topic_url = explode( '?', $topic_url )[0];
