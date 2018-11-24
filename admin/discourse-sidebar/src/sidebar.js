@@ -69,7 +69,7 @@ class PublishingResponse extends Component {
 
         if (this.props.published && this.props.discoursePermalink && !error) {
             const permalink = encodeURI(this.props.discoursePermalink);
-            const link = <a href={permalink} className={'wpdc-discourse-permalink'} target={'_blank'}>{permalink}</a>;
+            const link = <a href={permalink} className={'wpdc-permalink'} target={'_blank'}>{permalink}</a>;
             message = <span
                 className={'wpdc-publishing-success'}>{__('Your post is linked to', 'wp-discourse')} {link}</span>;
         } else if (error) {
@@ -152,15 +152,20 @@ class PublishingOptions extends Component {
     }
 }
 
-class PublishToDiscourseCheckBox extends Component {
+class PublishToDiscourse extends Component {
     constructor(props) {
         super(props);
 
-        this.handleChange = this.handleChange.bind(this);
+        this.handleToBePublishedChange = this.handleToBePublishedChange.bind(this);
+        this.handlePublishChange = this.handlePublishChange.bind(this);
     }
 
-    handleChange(e) {
-        this.props.handlePublishChange(e.target.checked);
+    handleToBePublishedChange(e) {
+        this.props.handleToBePublishedChange(e.target.checked);
+    }
+
+    handlePublishChange(e) {
+        this.props.handlePublishChange(e);
     }
 
     render() {
@@ -174,15 +179,24 @@ class PublishToDiscourseCheckBox extends Component {
         }
 
         if (!this.props.published && this.props.publishingMethod === 'publish_post') {
-            return (
-                <div className={'wpdc-publish-topic'}>
+            if (!'publish' === this.props.postStatus) {
+                return (
+                    <div className={'wpdc-publish-topic'}>
 
-                    <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
-                           checked={publishToDiscourse} onChange={this.handleChange}/>
-                    {__('Publish Post to Discourse', 'wp-discourse')}
-                    {message}
-                </div>
-            );
+                        <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
+                               checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
+                        {__('Publish Post to Discourse', 'wp-discourse')}
+                        {message}
+                    </div>
+                );
+            } else {
+                return (
+                    <button className={this.props.busy ? activeButtonClass : buttonClass}
+                            onClick={this.handlePublishChange}>{__('Publish to Discourse', 'wp-discourse')}
+                    </button>
+                );
+            }
+
         } else {
             return '';
         }
@@ -391,6 +405,7 @@ class DiscourseSidebar extends Component {
         super(props);
         this.state = {
             published: false,
+            postStatus: '',
             publishingMethod: 'publish_post',
             publishToDiscourse: 0,
             publishPostCategory: pluginOptions.defaultCategory,
@@ -400,11 +415,13 @@ class DiscourseSidebar extends Component {
             busyUnlinking: false,
             busyUpdating: false,
             busyLinking: false,
+            busyPublishing: false,
             updateSuccessMessage: null,
         };
 
         this.updateStateFromDatabase(this.props.postId);
 
+        this.handleToBePublishedChange = this.handleToBePublishedChange.bind(this);
         this.handlePublishChange = this.handlePublishChange.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
@@ -417,9 +434,11 @@ class DiscourseSidebar extends Component {
         if (this.isAllowedPostType()) {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
+                    console.log('returned post data', data);
                     const meta = data.meta;
                     this.setState({
                         published: meta.discourse_post_id > 0,
+                        postStatus: data.status,
                         publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                         publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                         discoursePostId: meta.discourse_post_id,
@@ -444,7 +463,7 @@ class DiscourseSidebar extends Component {
         this.setState({publishingMethod: publishingMethod});
     }
 
-    handlePublishChange(publishToDiscourse) {
+    handleToBePublishedChange(publishToDiscourse) {
         this.setState({publishToDiscourse: publishToDiscourse ? 1 : 0}, () => {
             wp.apiRequest({
                 path: '/wp-discourse/v1/set-publishing-options',
@@ -467,7 +486,7 @@ class DiscourseSidebar extends Component {
 
     handleCategoryChange(category_id) {
         this.setState({publishPostCategory: category_id}, () => {
-            this.handlePublishChange(this.state.publishToDiscourse);
+            this.handleToBePublishedChange(this.state.publishToDiscourse);
         });
     }
 
@@ -513,6 +532,42 @@ class DiscourseSidebar extends Component {
         );
     }
 
+    handlePublishChange(e) {
+        this.setState({
+            busyPublishing: true,
+        });
+        wp.apiRequest({
+            path: '/wp-discourse/v1/update-topic',
+            method: 'POST',
+            data: {id: this.props.postId}
+        }).then(
+            (data) => {
+                const success = 'success' === data.publish_response;
+                let message;
+                if (success) {
+                    message = <span className={'wpdc-info'}>{__('The Discourse topic has been published!', 'wp-discourse')}</span>;
+                } else {
+                    // Todo: give more details here.
+                    message = <span className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>;
+                }
+                this.setState({
+                    busyPublishing: false,
+                    published: success,
+                    updateSuccessMessage: message,
+                });
+                return null;
+            },
+            (err) => {
+                this.setState({
+                    busyPublishing: false,
+                    published: false,
+                    updateSuccessMessage: <span className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>,
+                });
+                return null;
+            }
+        );
+    }
+
     handleUpdateChange(e) {
         this.setState({
             busyUpdating: true,
@@ -547,13 +602,17 @@ class DiscourseSidebar extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.isAllowedPostType()) {
-            const meta = this.props.post.meta,
+            const post = this.props.post,
+                prevPost = prevProps.post,
+                meta = this.props.post.meta,
                 prevMeta = prevProps.post.meta;
-            if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
+            if (post.status !== prevPost.status ||
+                meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
                 this.setState({
                     published: meta.discourse_post_id > 0,
+                    postStatus: post.status,
                     publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                     discoursePostId: meta.discourse_post_id,
                     discoursePermalink: meta.discourse_permalink,
@@ -586,16 +645,21 @@ class DiscourseSidebar extends Component {
                                 />
                                 <PublishingOptions published={this.state.published}
                                                    handlePublishMethodChange={this.handlePublishMethodChange}
-                                                   publishingMethod={this.state.publishingMethod}/>
-                                <PublishToDiscourseCheckBox publishingMethod={this.state.publishingMethod}
-                                                            published={this.state.published}
-                                                            publishToDiscourse={this.state.publishToDiscourse}
-                                                            handlePublishChange={this.handlePublishChange}/>
+                                                   publishingMethod={this.state.publishingMethod}
+                                />
                                 <DiscourseCategorySelect
                                     publishingMethod={this.state.publishingMethod}
                                     published={this.state.published}
                                     category_id={this.state.publishPostCategory}
                                     handleCategoryChange={this.handleCategoryChange}
+                                />
+                                <PublishToDiscourse publishingMethod={this.state.publishingMethod}
+                                                            published={this.state.published}
+                                                            postStatus={this.state.postStatus}
+                                                            publishToDiscourse={this.state.publishToDiscourse}
+                                                            handleToBePublishedChange={this.handleToBePublishedChange}
+                                                            handlePublishChange={this.handlePublishChange}
+                                                            busy={this.state.busyPublishing}
                                 />
                                 <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
                                                       published={this.state.published}
