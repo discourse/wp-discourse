@@ -157,22 +157,22 @@ class PublishToDiscourseCheckBox extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {info: PublishToDiscourseCheckBox.publishingMessage(this.props.publishToDiscourse)};
         this.handleChange = this.handleChange.bind(this);
     }
 
-    // Todo: this seems awkward
-    static publishingMessage(publishToDiscourse) {
-        return publishToDiscourse ? __('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse') : '';
-    }
-
     handleChange(e) {
-        this.setState({info: PublishToDiscourseCheckBox.publishingMessage(e.target.checked)});
         this.props.handlePublishChange(e.target.checked);
     }
 
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
+        let message;
+
+        if (publishToDiscourse) {
+            message = <span className={'wpdc-info'}>{__('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse')}</span>;
+        } else {
+            message = '';
+        }
 
         if (!this.props.published && this.props.publishingMethod === 'publish_post') {
             return (
@@ -181,7 +181,7 @@ class PublishToDiscourseCheckBox extends Component {
                     <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                            checked={publishToDiscourse} onChange={this.handleChange}/>
                     {__('Publish Post to Discourse', 'wp-discourse')}
-                    <span className={'wpdc-info'}>{this.state.info}</span>
+                    {message}
                 </div>
             );
         } else {
@@ -539,7 +539,6 @@ class DiscourseSidebar extends Component {
     componentDidUpdate(prevProps) {
         const meta = this.props.post.meta,
             prevMeta = prevProps.post.meta;
-        console.log('meta', meta, 'prevMeta', prevMeta);
         if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
             meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
             meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
