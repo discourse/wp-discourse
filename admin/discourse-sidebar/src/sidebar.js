@@ -386,9 +386,7 @@ class UpdateDiscourseTopic extends Component {
     }
 }
 
-
 class DiscourseSidebar extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -416,23 +414,30 @@ class DiscourseSidebar extends Component {
     }
 
     updateStateFromDatabase(postId) {
-        wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
-            (data) => {
-                const meta = data.meta;
-                this.setState({
-                    published: meta.discourse_post_id > 0,
-                    publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
-                    publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
-                    discoursePostId: meta.discourse_post_id,
-                    discoursePermalink: meta.discourse_permalink,
-                    wpdcPublishingError: meta.wpdc_publishing_error,
-                });
-                return null;
-            },
-            (err) => {
-                return null;
-            }
-        );
+        if (this.isAllowedPostType()) {
+            wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
+                (data) => {
+                    const meta = data.meta;
+                    this.setState({
+                        published: meta.discourse_post_id > 0,
+                        publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
+                        publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
+                        discoursePostId: meta.discourse_post_id,
+                        discoursePermalink: meta.discourse_permalink,
+                        wpdcPublishingError: meta.wpdc_publishing_error,
+                    });
+                    return null;
+                },
+                (err) => {
+                    return null;
+                }
+            );
+        }
+    }
+
+    // Todo: this doesn't seem like the best way to do this. None of the code should be run for post types that can't be published to Discourse.
+    isAllowedPostType() {
+        return pluginOptions.allowedPostTypes.indexOf(this.props.post.type) >= 0
     }
 
     handlePublishMethodChange(publishingMethod) {
@@ -541,79 +546,85 @@ class DiscourseSidebar extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        const meta = this.props.post.meta,
-            prevMeta = prevProps.post.meta;
-        if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
-            meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
-            meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
-            this.setState({
-                published: meta.discourse_post_id > 0,
-                publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
-                discoursePostId: meta.discourse_post_id,
-                discoursePermalink: meta.discourse_permalink,
-                wpdcPublishingError: meta.wpdc_publishing_error,
-            });
+        if (this.isAllowedPostType()) {
+            const meta = this.props.post.meta,
+                prevMeta = prevProps.post.meta;
+            if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
+                meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
+                meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
+                this.setState({
+                    published: meta.discourse_post_id > 0,
+                    publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
+                    discoursePostId: meta.discourse_post_id,
+                    discoursePermalink: meta.discourse_permalink,
+                    wpdcPublishingError: meta.wpdc_publishing_error,
+                });
+            }
         }
     }
 
     render() {
-        return (
-            <Fragment>
-                <PluginSidebarMoreMenuItem
-                    target="discourse-sidebar"
-                >
-                    {__('Discourse', 'wp-discourse')}
-                </PluginSidebarMoreMenuItem>
-                <PluginSidebar
-                    name="discourse-sidebar"
-                    title={__('Discourse', 'wp-discourse')}
-                >
-                    <PanelBody>
-                        <div className={'wpdc-sidebar'}>
-                            <PublishingResponse
-                                published={this.state.published}
-                                discoursePostId={this.state.discoursePostId}
-                                wpdcPublishingError={this.state.wpdcPublishingError}
-                                discoursePermalink={this.state.discoursePermalink}
-                            />
-                            <PublishingOptions published={this.state.published}
-                                               handlePublishMethodChange={this.handlePublishMethodChange}
-                                               publishingMethod={this.state.publishingMethod}/>
-                            <PublishToDiscourseCheckBox publishingMethod={this.state.publishingMethod}
-                                                        published={this.state.published}
-                                                        publishToDiscourse={this.state.publishToDiscourse}
-                                                        handlePublishChange={this.handlePublishChange}/>
-                            <DiscourseCategorySelect
-                                publishingMethod={this.state.publishingMethod}
-                                published={this.state.published}
-                                category_id={this.state.publishPostCategory}
-                                handleCategoryChange={this.handleCategoryChange}
-                            />
-                            <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
-                                                  published={this.state.published}
-                                                  postId={this.props.postId}
-                                                  busy={this.state.busyLinking}
-                                                  handleLinkTopicClick={this.handleLinkTopicClick}
-                            />
-                            <div className={'wpdc-published-post'}>
+        if (this.isAllowedPostType()) {
+            return (
+                <Fragment>
+                    <PluginSidebarMoreMenuItem
+                        target="discourse-sidebar"
+                    >
+                        {__('Discourse', 'wp-discourse')}
+                    </PluginSidebarMoreMenuItem>
+                    <PluginSidebar
+                        name="discourse-sidebar"
+                        title={__('Discourse', 'wp-discourse')}
+                    >
+                        <PanelBody>
+                            <div className={'wpdc-sidebar'}>
+                                <PublishingResponse
+                                    published={this.state.published}
+                                    discoursePostId={this.state.discoursePostId}
+                                    wpdcPublishingError={this.state.wpdcPublishingError}
+                                    discoursePermalink={this.state.discoursePermalink}
+                                />
+                                <PublishingOptions published={this.state.published}
+                                                   handlePublishMethodChange={this.handlePublishMethodChange}
+                                                   publishingMethod={this.state.publishingMethod}/>
+                                <PublishToDiscourseCheckBox publishingMethod={this.state.publishingMethod}
+                                                            published={this.state.published}
+                                                            publishToDiscourse={this.state.publishToDiscourse}
+                                                            handlePublishChange={this.handlePublishChange}/>
+                                <DiscourseCategorySelect
+                                    publishingMethod={this.state.publishingMethod}
+                                    published={this.state.published}
+                                    category_id={this.state.publishPostCategory}
+                                    handleCategoryChange={this.handleCategoryChange}
+                                />
+                                <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
+                                                      published={this.state.published}
+                                                      postId={this.props.postId}
+                                                      busy={this.state.busyLinking}
+                                                      handleLinkTopicClick={this.handleLinkTopicClick}
+                                />
+                                <div className={'wpdc-published-post'}>
 
-                                <UnlinkFromDiscourse
-                                    published={this.state.published}
-                                    handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
-                                    busy={this.state.busyUnlinking}
-                                />
-                                <UpdateDiscourseTopic
-                                    published={this.state.published}
-                                    busy={this.state.busyUpdating}
-                                    handleUpdateChange={this.handleUpdateChange}
-                                    updateSuccessMessage={this.state.updateSuccessMessage}
-                                />
+                                    <UnlinkFromDiscourse
+                                        published={this.state.published}
+                                        handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
+                                        busy={this.state.busyUnlinking}
+                                    />
+                                    <UpdateDiscourseTopic
+                                        published={this.state.published}
+                                        busy={this.state.busyUpdating}
+                                        handleUpdateChange={this.handleUpdateChange}
+                                        updateSuccessMessage={this.state.updateSuccessMessage}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </PanelBody>
-                </PluginSidebar>
-            </Fragment>
-        )
+                        </PanelBody>
+                    </PluginSidebar>
+                </Fragment>
+            );
+        } else {
+            return '';
+        }
     }
 }
 
