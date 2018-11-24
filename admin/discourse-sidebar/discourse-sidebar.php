@@ -196,17 +196,22 @@ class DiscourseSidebar {
 	 * Called by `handleUpdateChange`.
 	 *
 	 * @param object $data The data sent with the API request.
+	 *
+	 * @return array
 	 */
 	public function update_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$post = get_post( $post_id );
 		update_post_meta( $post_id, 'update_discourse_topic', 1 );
 
-		// There is no return value from this function.
-		// Check the values for 'wpdc_publishing_response' and 'wpdc_publishing_error' on the client.
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
 
 		delete_post_meta( $post_id, 'update_discourse_topic' );
+
+		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
+		$response = $publishing_error ? 'error' : 'success';
+
+		return array( 'update_response' => $response );
 	}
 
 	public function get_discourse_categories() {
