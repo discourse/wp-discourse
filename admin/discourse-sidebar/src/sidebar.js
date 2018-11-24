@@ -437,7 +437,7 @@ class DiscourseSidebar extends Component {
 
     // Todo: this doesn't seem like the best way to do this. None of the code should be run for post types that can't be published to Discourse.
     isAllowedPostType() {
-        return pluginOptions.allowedPostTypes.indexOf(this.props.post.type) >= 0
+        return pluginOptions.allowedPostTypes.indexOf(this.props.post.type) >= 0;
     }
 
     handlePublishMethodChange(publishingMethod) {
