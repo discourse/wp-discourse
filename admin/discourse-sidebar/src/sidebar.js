@@ -34,7 +34,6 @@ const iconEl = el('img', {
     src: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII="
 });
 
-// Todo: remove unnecessary class names
 const buttonClass = 'components-button is-button is-default is-primary is-large wpdc-button';
 const activeButtonClass = 'components-button is-button is-default is-primary is-large wpdc-button active';
 const downArrow = (<svg
@@ -143,7 +142,7 @@ class PublishingOptions extends Component {
                         <input type="radio" name="wpdc_publish_options" value="link_post"
                                checked={this.props.publishingMethod === 'link_post'}
                                onChange={this.handleChange}/>
-                        Link to Existing Topic
+                        {__('Link to Existing Topic', 'wp-discourse')}
                     </label>
                 </div>
             );
@@ -205,9 +204,10 @@ class DiscourseCategorySelect extends Component {
                 this.setState({
                     discourseCategories: data
                 });
+                return null;
             },
             (err) => {
-                return err;
+                return null;
             }
         );
     }
@@ -391,7 +391,6 @@ class DiscourseSidebar extends Component {
 
     constructor(props) {
         super(props);
-        // Todo: normalize state naming method; remove unused states
         this.state = {
             published: false,
             publishingMethod: 'publish_post',
@@ -399,12 +398,11 @@ class DiscourseSidebar extends Component {
             publishPostCategory: pluginOptions.defaultCategory,
             discoursePostId: null,
             discoursePermalink: null,
-            wpdcPublishingResponse: null,
             wpdcPublishingError: null,
             busyUnlinking: false,
             busyUpdating: false,
             busyLinking: false,
-            updateSuccessMessage: '',
+            updateSuccessMessage: null,
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -427,7 +425,6 @@ class DiscourseSidebar extends Component {
                     publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                     discoursePostId: meta.discourse_post_id,
                     discoursePermalink: meta.discourse_permalink,
-                    wpdcPublishingResponse: meta.wpdc_publishing_response,
                     wpdcPublishingError: meta.wpdc_publishing_error,
                 });
                 return null;
@@ -522,10 +519,17 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId}
         }).then(
             (data) => {
-                // Todo: don't set the success message here. Check the metatdata and add message to publishing notificion area.
+                const response = data.update_response;
+                let message;
+                if ('success' === response) {
+                    message = <span className={'wpdc-info'}>{__('The Discourse topic has been updated!', 'wp-discourse')}</span>;
+                } else {
+                    // Todo: give more details here.
+                    message = <span className={'wpdc-info'}>{__('There was an error updating the Discourse topic.', 'wp-discourse')}</span>;
+                }
                 this.setState({
                     busyUpdating: false,
-                    updateSuccessMessage: __('The Discourse topic has been updated!', 'wp-discourse'),
+                    updateSuccessMessage: message,
                 });
                 return null;
             },
@@ -547,7 +551,6 @@ class DiscourseSidebar extends Component {
                 publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                 discoursePostId: meta.discourse_post_id,
                 discoursePermalink: meta.discourse_permalink,
-                wpdcPublishingResponse: meta.wpdc_publishing_response,
                 wpdcPublishingError: meta.wpdc_publishing_error,
             });
         }
@@ -570,7 +573,6 @@ class DiscourseSidebar extends Component {
                             <PublishingResponse
                                 published={this.state.published}
                                 discoursePostId={this.state.discoursePostId}
-                                wpdcPublishingResponse={this.state.wpdcPublishingResponse}
                                 wpdcPublishingError={this.state.wpdcPublishingError}
                                 discoursePermalink={this.state.discoursePermalink}
                             />
@@ -597,13 +599,11 @@ class DiscourseSidebar extends Component {
 
                                 <UnlinkFromDiscourse
                                     published={this.state.published}
-                                    // postId={this.props.postId}
                                     handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
                                     busy={this.state.busyUnlinking}
                                 />
                                 <UpdateDiscourseTopic
                                     published={this.state.published}
-                                    // postId={this.props.postId}
                                     busy={this.state.busyUpdating}
                                     handleUpdateChange={this.handleUpdateChange}
                                     updateSuccessMessage={this.state.updateSuccessMessage}
