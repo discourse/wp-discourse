@@ -66,10 +66,28 @@ class PublishingResponse extends Component {
     render() {
         return (
             <div>
-                <ErrorMessage publishingError={this.props.publishingError}/>
-                <DiscourseLink discoursePermalink={this.props.discoursePermalink}/>
+                <StatusMessage statusMessage={this.props.statusMessage} />
+                <ErrorMessage publishingError={this.props.publishingError} />
+                <DiscourseLink discoursePermalink={this.props.discoursePermalink} />
             </div>
         );
+    }
+}
+
+class StatusMessage extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        const statusMessage = this.props.statusMessage;
+        if (statusMessage) {
+            return (
+                <div className={'wpdc-publishing-response success'}>{statusMessage}</div>
+            );
+        }
+
+        return '';
     }
 }
 
@@ -85,38 +103,22 @@ class ErrorMessage extends Component {
             let message = 'test message';
             switch (publishingError) {
                 case 'deleted_topic':
-                    message =
-                        <span className={'wpdc-publishing-error'}>
-                            {__('Your post could not be published to Discourse. The associated Discourse topic may have been deleted. ' +
-                                'Unlink the post so that it can be published again.', 'wp-discourse')}
-                        </span>;
+                    message = __('Your post could not be published to Discourse. The associated Discourse topic may have been deleted. ' +
+                                'Unlink the post so that it can be published again.', 'wp-discourse');
                     break;
                 case 'Not Found':
-                    message =
-                        <span className={'wpdc-publishing-error'}>
-                            {__('Your post could not be updated on Discourse. The associated Discourse topic may have been deleted. ' +
-                                'Unlink the post so that it can be published again.', 'wp-discourse')}
-                        </span>;
+                    message = __('Your post could not be updated on Discourse. The associated Discourse topic may have been deleted. ' +
+                                'Unlink the post so that it can be published again.', 'wp-discourse');
                     break;
                 case 'queued_topic':
-                    message =
-                        <span className={'wpdc-publishing-error'}>
-                                {__("Your post has been added to the Discourse approval queue. When it has been approved, you will need to link it to Discourse by" +
-                                    "selecting the 'Link to Existing Topic' option.", 'wp-discourse')}
-                        </span>;
+                    message = __("Your post has been added to the Discourse approval queue. When it has been approved, you will need to link it to Discourse by" +
+                                    "selecting the 'Link to Existing Topic' option.", 'wp-discourse');
                     break;
                 default:
-                    message =
-                        <span className={'wpdc-publishing-error'}>
-                            {__('There has been an error publishing your post to Discourse: ', 'wp-discourse') + publishingError}
-                        </span>;
+                    message = __('There has been an error publishing your post to Discourse: ', 'wp-discourse') + publishingError;
             }
 
-            console.log('message', message);
-
-            return (
-                <div className={'wpdc-publishing-response error'}>{message}</div>
-            );
+            return <div className={'wpdc-publishing-response error'}>{message}</div>;
         }
         return '';
     }
@@ -435,7 +437,7 @@ class DiscourseSidebar extends Component {
             busyUpdating: false,
             busyLinking: false,
             busyPublishing: false,
-            statusMessage: 'This is a test...',
+            statusMessage: null,
         };
 
         this.updateStateFromDatabase(this.props.postId);
@@ -613,7 +615,7 @@ class DiscourseSidebar extends Component {
                 }
                 this.setState({
                     busyUpdating: false,
-                    updateStatusMessage: message,
+                    statusMessage: message,
                 });
                 return null;
             },
@@ -666,7 +668,7 @@ class DiscourseSidebar extends Component {
                                     discoursePostId={this.state.discoursePostId}
                                     publishingError={this.state.publishingError}
                                     discoursePermalink={this.state.discoursePermalink}
-                                    updateStatusMessage={this.state.updateStatusMessage}
+                                    statusMessage={this.state.statusMessage}
                                 />
                                 <PublishingOptions published={this.state.published}
                                                    handlePublishMethodChange={this.handlePublishMethodChange}
