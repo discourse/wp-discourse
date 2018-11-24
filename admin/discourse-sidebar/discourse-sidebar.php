@@ -219,7 +219,7 @@ class DiscourseSidebar {
 		delete_post_meta( $post_id, 'update_discourse_topic' );
 
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
-		$response = $publishing_error ? 'error' : 'success';
+		$response = $publishing_error ? $publishing_error : 'success';
 
 		return array( 'update_response' => $response );
 	}
