@@ -33,7 +33,7 @@ input.wpdc-topic-url-input {
   margin-bottom: 16px; }
 
 .wpdc-category-select {
-  margin-top: 8px; }
+  margin: 8px 0; }
 
 .wpdc-sidebar-title {
   margin-top: 0;
@@ -41,7 +41,7 @@ input.wpdc-topic-url-input {
 
 .wpdc-publishing-response {
   color: #555d66;
-  border-left: 4px solid #00a0d2; }
+  border-left: 4px solid; }
 
 .wpdc-publishing-response.success {
   margin: -16px -16px 16px -16px;

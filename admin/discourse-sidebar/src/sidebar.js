@@ -84,7 +84,7 @@ class StatusMessage extends Component {
             success = !this.props.publishingError ;
         if (statusMessage) {
             return (
-                <div className={'wpdc-publishing-response ' + (success ? 'success' : 'error')}>{statusMessage}</div>
+                <div className={'wpdc-publishing-response success'}>{statusMessage}</div>
             );
         }
 
@@ -116,7 +116,7 @@ class ErrorMessage extends Component {
                                     "selecting the 'Link to Existing Topic' option.", 'wp-discourse');
                     break;
                 default:
-                    message = __('There has been an error publishing your post to Discourse: ', 'wp-discourse') + publishingError;
+                    message = publishingError;
             }
 
             return <div className={'wpdc-publishing-response error'}>{message}</div>;
@@ -195,24 +195,17 @@ class PublishToDiscourse extends Component {
 
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
-        let message;
+        if ((!this.props.published) && this.props.publishingMethod === 'publish_post') {
 
-        if (publishToDiscourse) {
-            message = <span
-                className={'wpdc-info'}>{__('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse')}</span>;
-        } else {
-            message = '';
-        }
+            if (!('publish' === this.props.postStatus)) {
 
-        if (!this.props.published && this.props.publishingMethod === 'publish_post') {
-            if (!'publish' === this.props.postStatus) {
                 return (
                     <div className={'wpdc-publish-topic'}>
 
                         <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                                checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
                         {__('Publish Post to Discourse', 'wp-discourse')}
-                        {message}
+                        <span className={'wpdc-info'}>{__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}</span>
                     </div>
                 );
             } else {
@@ -525,20 +518,32 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId, topic_url: topicUrl}
         }).then(
             (data) => {
-                // Todo: look at the data to make sure it's worked.
                 this.setState({
                     busyLinking: false,
-                    published: true,
-                    discoursePermalink: data.discourse_permalink,
                 });
+
+                if (data.discourse_permalink) {
+                    this.setState({
+                        published: true,
+                        discoursePermalink: data.discourse_permalink,
+                        publishingError: null,
+                    });
+                } else {
+                    this.setState({
+                        publishingError: 'There has been an error linking your post with Discourse.'
+                    });
+                }
+
                 return null;
             },
             (err) => {
+                const message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'There has been an error linking your post with Discourse.';
                 this.setState({
                     busyLinking: false,
                     published: false,
-                    publishingError: 'there has been an error',
+                    publishingError: message,
                 });
+
                 return null;
             }
         );
@@ -579,6 +584,7 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId}
         }).then(
             (data) => {
+                console.log('publish data', data);
                 const success = 'success' === data.publish_response;
                 this.setState({
                     busyPublishing: false,
