@@ -45,6 +45,9 @@ input.wpdc-topic-url-input {
   font-style: italic; }
 
 .wpdc-info {
+  display: block;
+  margin-top: 4px;
+  color: #ababab;
   font-style: italic; }
 
 h2.wpdc-panel-section-title {

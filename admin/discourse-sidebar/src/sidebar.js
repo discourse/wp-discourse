@@ -65,22 +65,28 @@ class PublishingResponse extends Component {
     }
 
     render() {
-        const response = this.props.wpdcPublishingResponse,
-            error = this.props.wpdcPublishingError;
+        const error = this.props.wpdcPublishingError;
         let message;
 
-        if (this.props.published && this.props.discoursePermalink) {
+        if (this.props.published && this.props.discoursePermalink && !error) {
             const permalink = encodeURI(this.props.discoursePermalink);
             const link = <a href={permalink} className={'wpdc-discourse-permalink'} target={'_blank'}>{permalink}</a>;
             message = <span
-                className={'wpdc-publishing-success'}>{__('Your post has been published to', 'wp-discourse')} {link}</span>;
-        } else if (error && !this.props.published) {
+                className={'wpdc-publishing-success'}>{__('Your post is linked to', 'wp-discourse')} {link}</span>;
+        } else if (error) {
             switch (error) {
                 case 'deleted_topic':
                     message =
                         <span className={'wpdc-publishing-error'}>
-                            {__('Your post could not be published to Discourse. A previous version' +
-                                'of the post may have been deleted from Discourse. If so, unlink the post so that it can be published again as a new topic.', 'wp-discourse')}
+                            {__('Your post could not be published to Discourse. The associated Discourse topic may have been deleted. ' +
+                                'Unlink the post so that it can be published again.', 'wp-discourse')}
+                        </span>;
+                    break;
+                case 'Not Found':
+                    message =
+                        <span className={'wpdc-publishing-error'}>
+                            {__('Your post could not be updated on Discourse. The associated Discourse topic may have been deleted. ' +
+                                'Unlink the post so that it can be published again.', 'wp-discourse')}
                         </span>;
                     break;
                 case 'queued_topic':
@@ -157,7 +163,7 @@ class PublishToDiscourseCheckBox extends Component {
 
     // Todo: this seems awkward
     static publishingMessage(publishToDiscourse) {
-        return publishToDiscourse ? __('Your post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse') : '';
+        return publishToDiscourse ? __('The post will be published to Discourse when it is published or updated on WordPress.', 'wp-discourse') : '';
     }
 
     handleChange(e) {
@@ -175,7 +181,7 @@ class PublishToDiscourseCheckBox extends Component {
                     <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                            checked={publishToDiscourse} onChange={this.handleChange}/>
                     {__('Publish Post to Discourse', 'wp-discourse')}
-                    <span className={'wpdc-publishing-method'}>{this.state.info}</span>
+                    <span className={'wpdc-info'}>{this.state.info}</span>
                 </div>
             );
         } else {
@@ -417,7 +423,7 @@ class DiscourseSidebar extends Component {
                 const meta = data.meta;
                 this.setState({
                     published: meta.discourse_post_id > 0,
-                    publishToDiscourse: meta.publish_to_discourse,
+                    publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                     publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                     discoursePostId: meta.discourse_post_id,
                     discoursePermalink: meta.discourse_permalink,
@@ -533,11 +539,13 @@ class DiscourseSidebar extends Component {
     componentDidUpdate(prevProps) {
         const meta = this.props.post.meta,
             prevMeta = prevProps.post.meta;
+        console.log('meta', meta, 'prevMeta', prevMeta);
         if (meta.discourse_post_id !== prevMeta.discourse_post_id ||
             meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
             meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
             this.setState({
                 published: meta.discourse_post_id > 0,
+                publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                 discoursePostId: meta.discourse_post_id,
                 discoursePermalink: meta.discourse_permalink,
                 wpdcPublishingResponse: meta.wpdc_publishing_response,

@@ -115,15 +115,6 @@ class DiscourseSidebar {
 			)
 		);
 
-//		register_rest_route(
-//			'wp-discourse/v1', 'update-meta', array(
-//				array(
-//					'methods'  => \WP_REST_Server::CREATABLE,
-//					'callback' => array( $this, 'update_discourse_metadata' ),
-//				),
-//			)
-//		);
-
 		register_rest_route(
 			'wp-discourse/v1', 'update-topic', array(
 				array(
@@ -195,6 +186,7 @@ class DiscourseSidebar {
 		delete_post_meta( $post_id, 'update_discourse_topic' );
 		delete_post_meta( $post_id, 'wpdc_sync_post_comments' );
 		delete_post_meta( $post_id, 'wpdc_publishing_response' );
+		delete_post_meta( $post_id, 'wpdc_publishing_error' );
 		delete_post_meta( $post_id, 'wpdc_deleted_topic' );
 	}
 
@@ -216,17 +208,6 @@ class DiscourseSidebar {
 
 		delete_post_meta( $post_id, 'update_discourse_topic' );
 	}
-
-//	public function update_discourse_metadata( $data ) {
-//		$post_id = $data['id'];
-//		if ( $data['linked_topic_url'] && empty( $data['unlink_from_discourse'] ) ) {
-//
-//		} elseif ( empty ( $data['unlink_from_discourse'] ) ) {
-//			write_log( 'if this is called, the post should be published' );
-//			update_post_meta( $data['id'], 'publish_to_discourse', $data['publish_to_discourse'] );
-//			update_post_meta( $data['id'], 'publish_post_category', $data['publish_post_category'] );
-//		}
-//	}
 
 	public function get_discourse_categories() {
 

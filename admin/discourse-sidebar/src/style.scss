@@ -54,7 +54,10 @@ input.wpdc-topic-url-input {
 }
 
 .wpdc-info {
-  font-style: italic;
+	display: block;
+	margin-top: 4px;
+	color: #ababab;
+	font-style: italic;
 }
 
 h2.wpdc-panel-section-title {
@@ -72,9 +75,4 @@ h2.wpdc-panel-section-title {
 
 h2.wpdc-panel-section-title:hover {
   background: #f8f9f9;
-}
-
-.wpdc-component-panel-body {
-  //padding-bottom: 16px;
- // border-bottom: 1px solid #e2e4e7;
 }
