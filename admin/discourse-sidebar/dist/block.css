@@ -1,8 +1,8 @@
-.block-editor__container #discourse-publish-meta-box {
-  display: none; }
-
 .wpdc-published-post {
   margin-bottom: -15px; }
+
+a.wpdc-permalink {
+  text-decoration: none; }
 
 button.components-button.is-button.is-default.is-primary.is-large.active {
   color: #fff;
