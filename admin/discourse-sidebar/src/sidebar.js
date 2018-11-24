@@ -485,7 +485,10 @@ class DiscourseSidebar extends Component {
     }
 
     handleToBePublishedChange(publishToDiscourse) {
-        this.setState({publishToDiscourse: publishToDiscourse ? 1 : 0}, () => {
+        this.setState({
+            publishToDiscourse: publishToDiscourse ? 1 : 0,
+            statusMessage: '',
+        }, () => {
             wp.apiRequest({
                 path: '/wp-discourse/v1/set-publishing-options',
                 method: 'POST',
@@ -512,7 +515,10 @@ class DiscourseSidebar extends Component {
     }
 
     handleLinkTopicClick(topicUrl) {
-        this.setState({busyLinking: true});
+        this.setState({
+            busyLinking: true,
+            statusMessage: '',
+        });
         wp.apiRequest({
             path: '/wp-discourse/v1/link-topic',
             method: 'POST',
@@ -528,13 +534,21 @@ class DiscourseSidebar extends Component {
                 return null;
             },
             (err) => {
+                this.setState({
+                    busyLinking: false,
+                    published: false,
+                    publishingError: 'there has been an error',
+                });
                 return null;
             }
         );
     }
 
     handleUnlinkFromDiscourseChange(unlink_state) {
-        this.setState({busyUnlinking: true});
+        this.setState({
+            busyUnlinking: true,
+            statusMessage: '',
+        });
         wp.apiRequest({
             path: '/wp-discourse/v1/unlink-post',
             method: 'POST',
@@ -544,6 +558,7 @@ class DiscourseSidebar extends Component {
                 this.setState({
                     busyUnlinking: false,
                     published: false,
+                    statusMessage: __('Your post has been unlinked from Discourse.', 'wp-discourse')
                 });
                 return null;
             },
@@ -556,6 +571,7 @@ class DiscourseSidebar extends Component {
     handlePublishChange(e) {
         this.setState({
             busyPublishing: true,
+            statusMessage: '',
         });
         wp.apiRequest({
             path: '/wp-discourse/v1/update-topic',
@@ -684,16 +700,15 @@ class DiscourseSidebar extends Component {
                                                       handleLinkTopicClick={this.handleLinkTopicClick}
                                 />
                                 <div className={'wpdc-published-post'}>
-
-                                    <UnlinkFromDiscourse
-                                        published={this.state.published}
-                                        handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
-                                        busy={this.state.busyUnlinking}
-                                    />
                                     <UpdateDiscourseTopic
                                         published={this.state.published}
                                         busy={this.state.busyUpdating}
                                         handleUpdateChange={this.handleUpdateChange}
+                                    />
+                                    <UnlinkFromDiscourse
+                                        published={this.state.published}
+                                        handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
+                                        busy={this.state.busyUnlinking}
                                     />
                                 </div>
                             </div>
