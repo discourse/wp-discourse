@@ -66,7 +66,7 @@ class PublishingResponse extends Component {
     render() {
         return (
             <div>
-                <StatusMessage statusMessage={this.props.statusMessage} />
+                <StatusMessage statusMessage={this.props.statusMessage} publishingError={this.props.publishingError} />
                 <ErrorMessage publishingError={this.props.publishingError} />
                 <DiscourseLink discoursePermalink={this.props.discoursePermalink} />
             </div>
@@ -80,10 +80,11 @@ class StatusMessage extends Component {
     }
 
     render() {
-        const statusMessage = this.props.statusMessage;
+        const statusMessage = this.props.statusMessage,
+            success = !this.props.publishingError ;
         if (statusMessage) {
             return (
-                <div className={'wpdc-publishing-response success'}>{statusMessage}</div>
+                <div className={'wpdc-publishing-response ' + (success ? 'success' : 'error')}>{statusMessage}</div>
             );
         }
 
@@ -132,8 +133,8 @@ class DiscourseLink extends Component {
     render() {
         if (this.props.discoursePermalink) {
             const permalink = encodeURI(this.props.discoursePermalink);
-            const link = <a href={permalink} className={'wpdc-permalink'} target={'_blank'}>{permalink}</a>;
-            return <span>{__('Your post is linked with', 'wp-discourse')} {link}</span>;
+            const link = <a href={permalink} className={'wpdc-permalink-link'} target={'_blank'}>{permalink}</a>;
+            return <div className={'wpdc-permalink'}>{__('Your post is linked with', 'wp-discourse')} {link}</div>;
         }
         return '';
     }
@@ -475,7 +476,6 @@ class DiscourseSidebar extends Component {
         }
     }
 
-    // Todo: this doesn't seem like the best way to do this. None of the code should be run for post types that can't be published to Discourse.
     isAllowedPostType() {
         return pluginOptions.allowedPostTypes.indexOf(this.props.post.type) >= 0;
     }
@@ -564,19 +564,9 @@ class DiscourseSidebar extends Component {
         }).then(
             (data) => {
                 const success = 'success' === data.publish_response;
-                let message;
-                if (success) {
-                    message = <span
-                        className={'wpdc-info'}>{__('The Discourse topic has been published!', 'wp-discourse')}</span>;
-                } else {
-                    // Todo: give more details here.
-                    message = <span
-                        className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>;
-                }
                 this.setState({
                     busyPublishing: false,
                     published: success,
-                    updateStatusMessage: message,
                 });
                 return null;
             },
@@ -584,8 +574,6 @@ class DiscourseSidebar extends Component {
                 this.setState({
                     busyPublishing: false,
                     published: false,
-                    updateStatusMessage: <span
-                        className={'wpdc-info'}>{__('There was an error publishing the Discourse topic.', 'wp-discourse')}</span>,
                 });
                 return null;
             }
@@ -595,7 +583,7 @@ class DiscourseSidebar extends Component {
     handleUpdateChange(e) {
         this.setState({
             busyUpdating: true,
-            updateStatusMessage: '',
+            statusMessage: '',
         });
         wp.apiRequest({
             path: '/wp-discourse/v1/update-topic',
@@ -603,24 +591,25 @@ class DiscourseSidebar extends Component {
             data: {id: this.props.postId}
         }).then(
             (data) => {
-                const response = data.update_response;
+                const response = data.update_response,
+                    success = 'success' === response;
                 let message;
-                if ('success' === response) {
-                    message = <span
-                        className={'wpdc-info'}>{__('The Discourse topic has been updated!', 'wp-discourse')}</span>;
-                } else {
-                    // Todo: give more details here.
-                    message = <span
-                        className={'wpdc-info'}>{__('There was an error updating the Discourse topic.', 'wp-discourse')}</span>;
+                if (success) {
+                    message = __('The Discourse topic has been updated!', 'wp-discourse');
                 }
                 this.setState({
                     busyUpdating: false,
                     statusMessage: message,
+                    publishingError: success ? null : data.update_response,
                 });
                 return null;
             },
             (err) => {
-                this.setState({busyUpdating: false});
+                const message = __('There was an error updating the Discourse topic.', 'wp-discourse');
+                this.setState({
+                    busyUpdating: false,
+                    statusMessage: message,
+                });
                 return null;
             }
         );

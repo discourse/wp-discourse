@@ -2,10 +2,10 @@
 	margin-bottom: -15px;
 }
 
-.wpdc-discourse-link {
+.wpdc-permalink {
 	margin-bottom: 16px;
 }
-a.wpdc-permalink {
+a.wpdc-permalink-link {
 	text-decoration: none;
 }
 
@@ -48,15 +48,23 @@ input.wpdc-topic-url-input {
 }
 
 .wpdc-publishing-response {
-	margin: -16px -16px 16px -16px;
-	padding: 16px;
+
 	color: #555d66;
 	border-left: 4px solid #00a0d2;
 }
 
 .wpdc-publishing-response.success {
+	margin: -16px -16px 16px -16px;
+	padding: 16px;
 	border-left-color: #4ab866;
 	background-color: #eff9f1;
+}
+
+.wpdc-publishing-response.error {
+	margin: -16px -16px 16px -16px;
+	padding: 16px;
+	border-left-color: #d94f4f;
+	background-color: #f9e2e2;
 }
 
 .wpdc-publishing-method {
