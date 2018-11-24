@@ -125,6 +125,15 @@ class DiscourseSidebar {
 		);
 
 		register_rest_route(
+			'wp-discourse/v1', 'publish-topic', array(
+				array(
+					'methods'  => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'publish_topic' ),
+				)
+			)
+		);
+
+		register_rest_route(
 			'wp-discourse/v1', 'unlink-post', array(
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
@@ -155,12 +164,13 @@ class DiscourseSidebar {
 	/**
 	 * Updates post_meta to indicate whether or not the post should be published to Discourse, and which category it should be published to.
 	 *
-	 * Called by `handlePublishChange`.
+	 * Called by `handleToBePublishedChange`.
 	 *
 	 * @param object $data The data sent with the API request.
 	 */
 	public function set_publishing_options( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		// Todo: sanitize data.
 		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
 		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
 	}
@@ -207,6 +217,27 @@ class DiscourseSidebar {
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
 
 		delete_post_meta( $post_id, 'update_discourse_topic' );
+
+		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
+		$response = $publishing_error ? 'error' : 'success';
+
+		return array( 'update_response' => $response );
+	}
+
+	/**
+	 * Publishes a post to Discourse.
+	 *
+	 * Called by `handlePublishChange`.
+	 *
+	 * @param object $data The data sent with the API request.
+	 *
+	 * @return array
+	 */
+	public function publish_topic( $data ) {
+		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$post = get_post( $post_id );
+
+		$this->discourse_publish->publish_post_after_save( $post_id, $post );
 
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$response = $publishing_error ? 'error' : 'success';
