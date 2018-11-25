@@ -101,7 +101,7 @@ class ErrorMessage extends Component {
         const publishingError = this.props.publishingError;
 
         if (publishingError) {
-            let message = 'test message';
+            let message;
             switch (publishingError) {
                 case 'deleted_topic':
                     message = __('Your post could not be published to Discourse. The associated Discourse topic may have been deleted. ' +
@@ -114,6 +114,9 @@ class ErrorMessage extends Component {
                 case 'queued_topic':
                     message = __("Your post has been added to the Discourse approval queue. When it has been approved, you will need to link it to Discourse by" +
                                     "selecting the 'Link to Existing Topic' option.", 'wp-discourse');
+                    break;
+                case 'Unprocessable Entity':
+                    message = __('Your post could not be published to Discourse. There may be an existing Discourse topic that is using its permalink. Try linking the post with that topic.', 'wp-discourse');
                     break;
                 default:
                     message = publishingError;
@@ -449,7 +452,6 @@ class DiscourseSidebar extends Component {
         if (this.isAllowedPostType()) {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
-                    console.log('returned post data', data);
                     const meta = data.meta;
                     this.setState({
                         published: meta.discourse_post_id > 0,
@@ -530,14 +532,14 @@ class DiscourseSidebar extends Component {
                     });
                 } else {
                     this.setState({
-                        publishingError: 'There has been an error linking your post with Discourse.'
+                        publishingError: __('There has been an error linking your post with Discourse.', 'wp-discourse')
                     });
                 }
 
                 return null;
             },
             (err) => {
-                const message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : 'There has been an error linking your post with Discourse.';
+                const message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : __('There has been an error linking your post with Discourse.', 'wp-discourse');
                 this.setState({
                     busyLinking: false,
                     published: false,
@@ -563,6 +565,8 @@ class DiscourseSidebar extends Component {
                 this.setState({
                     busyUnlinking: false,
                     published: false,
+                    publishingMethod: 'link_post',
+                    discoursePermalink: null,
                     statusMessage: __('Your post has been unlinked from Discourse.', 'wp-discourse')
                 });
                 return null;
@@ -579,23 +583,26 @@ class DiscourseSidebar extends Component {
             statusMessage: '',
         });
         wp.apiRequest({
-            path: '/wp-discourse/v1/update-topic',
+            path: '/wp-discourse/v1/publish-topic',
             method: 'POST',
             data: {id: this.props.postId}
         }).then(
             (data) => {
-                console.log('publish data', data);
                 const success = 'success' === data.publish_response;
                 this.setState({
                     busyPublishing: false,
                     published: success,
+                    publishingError: success ? null : data.publish_response,
+                    publishingMethod: data.publish_response = 'Unprocessable Entity' ? 'link_post' : 'publish_post',
                 });
                 return null;
             },
             (err) => {
+                const message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : __('There has been an error linking your post with Discourse.', 'wp-discourse');
                 this.setState({
                     busyPublishing: false,
                     published: false,
+                    publishingError: message,
                 });
                 return null;
             }
