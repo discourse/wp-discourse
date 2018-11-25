@@ -58,7 +58,7 @@ const upArrow = (<svg
     </g>
 </svg>);
 
-class PublishingResponse extends Component {
+class Notification extends Component {
     constructor(props) {
         super(props);
     }
@@ -68,7 +68,7 @@ class PublishingResponse extends Component {
             <div>
                 <StatusMessage statusMessage={this.props.statusMessage} publishingError={this.props.publishingError} />
                 <ErrorMessage publishingError={this.props.publishingError} />
-                <DiscourseLink discoursePermalink={this.props.discoursePermalink} />
+                <DiscoursePermalink discoursePermalink={this.props.discoursePermalink} />
             </div>
         );
     }
@@ -80,14 +80,13 @@ class StatusMessage extends Component {
     }
 
     render() {
-        const statusMessage = this.props.statusMessage,
-            success = !this.props.publishingError ;
+        const statusMessage = this.props.statusMessage;
+
         if (statusMessage) {
             return (
                 <div className={'wpdc-publishing-response success'}>{statusMessage}</div>
             );
         }
-
         return '';
     }
 }
@@ -128,7 +127,7 @@ class ErrorMessage extends Component {
     }
 }
 
-class DiscourseLink extends Component {
+class DiscoursePermalink extends Component {
     constructor(props) {
         super(props);
     }
@@ -198,13 +197,11 @@ class PublishToDiscourse extends Component {
 
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
+
         if ((!this.props.published) && this.props.publishingMethod === 'publish_post') {
-
             if (!('publish' === this.props.postStatus)) {
-
                 return (
                     <div className={'wpdc-publish-topic'}>
-
                         <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                                checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
                         {__('Publish Post to Discourse', 'wp-discourse')}
@@ -218,7 +215,6 @@ class PublishToDiscourse extends Component {
                     </button>
                 );
             }
-
         } else {
             return '';
         }
@@ -229,23 +225,7 @@ class DiscourseCategorySelect extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            discourseCategories: null,
-        };
-
         this.handleChange = this.handleChange.bind(this);
-
-        wp.apiFetch({path: 'wp-discourse/v1/get-discourse-categories', method: 'GET'}).then(
-            (data) => {
-                this.setState({
-                    discourseCategories: data
-                });
-                return null;
-            },
-            (err) => {
-                return null;
-            }
-        );
     }
 
     handleChange(e) {
@@ -253,8 +233,10 @@ class DiscourseCategorySelect extends Component {
     }
 
     render() {
-        if (!this.props.published && this.props.publishingMethod === 'publish_post' && this.state.discourseCategories) {
-            const cats = Object.values(this.state.discourseCategories);
+        console.log('cat props', this.props);
+        if (!this.props.published && this.props.publishingMethod === 'publish_post' && this.props.discourseCategories) {
+            console.log('props', this.props);
+            const cats = Object.values(this.props.discourseCategories);
             const options = cats.map((cat) =>
                 <option value={cat.id}
                         selected={parseInt(this.props.category_id, 10) === parseInt(cat.id, 10)}>{cat.name}</option>
@@ -435,9 +417,11 @@ class DiscourseSidebar extends Component {
             busyLinking: false,
             busyPublishing: false,
             statusMessage: null,
+            discourseCategories: null,
         };
 
         this.updateStateFromDatabase(this.props.postId);
+        this.getDiscourseCategories();
 
         this.handleToBePublishedChange = this.handleToBePublishedChange.bind(this);
         this.handlePublishChange = this.handlePublishChange.bind(this);
@@ -446,6 +430,20 @@ class DiscourseSidebar extends Component {
         this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
         this.handleUpdateChange = this.handleUpdateChange.bind(this);
         this.handleLinkTopicClick = this.handleLinkTopicClick.bind(this);
+    }
+
+    getDiscourseCategories() {
+        wp.apiFetch({path: 'wp-discourse/v1/get-discourse-categories', method: 'GET'}).then(
+            (data) => {
+                this.setState({
+                    discourseCategories: data,
+                });
+            },
+            (err) => {
+                // Todo: this should be handled. Categories won't be available until the plugin is configured.
+                return null;
+            }
+        );
     }
 
     updateStateFromDatabase(postId) {
@@ -681,7 +679,7 @@ class DiscourseSidebar extends Component {
                     >
                         <PanelBody>
                             <div className={'wpdc-sidebar'}>
-                                <PublishingResponse
+                                <Notification
                                     published={this.state.published}
                                     discoursePostId={this.state.discoursePostId}
                                     publishingError={this.state.publishingError}
@@ -697,6 +695,7 @@ class DiscourseSidebar extends Component {
                                     published={this.state.published}
                                     category_id={this.state.publishPostCategory}
                                     handleCategoryChange={this.handleCategoryChange}
+                                    discourseCategories={this.state.discourseCategories}
                                 />
                                 <PublishToDiscourse publishingMethod={this.state.publishingMethod}
                                                     published={this.state.published}
