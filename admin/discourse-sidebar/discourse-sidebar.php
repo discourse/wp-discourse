@@ -242,7 +242,7 @@ class DiscourseSidebar {
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$response = $publishing_error ? $publishing_error : 'success';
 
-		return array( 'update_response' => $response );
+		return array( 'publish_response' => $response );
 	}
 
 	/**
