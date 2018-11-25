@@ -171,6 +171,7 @@ class PublishingOptions extends Component {
                                onChange={this.handleChange}/>
                         {__('Link to Existing Topic', 'wp-discourse')}
                     </label>
+                    <hr/>
                 </div>
             );
         } else {
@@ -390,6 +391,101 @@ class UpdateDiscourseTopic extends Component {
                         </button>
                     </div>
                 </div>
+            );
+        } else {
+            return '';
+        }
+    }
+}
+
+class TagTopic extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            tags: '',
+            chosenTags: [],
+            inputContent: '',
+            inputLength: 1,
+        };
+
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+    }
+
+    handleChange(e) {
+        const val = e.target.value;
+        this.setState({
+            inputContent: ',' === val ? '' : val,
+            inputLength: val.length === 0 ? 1 : val.length,
+        });
+    }
+
+    handleKeyPress(e) {
+        const keyVal = e.key;
+        const val = e.target.value;
+
+        if ('Enter' === keyVal || ',' === keyVal) {
+            console.log('input value', val);
+            let currentChoices = this.state.chosenTags;
+            currentChoices.push(val.trim().replace(/ /g, '-'));
+            console.log('current choices', currentChoices);
+            this.setState({
+                chosenTags: currentChoices,
+                inputContent: '',
+            });
+        }
+    }
+
+    handleClick(key) {
+        let tags = this.state.chosenTags;
+        console.log('chosen tags', tags);
+        let index = tags.indexOf(key);
+        if (index > -1) {
+            tags.splice(index, 1);
+            this.setState({chosenTags: tags});
+        }
+    }
+
+    render() {
+        if ('publish_post' === this.props.publishingMethod && !this.props.published) {
+            const tagDisplay = this.state.chosenTags.map((tag, index) =>
+                <span className={'components-form-token-field__token'} key={tag}>
+                    <span className={'components-form-token-field__token-text'}>
+                        <span className="screen-reader-text">{tag}</span>
+                        <span aria-hidden="true">{tag}</span>
+                    </span>
+                    <button type="button"
+                            aria-label="Remove Tag"
+                            className={'components-button components-icon-button components-form-token-field__remove-token'}
+                            onClick={this.handleClick.bind(this, tag)}
+                            key={tag}
+                    >
+                        <svg aria-hidden="true"
+                             role="img"
+                             focusable="false"
+                             className={'dashicon dashicons-dismiss'}
+                             xmlns="http://www.w3.org/2000/svg"
+                             width="20" height="20" viewBox="0 0 20 20">
+                            <path d={'M10 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm5 11l-3-3 3-3-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3z'}/>
+                        </svg>
+                    </button>
+                </span>
+            );
+            return (
+                <div className={'components-form-token-field__input-container'}>
+
+                    {tagDisplay}
+                    <input type={'text'}
+                           size={this.state.inputLength}
+                           className={'components-form-token-field__input'}
+                           onChange={this.handleChange}
+                           onKeyPress={this.handleKeyPress}
+                           value={this.state.inputContent}
+                    />
+                </div>
+
             );
         } else {
             return '';
@@ -693,6 +789,10 @@ class DiscourseSidebar extends Component {
                                     category_id={this.state.publishPostCategory}
                                     handleCategoryChange={this.handleCategoryChange}
                                     discourseCategories={this.state.discourseCategories}
+                                />
+                                <TagTopic
+                                    publishingMethod={this.state.publishingMethod}
+                                    published={this.state.published}
                                 />
                                 <PublishToDiscourse publishingMethod={this.state.publishingMethod}
                                                     published={this.state.published}

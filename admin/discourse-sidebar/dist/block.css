@@ -79,3 +79,7 @@ h2.wpdc-panel-section-title {
 
 h2.wpdc-panel-section-title:hover {
   background: #f8f9f9; }
+
+/* tags */
+.wpdc-sidebar .components-form-token-field__input-container input[type=text].components-form-token-field__input {
+  width: auto; }
