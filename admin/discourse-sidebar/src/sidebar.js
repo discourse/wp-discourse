@@ -233,9 +233,7 @@ class DiscourseCategorySelect extends Component {
     }
 
     render() {
-        console.log('cat props', this.props);
         if (!this.props.published && this.props.publishingMethod === 'publish_post' && this.props.discourseCategories) {
-            console.log('props', this.props);
             const cats = Object.values(this.props.discourseCategories);
             const options = cats.map((cat) =>
                 <option value={cat.id}
@@ -301,7 +299,6 @@ class LinkToDiscourseTopic extends Component {
         }
     }
 }
-
 
 class UnlinkFromDiscourse extends Component {
     constructor(props) {
