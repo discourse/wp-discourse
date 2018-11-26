@@ -577,11 +577,14 @@ class DiscourseSidebar extends Component {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
                     const meta = data.meta;
-                    console.log('meta.publish', meta.publish_to_discourse);
+                    let publishToDiscourse = parseInt(meta.publish_to_discourse, 10) === 0 ? 0 : 1;
+                    if( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
+                        publishToDiscourse = 0;
+                    }
                     this.setState({
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
-                        publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
+                        publishToDiscourse: publishToDiscourse,
                         publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                         topicTags: meta.wpdc_topic_tags.split(','),
                         discoursePostId: meta.discourse_post_id,
@@ -633,14 +636,12 @@ class DiscourseSidebar extends Component {
 
     handleCategoryChange(category_id) {
         this.setState({publishPostCategory: category_id}, () => {
-            console.log('changing cat. publishToDiscourse?', this.state.publishToDiscourse);
             this.handleToBePublishedChange(this.state.publishToDiscourse);
         });
     }
 
     handleTagChange(tags) {
         this.setState({topicTags: tags}, () => {
-            console.log('changing tags. publish to Discourse?', this.state.publishToDiscourse);
             this.handleToBePublishedChange(this.state.publishToDiscourse);
         })
     }
@@ -792,10 +793,15 @@ class DiscourseSidebar extends Component {
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
+                // Todo: this is weird.
+                let publishToDiscourse = parseInt(meta.publish_to_discourse, 10) === 0 ? 0 : 1;
+                if( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
+                    publishToDiscourse = 0;
+                }
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     postStatus: post.status,
-                    publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
+                    publishToDiscourse: publishToDiscourse,
                     discoursePostId: meta.discourse_post_id,
                     discoursePermalink: meta.discourse_permalink,
                     publishingError: meta.wpdc_publishing_error,
