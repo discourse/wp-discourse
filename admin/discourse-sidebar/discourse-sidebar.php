@@ -45,6 +45,7 @@ class DiscourseSidebar {
 		$meta_keys = array(
 			'publish_to_discourse',
 			'publish_post_category',
+			'wpdc_topic_tags',
 			'discourse_post_id',
 			'discourse_permalink',
 			'wpdc_publishing_response',
@@ -173,6 +174,9 @@ class DiscourseSidebar {
 		// Todo: sanitize data.
 		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
 		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
+		$tags = $data['wpdc_topic_tags'];
+		$tags = join(',', $tags );
+		update_post_meta( $post_id, 'wpdc_topic_tags', $tags);
 	}
 
 	/**
@@ -236,13 +240,18 @@ class DiscourseSidebar {
 	public function publish_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$post = get_post( $post_id );
+		update_post_meta( $post_id, 'publish_to_discourse', 1 );
 
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
 
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$response = $publishing_error ? $publishing_error : 'success';
+		$permalink = get_post_meta( $post_id, 'discourse_permalink', true );
 
-		return array( 'publish_response' => $response );
+		return array(
+			'publish_response' => $response,
+			'discourse_permalink' => $permalink,
+			);
 	}
 
 	/**
