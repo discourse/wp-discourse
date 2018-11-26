@@ -207,7 +207,7 @@ class PublishToDiscourse extends Component {
                         <div className={'wpdc-publish-topic'}>
                             <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                                    checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
-                            {__('Publish after save', 'wp-discourse')}
+                            {__('Auto publish', 'wp-discourse')}
                             <span
                                 className={'wpdc-info'}>{__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}</span>
                         </div>
@@ -437,8 +437,9 @@ class TagTopic extends Component {
         const val = e.target.value;
 
         if ('Enter' === keyVal || ',' === keyVal) {
-            let currentChoices = this.state.chosenTags;
+            let currentChoices =  this.state.chosenTags;
             currentChoices.push(val.trim().replace(/ /g, '-'));
+            currentChoices = TagTopic.sanitizeArray(currentChoices);
             this.setState({
                 chosenTags: currentChoices,
                 inputContent: '',
@@ -452,15 +453,15 @@ class TagTopic extends Component {
         let tags = this.state.chosenTags;
         let index = tags.indexOf(key);
         if (index > -1) {
-            tags.splice(index, 1);
+            tags = TagTopic.sanitizeArray(tags.splice(index, 1));
             this.setState({chosenTags: tags}, () => {
                 this.props.handleTagChange(tags);
             });
         }
     }
 
-    sanitizeArray(arr) {
-        let tmp = arr.sort().reduce((accumulator, current) => {
+    static sanitizeArray(arr) {
+        arr = arr.sort().reduce((accumulator, current) => {
             const length = accumulator.length;
             if ((length === 0 || accumulator[length - 1] !== current) && current.trim() !== '') {
                 accumulator.push(current);
@@ -468,12 +469,12 @@ class TagTopic extends Component {
             return accumulator;
         }, []);
 
-        return tmp;
+        return arr;
     }
 
     render() {
         if ('publish_post' === this.props.publishingMethod && !this.props.published) {
-            let tagDisplay = this.sanitizeArray(this.props.tags);
+            let tagDisplay = TagTopic.sanitizeArray(this.props.tags);
             tagDisplay = tagDisplay.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
@@ -531,7 +532,7 @@ class DiscourseSidebar extends Component {
             published: false,
             postStatus: '',
             publishingMethod: 'publish_post',
-            publishToDiscourse: 0,
+            publishToDiscourse: false,
             publishPostCategory: pluginOptions.defaultCategory,
             topicTags: [],
             discoursePostId: null,
@@ -576,11 +577,8 @@ class DiscourseSidebar extends Component {
         if (this.isAllowedPostType()) {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
-                    const meta = data.meta;
-                    let publishToDiscourse = parseInt(meta.publish_to_discourse, 10) === 0 ? 0 : 1;
-                    if( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
-                        publishToDiscourse = 0;
-                    }
+                    const meta = data.meta,
+                        publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
                     this.setState({
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
@@ -608,20 +606,17 @@ class DiscourseSidebar extends Component {
         this.setState({publishingMethod: publishingMethod});
     }
 
-    // Todo: this isn't quite right, maybe category and tag changes should be handled separately?
     handleToBePublishedChange(publishToDiscourse) {
         this.setState({
-            publishToDiscourse: publishToDiscourse ? 1 : 0,
+            publishToDiscourse: publishToDiscourse,
             statusMessage: '',
         }, () => {
             wp.apiRequest({
-                path: '/wp-discourse/v1/set-publishing-options',
+                path: '/wp-discourse/v1/set-publish-meta',
                 method: 'POST',
                 data: {
                     id: this.props.postId,
-                    publish_to_discourse: this.state.publishToDiscourse,
-                    publish_post_category: this.state.publishPostCategory,
-                    wpdc_topic_tags: this.state.topicTags,
+                    publish_to_discourse: this.state.publishToDiscourse ? 1 : 0,
                 }
             }).then(
                 (data) => {
@@ -634,16 +629,45 @@ class DiscourseSidebar extends Component {
         });
     }
 
-    handleCategoryChange(category_id) {
-        this.setState({publishPostCategory: category_id}, () => {
-            this.handleToBePublishedChange(this.state.publishToDiscourse);
+    handleCategoryChange(categoryId) {
+        this.setState({publishPostCategory: categoryId}, () => {
+            wp.apiRequest({
+                path: '/wp-discourse/v1/set-category-meta',
+                method: 'POST',
+                data: {
+                    id: this.props.postId,
+                    publish_post_category: categoryId,
+                }
+            }).then(
+                (data) => {
+                    return null;
+                },
+                (err) => {
+                    return null;
+                }
+            );
         });
     }
 
     handleTagChange(tags) {
         this.setState({topicTags: tags}, () => {
-            this.handleToBePublishedChange(this.state.publishToDiscourse);
-        })
+            const tagString = tags.join(',');
+            wp.apiRequest({
+                path: '/wp-discourse/v1/set-tag-meta',
+                method: 'POST',
+                data: {
+                    id: this.props.postId,
+                    wpdc_topic_tags: tagString,
+                }
+            }).then(
+                (data) => {
+                    return null;
+                },
+                (err) => {
+                    return null;
+                }
+            );
+        });
     }
 
     handleLinkTopicClick(topicUrl) {
@@ -793,11 +817,7 @@ class DiscourseSidebar extends Component {
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
-                // Todo: this is weird.
-                let publishToDiscourse = parseInt(meta.publish_to_discourse, 10) === 0 ? 0 : 1;
-                if( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
-                    publishToDiscourse = 0;
-                }
+                const publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     postStatus: post.status,
