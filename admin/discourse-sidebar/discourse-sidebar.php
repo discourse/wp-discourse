@@ -153,30 +153,70 @@ class DiscourseSidebar {
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'set-publishing-options', array(
+			'wp-discourse/v1', 'set-publish-meta', array(
 				array(
 					'methods' => \WP_REST_Server::CREATABLE,
-					'callback' => array( $this, 'set_publishing_options' ),
+					'callback' => array( $this, 'set_publish_meta' ),
+				)
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'set-category-meta', array(
+				array(
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'set_category_meta' ),
+				)
+			)
+		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'set-tag-meta', array(
+				array(
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'set_tag_meta' ),
 				)
 			)
 		);
 	}
 
 	/**
-	 * Updates post_meta to indicate whether or not the post should be published to Discourse, and which category it should be published to.
+	 * Updates post_meta to indicate whether or not the post should be published to Discourse.
 	 *
 	 * Called by `handleToBePublishedChange`.
 	 *
 	 * @param object $data The data sent with the API request.
 	 */
-	public function set_publishing_options( $data ) {
+	public function set_publish_meta( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
-		// Todo: sanitize data.
-		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
-		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
-		$tags = $data['wpdc_topic_tags'];
-		$tags = join(',', $tags );
-		update_post_meta( $post_id, 'wpdc_topic_tags', $tags);
+		$publish_to_discourse = intval( wp_unslash( $data['publish_to_discourse'] ) );
+		update_post_meta( $post_id, 'publish_to_discourse', $publish_to_discourse );
+	}
+
+	/**
+	 * Updates the publish_post_category metadata.
+	 *
+	 * Called by `handleCategoryChange`.
+	 *
+	 * @param object $data The data received from the API request.
+	 */
+	public function set_category_meta( $data ) {
+		$post_id = intval( wp_unslash( $data['id'] ) );
+		$category_id = intval( wp_unslash( $data['publish_post_category'] ) );
+		update_post_meta( $post_id, 'publish_post_category', $category_id );
+	}
+
+	/**
+	 * Updates the wpdc_topic_tags metadata.
+	 *
+	 * Called by `handleTagChange`.
+	 *
+	 * @param object $data The data received from the API request.
+	 */
+	public function set_tag_meta( $data ) {
+		$post_id = intval( wp_unslash( $data['id'] ) );
+		$tags = sanitize_text_field( wp_unslash( $data['wpdc_topic_tags'] ) );
+		update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
 	}
 
 	/**
