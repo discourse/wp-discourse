@@ -171,7 +171,7 @@ class PublishingOptions extends Component {
                                onChange={this.handleChange}/>
                         {__('Link to Existing Topic', 'wp-discourse')}
                     </label>
-                    <hr/>
+                    <hr className={'wpdc-sidebar-hr'}/>
                 </div>
             );
         } else {
@@ -208,8 +208,9 @@ class PublishToDiscourse extends Component {
                             <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
                                    checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
                             {__('Auto publish', 'wp-discourse')}
-                            <span
-                                className={'wpdc-info'}>{__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}</span>
+                            <p className={'wpdc-info'}>
+                                {__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}
+                            </p>
                         </div>
                     </div>
                 );
@@ -253,7 +254,7 @@ class DiscourseCategorySelect extends Component {
                     <select onChange={this.handleChange} className={'widefat'}>
                         {options}
                     </select>
-                    <hr/>
+                    <hr className={'wpdc-sidebar-hr'}/>
                 </div>
             );
         } else {
@@ -437,7 +438,7 @@ class TagTopic extends Component {
         const val = e.target.value;
 
         if ('Enter' === keyVal || ',' === keyVal) {
-            let currentChoices =  this.state.chosenTags;
+            let currentChoices = this.state.chosenTags;
             currentChoices.push(val.trim().replace(/ /g, '-'));
             currentChoices = TagTopic.sanitizeArray(currentChoices);
             this.setState({
@@ -516,7 +517,7 @@ class TagTopic extends Component {
                                }}
                         />
                     </div>
-                    <hr/>
+                    <hr className={'wpdc-sidebar-hr'}/>
                 </div>
             );
         } else {
@@ -578,7 +579,7 @@ class DiscourseSidebar extends Component {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
                     const meta = data.meta,
-                        publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
+                        publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
                     this.setState({
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
@@ -816,7 +817,7 @@ class DiscourseSidebar extends Component {
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
-                const publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
+                const publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     postStatus: post.status,

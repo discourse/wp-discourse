@@ -59,9 +59,9 @@ input.wpdc-topic-url-input {
   display: block;
   font-style: italic; }
 
-.wpdc-info {
+p.wpdc-info {
   display: block;
-  margin-top: 4px;
+  margin-top: 8px;
   color: #ababab;
   font-style: italic; }
 
@@ -80,9 +80,11 @@ h2.wpdc-panel-section-title {
 h2.wpdc-panel-section-title:hover {
   background: #f8f9f9; }
 
+hr.wpdc-sidebar-hr {
+  display: block;
+  margin-left: -16px;
+  margin-right: -16px; }
+
 /* tags */
 .wpdc-sidebar .components-form-token-field__input-container input[type=text].components-form-token-field__input {
   width: auto; }
-
-.wpdc-component-panel-body {
-  margin-bottom: 16px; }
