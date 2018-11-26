@@ -409,7 +409,7 @@ class TagTopic extends Component {
         super(props);
 
         this.state = {
-            chosenTags: [],
+            chosenTags: this.props.tags,
             inputContent: '',
             inputLength: 1,
         };
@@ -450,10 +450,10 @@ class TagTopic extends Component {
     }
 
     handleClick(key) {
-        let tags = this.state.chosenTags;
-        let index = tags.indexOf(key);
+        let tags = this.state.chosenTags,
+            index = tags.indexOf(key);
         if (index > -1) {
-            tags = TagTopic.sanitizeArray(tags.splice(index, 1));
+            tags.splice(index, 1);
             this.setState({chosenTags: tags}, () => {
                 this.props.handleTagChange(tags);
             });
@@ -474,7 +474,7 @@ class TagTopic extends Component {
 
     render() {
         if ('publish_post' === this.props.publishingMethod && !this.props.published) {
-            let tagDisplay = TagTopic.sanitizeArray(this.props.tags);
+            let tagDisplay = TagTopic.sanitizeArray(this.state.chosenTags);
             tagDisplay = tagDisplay.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
@@ -743,7 +743,6 @@ class DiscourseSidebar extends Component {
             busyPublishing: true,
             statusMessage: '',
         });
-        // Todo: is the category being set here? I think so, (from handleCategoryChange) but check this!
         wp.apiRequest({
             path: '/wp-discourse/v1/publish-topic',
             method: 'POST',
