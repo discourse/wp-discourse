@@ -37,7 +37,8 @@ if ( is_admin() ) {
 	new WebhookSettings( $form_helper );
 	new SettingsValidator();
 	new AdminNotice();
-	new MetaBox();
+	// Todo: load if 'Gutenberg Editor Compat Mode' is not enabled
+	//new MetaBox();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 	if ( is_multisite() ) {
