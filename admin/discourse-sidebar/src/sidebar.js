@@ -403,7 +403,6 @@ class TagTopic extends Component {
         super(props);
 
         this.state = {
-            tags: '',
             chosenTags: [],
             inputContent: '',
             inputLength: 1,
@@ -427,30 +426,31 @@ class TagTopic extends Component {
         const val = e.target.value;
 
         if ('Enter' === keyVal || ',' === keyVal) {
-            console.log('input value', val);
             let currentChoices = this.state.chosenTags;
             currentChoices.push(val.trim().replace(/ /g, '-'));
-            console.log('current choices', currentChoices);
             this.setState({
                 chosenTags: currentChoices,
                 inputContent: '',
+            }, () => {
+                this.props.handleTagChange(currentChoices);
             });
         }
     }
 
     handleClick(key) {
         let tags = this.state.chosenTags;
-        console.log('chosen tags', tags);
         let index = tags.indexOf(key);
         if (index > -1) {
             tags.splice(index, 1);
-            this.setState({chosenTags: tags});
+            this.setState({chosenTags: tags}, () => {
+                this.props.handleTagChange(tags);
+            });
         }
     }
 
     render() {
         if ('publish_post' === this.props.publishingMethod && !this.props.published) {
-            const tagDisplay = this.state.chosenTags.map((tag, index) =>
+            const tagDisplay = this.props.tags.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
                         <span className="screen-reader-text">{tag}</span>
@@ -502,6 +502,7 @@ class DiscourseSidebar extends Component {
             publishingMethod: 'publish_post',
             publishToDiscourse: 0,
             publishPostCategory: pluginOptions.defaultCategory,
+            topicTags: [],
             discoursePostId: null,
             discoursePermalink: null,
             publishingError: null,
@@ -519,6 +520,7 @@ class DiscourseSidebar extends Component {
         this.handleToBePublishedChange = this.handleToBePublishedChange.bind(this);
         this.handlePublishChange = this.handlePublishChange.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
+        this.handleTagChange = this.handleTagChange.bind(this);
         this.handleUnlinkFromDiscourseChange = this.handleUnlinkFromDiscourseChange.bind(this);
         this.handlePublishMethodChange = this.handlePublishMethodChange.bind(this);
         this.handleUpdateChange = this.handleUpdateChange.bind(this);
@@ -549,6 +551,7 @@ class DiscourseSidebar extends Component {
                         postStatus: data.status,
                         publishToDiscourse: ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? 0 : meta.publish_to_discourse,
                         publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
+                        topicTags: meta.wpdc_topic_tags.split(','),
                         discoursePostId: meta.discourse_post_id,
                         discoursePermalink: meta.discourse_permalink,
                         publishingError: meta.wpdc_publishing_error,
@@ -581,7 +584,8 @@ class DiscourseSidebar extends Component {
                 data: {
                     id: this.props.postId,
                     publish_to_discourse: this.state.publishToDiscourse,
-                    publish_post_category: this.state.publishPostCategory
+                    publish_post_category: this.state.publishPostCategory,
+                    wpdc_topic_tags: this.state.topicTags,
                 }
             }).then(
                 (data) => {
@@ -598,6 +602,12 @@ class DiscourseSidebar extends Component {
         this.setState({publishPostCategory: category_id}, () => {
             this.handleToBePublishedChange(this.state.publishToDiscourse);
         });
+    }
+
+    handleTagChange(tags) {
+        this.setState({topicTags: tags}, () => {
+            this.handleToBePublishedChange(this.state.publishToDiscourse);
+        })
     }
 
     handleLinkTopicClick(topicUrl) {
@@ -673,6 +683,7 @@ class DiscourseSidebar extends Component {
             busyPublishing: true,
             statusMessage: '',
         });
+        // Todo: is the category being set here? I think so, (from handleCategoryChange) but check this!
         wp.apiRequest({
             path: '/wp-discourse/v1/publish-topic',
             method: 'POST',
@@ -685,6 +696,7 @@ class DiscourseSidebar extends Component {
                     published: success,
                     publishingError: success ? null : data.publish_response,
                     publishingMethod: data.publish_response = 'Unprocessable Entity' ? 'link_post' : 'publish_post',
+                    discoursePermalink: data.discourse_permalink,
                 });
                 return null;
             },
@@ -793,6 +805,8 @@ class DiscourseSidebar extends Component {
                                 <TagTopic
                                     publishingMethod={this.state.publishingMethod}
                                     published={this.state.published}
+                                    handleTagChange={this.handleTagChange}
+                                    tags={this.state.topicTags}
                                 />
                                 <PublishToDiscourse publishingMethod={this.state.publishingMethod}
                                                     published={this.state.published}
