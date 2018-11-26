@@ -411,6 +411,12 @@ class TagTopic extends Component {
         this.handleKeyPress = this.handleKeyPress.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this);
+        this.focusInput = this.focusInput.bind(this);
+    }
+
+    focusInput(e) {
+        console.log('focus input now');
+        this.tagInput.focus();
     }
 
     handleChange(e) {
@@ -489,7 +495,7 @@ class TagTopic extends Component {
                 </span>
             );
             return (
-                <div className={'components-form-token-field__input-container'}>
+                <div className={'components-form-token-field__input-container'} onClick={this.focusInput}>
 
                     {tagDisplay}
                     <input type={'text'}
@@ -498,6 +504,7 @@ class TagTopic extends Component {
                            onChange={this.handleChange}
                            onKeyPress={this.handleKeyPress}
                            value={this.state.inputContent}
+                           ref={input => {this.tagInput = input;}}
                     />
                 </div>
 
