@@ -448,9 +448,24 @@ class TagTopic extends Component {
         }
     }
 
+    sanitizeArray(arr) {
+        let tmp = arr.sort().reduce((accumulator, current) => {
+            const length = accumulator.length;
+            if ((length === 0 || accumulator[length - 1] !== current) && current.trim() !== '') {
+                accumulator.push(current);
+            }
+            return accumulator;
+        }, []);
+
+        return tmp;
+    }
+
     render() {
         if ('publish_post' === this.props.publishingMethod && !this.props.published) {
-            const tagDisplay = this.props.tags.map((tag, index) =>
+            console.log('tags before sanitizing', this.props.tags);
+            let tagDisplay = this.sanitizeArray(this.props.tags);
+            console.log('sanitized tags', tagDisplay);
+            tagDisplay = tagDisplay.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
                         <span className="screen-reader-text">{tag}</span>
