@@ -421,7 +421,6 @@ class TagTopic extends Component {
     }
 
     focusInput(e) {
-        console.log('focus input now');
         this.tagInput.focus();
     }
 
@@ -474,9 +473,7 @@ class TagTopic extends Component {
 
     render() {
         if ('publish_post' === this.props.publishingMethod && !this.props.published) {
-            console.log('tags before sanitizing', this.props.tags);
             let tagDisplay = this.sanitizeArray(this.props.tags);
-            console.log('sanitized tags', tagDisplay);
             tagDisplay = tagDisplay.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
@@ -580,6 +577,7 @@ class DiscourseSidebar extends Component {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
                     const meta = data.meta;
+                    console.log('meta.publish', meta.publish_to_discourse);
                     this.setState({
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
@@ -607,6 +605,7 @@ class DiscourseSidebar extends Component {
         this.setState({publishingMethod: publishingMethod});
     }
 
+    // Todo: this isn't quite right, maybe category and tag changes should be handled separately?
     handleToBePublishedChange(publishToDiscourse) {
         this.setState({
             publishToDiscourse: publishToDiscourse ? 1 : 0,
@@ -634,12 +633,14 @@ class DiscourseSidebar extends Component {
 
     handleCategoryChange(category_id) {
         this.setState({publishPostCategory: category_id}, () => {
+            console.log('changing cat. publishToDiscourse?', this.state.publishToDiscourse);
             this.handleToBePublishedChange(this.state.publishToDiscourse);
         });
     }
 
     handleTagChange(tags) {
         this.setState({topicTags: tags}, () => {
+            console.log('changing tags. publish to Discourse?', this.state.publishToDiscourse);
             this.handleToBePublishedChange(this.state.publishToDiscourse);
         })
     }

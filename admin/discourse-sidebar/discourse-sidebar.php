@@ -172,6 +172,7 @@ class DiscourseSidebar {
 	public function set_publishing_options( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		// Todo: sanitize data.
+		write_log('setting publish data', 'publish', $data['publish_to_discourse'], 'cat', $data['publish_post_category'], 'tags',$data['wpdc_topic_tags']);
 		update_post_meta( $post_id, 'publish_to_discourse', $data['publish_to_discourse'] );
 		update_post_meta( $post_id, 'publish_post_category', $data['publish_post_category'] );
 		$tags = $data['wpdc_topic_tags'];
