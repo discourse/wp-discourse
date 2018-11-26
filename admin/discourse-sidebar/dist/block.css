@@ -83,3 +83,6 @@ h2.wpdc-panel-section-title:hover {
 /* tags */
 .wpdc-sidebar .components-form-token-field__input-container input[type=text].components-form-token-field__input {
   width: auto; }
+
+.wpdc-component-panel-body {
+  margin-bottom: 16px; }

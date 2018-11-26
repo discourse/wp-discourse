@@ -66,9 +66,9 @@ class Notification extends Component {
     render() {
         return (
             <div>
-                <StatusMessage statusMessage={this.props.statusMessage} publishingError={this.props.publishingError} />
-                <ErrorMessage publishingError={this.props.publishingError} />
-                <DiscoursePermalink discoursePermalink={this.props.discoursePermalink} />
+                <StatusMessage statusMessage={this.props.statusMessage} publishingError={this.props.publishingError}/>
+                <ErrorMessage publishingError={this.props.publishingError}/>
+                <DiscoursePermalink discoursePermalink={this.props.discoursePermalink}/>
             </div>
         );
     }
@@ -104,15 +104,15 @@ class ErrorMessage extends Component {
             switch (publishingError) {
                 case 'deleted_topic':
                     message = __('Your post could not be published to Discourse. The associated Discourse topic may have been deleted. ' +
-                                'Unlink the post so that it can be published again.', 'wp-discourse');
+                        'Unlink the post so that it can be published again.', 'wp-discourse');
                     break;
                 case 'Not Found':
                     message = __('Your post could not be updated on Discourse. The associated Discourse topic may have been deleted. ' +
-                                'Unlink the post so that it can be published again.', 'wp-discourse');
+                        'Unlink the post so that it can be published again.', 'wp-discourse');
                     break;
                 case 'queued_topic':
                     message = __("Your post has been added to the Discourse approval queue. When it has been approved, you will need to link it to Discourse by" +
-                                    "selecting the 'Link to Existing Topic' option.", 'wp-discourse');
+                        "selecting the 'Link to Existing Topic' option.", 'wp-discourse');
                     break;
                 case 'Unprocessable Entity':
                     message = __('Your post could not be published to Discourse. There may be an existing Discourse topic that is using its permalink. Try linking the post with that topic.', 'wp-discourse');
@@ -202,18 +202,25 @@ class PublishToDiscourse extends Component {
         if ((!this.props.published) && this.props.publishingMethod === 'publish_post') {
             if (!('publish' === this.props.postStatus)) {
                 return (
-                    <div className={'wpdc-publish-topic'}>
-                        <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
-                               checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
-                        {__('Publish Post to Discourse', 'wp-discourse')}
-                        <span className={'wpdc-info'}>{__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}</span>
+                    <div className={'wpdc-component-panel-body'}>
+                        <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
+                        <div className={'wpdc-publish-topic'}>
+                            <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
+                                   checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
+                            {__('Publish after save', 'wp-discourse')}
+                            <span
+                                className={'wpdc-info'}>{__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}</span>
+                        </div>
                     </div>
                 );
             } else {
                 return (
-                    <button className={this.props.busy ? activeButtonClass : buttonClass}
-                            onClick={this.handlePublishChange}>{__('Publish to Discourse', 'wp-discourse')}
-                    </button>
+                    <div className={'wpdc-component-panel-body'}>
+                        <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
+                        <button className={this.props.busy ? activeButtonClass : buttonClass}
+                                onClick={this.handlePublishChange}>{__('Publish to Discourse', 'wp-discourse')}
+                        </button>
+                    </div>
                 );
             }
         } else {
@@ -241,11 +248,12 @@ class DiscourseCategorySelect extends Component {
                         selected={parseInt(this.props.category_id, 10) === parseInt(cat.id, 10)}>{cat.name}</option>
             );
             return (
-                <div className={'wpdc-category-select'}>
-                    {__('Publish Category:', 'wp-discourse')}
+                <div className={'wpdc-category-select wpdc-component-panel-body'}>
+                    <h2 className={'wpdc-sidebar-title'}>{__('Category', 'wp-discourse')}</h2>
                     <select onChange={this.handleChange} className={'widefat'}>
                         {options}
                     </select>
+                    <hr/>
                 </div>
             );
         } else {
@@ -278,21 +286,19 @@ class LinkToDiscourseTopic extends Component {
     render() {
         if (!this.props.published && this.props.publishingMethod === 'link_post') {
             return (
-                <div className="wpdc-link-post">
-                    <label>
-                        {__('Topic URL:', 'wp-discourse')}
-                        <input
-                            type="url"
-                            className={'widefat wpdc-topic-url-input'}
-                            onChange={this.handleChange}
-                            value={this.state.topicUrl}
-                        />
+                <div className="wpdc-link-post wpdc-component-panel-body">
+                    <h2 className={'wpdc-sidebar-title'}>{__('Topic URL', 'wp-discourse')}</h2>
+                    <input
+                        type="url"
+                        className={'widefat wpdc-topic-url-input'}
+                        onChange={this.handleChange}
+                        value={this.state.topicUrl}
+                    />
 
-                        <button className={this.props.busy ? activeButtonClass : buttonClass}
-                                onClick={this.handleClick}>
-                            {__('Link With Discourse', 'wp-discourse')}
-                        </button>
-                    </label>
+                    <button className={this.props.busy ? activeButtonClass : buttonClass}
+                            onClick={this.handleClick}>
+                        {__('Link With Discourse', 'wp-discourse')}
+                    </button>
                 </div>
             )
         } else {
@@ -489,25 +495,31 @@ class TagTopic extends Component {
                              className={'dashicon dashicons-dismiss'}
                              xmlns="http://www.w3.org/2000/svg"
                              width="20" height="20" viewBox="0 0 20 20">
-                            <path d={'M10 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm5 11l-3-3 3-3-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3z'}/>
+                            <path
+                                d={'M10 2c4.42 0 8 3.58 8 8s-3.58 8-8 8-8-3.58-8-8 3.58-8 8-8zm5 11l-3-3 3-3-2-2-3 3-3-3-2 2 3 3-3 3 2 2 3-3 3 3z'}/>
                         </svg>
                     </button>
                 </span>
             );
             return (
-                <div className={'components-form-token-field__input-container'} onClick={this.focusInput}>
+                <div className={'wpdc-component-panel-body'}>
+                    <h2 className={'wpdc-sidebar-title'}>{__('Tags', 'wp-discourse')}</h2>
+                    <div className={'components-form-token-field__input-container'} onClick={this.focusInput}>
 
-                    {tagDisplay}
-                    <input type={'text'}
-                           size={this.state.inputLength}
-                           className={'components-form-token-field__input'}
-                           onChange={this.handleChange}
-                           onKeyPress={this.handleKeyPress}
-                           value={this.state.inputContent}
-                           ref={input => {this.tagInput = input;}}
-                    />
+                        {tagDisplay}
+                        <input type={'text'}
+                               size={this.state.inputLength}
+                               className={'components-form-token-field__input'}
+                               onChange={this.handleChange}
+                               onKeyPress={this.handleKeyPress}
+                               value={this.state.inputContent}
+                               ref={input => {
+                                   this.tagInput = input;
+                               }}
+                        />
+                    </div>
+                    <hr/>
                 </div>
-
             );
         } else {
             return '';
