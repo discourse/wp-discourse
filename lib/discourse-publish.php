@@ -192,6 +192,10 @@ class DiscoursePublish {
 		$category         = isset( $publish_post_category ) ? $publish_post_category : $default_category;
 		$category         = apply_filters( 'wpdc_publish_post_category', $category, $post_id );
 		$tags             = get_post_meta( $post_id, 'wpdc_topic_tags', true );
+		// Todo: this is for the Gutenberg API.
+		if( ! is_array( $tags ) ) {
+			$tags = explode( ',', $tags);
+		}
 		$tags_param       = $this->tags_param( $tags );
 
 		// The post hasn't been published to Discourse yet.
