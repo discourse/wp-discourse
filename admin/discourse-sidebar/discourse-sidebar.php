@@ -70,9 +70,11 @@ class DiscourseSidebar {
 
 		$default_category = $this->options['publish-category'];
 		$allowed_post_types = $this->options['allowed_post_types'];
+		$force_publish = ! empty( $this->options['force-publish']);
 		$data = array(
 			'defaultCategory' => $default_category,
 			'allowedPostTypes' => $allowed_post_types,
+			'forcePublish'     => $force_publish,
 		);
 
 		wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
