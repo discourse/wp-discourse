@@ -179,14 +179,14 @@ class PublishingOptions extends Component {
                 <h2 className={'wpdc-sidebar-title'}>{__('Publishing Options', 'wp-discourse')}</h2>
                 <label>
                     <input type="radio" name="wpdc_publish_options" value="publish_post"
-                           checked={this.props.publishingMethod === 'publish_post'}
+                           checked={'publish_post' === this.props.publishingMethod}
                            onChange={this.handleChange}/>
                     New Topic
                 </label>
                 <br/>
                 <label>
                     <input type="radio" name="wpdc_publish_options" value="link_post"
-                           checked={this.props.publishingMethod === 'link_post'}
+                           checked={'link_post' === this.props.publishingMethod}
                            onChange={this.handleChange}/>
                     {__('Link to Existing Topic', 'wp-discourse')}
                 </label>
@@ -213,9 +213,10 @@ class PublishToDiscourse extends Component {
     }
 
     render() {
-        const publishToDiscourse = this.props.publishToDiscourse;
+        const publishToDiscourse = this.props.publishToDiscourse,
+            publishedOnWordPress = 'publish' === this.props.postStatus;
 
-        if (!'publish' === this.props.postStatus) {
+        if (!publishedOnWordPress) {
             return (
                 <div className={'wpdc-component-panel-body'}>
                     <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
@@ -466,7 +467,7 @@ class TagTopic extends Component {
     static sanitizeArray(arr) {
         arr = arr.sort().reduce((accumulator, current) => {
             const length = accumulator.length;
-            if ((length === 0 || accumulator[length - 1] !== current) && current.trim() !== '') {
+            if ((0 === length || accumulator[length - 1] !== current) && current.trim() !== '') {
                 accumulator.push(current);
             }
             return accumulator;
@@ -577,7 +578,7 @@ class DiscourseSidebar extends Component {
             wp.apiFetch({path: `/wp/v2/posts/${postId}`, method: 'GET'}).then(
                 (data) => {
                     const meta = data.meta,
-                        publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
+                        publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : 1 === parseInt(meta.publish_to_discourse, 10);
                     this.setState({
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
@@ -815,7 +816,7 @@ class DiscourseSidebar extends Component {
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error) {
-                const publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : parseInt(meta.publish_to_discourse, 10) === 1;
+                const publishToDiscourse = ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : 1 === parseInt(meta.publish_to_discourse, 10);
                 this.setState({
                     published: meta.discourse_post_id > 0,
                     postStatus: post.status,
@@ -832,9 +833,9 @@ class DiscourseSidebar extends Component {
         if (this.isAllowedPostType()) {
             const isPublished = this.state.published,
                 forcePublish = this.state.forcePublish;
-            let display;
+            let actions;
             if (!isPublished && !forcePublish) {
-                display =
+                actions =
                     <div className={'wpdc-not-published'}>
                         <PublishingOptions handlePublishMethodChange={this.handlePublishMethodChange}
                                            publishingMethod={this.state.publishingMethod}
@@ -865,7 +866,7 @@ class DiscourseSidebar extends Component {
                             </div>)}
                     </div>
             } else if (!forcePublish) {
-                display =
+                actions =
                     <div className={'wpdc-published-post'}>
                         <UpdateDiscourseTopic
                             published={this.state.published}
@@ -881,19 +882,14 @@ class DiscourseSidebar extends Component {
                         />
                     </div>
             } else {
-                display = null;
+                actions = null;
             }
             return (
                 <Fragment>
-                    <PluginSidebarMoreMenuItem
-                        target="discourse-sidebar"
-                    >
+                    <PluginSidebarMoreMenuItem target="discourse-sidebar">
                         {__('Discourse', 'wp-discourse')}
                     </PluginSidebarMoreMenuItem>
-                    <PluginSidebar
-                        name="discourse-sidebar"
-                        title={__('Discourse', 'wp-discourse')}
-                    >
+                    <PluginSidebar name="discourse-sidebar" title={__('Discourse', 'wp-discourse')}>
                         <PanelBody>
                             <div className={'wpdc-sidebar'}>
                                 <Notification
@@ -903,14 +899,14 @@ class DiscourseSidebar extends Component {
                                     discoursePermalink={this.state.discoursePermalink}
                                     statusMessage={this.state.statusMessage}
                                 />
-                                {display}
+                                {actions}
                             </div>
                         </PanelBody>
                     </PluginSidebar>
                 </Fragment>
             );
         } else {
-            return '';
+            return null;
         }
     }
 }
