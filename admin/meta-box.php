@@ -50,24 +50,26 @@ class MetaBox {
 	}
 
 	/**
-	 * Registers a meta box for the allowed post types.
+	 * Registers a meta box for the allowed post types if the gutenberg-support option is not enabled.
 	 *
 	 * @param string $post_type The post_type of the current post.
 	 */
 	public function add_meta_box( $post_type ) {
-		if ( isset( $this->options['allowed_post_types'] ) &&
-			 in_array( $post_type, $this->options['allowed_post_types'], true )
-		) {
-			add_meta_box(
-				'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
-					$this,
-					'render_meta_box',
-				),     null, 'normal', 'high',
-				array(
-					'__block_editor_compatible_meta_box' => false,
-				)
-			);
-		}
+	    if ( empty( $this->options['gutenberg-support'] ) ) {
+		    if ( isset( $this->options['allowed_post_types'] ) &&
+		         in_array( $post_type, $this->options['allowed_post_types'], true )
+		    ) {
+			    add_meta_box(
+				    'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
+				    $this,
+				    'render_meta_box',
+			    ),     null, 'normal', 'high',
+				    array(
+					    '__block_editor_compatible_meta_box' => false,
+				    )
+			    );
+		    }
+        }
 	}
 
 	/**
@@ -102,6 +104,7 @@ class MetaBox {
 							   'draft' === get_post_status( $post_id ) ||
 							   'private' === get_post_status( $post_id ) ||
 							   'pending' === get_post_status( $post_id );
+		// Todo: these values are incorrect if a draft was saved when the plugin wasn't enabled.
 		$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
 		$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
 		$default_category_id  = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : null;
@@ -185,6 +188,11 @@ class MetaBox {
 	 * @return int
 	 */
 	public function save_meta_box( $post_id ) {
+        if ( ! empty( $this->options['gutenberg-support'] ) ) {
+
+            return 0;
+        }
+
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
 			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
 		) {

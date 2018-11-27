@@ -42,6 +42,7 @@ class Discourse {
 	 * @var array
 	 */
 	protected $discourse_publish = array(
+		'gutenberg-support'         => 0,
 		'display-subcategories'     => 0,
 		'publish-category'          => '',
 		'publish-category-update'   => 0,

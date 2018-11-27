@@ -40,9 +40,17 @@ class AdminNotice {
 
 	/**
 	 * Set admin notices.
+	 *
+	 * @return null
 	 */
 	public function set_admin_notices() {
 		global $pagenow, $post;
+
+		// Admin notices aren't supported by the Gutenberg editor.
+		if ( ! empty( $this->options['gutenberg-support'] ) ) {
+
+			return null;
+		}
 
 		// Post edit screen notices.
 		if ( 'post.php' === $pagenow || 'post-new.php' === $pagenow ) {
@@ -112,5 +120,7 @@ class AdminNotice {
 				}
 			}// End if().
 		}// End if().
+
+		return null;
 	}
 }

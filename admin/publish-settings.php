@@ -65,6 +65,13 @@ class PublishSettings {
 		);
 
 		add_settings_field(
+			'discourse_gutenberg_support', __( 'Support Gutenberg Editor', 'wp-discourse' ), array(
+			$this,
+			'gutenberg_support_checkbox',
+		), 'discourse_publish', 'discourse_publishing_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_publish_category', __( 'Default Discourse Category', 'wp-discourse' ), array(
 				$this,
 				'publish_category_input',
@@ -178,6 +185,16 @@ class PublishSettings {
 			)
 		);
 	}
+
+	/**
+	 * Outputs markup for the gutenberg-support checkbox.
+	 */
+	public function gutenberg_support_checkbox() {
+		$this->form_helper->checkbox_input(
+			'gutenberg-support', 'discourse_publish', __( 'Use the plugin with the new Gutenberg editor.', 'wp-discourse' ),
+            __( 'If you are using the new Gutenberg Editor, you need to enable this setting.', 'wp-discourse' )
+		);
+    }
 
 	/**
 	 * Outputs markup for the display-subcategories checkbox.
