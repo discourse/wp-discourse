@@ -215,33 +215,29 @@ class PublishToDiscourse extends Component {
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
 
-        if (this.props.publishingMethod === 'publish_post') {
-            if (!'publish' === this.props.postStatus) {
-                return (
-                    <div className={'wpdc-component-panel-body'}>
-                        <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
-                        <div className={'wpdc-publish-topic'}>
-                            <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
-                                   checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
-                            {__('Auto publish', 'wp-discourse')}
-                            <p className={'wpdc-info'}>
-                                {__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}
-                            </p>
-                        </div>
+        if (!'publish' === this.props.postStatus) {
+            return (
+                <div className={'wpdc-component-panel-body'}>
+                    <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
+                    <div className={'wpdc-publish-topic'}>
+                        <input type="checkBox" className={'wpdc-publish-topic-checkbox'}
+                               checked={publishToDiscourse} onChange={this.handleToBePublishedChange}/>
+                        {__('Auto publish', 'wp-discourse')}
+                        <p className={'wpdc-info'}>
+                            {__('Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse')}
+                        </p>
                     </div>
-                );
-            } else {
-                return (
-                    <div className={'wpdc-component-panel-body'}>
-                        <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
-                        <button className={this.props.busy ? activeButtonClass : buttonClass}
-                                onClick={this.handlePublishChange}>{__('Publish to Discourse', 'wp-discourse')}
-                        </button>
-                    </div>
-                );
-            }
+                </div>
+            );
         } else {
-            return null;
+            return (
+                <div className={'wpdc-component-panel-body'}>
+                    <h2 className={'wpdc-sidebar-title'}>{__('Publish to Discourse', 'wp-discourse')}</h2>
+                    <button className={this.props.busy ? activeButtonClass : buttonClass}
+                            onClick={this.handlePublishChange}>{__('Publish to Discourse', 'wp-discourse')}
+                    </button>
+                </div>
+            );
         }
     }
 }
@@ -258,7 +254,7 @@ class CategorySelect extends Component {
     }
 
     render() {
-        if (this.props.publishingMethod === 'publish_post' && this.props.discourseCategories) {
+        if (this.props.discourseCategories) {
             const cats = Object.values(this.props.discourseCategories);
             const options = cats.map((cat) =>
                 <option value={cat.id}
@@ -274,6 +270,7 @@ class CategorySelect extends Component {
                 </div>
             );
         } else {
+            // Todo: handle this.
             return null;
         }
     }
@@ -301,27 +298,23 @@ class LinkToDiscourseTopic extends Component {
     }
 
     render() {
-        if (this.props.publishingMethod === 'link_post') {
-            console.log('linking post');
-            return (
-                <div className="wpdc-link-post wpdc-component-panel-body">
-                    <h2 className={'wpdc-sidebar-title'}>{__('Topic URL', 'wp-discourse')}</h2>
-                    <input
-                        type="url"
-                        className={'widefat wpdc-topic-url-input'}
-                        onChange={this.handleChange}
-                        value={this.state.topicUrl}
-                    />
 
-                    <button className={this.props.busy ? activeButtonClass : buttonClass}
-                            onClick={this.handleClick}>
-                        {__('Link With Discourse', 'wp-discourse')}
-                    </button>
-                </div>
-            )
-        } else {
-            return null;
-        }
+        return (
+            <div className="wpdc-link-post wpdc-component-panel-body">
+                <h2 className={'wpdc-sidebar-title'}>{__('Topic URL', 'wp-discourse')}</h2>
+                <input
+                    type="url"
+                    className={'widefat wpdc-topic-url-input'}
+                    onChange={this.handleChange}
+                    value={this.state.topicUrl}
+                />
+
+                <button className={this.props.busy ? activeButtonClass : buttonClass}
+                        onClick={this.handleClick}>
+                    {__('Link With Discourse', 'wp-discourse')}
+                </button>
+            </div>
+        )
     }
 }
 
@@ -483,10 +476,9 @@ class TagTopic extends Component {
     }
 
     render() {
-        if ('publish_post' === this.props.publishingMethod) {
-            let tagDisplay = TagTopic.sanitizeArray(this.state.chosenTags);
-            tagDisplay = tagDisplay.map((tag, index) =>
-                <span className={'components-form-token-field__token'} key={tag}>
+        let tagDisplay = TagTopic.sanitizeArray(this.state.chosenTags);
+        tagDisplay = tagDisplay.map((tag, index) =>
+            <span className={'components-form-token-field__token'} key={tag}>
                     <span className={'components-form-token-field__token-text'}>
                         <span className="screen-reader-text">{tag}</span>
                         <span aria-hidden="true">{tag}</span>
@@ -508,29 +500,26 @@ class TagTopic extends Component {
                         </svg>
                     </button>
                 </span>
-            );
-            return (
-                <div className={'wpdc-component-panel-body'}>
-                    <h2 className={'wpdc-sidebar-title'}>{__('Tags', 'wp-discourse')}</h2>
-                    <div className={'components-form-token-field__input-container'} onClick={this.focusInput}>
-                        {tagDisplay}
-                        <input type={'text'}
-                               size={this.state.inputLength}
-                               className={'components-form-token-field__input'}
-                               onChange={this.handleChange}
-                               onKeyPress={this.handleKeyPress}
-                               value={this.state.inputContent}
-                               ref={input => {
-                                   this.tagInput = input;
-                               }}
-                        />
-                    </div>
-                    <hr className={'wpdc-sidebar-hr'}/>
+        );
+        return (
+            <div className={'wpdc-component-panel-body'}>
+                <h2 className={'wpdc-sidebar-title'}>{__('Tags', 'wp-discourse')}</h2>
+                <div className={'components-form-token-field__input-container'} onClick={this.focusInput}>
+                    {tagDisplay}
+                    <input type={'text'}
+                           size={this.state.inputLength}
+                           className={'components-form-token-field__input'}
+                           onChange={this.handleChange}
+                           onKeyPress={this.handleKeyPress}
+                           value={this.state.inputContent}
+                           ref={input => {
+                               this.tagInput = input;
+                           }}
+                    />
                 </div>
-            );
-        } else {
-            return null;
-        }
+                <hr className={'wpdc-sidebar-hr'}/>
+            </div>
+        );
     }
 }
 
@@ -850,29 +839,30 @@ class DiscourseSidebar extends Component {
                         <PublishingOptions handlePublishMethodChange={this.handlePublishMethodChange}
                                            publishingMethod={this.state.publishingMethod}
                         />
-                        <CategorySelect
-                            publishingMethod={this.state.publishingMethod}
-                            category_id={this.state.publishPostCategory}
-                            handleCategoryChange={this.handleCategoryChange}
-                            discourseCategories={this.state.discourseCategories}
-                        />
-                        <TagTopic
-                            publishingMethod={this.state.publishingMethod}
-                            handleTagChange={this.handleTagChange}
-                            tags={this.state.topicTags}
-                        />
-                        <PublishToDiscourse publishingMethod={this.state.publishingMethod}
-                                            postStatus={this.state.postStatus}
-                                            publishToDiscourse={this.state.publishToDiscourse}
-                                            handleToBePublishedChange={this.handleToBePublishedChange}
-                                            handlePublishChange={this.handlePublishChange}
-                                            busy={this.state.busyPublishing}
-                        />
-                        <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
-                                              postId={this.props.postId}
-                                              busy={this.state.busyLinking}
-                                              handleLinkTopicClick={this.handleLinkTopicClick}
-                        />
+                        {'publish_post' === this.state.publishingMethod ? (
+                            <div className={'wpdc-publish-to-discourse'}>
+                                <CategorySelect
+                                    category_id={this.state.publishPostCategory}
+                                    handleCategoryChange={this.handleCategoryChange}
+                                    discourseCategories={this.state.discourseCategories}
+                                />
+                                <TagTopic
+                                    handleTagChange={this.handleTagChange}
+                                    tags={this.state.topicTags}
+                                />
+                                <PublishToDiscourse postStatus={this.state.postStatus}
+                                                    publishToDiscourse={this.state.publishToDiscourse}
+                                                    handleToBePublishedChange={this.handleToBePublishedChange}
+                                                    handlePublishChange={this.handlePublishChange}
+                                                    busy={this.state.busyPublishing}
+                                />
+                            </div>
+                        ) : (
+                            <div className={'wpdc-link-to-discourse'}>
+                                <LinkToDiscourseTopic busy={this.state.busyLinking}
+                                                      handleLinkTopicClick={this.handleLinkTopicClick}
+                                />
+                            </div>)}
                     </div>
             } else if (!forcePublish) {
                 display =
