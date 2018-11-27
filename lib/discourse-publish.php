@@ -200,7 +200,10 @@ class DiscoursePublish {
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
-			$unlisted     = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+			// Unlisted has been moved from post metadata to a site option.
+			$unlisted_post     = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+			$unlisted_option = $this->options['publish-as-unlisted'];
+			$unlisted = ! empty( $unlisted_post ) || ! empty( $unlisted_option );
 			$data         = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
@@ -211,7 +214,7 @@ class DiscoursePublish {
 				'category'         => $category,
 				'skip_validations' => 'true',
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
-				'visible'          => ! empty( $unlisted ) ? 'false' : 'true',
+				'visible'          => $unlisted ? 'false' : 'true',
 			);
 			$url          = $options['url'] . '/posts';
 			$post_options = array(
