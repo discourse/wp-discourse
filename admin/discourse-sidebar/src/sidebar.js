@@ -66,11 +66,31 @@ class Notification extends Component {
     render() {
         return (
             <div>
-                <StatusMessage statusMessage={this.props.statusMessage} publishingError={this.props.publishingError}/>
+                <ForcePublishMessage forcePublish={this.props.forcePublish} published={this.props.published}/>
+                <StatusMessage statusMessage={this.props.statusMessage}/>
                 <ErrorMessage publishingError={this.props.publishingError}/>
                 <DiscoursePermalink discoursePermalink={this.props.discoursePermalink}/>
             </div>
         );
+    }
+}
+
+class ForcePublishMessage extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        if (this.props.forcePublish && !this.props.published) {
+            return (
+                <p className={'wpdc-force-publish-message'}>
+                    {__('The Force Publish option is enabled for your site. All posts published on WordPress will be automatically published to Discourse.', 'wp-discourse')}
+                </p>
+
+            );
+        } else {
+            return '';
+        }
     }
 }
 
@@ -154,7 +174,7 @@ class PublishingOptions extends Component {
     }
 
     render() {
-        if (!this.props.published) {
+        if (!this.props.published && !this.props.forcePublish) {
             return (
                 <div className={'wpdc-publishing-options'}>
                     <h2 className={'wpdc-sidebar-title'}>{__('Publishing Options', 'wp-discourse')}</h2>
@@ -199,7 +219,7 @@ class PublishToDiscourse extends Component {
     render() {
         const publishToDiscourse = this.props.publishToDiscourse;
 
-        if ((!this.props.published) && this.props.publishingMethod === 'publish_post') {
+        if (!this.props.published && !this.props.forcePublish && this.props.publishingMethod === 'publish_post') {
             if (!('publish' === this.props.postStatus)) {
                 return (
                     <div className={'wpdc-component-panel-body'}>
@@ -242,7 +262,7 @@ class DiscourseCategorySelect extends Component {
     }
 
     render() {
-        if (!this.props.published && this.props.publishingMethod === 'publish_post' && this.props.discourseCategories) {
+        if (!this.props.published && !this.props.forcePublish && this.props.publishingMethod === 'publish_post' && this.props.discourseCategories) {
             const cats = Object.values(this.props.discourseCategories);
             const options = cats.map((cat) =>
                 <option value={cat.id}
@@ -285,7 +305,7 @@ class LinkToDiscourseTopic extends Component {
     }
 
     render() {
-        if (!this.props.published && this.props.publishingMethod === 'link_post') {
+        if (!this.props.published && !this.props.forcePublish && this.props.publishingMethod === 'link_post') {
             return (
                 <div className="wpdc-link-post wpdc-component-panel-body">
                     <h2 className={'wpdc-sidebar-title'}>{__('Topic URL', 'wp-discourse')}</h2>
@@ -327,7 +347,7 @@ class UnlinkFromDiscourse extends Component {
     }
 
     render() {
-        if (this.props.published) {
+        if (this.props.published && !this.props.forcePublish) {
             return (
                 <div className={"wpdc-component-panel-body"}>
                     <h2 className={"wpdc-panel-section-title"}>
@@ -375,7 +395,7 @@ class UpdateDiscourseTopic extends Component {
     }
 
     render() {
-        if (this.props.published) {
+        if (this.props.published && !this.props.forcePublish) {
             return (
                 <div className={"wpdc-component-panel-body"}>
                     <h2 className={"wpdc-panel-section-title"}>
@@ -474,7 +494,7 @@ class TagTopic extends Component {
     }
 
     render() {
-        if ('publish_post' === this.props.publishingMethod && !this.props.published) {
+        if ('publish_post' === this.props.publishingMethod && !this.props.published && !this.props.forcePublish) {
             let tagDisplay = TagTopic.sanitizeArray(this.state.chosenTags);
             tagDisplay = tagDisplay.map((tag, index) =>
                 <span className={'components-form-token-field__token'} key={tag}>
@@ -533,6 +553,7 @@ class DiscourseSidebar extends Component {
             published: false,
             postStatus: '',
             publishingMethod: 'publish_post',
+            forcePublish: pluginOptions.forcePublish,
             publishToDiscourse: false,
             publishPostCategory: pluginOptions.defaultCategory,
             topicTags: [],
@@ -847,7 +868,7 @@ class DiscourseSidebar extends Component {
                             <div className={'wpdc-sidebar'}>
                                 <Notification
                                     published={this.state.published}
-                                    discoursePostId={this.state.discoursePostId}
+                                    forcePublish={this.state.forcePublish}
                                     publishingError={this.state.publishingError}
                                     discoursePermalink={this.state.discoursePermalink}
                                     statusMessage={this.state.statusMessage}
@@ -855,6 +876,7 @@ class DiscourseSidebar extends Component {
                                 <PublishingOptions published={this.state.published}
                                                    handlePublishMethodChange={this.handlePublishMethodChange}
                                                    publishingMethod={this.state.publishingMethod}
+                                                   forcePublish={this.state.forcePublish}
                                 />
                                 <DiscourseCategorySelect
                                     publishingMethod={this.state.publishingMethod}
@@ -862,12 +884,14 @@ class DiscourseSidebar extends Component {
                                     category_id={this.state.publishPostCategory}
                                     handleCategoryChange={this.handleCategoryChange}
                                     discourseCategories={this.state.discourseCategories}
+                                    forcePublish={this.state.forcePublish}
                                 />
                                 <TagTopic
                                     publishingMethod={this.state.publishingMethod}
                                     published={this.state.published}
                                     handleTagChange={this.handleTagChange}
                                     tags={this.state.topicTags}
+                                    forcePublish={this.state.forcePublish}
                                 />
                                 <PublishToDiscourse publishingMethod={this.state.publishingMethod}
                                                     published={this.state.published}
@@ -876,23 +900,27 @@ class DiscourseSidebar extends Component {
                                                     handleToBePublishedChange={this.handleToBePublishedChange}
                                                     handlePublishChange={this.handlePublishChange}
                                                     busy={this.state.busyPublishing}
+                                                    forcePublish={this.state.forcePublish}
                                 />
                                 <LinkToDiscourseTopic publishingMethod={this.state.publishingMethod}
                                                       published={this.state.published}
                                                       postId={this.props.postId}
                                                       busy={this.state.busyLinking}
                                                       handleLinkTopicClick={this.handleLinkTopicClick}
+                                                      forcePublish={this.state.forcePublish}
                                 />
                                 <div className={'wpdc-published-post'}>
                                     <UpdateDiscourseTopic
                                         published={this.state.published}
                                         busy={this.state.busyUpdating}
                                         handleUpdateChange={this.handleUpdateChange}
+                                        forcePublish={this.state.forcePublish}
                                     />
                                     <UnlinkFromDiscourse
                                         published={this.state.published}
                                         handleUnlinkFromDiscourseChange={this.handleUnlinkFromDiscourseChange}
                                         busy={this.state.busyUnlinking}
+                                        forcePublish={this.state.forcePublish}
                                     />
                                 </div>
                             </div>
