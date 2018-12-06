@@ -193,18 +193,18 @@ class DiscoursePublish {
 		$category         = apply_filters( 'wpdc_publish_post_category', $category, $post_id );
 		$tags             = get_post_meta( $post_id, 'wpdc_topic_tags', true );
 		// For Gutenberg, tags are being set through the API. For this case, it's easier to handle the data as a string.
-		if( ! is_array( $tags ) ) {
-			$tags = explode( ',', $tags);
+		if ( ! is_array( $tags ) ) {
+			$tags = explode( ',', $tags );
 		}
-		$tags_param       = $this->tags_param( $tags );
+		$tags_param = $this->tags_param( $tags );
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
 			// Unlisted has been moved from post metadata to a site option.
-			$unlisted_post     = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+			$unlisted_post   = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 			$unlisted_option = $this->options['publish-as-unlisted'];
-			$unlisted = ! empty( $unlisted_post ) || ! empty( $unlisted_option );
-			$data         = array(
+			$unlisted        = ! empty( $unlisted_post ) || ! empty( $unlisted_option );
+			$data            = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
@@ -216,8 +216,8 @@ class DiscoursePublish {
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => $unlisted ? 'false' : 'true',
 			);
-			$url          = $options['url'] . '/posts';
-			$post_options = array(
+			$url             = $options['url'] . '/posts';
+			$post_options    = array(
 				'timeout' => 30,
 				'method'  => 'POST',
 				'body'    => http_build_query( $data ) . $tags_param,
@@ -246,7 +246,7 @@ class DiscoursePublish {
 			if ( is_wp_error( $result ) ) {
 				$error_message = $result->get_error_message();
 				$error_code    = null;
-				update_post_meta( $post_id,'wpdc_publishing_error', $error_message );
+				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			} else {
 				$error_message = wp_remote_retrieve_response_message( $result );
 				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );

@@ -31,7 +31,7 @@ class DiscourseSidebar {
 	public function __construct( $discourse_publish ) {
 		$this->discourse_publish = $discourse_publish;
 
-		add_action( 'init', array( $this, 'setup_options'));
+		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'register_sidebar_routes' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_scripts' ) );
 	}
@@ -40,9 +40,9 @@ class DiscourseSidebar {
 	 * Setup options and register API meta keys.
 	 */
 	public function setup_options() {
-		$this->options = $this->get_options();
+		$this->options      = $this->get_options();
 		$allowed_post_types = $this->options['allowed_post_types'];
-		$meta_keys = array(
+		$meta_keys          = array(
 			'publish_to_discourse',
 			'publish_post_category',
 			'wpdc_topic_tags',
@@ -65,15 +65,15 @@ class DiscourseSidebar {
 			'discourse-sidebar-js',
 			plugins_url( $blockPath, __FILE__ ),
 			[ 'wp-i18n', 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-editor', 'wp-components', 'wp-data', 'wp-plugins', 'wp-edit-post', 'wp-api' ],
-			filemtime( plugin_dir_path(__FILE__) . $blockPath )
+			filemtime( plugin_dir_path( __FILE__ ) . $blockPath )
 		);
 
-		$default_category = $this->options['publish-category'];
+		$default_category   = $this->options['publish-category'];
 		$allowed_post_types = $this->options['allowed_post_types'];
-		$force_publish = ! empty( $this->options['force-publish']);
-		$max_tags = isset( $this->options['max-tags']) ? $this->options['max-tags'] : 5;
-		$data = array(
-			'defaultCategory' => $default_category,
+		$force_publish      = ! empty( $this->options['force-publish'] );
+		$max_tags           = isset( $this->options['max-tags'] ) ? $this->options['max-tags'] : 5;
+		$data               = array(
+			'defaultCategory'  => $default_category,
 			'allowedPostTypes' => $allowed_post_types,
 			'forcePublish'     => $force_publish,
 			'maxTags'          => $max_tags,
@@ -86,7 +86,7 @@ class DiscourseSidebar {
 			'discourse-sidebar-css',
 			plugins_url( $stylePath, __FILE__ ),
 			'',
-			filemtime( plugin_dir_path(__FILE__) . $stylePath )
+			filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
 		);
 	}
 
@@ -96,13 +96,15 @@ class DiscourseSidebar {
 	 * @param array $meta_keys The meta_keys to register.
 	 * @param array $post_types The post types to register the meta_keys for.
 	 */
-	protected function register_api_meta($meta_keys, $post_types) {
-		foreach( $meta_keys as $meta_key ) {
+	protected function register_api_meta( $meta_keys, $post_types ) {
+		foreach ( $meta_keys as $meta_key ) {
 			foreach ( $post_types as $post_type ) {
-				register_meta( $post_type, $meta_key, array(
-					'single' => true,
-					'show_in_rest' => true,
-				));
+				register_meta(
+					$post_type, $meta_key, array(
+						'single'       => true,
+						'show_in_rest' => true,
+					)
+				);
 			}
 		}
 	}
@@ -125,7 +127,7 @@ class DiscourseSidebar {
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'update_topic' ),
-				)
+				),
 			)
 		);
 
@@ -134,7 +136,7 @@ class DiscourseSidebar {
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'publish_topic' ),
-				)
+				),
 			)
 		);
 
@@ -143,7 +145,7 @@ class DiscourseSidebar {
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'unlink_post' ),
-				)
+				),
 			)
 		);
 
@@ -152,34 +154,34 @@ class DiscourseSidebar {
 				array(
 					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'link_topic' ),
-				)
+				),
 			)
 		);
 
 		register_rest_route(
 			'wp-discourse/v1', 'set-publish-meta', array(
 				array(
-					'methods' => \WP_REST_Server::CREATABLE,
+					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'set_publish_meta' ),
-				)
+				),
 			)
 		);
 
 		register_rest_route(
 			'wp-discourse/v1', 'set-category-meta', array(
 				array(
-					'methods' => \WP_REST_Server::CREATABLE,
+					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'set_category_meta' ),
-				)
+				),
 			)
 		);
 
 		register_rest_route(
 			'wp-discourse/v1', 'set-tag-meta', array(
 				array(
-					'methods' => \WP_REST_Server::CREATABLE,
+					'methods'  => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'set_tag_meta' ),
-				)
+				),
 			)
 		);
 	}
@@ -192,7 +194,7 @@ class DiscourseSidebar {
 	 * @param object $data The data sent with the API request.
 	 */
 	public function set_publish_meta( $data ) {
-		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$post_id              = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$publish_to_discourse = intval( wp_unslash( $data['publish_to_discourse'] ) );
 		update_post_meta( $post_id, 'publish_to_discourse', $publish_to_discourse );
 	}
@@ -205,7 +207,7 @@ class DiscourseSidebar {
 	 * @param object $data The data received from the API request.
 	 */
 	public function set_category_meta( $data ) {
-		$post_id = intval( wp_unslash( $data['id'] ) );
+		$post_id     = intval( wp_unslash( $data['id'] ) );
 		$category_id = intval( wp_unslash( $data['publish_post_category'] ) );
 		update_post_meta( $post_id, 'publish_post_category', $category_id );
 	}
@@ -219,7 +221,7 @@ class DiscourseSidebar {
 	 */
 	public function set_tag_meta( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) );
-		$tags = sanitize_text_field( wp_unslash( $data['wpdc_topic_tags'] ) );
+		$tags    = sanitize_text_field( wp_unslash( $data['wpdc_topic_tags'] ) );
 		update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
 	}
 
@@ -259,7 +261,7 @@ class DiscourseSidebar {
 	 */
 	public function update_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
-		$post = get_post( $post_id );
+		$post    = get_post( $post_id );
 		update_post_meta( $post_id, 'update_discourse_topic', 1 );
 
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
@@ -267,7 +269,7 @@ class DiscourseSidebar {
 		delete_post_meta( $post_id, 'update_discourse_topic' );
 
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
-		$response = $publishing_error ? $publishing_error : 'success';
+		$response         = $publishing_error ? $publishing_error : 'success';
 
 		return array( 'update_response' => $response );
 	}
@@ -283,19 +285,19 @@ class DiscourseSidebar {
 	 */
 	public function publish_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
-		$post = get_post( $post_id );
+		$post    = get_post( $post_id );
 		update_post_meta( $post_id, 'publish_to_discourse', 1 );
 
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
 
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
-		$response = $publishing_error ? $publishing_error : 'success';
-		$permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		$response         = $publishing_error ? $publishing_error : 'success';
+		$permalink        = get_post_meta( $post_id, 'discourse_permalink', true );
 
 		return array(
-			'publish_response' => $response,
+			'publish_response'    => $response,
 			'discourse_permalink' => $permalink,
-			);
+		);
 	}
 
 	/**
@@ -311,13 +313,13 @@ class DiscourseSidebar {
 	/**
 	 * Links a WordPress post to a Discourse topic.
 	 *
-	 * @param int $post_id The WordPress post_id to link to.
+	 * @param int    $post_id The WordPress post_id to link to.
 	 * @param string $topic_url The Discourse topic URL.
 	 *
 	 * @return array|\WP_Error
 	 */
 	public function link_topic( $data ) {
-		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$post_id   = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$topic_url = esc_url_raw( wp_unslash( $data['topic_url'] ) ); // Input var okay.
 		// Remove 'publish_to_discourse' metadata so we don't publish and link to the post.
 		delete_post_meta( $post_id, 'publish_to_discourse' );

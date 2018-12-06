@@ -154,16 +154,16 @@ class CommentSettings {
 
 		add_settings_field(
 			'discourse_cache_html', __( 'Cache Comment HTML', 'wp-discourse' ), array(
-			$this,
-			'cache_html_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'cache_html_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		add_settings_field(
 			'discourse_clear_cached_comment_html', __( 'Clear Cached Comment HTML', 'wp-discourse' ), array(
-			$this,
-			'clear_cached_comment_html_checkbox',
-		), 'discourse_comment', 'discourse_commenting_settings_section'
+				$this,
+				'clear_cached_comment_html_checkbox',
+			), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		register_setting(
