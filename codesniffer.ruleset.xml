@@ -22,6 +22,7 @@
         <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
         <!-- DOMDocument uses camelCase. -->
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
     </rule>
 
     <!-- Include sniffs for PHP cross-version compatibility. -->

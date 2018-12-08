@@ -1,9 +1,17 @@
 <?php
+/**
+ * Add the Gutenberg Sidebar.
+ *
+ * @package WPDiscourse
+ */
 
 namespace WPDiscourse\Admin;
 
 use WPDiscourse\Shared\PluginUtilities;
 
+/**
+ * Class DiscourseSidebar
+ */
 class DiscourseSidebar {
 	use PluginUtilities;
 
@@ -271,7 +279,9 @@ class DiscourseSidebar {
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$response         = $publishing_error ? $publishing_error : 'success';
 
-		return array( 'update_response' => $response );
+		return array(
+			'update_response' => $response,
+		);
 	}
 
 	/**
@@ -313,9 +323,7 @@ class DiscourseSidebar {
 	/**
 	 * Links a WordPress post to a Discourse topic.
 	 *
-	 * @param int    $post_id The WordPress post_id to link to.
-	 * @param string $topic_url The Discourse topic URL.
-	 *
+	 * @param object $data The data sent with the API request.
 	 * @return array|\WP_Error
 	 */
 	public function link_topic( $data ) {
