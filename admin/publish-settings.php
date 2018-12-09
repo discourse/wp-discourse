@@ -54,7 +54,6 @@ class PublishSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_publish_settings() {
-		global $wp_version;
 		$this->options                      = $this->get_options();
 		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
@@ -128,14 +127,12 @@ class PublishSettings {
 			), 'discourse_publish', 'discourse_publishing_settings_section'
 		);
 
-		if ( version_compare( $wp_version, '5.0', '<' ) ) {
 			add_settings_field(
 				'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
 					$this,
 					'auto_publish_checkbox',
 				), 'discourse_publish', 'discourse_publishing_settings_section'
 			);
-		}
 
 		add_settings_field(
 			'discourse_force_publish', __( 'Force Publish', 'wp-discourse' ), array(
@@ -306,7 +303,7 @@ class PublishSettings {
 	public function auto_publish_checkbox() {
 		$this->form_helper->checkbox_input(
 			'auto-publish', 'discourse_publish', __( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-			__( 'This setting can be overridden on the new-post screen.', 'wp-discourse' )
+			__( 'This setting is not supported when using the Block Editor.', 'wp-discourse' )
 		);
 	}
 
