@@ -536,6 +536,8 @@ class DiscourseSidebar extends Component {
             forcePublish: pluginOptions.forcePublish,
             publishToDiscourse: false,
             publishPostCategory: pluginOptions.defaultCategory,
+            allowTags: pluginOptions.allowTags,
+            maxTags: pluginOptions.maxTags,
             topicTags: [],
             discoursePostId: null,
             discoursePermalink: null,
@@ -850,6 +852,8 @@ class DiscourseSidebar extends Component {
                                 <TagTopic
                                     handleTagChange={ this.handleTagChange }
                                     tags={ this.state.topicTags }
+                                    allowTags={ this.state.allowTags }
+                                    maxTags={ this.state.maxTags }
                                 />
                                 <PublishToDiscourse postStatus={ this.state.postStatus }
                                                     publishToDiscourse={ this.state.publishToDiscourse }
