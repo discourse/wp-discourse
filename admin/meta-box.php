@@ -53,8 +53,15 @@ class MetaBox {
 	 * Registers a meta box for the allowed post types if the legacy-editor-support option is not enabled.
 	 *
 	 * @param string $post_type The post_type of the current post.
+     * @return null
 	 */
 	public function add_meta_box( $post_type ) {
+	    global $current_screen;
+	    $current_screen = get_current_screen();
+	    if ( ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) ) {
+
+	        return null;
+        }
 		    if ( isset( $this->options['allowed_post_types'] ) &&
 		         in_array( $post_type, $this->options['allowed_post_types'], true )
 		    ) {
@@ -65,6 +72,8 @@ class MetaBox {
 			    ), null, 'side', 'high', null
 			    );
 		    }
+
+		    return null;
 	}
 
 	/**
