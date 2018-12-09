@@ -419,6 +419,7 @@ class TagTopic extends Component {
             chosenTags: this.props.tags,
             inputContent: '',
             inputLength: 1,
+            maxTagsExceeded: false
         };
 
         this.handleKeyPress = this.handleKeyPress.bind( this );
@@ -445,6 +446,13 @@ class TagTopic extends Component {
 
         if ( 'Enter' === keyVal || ',' === keyVal ) {
             let currentChoices = this.state.chosenTags;
+            if ( currentChoices.length >= this.props.maxTags ) {
+                this.setState( {
+                    maxTagsExceeded: true,
+                    inputContent: '',
+                } );
+                return null;
+            }
             currentChoices.push( val.trim().replace( / /g, '-' ) );
             currentChoices = TagTopic.sanitizeArray( currentChoices );
             this.setState( {
@@ -461,7 +469,10 @@ class TagTopic extends Component {
             index = tags.indexOf( key );
         if ( index > -1 ) {
             tags.splice( index, 1 );
-            this.setState( { chosenTags: tags }, () => {
+            this.setState( {
+                chosenTags: tags,
+                maxTagsExceeded: false
+            }, () => {
                 this.props.handleTagChange( tags );
             });
         }
@@ -479,9 +490,11 @@ class TagTopic extends Component {
     }
 
     render() {
-        let tagDisplay = TagTopic.sanitizeArray( this.state.chosenTags );
-        tagDisplay = tagDisplay.map( ( tag, index ) =>
-            <span className={ 'components-form-token-field__token' } key={ tag }>
+        if ( this.props.allowTags ) {
+            let maxTagsNotice = this.state.maxTagsExceeded ? __( 'You have exceeded the maximum number of allowed tags for your site. Remove a tag to add more.', 'wp-discourse' ) : '';
+            let tagDisplay = TagTopic.sanitizeArray( this.state.chosenTags );
+            tagDisplay = tagDisplay.map( ( tag, index ) =>
+                <span className={ 'components-form-token-field__token' } key={ tag }>
                     <span className={ 'components-form-token-field__token-text' }>
                         <span className={ 'screen-reader-text' }>{ tag }</span>
                         <span aria-hidden='true'>{ tag }</span>
@@ -495,7 +508,7 @@ class TagTopic extends Component {
                         <svg aria-hidden='true'
                              role='img'
                              focusable='false'
-                             className={ 'dashicon dashicons-dismiss' }
+                             className={'dashicon dashicons-dismiss'}
                              xmlns='http://www.w3.org/2000/svg'
                              width='20' height='20' viewBox='0 0 20 20'>
                             <path
@@ -503,26 +516,32 @@ class TagTopic extends Component {
                         </svg>
                     </button>
                 </span>
-        );
-        return (
-            <div className={ 'wpdc-component-panel-body' }>
-                <h2 className={ 'wpdc-sidebar-title' }>{ __( 'Tags', 'wp-discourse' ) }</h2>
-                <div className={ 'components-form-token-field__input-container' } onClick={ this.focusInput }>
-                    { tagDisplay }
-                    <input type={ 'text' }
-                           size={ this.state.inputLength }
-                           className={ 'components-form-token-field__input' }
-                           onChange={ this.handleChange }
-                           onKeyPress={ this.handleKeyPress }
-                           value={ this.state.inputContent }
-                           ref={ input => {
-                               this.tagInput = input;
-                           } }
-                    />
+            );
+            return (
+                <div className={ 'wpdc-component-panel-body' }>
+                    <h2 className={ 'wpdc-sidebar-title' }>{__( 'Tags', 'wp-discourse' ) }</h2>
+                    <div className={ 'components-form-token-field__input-container' } onClick={ this.focusInput }>
+                        { tagDisplay }
+                        <input type={ 'text' }
+                               size={ this.state.inputLength }
+                               className={ 'components-form-token-field__input' }
+                               onChange={ this.handleChange }
+                               onKeyPress={ this.handleKeyPress }
+                               value={ this.state.inputContent }
+                               ref={ input => {
+                                   this.tagInput = input;
+                               } }
+                        />
+                    </div>
+                    <div className={ this.state.maxTagsExceeded ? 'wpdc-info' : ''}>
+                        { maxTagsNotice }
+                    </div>
+                    <hr className={ 'wpdc-sidebar-hr' }/>
                 </div>
-                <hr className={ 'wpdc-sidebar-hr' }/>
-            </div>
-        );
+            );
+        } else {
+            return null;
+        }
     }
 }
 
