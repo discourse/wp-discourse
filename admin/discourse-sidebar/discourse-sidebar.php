@@ -54,6 +54,8 @@ class DiscourseSidebar {
 			'publish_to_discourse',
 			'publish_post_category',
 			'wpdc_topic_tags',
+			'wpdc_pin_topic',
+			'wpdc_pin_until',
 			'discourse_post_id',
 			'discourse_permalink',
 			'wpdc_publishing_response',
@@ -194,6 +196,15 @@ class DiscourseSidebar {
 				),
 			)
 		);
+
+		register_rest_route(
+			'wp-discourse/v1', 'set-pin-meta', array(
+				array(
+					'methods' => \WP_REST_Server::CREATABLE,
+					'callback' => array( $this, 'set_pin_meta' ),
+				)
+			)
+		);
 	}
 
 	/**
@@ -205,7 +216,7 @@ class DiscourseSidebar {
 	 */
 	public function set_publish_meta( $data ) {
 		$post_id              = intval( wp_unslash( $data['id'] ) ); // Input var okay.
-		$publish_to_discourse = intval( wp_unslash( $data['publish_to_discourse'] ) );
+		$publish_to_discourse = intval( wp_unslash( $data['publish_to_discourse'] ) ); // Input var okay.
 		update_post_meta( $post_id, 'publish_to_discourse', $publish_to_discourse );
 	}
 
@@ -217,8 +228,8 @@ class DiscourseSidebar {
 	 * @param object $data The data received from the API request.
 	 */
 	public function set_category_meta( $data ) {
-		$post_id     = intval( wp_unslash( $data['id'] ) );
-		$category_id = intval( wp_unslash( $data['publish_post_category'] ) );
+		$post_id     = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$category_id = intval( wp_unslash( $data['publish_post_category'] ) ); // Input var okay.
 		update_post_meta( $post_id, 'publish_post_category', $category_id );
 	}
 
@@ -230,9 +241,34 @@ class DiscourseSidebar {
 	 * @param object $data The data received from the API request.
 	 */
 	public function set_tag_meta( $data ) {
-		$post_id = intval( wp_unslash( $data['id'] ) );
-		$tags    = sanitize_text_field( wp_unslash( $data['wpdc_topic_tags'] ) );
+		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$tags    = sanitize_text_field( wp_unslash( $data['wpdc_topic_tags'] ) ); // Input var okay.
 		update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
+	}
+
+	/**
+	 * Updates the pin-topic metadata fields.
+	 *
+	 * Called by `handlePinChange`.
+	 *
+	 * @param object $data The data received from the API request.
+	 */
+	public function set_pin_meta( $data ) {
+		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$pin_topic = intval( wp_unslash( $data['wpdc_pin_topic'] ) ); // Input var okay.
+		if ( ! empty( $data['wpdc_pin_until'] ) ) { // Input var okay.
+			$pin_until = sanitize_text_field( wp_unslash( $data['wpdc_pin_until'] ) ); // Input var okay.
+		} else {
+			$now = new \DateTime( 'now' );
+			try {
+				$pin_until = $now->add( new \DateInterval( 'P2D' ) )->format( 'Y-m-d' );
+			} catch ( \Exception $e ) {
+				$pin_until = null;
+			}
+		}
+
+		update_post_meta( $post_id, 'wpdc_pin_topic', $pin_topic );
+		update_post_meta( $post_id, 'wpdc_pin_until', $pin_until );
 	}
 
 	/**
