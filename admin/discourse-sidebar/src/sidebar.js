@@ -548,6 +548,24 @@ class TagTopic extends Component {
 class PinTopic extends Component {
     constructor( props ) {
         super( props );
+
+        this.state = {
+            pinTopic: this.props.pinTopic,
+            pinUntil: this.props.pinUntil
+        };
+
+        this.handleUpdateDate = this.handleUpdateDate.bind( this );
+        this.handleToBePinnedChange = this.handleToBePinnedChange.bind( this );
+    }
+
+    handleUpdateDate( e ) {
+        this.setState( { pinUntil: e.target.value } );
+        this.props.handlePinChange( this.state.pinTopic, e.target.value )
+    }
+
+    handleToBePinnedChange( e ) {
+        this.setState( { pinTopic: e.target.checked } );
+        this.props.handlePinChange( e.target.checked, this.state.pinUntil );
     }
 
     render() {
@@ -555,14 +573,14 @@ class PinTopic extends Component {
             <div className={ 'wpdc-component-panel-body' }>
                 <h2 className={ 'wpdc-sidebar-title' }>{__( 'Pin Topic', 'wp-discourse' ) }</h2>
                 <label>
-                    <input type={ 'checkbox' }/>
+                    <input type={ 'checkbox' } onChange={ this.handleToBePinnedChange } checked={ this.state.pinTopic }/>
                     { __( 'Pin Discourse Topic', 'wp-discourse' ) }
                 </label>
                 <br/>
                 <label className={ 'wpdc-pin-until-input'}>
                     { __( 'Pin Until', 'wp-discourse' ) }
                     <br/>
-                    <input type={ 'date' } className={ 'widefat' } />
+                    <input type={ 'date' } className={ 'widefat' } onChange={ this.handleUpdateDate } value={ this.state.pinUntil } />
                 </label>
                 <hr className={ 'wpdc-sidebar-hr' }/>
             </div>
@@ -583,6 +601,8 @@ class DiscourseSidebar extends Component {
             allowTags: pluginOptions.allowTags,
             maxTags: pluginOptions.maxTags,
             topicTags: [],
+            pinTopic: false,
+            pinUntil: null,
             discoursePostId: null,
             discoursePermalink: null,
             publishingError: null,
@@ -605,6 +625,7 @@ class DiscourseSidebar extends Component {
         this.handlePublishMethodChange = this.handlePublishMethodChange.bind( this );
         this.handleUpdateChange = this.handleUpdateChange.bind( this );
         this.handleLinkTopicClick = this.handleLinkTopicClick.bind( this );
+        this.handlePinChange = this.handlePinChange.bind( this );
     }
 
     getDiscourseCategories() {
@@ -633,6 +654,8 @@ class DiscourseSidebar extends Component {
                         publishToDiscourse: publishToDiscourse,
                         publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
                         topicTags: meta.wpdc_topic_tags.split( ',' ),
+                        pinTopic: meta.wpdc_pin_topic > 0,
+                        pinUntil: meta.wpdc_pin_until,
                         discoursePostId: meta.discourse_post_id,
                         discoursePermalink: meta.discourse_permalink,
                         publishingError: meta.wpdc_publishing_error,
@@ -693,6 +716,30 @@ class DiscourseSidebar extends Component {
                 ( err ) => {
                     return null;
                 }
+            );
+        });
+    }
+
+    handlePinChange( pinTopic, pinUntil ) {
+        this.setState( {
+            pinTopic: pinTopic,
+            pinUntil: pinUntil
+        }, () => {
+            wp.apiRequest( {
+                path: '/wp-discourse/v1/set-pin-meta',
+                method: 'Post',
+                data: {
+                    id: this.props.postId,
+                    wpdc_pin_topic: pinTopic ? 1 : 0,
+                    wpdc_pin_until: pinUntil
+                }
+            } ).then(
+                ( data ) => {
+                    return null;
+                },
+                ( err ) => {
+                    return null;
+            }
             );
         });
     }
@@ -899,7 +946,11 @@ class DiscourseSidebar extends Component {
                                     allowTags={ this.state.allowTags }
                                     maxTags={ this.state.maxTags }
                                 />
-                                <PinTopic/>
+                                <PinTopic
+                                    handlePinChange={ this.handlePinChange }
+                                    pinTopic={ this.state.pinTopic }
+                                    pinUntil={ this.state.pinUntil }
+                                />
                                 <PublishToDiscourse postStatus={ this.state.postStatus }
                                                     publishToDiscourse={ this.state.publishToDiscourse }
                                                     handleToBePublishedChange={ this.handleToBePublishedChange }
