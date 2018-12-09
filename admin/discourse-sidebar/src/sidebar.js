@@ -1,6 +1,6 @@
 /*jshint esversion: 6*/
 /**
- * Internal block libraries
+ * Internal block libraries.
  */
 
 const { __ } = wp.i18n;
@@ -137,6 +137,9 @@ class ErrorMessage extends Component {
                     break;
                 case 'Unprocessable Entity':
                     message = __( 'Your post could not be published to Discourse. There may be an existing Discourse topic that is using its permalink. Try linking the post with that topic.', 'wp-discourse' );
+                    break;
+                case 'Forbidden':
+                    message = __( 'Your post could not be published to Discourse. Check that your Discourse Username is set correctly on your WordPress profile page.', 'wp-discourse' );
                     break;
                 default:
                     message = publishingError;
@@ -300,9 +303,8 @@ class LinkToDiscourseTopic extends Component {
     }
 
     render() {
-
         return (
-            <div className='wpdc-link-post wpdc-component-panel-body'>
+            <div className={ 'wpdc-link-post wpdc-component-panel-body' }>
                 <h2 className={ 'wpdc-sidebar-title' }>{ __( 'Topic URL', 'wp-discourse' ) }</h2>
                 <input
                     type='url'
@@ -473,7 +475,6 @@ class TagTopic extends Component {
             }
             return accumulator;
         }, [] );
-
         return arr;
     }
 
@@ -482,7 +483,7 @@ class TagTopic extends Component {
         tagDisplay = tagDisplay.map( ( tag, index ) =>
             <span className={ 'components-form-token-field__token' } key={ tag }>
                     <span className={ 'components-form-token-field__token-text' }>
-                        <span className='screen-reader-text'>{ tag }</span>
+                        <span className={ 'screen-reader-text' }>{ tag }</span>
                         <span aria-hidden='true'>{ tag }</span>
                     </span>
                     <button type='button'
@@ -697,7 +698,6 @@ class DiscourseSidebar extends Component {
                         publishingError: __( 'There has been an error linking your post with Discourse.', 'wp-discourse' )
                     });
                 }
-
                 return null;
             },
             ( err ) => {
@@ -707,13 +707,12 @@ class DiscourseSidebar extends Component {
                     published: false,
                     publishingError: message,
                 } );
-
                 return null;
             }
         );
     }
 
-    handleUnlinkFromDiscourseChange( unlink_state ) {
+    handleUnlinkFromDiscourseChange( e ) {
         this.setState({
             busyUnlinking: true,
             statusMessage: '',
