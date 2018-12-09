@@ -54,6 +54,7 @@ class PublishSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_publish_settings() {
+		global $wp_version;
 		$this->options                      = $this->get_options();
 		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
@@ -101,9 +102,9 @@ class PublishSettings {
 
 		add_settings_field(
 			'discourse_publish_as_unlisted', __( 'Publish as Unlisted Topics', 'wp-discourse' ), array(
-			$this,
-			'publish_as_unlisted_checkbox',
-		), 'discourse_publish', 'discourse_publishing_settings_section'
+				$this,
+				'publish_as_unlisted_checkbox',
+			), 'discourse_publish', 'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
@@ -127,12 +128,14 @@ class PublishSettings {
 			), 'discourse_publish', 'discourse_publishing_settings_section'
 		);
 
-		add_settings_field(
-			'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
-				$this,
-				'auto_publish_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
-		);
+		if ( version_compare( $wp_version, '5.0', '<' ) ) {
+			add_settings_field(
+				'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
+					$this,
+					'auto_publish_checkbox',
+				), 'discourse_publish', 'discourse_publishing_settings_section'
+			);
+		}
 
 		add_settings_field(
 			'discourse_force_publish', __( 'Force Publish', 'wp-discourse' ), array(
@@ -230,9 +233,9 @@ class PublishSettings {
 	public function publish_as_unlisted_checkbox() {
 		$this->form_helper->checkbox_input(
 			'publish-as-unlisted', 'discourse_publish', __( 'Publish posts as unlisted Discourse topics.', 'wp-discourse' ),
-            __( 'If you have enabled the Sync Comment Data webhook, topics will be listed when they receive a comment.', 'wp-discourse' )
+			__( 'If you have enabled the Sync Comment Data webhook, topics will be listed when they receive a comment.', 'wp-discourse' )
 		);
-    }
+	}
 
 	/**
 	 * Outputs markup for the publish-category-update input.
