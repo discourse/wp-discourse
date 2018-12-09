@@ -185,7 +185,7 @@ class PublishingOptions extends Component {
                     <input type='radio' name='wpdc_publish_options' value='publish_post'
                            checked={'publish_post' === this.props.publishingMethod}
                            onChange={this.handleChange}/>
-                    New Topic
+                    { __( 'New Topic', 'wp-discourse' ) }
                 </label>
                 <br/>
                 <label>
@@ -227,7 +227,7 @@ class PublishToDiscourse extends Component {
                     <div className={ 'wpdc-publish-topic' }>
                         <input type='checkBox' className={ 'wpdc-publish-topic-checkbox' }
                                checked={ publishToDiscourse } onChange={ this.handleToBePublishedChange }/>
-                        { __( 'Auto publish', 'wp-discourse' ) }
+                        { __( 'Publish', 'wp-discourse' ) }
                         <p className={'wpdc-info'}>
                             { __( 'Automatically publish the post to Discourse when it is published on WordPress.', 'wp-discourse' ) }
                         </p>
@@ -542,6 +542,31 @@ class TagTopic extends Component {
         } else {
             return null;
         }
+    }
+}
+
+class PinTopic extends Component {
+    constructor( props ) {
+        super( props );
+    }
+
+    render() {
+        return (
+            <div className={ 'wpdc-component-panel-body' }>
+                <h2 className={ 'wpdc-sidebar-title' }>{__( 'Pin Topic', 'wp-discourse' ) }</h2>
+                <label>
+                    <input type={ 'checkbox' }/>
+                    { __( 'Pin Discourse Topic', 'wp-discourse' ) }
+                </label>
+                <br/>
+                <label className={ 'wpdc-pin-until-input'}>
+                    { __( 'Pin Until', 'wp-discourse' ) }
+                    <br/>
+                    <input type={ 'date' } className={ 'widefat' } />
+                </label>
+                <hr className={ 'wpdc-sidebar-hr' }/>
+            </div>
+        );
     }
 }
 
@@ -874,6 +899,7 @@ class DiscourseSidebar extends Component {
                                     allowTags={ this.state.allowTags }
                                     maxTags={ this.state.maxTags }
                                 />
+                                <PinTopic/>
                                 <PublishToDiscourse postStatus={ this.state.postStatus }
                                                     publishToDiscourse={ this.state.publishToDiscourse }
                                                     handleToBePublishedChange={ this.handleToBePublishedChange }
