@@ -44,7 +44,7 @@ class AdminNotice {
 	 * @return null
 	 */
 	public function set_admin_notices() {
-		global $pagenow, $post, $current_screen;
+		global $pagenow, $post;
 		$current_screen = get_current_screen();
 
 		// Admin notices aren't supported by the block editor. For now, disable admin notices for versions >= 5.0.

@@ -56,7 +56,6 @@ class MetaBox {
      * @return null
 	 */
 	public function add_meta_box( $post_type ) {
-	    global $current_screen;
 	    $current_screen = get_current_screen();
 	    if ( ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) ) {
 
