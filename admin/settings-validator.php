@@ -88,7 +88,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_api_key', array( $this, 'validate_api_key' ) );
 		add_filter( 'wpdc_validate_publish_username', array( $this, 'validate_publish_username' ) );
 
-		add_filter( 'wpdc_validate_gutenberg_support', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_publish_category', array( $this, 'validate_publish_category' ) );
 		add_filter( 'wpdc_validate_publish_category_update', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allow_tags', array( $this, 'validate_checkbox' ) );
