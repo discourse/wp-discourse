@@ -128,6 +128,12 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
 
+#### 1.7.8 12/08/2018
+
+- Add support for the Gutenberg editor
+- Update HTML templates to for WordPress twentyninteen theme
+- Apply 'the_content' filter to full post content that will be published to Discourse
+
 #### 1.7.7 10/12/2018
 
 - Add option to not load the WordPress comment template for posts that have not been published to Discourse
