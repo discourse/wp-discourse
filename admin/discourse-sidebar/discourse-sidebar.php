@@ -202,7 +202,7 @@ class DiscourseSidebar {
 				array(
 					'methods' => \WP_REST_Server::CREATABLE,
 					'callback' => array( $this, 'set_pin_meta' ),
-				)
+				),
 			)
 		);
 	}
