@@ -44,10 +44,11 @@ class AdminNotice {
 	 * @return null
 	 */
 	public function set_admin_notices() {
-		global $pagenow, $post, $wp_version;
+		global $pagenow, $post, $current_screen;
+		$current_screen = get_current_screen();
 
 		// Admin notices aren't supported by the block editor. For now, disable admin notices for versions >= 5.0.
-		if ( version_compare( $wp_version, '5.0', '>=' ) ) {
+		if ( ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) ) {
 
 			return null;
 		}
