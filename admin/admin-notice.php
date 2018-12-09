@@ -44,10 +44,10 @@ class AdminNotice {
 	 * @return null
 	 */
 	public function set_admin_notices() {
-		global $pagenow, $post;
+		global $pagenow, $post, $wp_version;
 
-		// Admin notices aren't supported by the Gutenberg editor.
-		if ( ! empty( $this->options['gutenberg-support'] ) ) {
+		// Admin notices aren't supported by the block editor. For now, disable admin notices for versions >= 5.0.
+		if ( version_compare( $wp_version, '5.0', '>=' ) ) {
 
 			return null;
 		}
