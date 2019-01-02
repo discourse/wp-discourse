@@ -67,7 +67,7 @@ class SSOClientBase {
 
 		return add_query_arg(
 			array(
-				'discourse_sso' => 1,
+				'discourse_sso' => apply_filters( 'wpdc_sso_client_query', 1 ),
 				'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url', esc_url( $redirect_to ), $redirect_to ),
 			), home_url( '/' )
 		);
