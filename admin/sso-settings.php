@@ -616,7 +616,7 @@ class SSOSettings {
 					<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
 				</li>
 				<li>
-					<?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?>
+					<?php esc_html_e( "add your 'SSO Secret Key' to the 'sso provider secrets' setting (use the Wildcard symbol * for the domain field)", 'wp-discourse' ); ?>
 				</li>
 			</em>
 		</ul>
