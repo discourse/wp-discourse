@@ -644,8 +644,23 @@ class DiscourseSidebar extends Component {
 
     updateStateFromDatabase( postId ) {
         if ( this.isAllowedPostType() ) {
-            wp.apiFetch( { path: `/wp/v2/posts/${postId}`, method: 'GET' } ).then(
+            const postType = this.props.post.type;
+            let postRouteName;
+            switch ( postType ) {
+                case 'post':
+                    postRouteName = 'posts';
+                    break;
+                case 'page':
+                    postRouteName = 'pages';
+                    break;
+                default:
+                    postRouteName = postType;
+            }
+            wp.apiFetch( { path: `/wp/v2/${postRouteName}/${postId}`, method: 'GET' } ).then(
                 ( data ) => {
+                    if ( ! data.meta ) {
+                        return;
+                    }
                     const meta = data.meta,
                         publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : 1 === parseInt( meta.publish_to_discourse, 10 );
                     this.setState( {
@@ -905,10 +920,12 @@ class DiscourseSidebar extends Component {
                 prevPost = prevProps.post,
                 meta = this.props.post.meta,
                 prevMeta = prevProps.post.meta;
-            if ( post.status !== prevPost.status ||
+
+            if ( meta &&
+                prevMeta && ( post.status !== prevPost.status ||
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
-                meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error ) {
+                meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error ) ) {
                 const publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : 1 === parseInt( meta.publish_to_discourse, 10 );
                 this.setState( {
                     published: meta.discourse_post_id > 0,
