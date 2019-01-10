@@ -209,10 +209,11 @@ class HTMLTemplates {
 	 * Available tags:
 	 * {excerpt}, {blogurl}, {author}, {thumbnail}, {featuredimage}
 	 *
+     * @param int|null $post_id The ID of the post being published.
 	 * @static
 	 * @return string
 	 */
-	public static function publish_format_html() {
+	public static function publish_format_html( $post_id = null ) {
 		ob_start();
 		?>
 		<small><?php echo esc_html( self::get_text_options( 'published-at-text' ) ); ?>
@@ -221,7 +222,7 @@ class HTMLTemplates {
 		<?php
 		$output = ob_get_clean();
 
-		return apply_filters( 'discourse_publish_format_html', $output );
+		return apply_filters( 'discourse_publish_format_html', $output, $post_id );
 	}
 
 	/**
