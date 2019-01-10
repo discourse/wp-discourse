@@ -170,7 +170,7 @@ class DiscoursePublish {
 		}
 
 		// Trim to keep the Discourse markdown parser from treating this as code.
-		$baked    = trim( Templates::publish_format_html() );
+		$baked    = trim( Templates::publish_format_html( $post_id ) );
 		$baked    = str_replace( '{excerpt}', $excerpt, $baked );
 		$baked    = str_replace( '{blogurl}', $permalink, $baked );
 		$author   = get_the_author_meta( 'display_name', $author_id );
