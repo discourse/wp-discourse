@@ -180,7 +180,11 @@ class DiscoursePublish {
 		$featured = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'full' );
 		$baked    = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 
-		$username = get_the_author_meta( 'discourse_username', $current_post->post_author );
+		$username = null;
+		if ( empty( $options['hide-discourse-name-field'] ) ) {
+			$username = get_the_author_meta( 'discourse_username', $current_post->post_author );
+		}
+
 		if ( ! $username || strlen( $username ) < 2 ) {
 			$username = $options['publish-username'];
 		}
