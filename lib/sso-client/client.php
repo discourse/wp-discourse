@@ -379,11 +379,16 @@ class Client extends SSOClientBase {
 			// @codingStandardsIgnoreEnd
 		}
 
-		$sso = urldecode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ) ); // Input var okay.
+		$sso = base64_decode( $_GET['sso'], true ); // Input var okay.
+
+		if ( ! $sso ) {
+			return null;
+		}
 
 		$response = array();
 
-		parse_str( base64_decode( $sso ), $response );
+		parse_str( $sso, $response );
+		$response = array_map( 'urldecode', $response );
 		$response = array_map( 'sanitize_text_field', $response );
 
 		if ( empty( $response['external_id'] ) ) {
