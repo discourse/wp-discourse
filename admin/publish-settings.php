@@ -353,7 +353,7 @@ class PublishSettings {
 				'Removes the Discourse Name field
 	    from the WordPress user profile page.', 'wp-discourse'
 			), __(
-				"Enabling this setting will cause all posts published
+				"Unless SSO is enabled, this setting will cause all posts published
 	    to Discourse to be published by the 'Publishing Username.'", 'wp-discourse'
 			)
 		);
