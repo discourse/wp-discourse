@@ -40,12 +40,17 @@ class DiscourseSSO {
 	 *
 	 * @param string   $user_login The user's username.
 	 * @param \WP_User $user The User object.
+	 * @return null
 	 */
 	public function sync_sso_record( $user_login, $user ) {
+		if ( empty( $this->options['enable-sso'] ) || empty( $this->options['auto-create-sso-user'] ) ) {
+
+			return null;
+		}
 		do_action( 'wpdc_sso_provider_before_create_user', $user_login, $user );
 		$bypass_sync = apply_filters( 'wpdc_bypass_sync_sso', false, $user->ID, $user );
 
-		if ( ! $bypass_sync && ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['auto-create-sso-user'] ) ) {
+		if ( ! $bypass_sync ) {
 			// Make sure the login hasn't been initiated by clicking on a SSO login link.
 			$query_string = parse_url( wp_get_referer(), PHP_URL_QUERY );
 			$query_params = [];
@@ -57,6 +62,8 @@ class DiscourseSSO {
 				$this->sync_sso( $params, $user->ID );
 			}
 		}
+
+		return null;
 	}
 
 	/**
