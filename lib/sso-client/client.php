@@ -109,9 +109,7 @@ class Client extends SSOClientBase {
 	public function parse_request() {
 		$this->options = $this->get_options();
 
-		if ( empty( $this->options['sso-client-enabled'] ) || 1 !== intval( $this->options['sso-client-enabled'] ) ||
-			 empty( $_GET['sso'] ) || empty( $_GET['sig'] ) // Input var okay.
-		) {
+		if ( empty( $this->options['sso-client-enabled'] ) || empty( $_GET['sso'] ) || empty( $_GET['sig'] ) ) {
 			return;
 		}
 
@@ -255,13 +253,18 @@ class Client extends SSOClientBase {
 	 * Set auth cookies
 	 *
 	 * @param  int $user_id the user ID.
+     * @return null
 	 */
 	private function auth_user( $user_id ) {
 		$query = $this->get_sso_response();
-
 		wp_set_current_user( $user_id, $query['username'] );
 		wp_set_auth_cookie( $user_id );
-		do_action( 'wp_login', $query['username'], $query['email'] );
+		$user = wp_get_current_user();
+		if ( ! $user->exists() ) {
+
+		    return null;
+        }
+		do_action( 'wp_login', $query['username'], $user );
 
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
