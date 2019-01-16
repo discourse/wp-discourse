@@ -200,10 +200,13 @@ class DiscoursePublish {
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
-			// Unlisted has been moved from post metadata to a site option.
+			// Unlisted has been moved from post metadata to a site option. This is awkward for now.
 			$unlisted_post   = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 			$unlisted_option = $this->options['publish-as-unlisted'];
 			$unlisted        = ! empty( $unlisted_post ) || ! empty( $unlisted_option );
+			if ( $unlisted ) {
+				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
+			}
 			$data            = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
