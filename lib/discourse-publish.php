@@ -203,7 +203,7 @@ class DiscoursePublish {
 			// Unlisted has been moved from post metadata to a site option. This is awkward for now.
 			$unlisted_post   = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 			$unlisted_option = $this->options['publish-as-unlisted'];
-			$unlisted        = ! empty( $unlisted_post ) || ! empty( $unlisted_option );
+			$unlisted        = apply_filters( 'wpdc_publish_unlisted', ! empty( $unlisted_post ) || ! empty( $unlisted_option ), $current_post, $post_id );
 			if ( $unlisted ) {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
