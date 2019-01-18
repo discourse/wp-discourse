@@ -85,7 +85,7 @@ class QueryRedirect {
 		}
 
 		if ( ! empty( $_GET['redirect_to'] ) ) { // Input var okay.
-			$redirect_to = sanitize_text_field( wp_unslash( $_GET['redirect_to'] ) ); // Input var okay.
+			$redirect_to = esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ); // Input var okay.
 		} else {
 			$redirect_to = home_url( '/' );
 		}
@@ -94,7 +94,7 @@ class QueryRedirect {
 			http_build_query(
 				array(
 					'nonce'          => Nonce::get_instance()->create( '_discourse_sso' ),
-					'return_sso_url' => $redirect_to,
+					'return_sso_url' => utf8_uri_encode( $redirect_to ),
 				)
 			)
 		);
