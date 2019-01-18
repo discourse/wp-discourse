@@ -253,7 +253,7 @@ class Client extends SSOClientBase {
 	 * Set auth cookies
 	 *
 	 * @param  int $user_id the user ID.
-     * @return null
+	 * @return null
 	 */
 	private function auth_user( $user_id ) {
 		$query = $this->get_sso_response();
@@ -262,8 +262,8 @@ class Client extends SSOClientBase {
 		$user = wp_get_current_user();
 		if ( ! $user->exists() ) {
 
-		    return null;
-        }
+			return null;
+		}
 		do_action( 'wp_login', $query['username'], $user );
 
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
@@ -382,7 +382,7 @@ class Client extends SSOClientBase {
 			// @codingStandardsIgnoreEnd
 		}
 
-		$sso = base64_decode( $_GET['sso'], true ); // Input var okay.
+		$sso = base64_decode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ), true ); // Input var okay.
 
 		if ( ! $sso ) {
 			return null;
