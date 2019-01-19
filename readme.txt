@@ -3,7 +3,7 @@ Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.0.3
-Stable tag: 1.8.2
+Stable tag: 1.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -126,6 +126,16 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 == Changelog ==
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+
+#### 1.8.3 01/18/2019
+
+- Fix encoding of SSO client redirect URL
+- Update wp_new_user_notification function to mirror latest WordPress version
+- Fix calling the 'wp_login' action with the wrong parameters
+- Fix listing unlisted topics for posts published with the Block Editor
+- Add 'wpdc_discourse_username' filter to allow publishing username to be overwritten before post is published
+- Add 'wpdc_publish_unlisted' filter to allow filtering which topics should be published as unlisted
+- Fix copy for Do Not Display Discourse Name Field option
 
 #### 1.8.2 01/10/2019
 
