@@ -608,6 +608,6 @@ class MetaBox {
 				echo '<hr>';
 
 				return 'unhandled_error';
-		}
+		} // End switch().
 	}
 }
