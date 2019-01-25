@@ -53,26 +53,26 @@ class MetaBox {
 	 * Registers a meta box for the allowed post types if the legacy-editor-support option is not enabled.
 	 *
 	 * @param string $post_type The post_type of the current post.
-     * @return null
+	 * @return null
 	 */
 	public function add_meta_box( $post_type ) {
-	    $current_screen = get_current_screen();
-	    if ( ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) ) {
+		$current_screen = get_current_screen();
+		if ( ( method_exists( $current_screen, 'is_block_editor' ) && $current_screen->is_block_editor() ) ) {
 
-	        return null;
-        }
-		    if ( isset( $this->options['allowed_post_types'] ) &&
-		         in_array( $post_type, $this->options['allowed_post_types'], true )
-		    ) {
-			    add_meta_box(
-				    'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
-				    $this,
-				    'render_meta_box',
-			    ), null, 'side', 'high', null
-			    );
-		    }
+			return null;
+		}
+		if ( isset( $this->options['allowed_post_types'] ) &&
+				 in_array( $post_type, $this->options['allowed_post_types'], true )
+			) {
+			add_meta_box(
+				'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
+					$this,
+					'render_meta_box',
+				), null, 'side', 'high', null
+			);
+		}
 
-		    return null;
+			return null;
 	}
 
 	/**
@@ -98,11 +98,11 @@ class MetaBox {
 	 * @return null
 	 */
 	public function render_meta_box( $post ) {
-		$post_id              = $post->ID;
-		$published            = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publishing_error     = get_post_meta( $post_id, 'wpdc_publishing_error', true );
-		$force_publish        = ! empty( $this->options['force-publish'] );
-		$saved                = 'publish' === get_post_status( $post_id ) ||
+		$post_id          = $post->ID;
+		$published        = get_post_meta( $post_id, 'discourse_post_id', true );
+		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
+		$force_publish    = ! empty( $this->options['force-publish'] );
+		$saved            = 'publish' === get_post_status( $post_id ) ||
 							   'future' === get_post_status( $post_id ) ||
 							   'draft' === get_post_status( $post_id ) ||
 							   'private' === get_post_status( $post_id ) ||
@@ -119,9 +119,12 @@ class MetaBox {
 
 		if ( ! $published ) {
 			if ( $publishing_error ) {
-				$this->publishing_error_markup( $publishing_error, $force_publish );
+				$error_handled = $this->publishing_error_markup( $publishing_error, $force_publish );
 
-				return null;
+				if ( 'handled_error' === $error_handled ) {
+
+					return null;
+				}
 			}
 			if ( $force_publish ) {
 				$this->force_publish_markup( $default_category_id );
@@ -160,23 +163,25 @@ class MetaBox {
 		} else {
 			// The post has already been published to Discourse.
 			if ( ! empty( $publishing_error ) ) {
-				$this->publishing_error_markup( $publishing_error, $force_publish );
+				$error_handled = $this->publishing_error_markup( $publishing_error, $force_publish, true );
 
-				return null;
-			} else {
-				$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-				$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . esc_url( $discourse_permalink ) . '</a>';
-				// translators: Discourse post_is_linked_to_discourse message. Placeholder: A link to the Discourse topic.
-				$message = sprintf( __( 'This post is linked to %1$s.<br><hr>', 'wp-discourse' ), $discourse_link );
-				echo wp_kses_post( $message );
-				if ( $force_publish ) {
-					esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
-				} else {
-					$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-					$this->update_discourse_topic_checkbox( $publish_text );
-					echo '<br>';
-					$this->unlink_from_discourse_checkbox();
+				if ( 'handled_error' === $error_handled ) {
+
+					return null;
 				}
+			}
+			$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+			$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . esc_url( $discourse_permalink ) . '</a>';
+			// translators: Discourse post_is_linked_to_discourse message. Placeholder: A link to the Discourse topic.
+			$message = sprintf( __( 'This post is linked to %1$s.<br><hr>', 'wp-discourse' ), $discourse_link );
+			echo wp_kses_post( $message );
+			if ( $force_publish ) {
+				esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
+			} else {
+				$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
+				$this->update_discourse_topic_checkbox( $publish_text );
+				echo '<br>';
+				$this->unlink_from_discourse_checkbox();
 			}
 		} // End if().
 
@@ -379,7 +384,7 @@ class MetaBox {
 		$info_message         = sprintf(
 			// translators: Unlisted topic option description. Placeholder: webhook options link.
 			__( 'If you have configured the %1s, topics will be listed when they receive a comment.', 'wp-discourse' ), $webhook_options_link
-		)
+		);
 		?>
 		<label for="unlist_discourse_topic">
 
@@ -562,9 +567,10 @@ class MetaBox {
 	 *
 	 * @param string $publishing_error The publishing error that has been returned.
 	 * @param bool   $force_publish Whether or not the force_publish option has been selected.
-	 * @return null
+	 * @param bool   $already_published Whether or not the post has already been published.
+	 * @return string
 	 */
-	protected function publishing_error_markup( $publishing_error, $force_publish ) {
+	protected function publishing_error_markup( $publishing_error, $force_publish, $already_published = false ) {
 		switch ( $publishing_error ) {
 			case 'deleted_topic':
 				esc_html_e(
@@ -581,7 +587,7 @@ class MetaBox {
 					$this->update_discourse_topic_checkbox( $publish_text );
 				}
 
-				return null;
+				return 'handled_error';
 
 			case 'queued_topic':
 				esc_html_e(
@@ -591,9 +597,17 @@ class MetaBox {
 				echo '<hr>';
 				$this->link_to_discourse_topic_input();
 
-				return null;
-		}
+				return 'handled_error';
 
-		return null;
+			default:
+				$action = $already_published ? __( 'updating', 'wp-discourse' ) : __( 'publishing', 'wp-discourse' );
+				// translators: Publishing error message. Placeholder: publishing or updating.
+				$message = sprintf( __( 'There has been an error %1s your post. Please try again.', 'wp-discourse' ), $action );
+				echo wp_kses_post( $message );
+
+				echo '<hr>';
+
+				return 'unhandled_error';
+		}
 	}
 }
