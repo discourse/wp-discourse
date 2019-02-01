@@ -602,11 +602,6 @@ class SSOSettings {
 		</p>
 		<p class="wpdc-options-documentation">
 			<em>
-				<strong><?php esc_html_e( 'Note: ', 'wp-discourse' ); ?></strong><?php esc_html_e( 'this setting does not yet work with multisite installations.', 'wp-discourse' ); ?>
-			</em>
-		</p>
-		<p class="wpdc-options-documentation">
-			<em>
 				<?php esc_html_e( 'Use of this setting requires some configuration on Discourse:' ); ?>
 			</em>
 		</p>
