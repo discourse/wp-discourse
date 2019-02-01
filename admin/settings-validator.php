@@ -622,13 +622,14 @@ class SettingsValidator {
 	 * @return string
 	 */
 	public function validate_sso_secret( $input ) {
-		if ( strlen( $input ) < 10 ) {
+		$secret = trim( $input );
+		if ( strlen( $secret ) < 10 ) {
 			add_settings_error( 'discourse', 'sso_secret', __( 'The SSO secret key must be at least 10 characters long.', 'wp-discourse' ) );
 
 			return '';
 		}
 
-		return $input;
+		return $secret;
 	}
 
 	/**
