@@ -216,12 +216,32 @@ class DiscourseSidebar {
 		);
 	}
 
+	/**
+	 * Checks whether the current user has permission to access the Discourse categories option.
+	 *
+	 * @return bool|\WP_Error
+	 */
 	public function get_discourse_read_categorories_permissions() {
+		if ( ! current_user_can( 'publish_posts' ) ) {
+			return new \WP_Error(
+				'rest_forbidden',
+				__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		return true;
 	}
 
+	/**
+	 * Checks if the user has permissions to publish the post.
+	 *
+	 * @param object $data The data sent with the API request.
+	 *
+	 * @return bool|\WP_Error
+	 */
 	public function get_discourse_publish_permissions( $data ) {
-		$post_id              = isset( $data['id'] ) ? intval( wp_unslash( $data['id'] ) ) : 0; // Input var okay.
+		$post_id = isset( $data['id'] ) ? intval( wp_unslash( $data['id'] ) ) : 0; // Input var okay.
 
 		if ( $post_id <= 0 ) {
 			return new \WP_Error(
