@@ -152,7 +152,12 @@ class DiscourseComment {
 			return '';
 		}
 
-		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
+		$status = get_post_status( $post_id );
+		if ( 'publish' === $status ) {
+			return wp_kses_post( $this->comment_formatter->format( $post_id ) );
+		}
+
+		return '';
 	}
 
 	/**
