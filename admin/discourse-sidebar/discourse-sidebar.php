@@ -226,7 +226,9 @@ class DiscourseSidebar {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
-				array( 'status' => rest_authorization_required_code() )
+				array(
+					'status' => rest_authorization_required_code(),
+					)
 			);
 		}
 
@@ -248,7 +250,9 @@ class DiscourseSidebar {
 				'rest_invalid_param',
 				// translators: Discourse invalid parameter message. Placeholder: the post ID.
 				sprintf( __( 'Invalid parameter: %s', 'wp-discourse' ), $post_id ),
-				array( 'status' => 400 )
+				array(
+					'status' => 400,
+					)
 			);
 		}
 
@@ -256,7 +260,9 @@ class DiscourseSidebar {
 			return new \WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
-				array( 'status' => rest_authorization_required_code() )
+				array(
+					'status' => rest_authorization_required_code(),
+					)
 			);
 		}
 
