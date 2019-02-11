@@ -376,13 +376,10 @@ class PublishSettings {
 	public function publishing_settings_tab_details() {
 		$setup_howto_url    = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url = 'https://meta.discourse.org/';
-		$classic_editor_url = 'https://en-ca.wordpress.org/plugins/classic-editor/';
 		?>
 		<p class="wpdc-options-documentation">
 			<em>
-				<?php esc_html_e( 'This section is for configuring how the plugin publishes posts to Discourse. Note: the WP Discourse
-				plugin currently only supports publishing posts to Discourse with the ', 'wp-discourse' ); ?>
-                <a href="<?php echo esc_url( $classic_editor_url ); ?>" target="_blank"><?php esc_html_e( 'Classic Editor', 'wp-discourse' ); ?></a>.
+				<?php esc_html_e( 'This section is for configuring how the plugin publishes posts to Discourse.', 'wp-discourse' ); ?>
 			</em>
 		</p>
 		<p class="wpdc-options-documentation">
