@@ -145,7 +145,7 @@ class DiscourseComment {
 	 * @return string
 	 */
 	public function get_discourse_comments( $request ) {
-		$post_id = isset($request['post_id'] ) ? intval( ( $request['post_id'] ) ) : 0;
+		$post_id = isset( $request['post_id'] ) ? intval( ( $request['post_id'] ) ) : 0;
 
 		if ( empty( $post_id ) ) {
 
