@@ -145,7 +145,7 @@ class DiscourseComment {
 	 * @return string
 	 */
 	public function get_discourse_comments( $request ) {
-		$post_id = isset( $request['post_id'] ) ? esc_attr( wp_unslash( $request['post_id'] ) ) : null;
+		$post_id = isset($request['post_id'] ) ? intval( ( $request['post_id'] ) ) : 0;
 
 		if ( empty( $post_id ) ) {
 
@@ -153,11 +153,13 @@ class DiscourseComment {
 		}
 
 		$status = get_post_status( $post_id );
-		if ( 'publish' === $status ) {
-			return wp_kses_post( $this->comment_formatter->format( $post_id ) );
+
+		if ( 'publish' !== $status ) {
+
+			return '';
 		}
 
-		return '';
+		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
 	}
 
 	/**
