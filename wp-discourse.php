@@ -56,11 +56,13 @@ require_once __DIR__ . '/lib/sso-client/client.php';
 require_once __DIR__ . '/lib/sso-client/query-redirect.php';
 require_once __DIR__ . '/lib/shortcodes/sso-client.php';
 require_once __DIR__ . '/templates/html-templates.php';
+require_once __DIR__ . '/admin/discourse-sidebar/discourse-sidebar.php';
 require_once __DIR__ . '/admin/admin.php';
 
 new WPDiscourse\Discourse\Discourse();
 $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();
 $discourse_publish = new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
+new WPDiscourse\Admin\DiscourseSidebar( $discourse_publish );
 $discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
 new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );
 new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
