@@ -153,8 +153,9 @@ class DiscourseComment {
 		}
 
 		$status = get_post_status( $post_id );
+		$post = get_post( $post_id );
 
-		if ( 'publish' !== $status ) {
+		if ( 'publish' !== $status || ! empty( $post->post_password ) ) {
 
 			return '';
 		}
