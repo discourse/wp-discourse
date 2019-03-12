@@ -139,17 +139,17 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-			'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
-				$this,
-				'custom_datetime_format',
-			), 'discourse_comment', 'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_only_show_moderator_liked', __( 'Only Import Moderator-Liked', 'wp-discourse' ), array(
 				$this,
 				'only_show_moderator_liked_checkbox',
 			), 'discourse_comment', 'discourse_commenting_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_custom_datetime_format', __( 'Custom Datetime Format', 'wp-discourse' ), array(
+			$this,
+			'custom_datetime_format',
+		), 'discourse_comment', 'discourse_commenting_settings_section'
 		);
 
 		add_settings_field(
