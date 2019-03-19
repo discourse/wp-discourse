@@ -125,12 +125,11 @@ class DiscoursePublish {
 	public function sync_to_discourse( $post_id, $title, $raw ) {
 		global $wpdb;
 
-		wp_cache_set( 'discourse_publishing_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_publish_lock', 0 ) got_it" ) );
-
-		// This avoids a double sync, just 1 is allowed to go through at a time.
-		if ( 1 === intval( wp_cache_get( 'discourse_publishing_lock' )->got_it ) ) {
+		// this avoids a double sync, just 1 is allowed to go through at a time
+		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
+		if ( $got_lock ) {
 			$this->sync_to_discourse_work( $post_id, $title, $raw );
-			wp_cache_set( 'discourse_publishing_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_publish_lock' )" ) );
+			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
 	}
 
@@ -207,7 +206,7 @@ class DiscoursePublish {
 			if ( $unlisted ) {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
-			$data            = array(
+			$data         = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
@@ -219,8 +218,8 @@ class DiscoursePublish {
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => $unlisted ? 'false' : 'true',
 			);
-			$url             = $options['url'] . '/posts';
-			$post_options    = array(
+			$url          = $options['url'] . '/posts';
+			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
 				'body'    => http_build_query( $data ) . $tags_param,
