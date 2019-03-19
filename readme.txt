@@ -127,7 +127,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 **Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
 
-#### 1.8.8 13/19/2019
+#### 1.8.8 03/19/2019
 
 - Fix don't cache database call to GET_LOCK when publishing posts from WordPress to Discourse
 
