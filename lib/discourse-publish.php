@@ -127,7 +127,7 @@ class DiscoursePublish {
 
 		// this avoids a double sync, just 1 is allowed to go through at a time.
 		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
-		if ( $got_lock ) {
+		if ( 1 === intval( $got_lock->got_it ) ) {
 			$this->sync_to_discourse_work( $post_id, $title, $raw );
 			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
