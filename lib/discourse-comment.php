@@ -212,20 +212,22 @@ class DiscourseComment {
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );
+		// Every 10 minutes do a json call to sync comments.
+		$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
+		$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
+		$sync_post   = $last_sync + $sync_period < $time;
 
-		if ( ! $use_discourse_webhook ) {
-			// Every 10 minutes do a json call to sync comment count and top comments.
-			$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
-			$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
-			$sync_post   = $last_sync + $sync_period < $time;
-		} else {
-			$sync_post = ( 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) ) );
+		// If the comments webhook is enabled, comments may be synced more often than once every 10 minutes.
+		// For now, the 10 minute sync period is used as a fallback even when the webhook is enabled.
+		// Once we give authors some feedback about the webhooks success after a post is published, the fallback can be removed.
+		if ( $use_discourse_webhook ) {
+			$sync_post = $sync_post || 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) );
 		}
 
 		if ( $sync_post ) {
 			// Avoids a double sync.
-			wp_cache_set( 'discourse_comments_lock', $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" ) );
-			if ( 1 === intval( wp_cache_get( 'discourse_comments_lock' )->got_it ) ) {
+			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
+			if ( 1 === intval( $got_lock->got_it ) ) {
 
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $postid );
 				if ( 'publish' === get_post_status( $postid ) || $publish_private ) {
@@ -279,7 +281,7 @@ class DiscourseComment {
 				}// End if().
 			}// End if().
 
-			wp_cache_set( 'discourse_comments_lock', $wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" ) );
+			$wpdb->get_results( "SELECT RELEASE_LOCK( 'discourse_lock' )" );
 		}// End if().
 
 		return null;
