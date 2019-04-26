@@ -107,7 +107,6 @@ class DiscourseSidebar {
 			'maxTags'          => $max_tags,
 		);
 
-
         wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
         wp_enqueue_script( 'discourse-sidebar-js' );
 
