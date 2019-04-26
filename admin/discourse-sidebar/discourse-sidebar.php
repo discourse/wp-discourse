@@ -46,10 +46,17 @@ class DiscourseSidebar {
 
 	/**
 	 * Setup options and register API meta keys.
+     *
+     * @return null
 	 */
 	public function setup_options() {
 		$this->options      = $this->get_options();
-		$allowed_post_types = $this->options['allowed_post_types'];
+		if ( ! isset( $this->options['allowed_post_types'] ) ) {
+
+		    return null;
+        }
+
+		$allowed_post_types = isset( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : null ;
 		$meta_keys          = array(
 			'publish_to_discourse',
 			'publish_post_category',
@@ -61,13 +68,22 @@ class DiscourseSidebar {
 			'wpdc_publishing_response',
 			'wpdc_publishing_error',
 		);
-		$this->register_api_meta( $meta_keys, $allowed_post_types );
+
+        $this->register_api_meta( $meta_keys, $allowed_post_types );
+
+        return null;
 	}
 
 	/**
 	 * Enqueue Sidebar javascript and stylesheet.
+     *
+     * @return null
 	 */
 	public function enqueue_scripts() {
+	    if ( ! isset( $this->options['allowed_post_types'] ) ) {
+
+	        return null;
+        }
 		$blockPath = '/dist/block.js';
 		$stylePath = '/dist/block.css';
 
@@ -91,15 +107,18 @@ class DiscourseSidebar {
 			'maxTags'          => $max_tags,
 		);
 
-		wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
-		wp_enqueue_script( 'discourse-sidebar-js' );
 
-		wp_enqueue_style(
-			'discourse-sidebar-css',
-			plugins_url( $stylePath, __FILE__ ),
-			'',
-			filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
-		);
+        wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
+        wp_enqueue_script( 'discourse-sidebar-js' );
+
+        wp_enqueue_style(
+            'discourse-sidebar-css',
+            plugins_url( $stylePath, __FILE__ ),
+            '',
+            filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
+        );
+
+		return null;
 	}
 
 	/**
