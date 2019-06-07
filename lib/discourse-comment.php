@@ -299,6 +299,13 @@ class DiscourseComment {
 	public function comments_template( $old ) {
 		global $post;
 		$post_id = $post->ID;
+        $current_user = wp_get_current_user();
+		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
+
+		if ( ! $load_comments_template ) {
+
+            return WPDISCOURSE_PATH . 'templates/blank.php';
+        }
 
 		if ( $this->use_discourse_comments( $post_id ) ) {
 			if ( ! empty( $this->options['ajax-load'] ) ) {
