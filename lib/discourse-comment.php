@@ -127,7 +127,9 @@ class DiscourseComment {
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['ajax-load'] ) ) {
 			register_rest_route(
-				'wp-discourse/v1', 'discourse-comments', array(
+				'wp-discourse/v1',
+				'discourse-comments',
+				array(
 					array(
 						'methods'  => \WP_REST_Server::READABLE,
 						'callback' => array( $this, 'get_discourse_comments' ),
@@ -153,7 +155,7 @@ class DiscourseComment {
 		}
 
 		$status = get_post_status( $post_id );
-		$post = get_post( $post_id );
+		$post   = get_post( $post_id );
 
 		if ( 'publish' !== $status || ! empty( $post->post_password ) ) {
 
@@ -298,14 +300,14 @@ class DiscourseComment {
 	 */
 	public function comments_template( $old ) {
 		global $post;
-		$post_id = $post->ID;
-        $current_user = wp_get_current_user();
+		$post_id                = $post->ID;
+		$current_user           = wp_get_current_user();
 		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
 
 		if ( ! $load_comments_template ) {
 
-            return WPDISCOURSE_PATH . 'templates/blank.php';
-        }
+			return WPDISCOURSE_PATH . 'templates/blank.php';
+		}
 
 		if ( $this->use_discourse_comments( $post_id ) ) {
 			if ( ! empty( $this->options['ajax-load'] ) ) {
