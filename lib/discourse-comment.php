@@ -162,8 +162,7 @@ class DiscourseComment {
 			return '';
 		}
 
-		// This will return the cached comment HTML when it is available.
-		return $this->comment_formatter->format( $post_id );
+		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
 	}
 
 	/**

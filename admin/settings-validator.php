@@ -104,6 +104,7 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_enable_discourse_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_comment_type', array( $this, 'validate_radio_string_value' ) );
+		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_clear_cached_comment_html', array( $this, 'validate_clear_comments_html' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_load_comment_css', array( $this, 'validate_checkbox' ) );

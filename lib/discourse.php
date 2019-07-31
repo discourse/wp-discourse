@@ -69,6 +69,7 @@ class Discourse {
 		'enable-discourse-comments' => 0,
 		'comment-type'              => 'display-comments',
 		'ajax-load'                 => 0,
+		'cache-html'                => 0,
 		'clear-cached-comment-html' => 0,
 		'discourse-new-tab'         => 0,
 		'comment-sync-period'       => 10,

@@ -62,7 +62,7 @@ class DiscourseCommentFormatter {
 		// The topic_id may not be available for posts that were published before version 1.4.0.
 		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
 
-		if ( ! empty( $topic_id ) ) {
+		if ( ! empty( $topic_id ) && ! empty( $this->options['cache-html'] ) ) {
 			$transient_key = "wpdc_comment_html_{$topic_id}";
 			$html          = get_transient( $transient_key );
 
@@ -166,6 +166,6 @@ class DiscourseCommentFormatter {
 			}
 		}
 
-		return wp_kses_post( $discourse_html );
+		return $discourse_html;
 	}
 }
