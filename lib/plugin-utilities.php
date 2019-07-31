@@ -63,7 +63,8 @@ trait PluginUtilities {
 			array(
 				'api_key'      => $api_key,
 				'api_username' => $api_username,
-			), $url . '/users/' . $api_username . '.json'
+			),
+			$url . '/users/' . $api_username . '.json'
 		);
 
 		$url      = esc_url_raw( $url );
@@ -127,7 +128,8 @@ trait PluginUtilities {
 				array(
 					'api_key'      => $api_key,
 					'api_username' => $api_username,
-				), $site_url
+				),
+				$site_url
 			);
 
 			$remote = wp_remote_get( $site_url );
@@ -178,7 +180,8 @@ trait PluginUtilities {
 				array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
-				), $external_user_url
+				),
+				$external_user_url
 			)
 		);
 
@@ -230,7 +233,8 @@ trait PluginUtilities {
 					'filter'       => rawurlencode_deep( $email ),
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
-				), $users_url
+				),
+				$users_url
 			)
 		);
 
@@ -271,7 +275,8 @@ trait PluginUtilities {
 			array(
 				'api_key'      => $api_credentials['api_key'],
 				'api_username' => $api_credentials['api_username'],
-			), $topic_url
+			),
+			$topic_url
 		);
 
 		$response = wp_remote_get( $topic_url );

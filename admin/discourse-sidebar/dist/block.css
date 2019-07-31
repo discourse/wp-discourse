@@ -12,15 +12,24 @@ button.components-button.is-button.is-default.is-primary.is-large.active {
   background-size: 100px 100%;
   background-image: linear-gradient(-45deg, #0085ba 28%, #005d82 28%, #005d82 72%, #0085ba 72%);
   border-color: #00435d;
-  animation: components-button__busy-animation 2.5s infinite linear;
-  animation-name: components-button__busy-animation;
-  animation-duration: 2.5s;
-  animation-timing-function: linear;
-  animation-delay: 0s;
-  animation-iteration-count: infinite;
-  animation-direction: normal;
-  animation-fill-mode: none;
-  animation-play-state: running;
+  -webkit-animation: components-button__busy-animation 2.5s infinite linear;
+          animation: components-button__busy-animation 2.5s infinite linear;
+  -webkit-animation-name: components-button__busy-animation;
+          animation-name: components-button__busy-animation;
+  -webkit-animation-duration: 2.5s;
+          animation-duration: 2.5s;
+  -webkit-animation-timing-function: linear;
+          animation-timing-function: linear;
+  -webkit-animation-delay: 0s;
+          animation-delay: 0s;
+  -webkit-animation-iteration-count: infinite;
+          animation-iteration-count: infinite;
+  -webkit-animation-direction: normal;
+          animation-direction: normal;
+  -webkit-animation-fill-mode: none;
+          animation-fill-mode: none;
+  -webkit-animation-play-state: running;
+          animation-play-state: running;
   opacity: 1; }
 
 .wpdc-button {

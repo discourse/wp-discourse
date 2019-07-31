@@ -162,7 +162,8 @@ class DiscourseComment {
 			return '';
 		}
 
-		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
+		// This will return the cached comment HTML when it is available.
+		return $this->comment_formatter->format( $post_id );
 	}
 
 	/**
@@ -262,9 +263,8 @@ class DiscourseComment {
 
 						$json = json_decode( $result['body'] );
 
-						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
-						if ( isset( $json->posts_count ) ) {
-							$posts_count = $json->posts_count - 1;
+						if ( isset( $json->filtered_posts_count ) ) {
+							$posts_count = $json->filtered_posts_count - 1;
 							if ( $posts_count < 0 ) {
 								$posts_count = 0;
 							}

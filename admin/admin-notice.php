@@ -77,7 +77,8 @@ class AdminNotice {
 
 						$success_message = sprintf(
 							// translators: Discourse post-published success message. Placeholder: discourse_permalink.
-							__( '<div class="notice notice-success is-dismissible"><p>Your post has been published to Discourse. %1$s on Discourse.</p></div>', 'wp-discourse' ), $discourse_link
+							__( '<div class="notice notice-success is-dismissible"><p>Your post has been published to Discourse. %1$s on Discourse.</p></div>', 'wp-discourse' ),
+							$discourse_link
 						);
 
 						delete_post_meta( $post_id, 'wpdc_publishing_response' );
@@ -114,7 +115,9 @@ class AdminNotice {
 				) {
 					$username_not_set_notice = sprintf(
 						// translators: Discourse username_not_set notice. Placeholder: discourse_username.
-						__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ), $publish_username, $profile_page_link
+						__( '<div class="notice notice-error is-dismissible"><p>You have not set your Discourse username. Any posts you publish to Discourse will be published under the system default username \'%1$s\'. To stop seeing this notice, please visit your %2$s and set your Discourse username.</p></div>', 'wp-discourse' ),
+						$publish_username,
+						$profile_page_link
 					);
 
 					echo wp_kses_post( $username_not_set_notice );

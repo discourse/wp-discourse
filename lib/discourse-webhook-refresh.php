@@ -35,7 +35,7 @@ class DiscourseWebhookRefresh extends Webhook {
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
-		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
+		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
 		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
 	}
 
@@ -49,10 +49,12 @@ class DiscourseWebhookRefresh extends Webhook {
 	/**
 	 * Registers the Rest API route wp-discourse/v1/update-topic-content.
 	 */
-	public function initialize_comment_route() {
+	public function initialize_update_content_route() {
 		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
 			register_rest_route(
-				'wp-discourse/v1', 'update-topic-content', array(
+				'wp-discourse/v1',
+				'update-topic-content',
+				array(
 					array(
 						'methods'  => \WP_REST_Server::CREATABLE,
 						'callback' => array( $this, 'update_topic_content' ),
@@ -80,14 +82,14 @@ class DiscourseWebhookRefresh extends Webhook {
 		$json = $data->get_json_params();
 		do_action( 'wpdc_before_webhook_post_update', $json );
 
-		if ( ! empty( $json['post'] ) ) {
+		if ( ! is_wp_error( $json ) && ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
 			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-				$topic_id   = $post_data['topic_id'];
+				$topic_id   = intval( $post_data['topic_id'] );
 				$query      = "SELECT blog_id FROM $table_name WHERE topic_id = %d";
 				$blog_id    = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
 
@@ -151,11 +153,11 @@ class DiscourseWebhookRefresh extends Webhook {
 	 * @return null
 	 */
 	protected function update_post_metadata( $post_data ) {
-		$topic_id       = ! empty( $post_data['topic_id'] ) ? $post_data['topic_id'] : null;
-		$post_number    = ! empty( $post_data['post_number'] ) ? $post_data['post_number'] : null;
-		$post_title     = ! empty( $post_data['topic_title'] ) ? $post_data['topic_title'] : null;
-		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? $post_data['topic_posts_count'] - 1 : null;
-		$post_type      = ! empty( $post_data['post_type'] ) ? $post_data['post_type'] : null;
+		$topic_id       = ! empty( $post_data['topic_id'] ) ? intval( $post_data['topic_id'] ) : null;
+		$post_number    = ! empty( $post_data['post_number'] ) ? intval( $post_data['post_number'] ) : null;
+		$post_title     = ! empty( $post_data['topic_title'] ) ? sanitize_text_field( $post_data['topic_title'] ) : null;
+		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? intval( $post_data['topic_posts_count'] ) - 1 : null;
+		$post_type      = ! empty( $post_data['post_type'] ) ? intval( $post_data['post_type'] ) : null;
 
 		if ( $topic_id && $post_number && $post_title ) {
 
@@ -204,11 +206,20 @@ class DiscourseWebhookRefresh extends Webhook {
 	 * @return null|\WP_Error
 	 */
 	protected function list_topic( $post_id, $topic_id ) {
-		$url          = $this->options['url'];
-		$status_url   = esc_url( "{$url}/t/{$topic_id}/status" );
+		$url          = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
+		$api_key      = ! empty( $this->options['api-key'] ) ? $this->options['api-key'] : null;
+		$api_username = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : null;
+
+		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
+
+			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+		}
+
+		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
+
 		$data         = array(
-			'api_key'      => $this->options['api-key'],
-			'api_username' => $this->options['publish-username'],
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
 			'status'       => 'visible',
 			'enabled'      => 'true',
 		);

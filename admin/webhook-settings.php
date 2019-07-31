@@ -58,52 +58,77 @@ class WebhookSettings {
 		$this->display_webhook_options = ! is_multisite() || empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(
-			'discourse_webhook_settings_section', __( 'Webhook Settings', 'wp-discourse' ), array(
+			'discourse_webhook_settings_section',
+			__( 'Webhook Settings', 'wp-discourse' ),
+			array(
 				$this,
 				'webhook_settings_tab_details',
-			), 'discourse_webhook'
+			),
+			'discourse_webhook'
 		);
 
 		if ( $this->display_webhook_options ) {
 			add_settings_field(
-				'discourse_use_discourse_webhook', __( 'Sync Comment Data', 'wp-discourse' ), array(
+				'discourse_use_discourse_webhook',
+				__( 'Sync Comment Data', 'wp-discourse' ),
+				array(
 					$this,
 					'use_discourse_webhook_checkbox',
-				), 'discourse_webhook', 'discourse_webhook_settings_section'
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
 			);
 
 			add_settings_field(
-				'discourse_webhook_match_old_topics', __( 'Match Old Topics', 'wp-discourse' ), array(
+				'discourse_webhook_match_old_topics',
+				__( 'Match Old Topics', 'wp-discourse' ),
+				array(
 					$this,
 					'webhook_match_old_topics_checkbox',
-				), 'discourse_webhook', 'discourse_webhook_settings_section'
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
 			);
 
 			add_settings_field(
-				'discourse_use_discourse_user_webhook', __( 'Update Userdata', 'wp-discourse' ), array(
+				'discourse_use_discourse_user_webhook',
+				__( 'Update Userdata', 'wp-discourse' ),
+				array(
 					$this,
 					'use_discourse_user_webhook_checkbox',
-				), 'discourse_webhook', 'discourse_webhook_settings_section'
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
 			);
 
 			add_settings_field(
-				'discourse_webhook_match_user_email', __( 'Match Users by Email Address', 'wp-discourse' ), array(
+				'discourse_webhook_match_user_email',
+				__( 'Match Users by Email Address', 'wp-discourse' ),
+				array(
 					$this,
 					'webhook_match_user_email_checkbox',
-				), 'discourse_webhook', 'discourse_webhook_settings_section'
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
 			);
 
 			add_settings_field(
-				'discourse_webhook_secret', __( 'Webhook Secret Key', 'wp-discourse' ), array(
+				'discourse_webhook_secret',
+				__( 'Webhook Secret Key', 'wp-discourse' ),
+				array(
 					$this,
 					'webhook_secret_input',
-				), 'discourse_webhook', 'discourse_webhook_settings_section'
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
 			);
 
 		}// End if().
 
 		register_setting(
-			'discourse_webhook', 'discourse_webhook', array(
+			'discourse_webhook',
+			'discourse_webhook',
+			array(
 				$this->form_helper,
 				'validate_options',
 			)
@@ -128,15 +153,22 @@ class WebhookSettings {
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
 				'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code class="wpdc-select-all">%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.', 'wp-discourse'
-			), $discourse_webhooks_url, $webhook_payload_url
+ URL <code class="wpdc-select-all">%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.',
+				'wp-discourse'
+			),
+			$discourse_webhooks_url,
+			$webhook_payload_url
 		);
 
 		$this->form_helper->checkbox_input(
-			'use-discourse-webhook', 'discourse_webhook', __(
+			'use-discourse-webhook',
+			'discourse_webhook',
+			__(
 				'Use a webhook
-		to sync comment data between Discourse and WordPress.', 'wp-discourse'
-			), $description
+		to sync comment data between Discourse and WordPress.',
+				'wp-discourse'
+			),
+			$description
 		);
 	}
 
@@ -145,14 +177,19 @@ class WebhookSettings {
 	 */
 	public function webhook_match_old_topics_checkbox() {
 		$this->form_helper->checkbox_input(
-			'webhook-match-old-topics', 'discourse_webhook', __(
+			'webhook-match-old-topics',
+			'discourse_webhook',
+			__(
 				'Match WordPress posts
-	    published prior to WP Discourse version 1.4.0.', 'wp-discourse'
-			), __(
+	    published prior to WP Discourse version 1.4.0.',
+				'wp-discourse'
+			),
+			__(
 				"By default, posts
 	    are matched to Discourse topics through their discourse_topic_id metadata. That value isn't available for posts
 	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
-	    'post' to Discourse topics through their titles.", 'wp-discourse'
+	    'post' to Discourse topics through their titles.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -175,15 +212,22 @@ class WebhookSettings {
 				'Used to automatically fill in the WordPress user\'s Discourse Name field and store their Discourse Id as metadata.
 This setting will only be activated if your site is functioning as the SSO provider for Discourse (this can be overridden by hooking into the
 \'wpdc_use_discourse_user_webhook\' filter.) Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.', 'wp-discourse'
-			), $discourse_webhooks_url, $webhook_payload_url
+ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
+				'wp-discourse'
+			),
+			$discourse_webhooks_url,
+			$webhook_payload_url
 		);
 
 		$this->form_helper->checkbox_input(
-			'use-discourse-user-webhook', 'discourse_webhook', __(
+			'use-discourse-user-webhook',
+			'discourse_webhook',
+			__(
 				'Use a webhook
-		to sync user data with Discourse.', 'wp-discourse'
-			), $description
+		to sync user data with Discourse.',
+				'wp-discourse'
+			),
+			$description
 		);
 
 	}
@@ -193,14 +237,19 @@ This setting will only be activated if your site is functioning as the SSO provi
 	 */
 	public function webhook_match_user_email_checkbox() {
 		$this->form_helper->checkbox_input(
-			'webhook-match-user-email', 'discourse_webhook', __(
+			'webhook-match-user-email',
+			'discourse_webhook',
+			__(
 				'Match users with Discourse
-        through their email address.', 'wp-discourse'
-			), __(
+        through their email address.',
+				'wp-discourse'
+			),
+			__(
 				'Used for syncing accounts that were created before enabling the
         Update Userdata webhook. Existing accounts are synced when the user updates and saves their profile on Discourse.
         <strong>Note: only enable this setting if you are certain that email addresses match between Discourse
-        and WordPress.</strong>', 'wp-discourse'
+        and WordPress.</strong>',
+				'wp-discourse'
 			)
 		);
 	}
@@ -220,8 +269,10 @@ This setting will only be activated if your site is functioning as the SSO provi
 			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
 			__(
 				'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
-		        characters long. It needs to match the key set at %1$s.', 'wp-discourse'
-			), $discourse_webhooks_url
+		        characters long. It needs to match the key set at %1$s.',
+				'wp-discourse'
+			),
+			$discourse_webhooks_url
 		);
 
 		$this->form_helper->input( 'webhook-secret', 'discourse_webhook', $description );
@@ -244,9 +295,10 @@ This setting will only be activated if your site is functioning as the SSO provi
 				Using it will reduce the number of API requests made between WordPress and your forum. The Update Userdata
 				webhook will only be functional when WordPress is used as the SSO Provider for Discourse. If enabled, it
 				automatically fills in the user's WordPress name field when a new account is created or updated on Discourse
-				through SSO.", 'wp-discourse'
+				through SSO.",
+					'wp-discourse'
 				);
-?>
+				?>
 			</em>
 		</p>
 		<?php if ( $this->display_webhook_options ) : ?>
@@ -257,9 +309,10 @@ This setting will only be activated if your site is functioning as the SSO provi
 						"There are some issues with syncing posts that were published from WordPress to
 					Discourse before WP Discourse version 1.4.0. Old posts can be synced with their corresponding Discourse
 					topic if they are using the post type 'post' and the title of the post matches the title of the Discourse
-					topic. To enable this functionality, select the 'Match Old Topics' option.", 'wp-discourse'
+					topic. To enable this functionality, select the 'Match Old Topics' option.",
+						'wp-discourse'
 					);
-?>
+					?>
 				</em>
 			</p>
 			<p class="wpdc-options-documentation">
@@ -279,9 +332,10 @@ This setting will only be activated if your site is functioning as the SSO provi
 					<?php
 					esc_html_e(
 						"You are using the WP Discourse plugin in a subsite of a multisite installation.
-                    The plugin's webhook configuration is being managed through the installation's main site.", 'wp-discourse'
+                    The plugin's webhook configuration is being managed through the installation's main site.",
+						'wp-discourse'
 					);
-?>
+					?>
 </strong>
 				</em>
 			</p>

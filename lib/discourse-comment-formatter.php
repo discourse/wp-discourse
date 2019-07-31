@@ -62,7 +62,7 @@ class DiscourseCommentFormatter {
 		// The topic_id may not be available for posts that were published before version 1.4.0.
 		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
 
-		if ( ! empty( $topic_id ) && ! empty( $this->options['cache-html'] ) ) {
+		if ( ! empty( $topic_id ) ) {
 			$transient_key = "wpdc_comment_html_{$topic_id}";
 			$html          = get_transient( $transient_key );
 
@@ -87,7 +87,7 @@ class DiscourseCommentFormatter {
 		// Use custom datetime format string if provided, else global date format.
 		$datetime_format = empty( $this->options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $this->options['custom-datetime-format'];
 
-		$more_replies_number = intval( ( $topic_data->posts_count - count( $topic_data->posts ) - 1 ) );
+		$more_replies_number = intval( ( $topic_data->filtered_posts_count - count( $topic_data->posts ) - 1 ) );
 		$more_text           = esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
 		if ( 0 >= $more_replies_number ) {
 			$more_replies = '';
@@ -101,7 +101,7 @@ class DiscourseCommentFormatter {
 		$comments_html     = '';
 		$participants_html = '';
 
-		$discourse_posts_count = ! empty( $topic_data->posts_count ) ? $topic_data->posts_count : 0;
+		$discourse_posts_count = ! empty( $topic_data->filtered_posts_count ) ? $topic_data->filtered_posts_count : 0;
 		$posts                 = $topic_data->posts;
 		$participants          = $topic_data->participants;
 
@@ -158,7 +158,7 @@ class DiscourseCommentFormatter {
 		do_action( 'wp_discourse_after_comments', $topic_id );
 
 		if ( isset( $transient_key ) ) {
-			set_transient( $transient_key, $discourse_html, 12 * HOUR_IN_SECONDS );
+			set_transient( $transient_key, $discourse_html, 10 * MINUTE_IN_SECONDS );
 			$transient_keys = get_option( 'wpdc_cached_html_keys' ) ? get_option( 'wpdc_cached_html_keys' ) : array();
 			if ( ! in_array( $transient_key, $transient_keys, true ) ) {
 				$transient_keys[] = $transient_key;
@@ -166,6 +166,6 @@ class DiscourseCommentFormatter {
 			}
 		}
 
-		return $discourse_html;
+		return wp_kses_post( $discourse_html );
 	}
 }

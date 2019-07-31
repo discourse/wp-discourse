@@ -58,128 +58,186 @@ class PublishSettings {
 		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(
-			'discourse_publishing_settings_section', __( 'Publishing Settings', 'wp-discourse' ), array(
+			'discourse_publishing_settings_section',
+			__( 'Publishing Settings', 'wp-discourse' ),
+			array(
 				$this,
 				'publishing_settings_tab_details',
-			), 'discourse_publish'
+			),
+			'discourse_publish'
 		);
 
 		add_settings_field(
-			'discourse_publish_category', __( 'Default Discourse Category', 'wp-discourse' ), array(
+			'discourse_publish_category',
+			__( 'Default Discourse Category', 'wp-discourse' ),
+			array(
 				$this,
 				'publish_category_input',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_display_subcategories', __( 'Display Subcategories', 'wp-discourse' ), array(
+			'discourse_display_subcategories',
+			__( 'Display Subcategories', 'wp-discourse' ),
+			array(
 				$this,
 				'display_subcategories',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_publish_category_update', __( 'Force Category Update', 'wp-discourse' ), array(
+			'discourse_publish_category_update',
+			__( 'Force Category Update', 'wp-discourse' ),
+			array(
 				$this,
 				'publish_category_input_update',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_allow_tags', __( 'Allow Tags', 'wp-discourse' ), array(
+			'discourse_allow_tags',
+			__( 'Allow Tags', 'wp-discourse' ),
+			array(
 				$this,
 				'allow_tags_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_max_tags', __( 'Maximum Number of Tags', 'wp-discourse' ), array(
+			'discourse_max_tags',
+			__( 'Maximum Number of Tags', 'wp-discourse' ),
+			array(
 				$this,
 				'max_tags_input',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_publish_as_unlisted', __( 'Publish as Unlisted Topics', 'wp-discourse' ), array(
+			'discourse_publish_as_unlisted',
+			__( 'Publish as Unlisted Topics', 'wp-discourse' ),
+			array(
 				$this,
 				'publish_as_unlisted_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_full_post_content', __( 'Use Full Post Content', 'wp-discourse' ), array(
+			'discourse_full_post_content',
+			__( 'Use Full Post Content', 'wp-discourse' ),
+			array(
 				$this,
 				'full_post_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_custom_excerpt_length', __( 'Custom Excerpt Length', 'wp-discourse' ), array(
+			'discourse_custom_excerpt_length',
+			__( 'Custom Excerpt Length', 'wp-discourse' ),
+			array(
 				$this,
 				'custom_excerpt_length',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_add_featured_link', __( 'Add Featured Links', 'wp-discourse' ), array(
-				$this,
-				'add_featured_link_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 			add_settings_field(
-				'discourse_auto_publish', __( 'Auto Publish', 'wp-discourse' ), array(
+				'discourse_auto_publish',
+				__( 'Auto Publish', 'wp-discourse' ),
+				array(
 					$this,
 					'auto_publish_checkbox',
-				), 'discourse_publish', 'discourse_publishing_settings_section'
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
 			);
 
 		add_settings_field(
-			'discourse_force_publish', __( 'Force Publish', 'wp-discourse' ), array(
+			'discourse_force_publish',
+			__( 'Force Publish', 'wp-discourse' ),
+			array(
 				$this,
 				'force_publish_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_publish_failure_notice', __( 'Send Email Notification on Publish Failure', 'wp-discourse' ), array(
+			'discourse_publish_failure_notice',
+			__( 'Send Email Notification on Publish Failure', 'wp-discourse' ),
+			array(
 				$this,
 				'publish_failure_notice_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_publish_failure_email_address', __( 'Email Address for Failure Notification', 'wp-discourse' ), array(
+			'discourse_publish_failure_email_address',
+			__( 'Email Address for Failure Notification', 'wp-discourse' ),
+			array(
 				$this,
 				'publish_failure_email_address',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_auto_track', __( 'Auto Track Published Topics', 'wp-discourse' ), array(
+			'discourse_auto_track',
+			__( 'Auto Track Published Topics', 'wp-discourse' ),
+			array(
 				$this,
 				'auto_track_checkbox',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_allowed_post_types', __( 'Post Types to Publish', 'wp-discourse' ), array(
+			'discourse_allowed_post_types',
+			__( 'Post Types to Publish', 'wp-discourse' ),
+			array(
 				$this,
 				'post_types_select',
-			), 'discourse_publish', 'discourse_publishing_settings_section'
+			),
+			'discourse_publish',
+			'discourse_publishing_settings_section'
 		);
 
 		if ( ! $this->use_network_publish_settings ) {
 			add_settings_field(
-				'discourse_hide_name_field', __( 'Do Not Display Discourse Name Field', 'wp-discourse' ), array(
+				'discourse_hide_name_field',
+				__( 'Do Not Display Discourse Name Field', 'wp-discourse' ),
+				array(
 					$this,
 					'hide_discourse_name_field_checkbox',
-				), 'discourse_publish', 'discourse_publishing_settings_section'
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
 			);
 		}
 
 		register_setting(
-			'discourse_publish', 'discourse_publish', array(
+			'discourse_publish',
+			'discourse_publish',
+			array(
 				$this->form_helper,
 				'validate_options',
 			)
@@ -191,7 +249,9 @@ class PublishSettings {
 	 */
 	public function display_subcategories() {
 		$this->form_helper->checkbox_input(
-			'display-subcategories', 'discourse_publish', __( 'Include subcategories in the list of available categories.', 'wp-discourse' ),
+			'display-subcategories',
+			'discourse_publish',
+			__( 'Include subcategories in the list of available categories.', 'wp-discourse' ),
 			__( "You need to select and save both this setting and the 'Force Category Update' setting before subcategories will be available in the category list.", 'wp-discourse' )
 		);
 	}
@@ -201,9 +261,12 @@ class PublishSettings {
 	 */
 	public function publish_category_input() {
 		$this->form_helper->category_select(
-			'publish-category', 'discourse_publish', __(
+			'publish-category',
+			'discourse_publish',
+			__(
 				"The default category in which
-		your posts will be published on Discourse. (This can be changed in the 'Publish to Discourse' meta-box when you create a post.)", 'wp-discourse'
+		your posts will be published on Discourse. (This can be changed in the 'Publish to Discourse' meta-box when you create a post.)",
+				'wp-discourse'
 			)
 		);
 	}
@@ -213,7 +276,9 @@ class PublishSettings {
 	 */
 	public function allow_tags_checkbox() {
 		$this->form_helper->checkbox_input(
-			'allow-tags', 'discourse_publish', __( 'Allow post authors to add tags to Discourse topic.', 'wp-discourse' )
+			'allow-tags',
+			'discourse_publish',
+			__( 'Allow post authors to add tags to Discourse topic.', 'wp-discourse' )
 		);
 	}
 
@@ -229,7 +294,9 @@ class PublishSettings {
 	 */
 	public function publish_as_unlisted_checkbox() {
 		$this->form_helper->checkbox_input(
-			'publish-as-unlisted', 'discourse_publish', __( 'Publish posts as unlisted Discourse topics.', 'wp-discourse' ),
+			'publish-as-unlisted',
+			'discourse_publish',
+			__( 'Publish posts as unlisted Discourse topics.', 'wp-discourse' ),
 			__( 'If you have enabled the Sync Comment Data webhook, topics will be listed when they receive a comment.', 'wp-discourse' )
 		);
 	}
@@ -244,10 +311,13 @@ class PublishSettings {
 		update_option( 'discourse_publish', $discourse_publish );
 
 		$this->form_helper->checkbox_input(
-			'publish-category-update', 'discourse_publish', __( 'Update the discourse publish category list.', 'wp-discourse' ),
+			'publish-category-update',
+			'discourse_publish',
+			__( 'Update the discourse publish category list.', 'wp-discourse' ),
 			__(
 				"Check this box if you've added new categories to your forum and would like them to be available on WordPress. The check box
-		will be reset to 'unchecked' after a single request.", 'wp-discourse'
+		will be reset to 'unchecked' after a single request.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -262,12 +332,14 @@ class PublishSettings {
 			$description                  = __(
 				"<strong>Note:</strong> to keep the 'Show Full Post' button
             from appearing under your post on Discourse, you must unselect the 'embed truncate' setting on Discourse.
-			This setting is found at ", 'wp-discourse'
+			This setting is found at ",
+				'wp-discourse'
 			) . $discourse_admin_posting_link;
 		} else {
 			$description = __(
 				"<strong>Note:</strong> to keep the 'Show Full Post' button from appearing under your post on Discourse, you must uncheck the 'embed truncate' setting on Discourse.
-			This setting is found at http://discourse.example.com/admin/site_settings/category/posting.", 'wp-discourse'
+			This setting is found at http://discourse.example.com/admin/site_settings/category/posting.",
+				'wp-discourse'
 			);
 		}
 
@@ -280,7 +352,8 @@ class PublishSettings {
 	public function custom_excerpt_length() {
 		$description = __(
 			'Custom excerpt length in words. If you set an excerpt in the new-post excerpt
-        metabox, that excerpt will be given priority over the length set here.', 'wp-discourse'
+        metabox, that excerpt will be given priority over the length set here.',
+			'wp-discourse'
 		);
 		$this->form_helper->input( 'custom-excerpt-length', 'discourse_publish', $description, 'number', 0 );
 	}
@@ -290,9 +363,12 @@ class PublishSettings {
 	 */
 	public function add_featured_link_checkbox() {
 		$this->form_helper->checkbox_input(
-			'add-featured-link', 'discourse_publish', __(
+			'add-featured-link',
+			'discourse_publish',
+			__(
 				'Adds a link to the WordPress post
-	    to the Discourse topic list and topic title.', 'wp-discourse'
+	    to the Discourse topic list and topic title.',
+				'wp-discourse'
 			)
 		);
 	}
@@ -302,7 +378,9 @@ class PublishSettings {
 	 */
 	public function auto_publish_checkbox() {
 		$this->form_helper->checkbox_input(
-			'auto-publish', 'discourse_publish', __( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
+			'auto-publish',
+			'discourse_publish',
+			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
 			__( 'This setting is not supported when using the Block Editor.', 'wp-discourse' )
 		);
 	}
@@ -312,7 +390,9 @@ class PublishSettings {
 	 */
 	public function force_publish_checkbox() {
 		$this->form_helper->checkbox_input(
-			'force-publish', 'discourse_publish', __( 'Automatically publish all new posts and updates. Posts will be published to the Default Discourse Category.', 'wp-discourse' ),
+			'force-publish',
+			'discourse_publish',
+			__( 'Automatically publish all new posts and updates. Posts will be published to the Default Discourse Category.', 'wp-discourse' ),
 			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
 		);
 	}
@@ -322,10 +402,13 @@ class PublishSettings {
 	 */
 	public function publish_failure_notice_checkbox() {
 		$this->form_helper->checkbox_input(
-			'publish-failure-notice', 'discourse_publish', __( 'Send an email notification if publishing to Discourse fails.', 'wp-discourse' ),
+			'publish-failure-notice',
+			'discourse_publish',
+			__( 'Send an email notification if publishing to Discourse fails.', 'wp-discourse' ),
 			__(
 				"If the 'auto publish' option is selected, this will send a notification for any posts that fail to publish to Discourse. If that setting is not enabled, it
-            will only send a notification if an error is returned from Discourse.", 'wp-discourse'
+            will only send a notification if an error is returned from Discourse.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -349,12 +432,17 @@ class PublishSettings {
 	 */
 	public function hide_discourse_name_field_checkbox() {
 		$this->form_helper->checkbox_input(
-			'hide-discourse-name-field', 'discourse_publish', __(
+			'hide-discourse-name-field',
+			'discourse_publish',
+			__(
 				'Removes the Discourse Name field
-	    from the WordPress user profile page.', 'wp-discourse'
-			), __(
+	    from the WordPress user profile page.',
+				'wp-discourse'
+			),
+			__(
 				"Unless SSO is enabled, this setting will cause all posts published
-	    to Discourse to be published by the 'Publishing Username.'", 'wp-discourse'
+	    to Discourse to be published by the 'Publishing Username.'",
+				'wp-discourse'
 			)
 		);
 	}

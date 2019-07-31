@@ -46,17 +46,17 @@ class DiscourseSidebar {
 
 	/**
 	 * Setup options and register API meta keys.
-     *
-     * @return null
+	 *
+	 * @return null
 	 */
 	public function setup_options() {
-		$this->options      = $this->get_options();
+		$this->options = $this->get_options();
 		if ( ! isset( $this->options['allowed_post_types'] ) ) {
 
-		    return null;
-        }
+			return null;
+		}
 
-		$allowed_post_types = isset( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : null ;
+		$allowed_post_types = isset( $this->options['allowed_post_types'] ) ? $this->options['allowed_post_types'] : null;
 		$meta_keys          = array(
 			'publish_to_discourse',
 			'publish_post_category',
@@ -69,21 +69,21 @@ class DiscourseSidebar {
 			'wpdc_publishing_error',
 		);
 
-        $this->register_api_meta( $meta_keys, $allowed_post_types );
+		$this->register_api_meta( $meta_keys, $allowed_post_types );
 
-        return null;
+		return null;
 	}
 
 	/**
 	 * Enqueue Sidebar javascript and stylesheet.
-     *
-     * @return null
+	 *
+	 * @return null
 	 */
 	public function enqueue_scripts() {
-	    if ( ! isset( $this->options['allowed_post_types'] ) ) {
+		if ( ! isset( $this->options['allowed_post_types'] ) ) {
 
-	        return null;
-        }
+			return null;
+		}
 		$blockPath = '/dist/block.js';
 		$stylePath = '/dist/block.css';
 
@@ -91,7 +91,8 @@ class DiscourseSidebar {
 			'discourse-sidebar-js',
 			plugins_url( $blockPath, __FILE__ ),
 			[ 'wp-i18n', 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-editor', 'wp-components', 'wp-data', 'wp-plugins', 'wp-edit-post', 'wp-api' ],
-			filemtime( plugin_dir_path( __FILE__ ) . $blockPath )
+			filemtime( plugin_dir_path( __FILE__ ) . $blockPath ),
+			true
 		);
 
 		$default_category   = $this->options['publish-category'];
@@ -100,22 +101,31 @@ class DiscourseSidebar {
 		$allow_tags         = ! empty( $this->options['allow-tags'] );
 		$max_tags           = isset( $this->options['max-tags'] ) ? $this->options['max-tags'] : 5;
 		$data               = array(
-			'defaultCategory'  => $default_category,
-			'allowedPostTypes' => $allowed_post_types,
-			'forcePublish'     => $force_publish,
-			'allowTags'        => $allow_tags,
-			'maxTags'          => $max_tags,
+			'defaultCategory'         => $default_category,
+			'allowedPostTypes'        => $allowed_post_types,
+			'forcePublish'            => $force_publish,
+			'allowTags'               => $allow_tags,
+			'maxTags'                 => $max_tags,
+			'get_categories_nonce'    => wp_create_nonce( 'get_categories_nonce' ),
+			'publish_topic_nonce'     => wp_create_nonce( 'publish_topic_nonce' ),
+			'update_topic_nonce'      => wp_create_nonce( 'update_topic_nonce' ),
+			'set_publish_meta_nonce'  => wp_create_nonce( 'set_publish_meta_nonce' ),
+			'set_category_meta_nonce' => wp_create_nonce( 'set_category_meta_nonce' ),
+			'set_pin_meta_nonce'      => wp_create_nonce( 'set_pin_meta_nonce' ),
+			'set_tag_meta_nonce'      => wp_create_nonce( 'set_tag_meta_nonce' ),
+			'link_topic_nonce'        => wp_create_nonce( 'link_topic_nonce' ),
+			'unlink_post_nonce'       => wp_create_nonce( 'unlink_post_nonce' ),
 		);
 
-        wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
-        wp_enqueue_script( 'discourse-sidebar-js' );
+		wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
+		wp_enqueue_script( 'discourse-sidebar-js' );
 
-        wp_enqueue_style(
-            'discourse-sidebar-css',
-            plugins_url( $stylePath, __FILE__ ),
-            '',
-            filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
-        );
+		wp_enqueue_style(
+			'discourse-sidebar-css',
+			plugins_url( $stylePath, __FILE__ ),
+			'',
+			filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
+		);
 
 		return null;
 	}
@@ -130,7 +140,9 @@ class DiscourseSidebar {
 		foreach ( $meta_keys as $meta_key ) {
 			foreach ( $post_types as $post_type ) {
 				register_meta(
-					$post_type, $meta_key, array(
+					$post_type,
+					$meta_key,
+					array(
 						'single'       => true,
 						'show_in_rest' => true,
 					)
@@ -144,123 +156,164 @@ class DiscourseSidebar {
 	 */
 	public function register_sidebar_routes() {
 		register_rest_route(
-			'wp-discourse/v1', 'get-discourse-categories', array(
+			'wp-discourse/v1',
+			'get-discourse-categories',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'permission_callback' => array( $this, 'get_discourse_read_categorories_permissions' ),
+					'permission_callback' => function( $data ) {
+
+						return $this->get_api_category_permissions( $data, 'get_categories_nonce' );
+					},
 					'callback'            => array( $this, 'get_discourse_categories' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'update-topic', array(
+			'wp-discourse/v1',
+			'update-topic',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+						return $this->get_api_post_permissions( $data, 'update_topic_nonce' );
+					},
 					'callback'            => array( $this, 'update_topic' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'publish-topic', array(
+			'wp-discourse/v1',
+			'publish-topic',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+						return $this->get_api_post_permissions( $data, 'publish_topic_nonce' );
+					},
 					'callback'            => array( $this, 'publish_topic' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'unlink-post', array(
+			'wp-discourse/v1',
+			'unlink-post',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+						return $this->get_api_post_permissions( $data, 'unlink_post_nonce' );
+					},
 					'callback'            => array( $this, 'unlink_post' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'link-topic', array(
+			'wp-discourse/v1',
+			'link-topic',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+						return $this->get_api_post_permissions( $data, 'link_topic_nonce' );
+					},
 					'callback'            => array( $this, 'link_topic' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'set-publish-meta', array(
+			'wp-discourse/v1',
+			'set-publish-meta',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+						return $this->get_api_post_permissions( $data, 'set_publish_meta_nonce' );
+					},
 					'callback'            => array( $this, 'set_publish_meta' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'set-category-meta', array(
+			'wp-discourse/v1',
+			'set-category-meta',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+
+						return $this->get_api_post_permissions( $data, 'set_category_meta_nonce' );
+					},
 					'callback'            => array( $this, 'set_category_meta' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'set-tag-meta', array(
+			'wp-discourse/v1',
+			'set-tag-meta',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+
+						return $this->get_api_post_permissions( $data, 'set_tag_meta_nonce' );
+					},
 					'callback'            => array( $this, 'set_tag_meta' ),
 				),
 			)
 		);
 
 		register_rest_route(
-			'wp-discourse/v1', 'set-pin-meta', array(
+			'wp-discourse/v1',
+			'set-pin-meta',
+			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_discourse_publish_permissions' ),
+					'permission_callback' => function( $data ) {
+
+						return $this->get_api_post_permissions( $data, 'set_pin_meta_nonce' );
+					},
 					'callback'            => array( $this, 'set_pin_meta' ),
 				),
 			)
 		);
 	}
 
+
 	/**
-	 * Checks whether the current user has permission to access the Discourse categories option.
+	 * Checks the permissions for requests made to the `get_discourse_categories` route.
+	 *
+	 * @param object $data The data sent with the API Request.
+	 * @param string $nonce_name The nonce action name to validate.
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function get_discourse_read_categorories_permissions() {
-		if ( ! current_user_can( 'publish_posts' ) ) {
-			return new \WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
-				array(
-					'status' => rest_authorization_required_code(),
-					)
-			);
+	public function get_api_category_permissions( $data, $nonce_name ) {
+		$nonce = ! empty( $data[ $nonce_name ] ) ? sanitize_key( $data[ $nonce_name ] ) : null;
+		if ( ! wp_verify_nonce( $nonce, $nonce_name ) || ! current_user_can( 'publish_posts' ) ) {
+
+			return $this->rest_authorization_error();
 		}
 
 		return true;
 	}
 
 	/**
-	 * Checks if the user has permissions to publish the post.
+	 * Checks the permissions for requests made to Rest Routes that act on posts.
 	 *
-	 * @param object $data The data sent with the API request.
-	 *
+	 * @param object $data The data sent with the API Request.
+	 * @param string $nonce_name The nonce action name to validate.
 	 * @return bool|\WP_Error
 	 */
-	public function get_discourse_publish_permissions( $data ) {
+	public function get_api_post_permissions( $data, $nonce_name ) {
+		$nonce   = ! empty( $data[ $nonce_name ] ) ? sanitize_key( $data[ $nonce_name ] ) : null;
 		$post_id = isset( $data['id'] ) ? intval( wp_unslash( $data['id'] ) ) : 0; // Input var okay.
 
 		if ( $post_id <= 0 ) {
@@ -270,21 +323,31 @@ class DiscourseSidebar {
 				sprintf( __( 'Invalid parameter: %s', 'wp-discourse' ), $post_id ),
 				array(
 					'status' => 400,
-					)
+				)
 			);
 		}
 
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
-			return new \WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
-				array(
-					'status' => rest_authorization_required_code(),
-					)
-			);
+		if ( ! wp_verify_nonce( $nonce, $nonce_name ) || ! current_user_can( 'edit_post', $post_id ) ) {
+
+			return $this->rest_authorization_error();
 		}
 
 		return true;
+	}
+
+	/**
+	 * The error that is returned for unauthorized requests.
+	 *
+	 * @return \WP_Error
+	 */
+	protected function rest_authorization_error() {
+		return new \WP_Error(
+			'rest_forbidden',
+			__( 'Sorry, you are not allowed to do that.', 'wp-discourse' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
 	}
 
 	/**
@@ -388,6 +451,11 @@ class DiscourseSidebar {
 	public function update_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$post    = get_post( $post_id );
+
+		if ( empty( $post->post_title ) ) {
+
+			return array( 'update_response' => 'You need to add a title to the post before it can be updated on Discourse.' );
+		}
 		update_post_meta( $post_id, 'update_discourse_topic', 1 );
 
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
@@ -414,6 +482,12 @@ class DiscourseSidebar {
 	public function publish_topic( $data ) {
 		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$post    = get_post( $post_id );
+
+		if ( empty( $post->post_title ) ) {
+
+			return array( 'publish_response' => 'You need to add a title to the post before it can be published to Discourse.' );
+		}
+
 		update_post_meta( $post_id, 'publish_to_discourse', 1 );
 
 		$this->discourse_publish->publish_post_after_save( $post_id, $post );
@@ -424,7 +498,7 @@ class DiscourseSidebar {
 
 		return array(
 			'publish_response'    => $response,
-			'discourse_permalink' => $permalink,
+			'discourse_permalink' => esc_url( $permalink ),
 		);
 	}
 
@@ -468,11 +542,11 @@ class DiscourseSidebar {
 
 		update_post_meta( $post_id, 'wpdc_linking_response', 'success' );
 
-		$discourse_post_id        = $topic->post_stream->stream[0];
-		$topic_id                 = $topic->id;
-		$category_id              = $topic->category_id;
-		$discourse_comments_count = $topic->posts_count - 1;
-		$topic_slug               = $topic->slug;
+		$discourse_post_id        = intval( $topic->post_stream->stream[0] );
+		$topic_id                 = intval( $topic->id );
+		$category_id              = intval( $topic->category_id );
+		$discourse_comments_count = intval( $topic->posts_count ) - 1;
+		$topic_slug               = sanitize_text_field( $topic->slug );
 		$discourse_permalink      = esc_url_raw( "{$this->options['url']}/t/{$topic_slug}/{$topic_id}" );
 
 		update_post_meta( $post_id, 'discourse_post_id', $discourse_post_id );

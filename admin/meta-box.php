@@ -65,10 +65,16 @@ class MetaBox {
 				 in_array( $post_type, $this->options['allowed_post_types'], true )
 			) {
 			add_meta_box(
-				'discourse-publish-meta-box', esc_html__( 'Discourse' ), array(
+				'discourse-publish-meta-box',
+				esc_html__( 'Discourse' ),
+				array(
 					$this,
 					'render_meta_box',
-				), null, 'side', 'high', null
+				),
+				null,
+				'side',
+				'high',
+				null
 			);
 		}
 
@@ -83,7 +89,7 @@ class MetaBox {
 	public function check_for_quickdrafts( $post ) {
 		if ( in_array( $post->post_type, $this->options['allowed_post_types'], true ) ) {
 			$post_id          = $post->ID;
-			$default_category = ! empty( $this->options['publish-category'] ) ? $this->options['publish-category'] : 0;
+			$default_category = ! empty( $this->options['publish-category'] ) ? intval( $this->options['publish-category'] ) : 0;
 			update_post_meta( $post_id, 'publish_post_category', $default_category );
 			if ( ! empty( $this->options['auto-publish'] ) ) {
 				update_post_meta( $post_id, 'publish_to_discourse', 1 );
@@ -383,7 +389,8 @@ class MetaBox {
 		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
 		$info_message         = sprintf(
 			// translators: Unlisted topic option description. Placeholder: webhook options link.
-			__( 'If you have configured the %1s, topics will be listed when they receive a comment.', 'wp-discourse' ), $webhook_options_link
+			__( 'If you have configured the %1s, topics will be listed when they receive a comment.', 'wp-discourse' ),
+			$webhook_options_link
 		);
 		?>
 		<label for="unlist_discourse_topic">
@@ -444,7 +451,7 @@ class MetaBox {
 			if ( ! empty( $this->options['allow-tags'] ) ) {
 				$this->tag_topic_input( $post_id );
 			}
-		?>
+			?>
 		</div>
 		<?php
 	}
@@ -554,7 +561,8 @@ class MetaBox {
 				<?php
 				esc_html_e(
 					'The Discourse categories list is not currently available. Please check the WP Discourse connection settings,
-                        or try refreshing the page.', 'wp-discourse'
+                        or try refreshing the page.',
+					'wp-discourse'
 				);
 				?>
 			</p>
@@ -576,7 +584,8 @@ class MetaBox {
 				esc_html_e(
 					"An error has been returned while trying to republish your post to Discourse. The most likely cause
             is that the post's associated Discourse topic has been deleted. If that's the case, unlink the post from Discourse so that it
-            can be republished as a new topic.", 'wp-discourse'
+            can be republished as a new topic.",
+					'wp-discourse'
 				);
 
 				echo '<hr>';
@@ -592,7 +601,8 @@ class MetaBox {
 			case 'queued_topic':
 				esc_html_e(
 					'Your post has been sent to Discourse and added to the approval queue. When it has been approved, manually
-					link it to Discourse by copying its URL into the input box below.', 'wp-discourse'
+					link it to Discourse by copying its URL into the input box below.',
+					'wp-discourse'
 				);
 				echo '<hr>';
 				$this->link_to_discourse_topic_input();

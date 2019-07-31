@@ -56,7 +56,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
+	 * @param int $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -108,7 +108,8 @@ class DiscoursePublish {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
 			$this->email_notifier->publish_failure_notification(
-				$post, array(
+				$post,
+				array(
 					'location' => 'after_xmlrpc_publish',
 				)
 			);
@@ -118,7 +119,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_to_discourse_work` after getting the lock.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -136,7 +137,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int    $post_id The post id.
+	 * @param int $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -149,7 +150,6 @@ class DiscoursePublish {
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration-enabled'] );
-		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
@@ -206,9 +206,9 @@ class DiscoursePublish {
 			if ( $unlisted ) {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
+
 			$data         = array(
 				'embed_url'        => $permalink,
-				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
 				'title'            => $title,
@@ -242,7 +242,7 @@ class DiscoursePublish {
 			);
 		}// End if().
 
-		$result = wp_remote_post( $url, $post_options );
+		$result = wp_remote_post( esc_url_raw( $url ), $post_options );
 
 		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
@@ -274,23 +274,23 @@ class DiscoursePublish {
 
 		// The response when a topic is first created.
 		if ( ! empty( $body->id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
-			$discourse_id   = (int) $body->id;
-				$topic_slug = $body->topic_slug;
-				$topic_id   = $body->topic_id;
+			$discourse_id = intval( $body->id );
+			$topic_slug   = sanitize_text_field( $body->topic_slug );
+			$topic_id     = intval( $body->topic_id );
 
-				delete_post_meta( $post_id, 'wpdc_publishing_error' );
-				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
-				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
-				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
+			delete_post_meta( $post_id, 'wpdc_publishing_error' );
+			add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
+			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
+			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
 
-				// Used for resetting the error notification, if one was being displayed.
-				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+			// Used for resetting the error notification, if one was being displayed.
+			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 			if ( $use_multisite_configuration ) {
-				$blog_id = get_current_blog_id();
+				$blog_id = intval( get_current_blog_id() );
 				$this->save_topic_blog_id( $body->topic_id, $blog_id );
 			}
 
-				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
+			$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
 			if ( ! empty( $pin_until ) ) {
 				$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
 
@@ -303,8 +303,8 @@ class DiscoursePublish {
 		} elseif ( ! empty( $body->post ) ) {
 
 			$discourse_post = $body->post;
-			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
-			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
+			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? sanitize_text_field( $discourse_post->topic_slug ) : null;
+			$topic_id       = ! empty( $discourse_post->topic_id ) ? intval( $discourse_post->topic_id ) : null;
 
 			// Handles deleted topics for recent versions of Discourse.
 			if ( ! empty( $discourse_post->deleted_at ) ) {
@@ -315,8 +315,8 @@ class DiscoursePublish {
 
 			if ( $topic_slug && $topic_id ) {
 				delete_post_meta( $post_id, 'wpdc_publishing_error' );
-				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
-				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
+				update_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ) );
+				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
 				if ( $use_multisite_configuration ) {
@@ -353,7 +353,7 @@ class DiscoursePublish {
 		$tags_string = '';
 		if ( ! empty( $tags ) ) {
 			foreach ( $tags as $tag ) {
-				$tag          = trim( $tag );
+				$tag          = sanitize_text_field( $tag );
 				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
 			}
 		}
@@ -364,14 +364,14 @@ class DiscoursePublish {
 	/**
 	 * Pins a Discourse topic.
 	 *
-	 * @param int    $post_id The WordPress id of the pinned post.
-	 * @param int    $topic_id The Discourse topic_id of the pinned post.
+	 * @param int $post_id The WordPress id of the pinned post.
+	 * @param int $topic_id The Discourse topic_id of the pinned post.
 	 * @param string $pin_until A string that sets the pin_until date.
 	 *
 	 * @return null|\WP_Error
 	 */
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
-		$status_url   = esc_url( $this->options['url'] . "/t/$topic_id/status" );
+		$status_url   = esc_url_raw( $this->options['url'] . "/t/$topic_id/status" );
 		$data         = array(
 			'api_key'      => $this->options['api-key'],
 			'api_username' => $this->options['publish-username'],
@@ -401,14 +401,15 @@ class DiscoursePublish {
 	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
 	 *
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
-	 * @param int      $post_id The current post id.
-	 * @param string   $error_message The error message returned from the request.
-	 * @param int      $error_code The error code returned from the request.
+	 * @param int $post_id The current post id.
+	 * @param string $error_message The error message returned from the request.
+	 * @param int $error_code The error code returned from the request.
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
 		$this->email_notifier->publish_failure_notification(
-			$current_post, array(
+			$current_post,
+			array(
 				'location'      => 'after_bad_response',
 				'error_message' => $error_message,
 				'error_code'    => $error_code,

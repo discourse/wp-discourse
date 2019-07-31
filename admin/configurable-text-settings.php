@@ -51,133 +51,206 @@ class ConfigurableTextSettings {
 		$this->options = $this->get_options();
 
 		add_settings_section(
-			'discourse_configurable_text_settings_section', __( 'Text Content Settings', 'wp-discourse' ), array(
+			'discourse_configurable_text_settings_section',
+			__( 'Text Content Settings', 'wp-discourse' ),
+			array(
 				$this,
 				'configurable_text_tab_details',
-			), 'discourse_configurable_text'
+			),
+			'discourse_configurable_text'
 		);
 
 		add_settings_field(
-			'discourse_link_text', __( 'Discourse Link', 'wp-discourse' ), array(
+			'discourse_link_text',
+			__( 'Discourse Link', 'wp-discourse' ),
+			array(
 				$this,
 				'discourse_link_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_start_discussion_text', __( 'Start Discussion', 'wp-discourse' ), array(
+			'discourse_start_discussion_text',
+			__( 'Start Discussion', 'wp-discourse' ),
+			array(
 				$this,
 				'start_discussion_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_continue_discussion_text', __( 'Continue Discussion', 'wp-discourse' ), array(
+			'discourse_continue_discussion_text',
+			__( 'Continue Discussion', 'wp-discourse' ),
+			array(
 				$this,
 				'continue_discussion_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_join_discussion_text', __( 'Join Discussion', 'wp-discourse' ), array(
+			'discourse_join_discussion_text',
+			__( 'Join Discussion', 'wp-discourse' ),
+			array(
 				$this,
 				'join_discussion_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_no_comments_text', __( 'Join Discussion Link: no Comments', 'wp-discourse' ), array(
+			'discourse_no_comments_text',
+			__( 'Join Discussion Link: no Comments', 'wp-discourse' ),
+			array(
 				$this,
 				'no_comments_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_comments_singular_text', __( 'Join Discussion Link: Comments Singular', 'wp-discourse' ), array(
+			'discourse_comments_singular_text',
+			__( 'Join Discussion Link: Comments Singular', 'wp-discourse' ),
+			array(
 				$this,
 				'comments_singular_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_comments_plural_text', __( 'Join Discussion Link: Comments Plural', 'wp-discourse' ), array(
+			'discourse_comments_plural_text',
+			__( 'Join Discussion Link: Comments Plural', 'wp-discourse' ),
+			array(
 				$this,
 				'comments_plural_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_notable_replies_text', __( 'Top Level Comments Heading', 'wp-discourse' ), array(
+			'discourse_notable_replies_text',
+			__( 'Top Level Comments Heading', 'wp-discourse' ),
+			array(
 				$this,
 				'notable_replies_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_comments_not_available_text', __( 'Comments Not Available', 'wp-discourse' ), array(
+			'discourse_comments_not_available_text',
+			__( 'Comments Not Available', 'wp-discourse' ),
+			array(
 				$this,
 				'comments_not_available_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_participants_text', __( 'Participants Heading', 'wp-discourse' ), array(
+			'discourse_participants_text',
+			__( 'Participants Heading', 'wp-discourse' ),
+			array(
 				$this,
 				'participants_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_published_at_text', __( 'Published at Text', 'wp-discourse' ), array(
+			'discourse_published_at_text',
+			__( 'Published at Text', 'wp-discourse' ),
+			array(
 				$this,
 				'published_at_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_single_reply_text', __( 'Single Reply', 'wp-discourse' ), array(
+			'discourse_single_reply_text',
+			__( 'Single Reply', 'wp-discourse' ),
+			array(
 				$this,
 				'single_reply_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_many_replies_text', __( 'Many Replies', 'wp-discourse' ), array(
+			'discourse_many_replies_text',
+			__( 'Many Replies', 'wp-discourse' ),
+			array(
 				$this,
 				'many_replies_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_more_replies_text', __( 'More Replies', 'wp-discourse' ), array(
+			'discourse_more_replies_text',
+			__( 'More Replies', 'wp-discourse' ),
+			array(
 				$this,
 				'more_replies_more_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_external_login_text', __( 'External Login Text', 'wp-discourse' ), array(
+			'discourse_external_login_text',
+			__( 'External Login Text', 'wp-discourse' ),
+			array(
 				$this,
 				'external_login_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_link_to_discourse_text', __( 'Link Accounts Text', 'wp-discourse' ), array(
+			'discourse_link_to_discourse_text',
+			__( 'Link Accounts Text', 'wp-discourse' ),
+			array(
 				$this,
 				'link_to_discourse_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		add_settings_field(
-			'discourse_linked_to_discourse_text', __( 'Account is Linked Text', 'wp-discourse' ), array(
+			'discourse_linked_to_discourse_text',
+			__( 'Account is Linked Text', 'wp-discourse' ),
+			array(
 				$this,
 				'linked_to_discourse_text',
-			), 'discourse_configurable_text', 'discourse_configurable_text_settings_section'
+			),
+			'discourse_configurable_text',
+			'discourse_configurable_text_settings_section'
 		);
 
 		register_setting(
-			'discourse_configurable_text', 'discourse_configurable_text', array(
+			'discourse_configurable_text',
+			'discourse_configurable_text',
+			array(
 				$this->form_helper,
 				'validate_options',
 			)
@@ -190,11 +263,18 @@ class ConfigurableTextSettings {
 	public function discourse_link_text() {
 		$default = ! empty( $this->options['url'] ) ? preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) ) : '';
 		$this->form_helper->input(
-			'discourse-link-text', 'discourse_configurable_text', __(
+			'discourse-link-text',
+			'discourse_configurable_text',
+			__(
 				'The link-text
 		for links to the Discourse topic. Used after the text set in both the \'start discussion\' and \'continue discussion\' settings. It is combined with
-		those settings to create the complete links to your forum. Defaults to your forum\'s URL.', 'wp-discourse'
-			), 'text', null, null, $default
+		those settings to create the complete links to your forum. Defaults to your forum\'s URL.',
+				'wp-discourse'
+			),
+			'text',
+			null,
+			null,
+			$default
 		);
 	}
 
@@ -203,9 +283,12 @@ class ConfigurableTextSettings {
 	 */
 	public function start_discussion_text() {
 		$this->form_helper->input(
-			'start-discussion-text', 'discourse_configurable_text', __(
+			'start-discussion-text',
+			'discourse_configurable_text',
+			__(
 				'Text used after posts with no comments, for starting a discussion on Discourse.
-		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse'
+		This is combined with the \'Discourse link text\' to create a link back to your forum.',
+				'wp-discourse'
 			)
 		);
 	}
@@ -215,7 +298,9 @@ class ConfigurableTextSettings {
 	 */
 	public function join_discussion_text() {
 		$this->form_helper->input(
-			'join-discussion-text', 'discourse_configurable_text', __(
+			'join-discussion-text',
+			'discourse_configurable_text',
+			__(
 				"Text used after posts with comments on Discourse, but no comments that are displayed on Discourse.
 	                    This is combined with the 'Discourse link text' to create a link to your forum."
 			)
@@ -227,9 +312,12 @@ class ConfigurableTextSettings {
 	 */
 	public function continue_discussion_text() {
 		$this->form_helper->input(
-			'continue-discussion-text', 'discourse_configurable_text', __(
+			'continue-discussion-text',
+			'discourse_configurable_text',
+			__(
 				'Text used after posts that have comments, for continuing the discussion on Discourse.
-		This is combined with the \'Discourse link text\' to create a link back to your forum.', 'wp-discourse'
+		This is combined with the \'Discourse link text\' to create a link back to your forum.',
+				'wp-discourse'
 			)
 		);
 	}
@@ -239,8 +327,11 @@ class ConfigurableTextSettings {
 	 */
 	public function comments_singular_text() {
 		$this->form_helper->input(
-			'comments-singular-text', 'discourse_configurable_text', __(
-				"Text used when the 'Link to Comments Without Displaying Them' option is selected and one comment has been created. (The number 1 will be prepended to the text.)", 'wp-discourse'
+			'comments-singular-text',
+			'discourse_configurable_text',
+			__(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and one comment has been created. (The number 1 will be prepended to the text.)",
+				'wp-discourse'
 			)
 		);
 	}
@@ -250,8 +341,11 @@ class ConfigurableTextSettings {
 	 */
 	public function comments_plural_text() {
 		$this->form_helper->input(
-			'comments-plural-text', 'discourse_configurable_text', __(
-				"Text used when the 'Link to Comments Without Displaying Them' option is selected and multiple comments have been created. (The number of comments will be prepended to the text.)", 'wp-discourse'
+			'comments-plural-text',
+			'discourse_configurable_text',
+			__(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and multiple comments have been created. (The number of comments will be prepended to the text.)",
+				'wp-discourse'
 			)
 		);
 	}
@@ -261,8 +355,11 @@ class ConfigurableTextSettings {
 	 */
 	public function no_comments_text() {
 		$this->form_helper->input(
-			'no-comments-text', 'discourse_configurable_text', __(
-				"Text used when the 'Link to Comments Without Displaying Them' option is selected and no comments have been created.", 'wp-discourse'
+			'no-comments-text',
+			'discourse_configurable_text',
+			__(
+				"Text used when the 'Link to Comments Without Displaying Them' option is selected and no comments have been created.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -314,9 +411,12 @@ class ConfigurableTextSettings {
 	 */
 	public function more_replies_more_text() {
 		$this->form_helper->input(
-			'more-replies-more-text', 'discourse_configurable_text', __(
+			'more-replies-more-text',
+			'discourse_configurable_text',
+			__(
 				"Text used when there are more replies on Discourse than are being shown on WordPress.
-		For example, if there are 10 replies on Discourse and 5 replies on WordPress, the text '5 more replies' will be shown underneath the comments section.", 'wp-discourse'
+		For example, if there are 10 replies on Discourse and 5 replies on WordPress, the text '5 more replies' will be shown underneath the comments section.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -333,9 +433,12 @@ class ConfigurableTextSettings {
 	 */
 	public function link_to_discourse_text() {
 		$this->form_helper->input(
-			'link-to-discourse-text', 'discourse_configurable_text', __(
+			'link-to-discourse-text',
+			'discourse_configurable_text',
+			__(
 				'Text added to the login and profile pages when Discourse is used as the
-	    SSO provider. Used for linking existing accounts between Discourse and WordPress.', 'wp-discourse'
+	    SSO provider. Used for linking existing accounts between Discourse and WordPress.',
+				'wp-discourse'
 			)
 		);
 	}
@@ -345,9 +448,12 @@ class ConfigurableTextSettings {
 	 */
 	public function linked_to_discourse_text() {
 		$this->form_helper->input(
-			'linked-to-discourse-text', 'discourse_configurable_text', __(
+			'linked-to-discourse-text',
+			'discourse_configurable_text',
+			__(
 				"Text added to the user's profile page when Discourse is used as the
-	    SSO proveder. Used to indicate that the user's account is linked to Discourse.", 'wp-discourse'
+	    SSO proveder. Used to indicate that the user's account is linked to Discourse.",
+				'wp-discourse'
 			)
 		);
 	}
@@ -398,13 +504,22 @@ class ConfigurableTextSettings {
 		}
 
 		delete_option( 'discourse_configurable_text' );
-		add_option( 'discourse_configurable_text', get_option( 'discourse_configurable_text_backup' ) );
+		$default_text           = get_option( 'discourse_configurable_text_backup' );
+		$sanitized_text_options = array();
+		foreach ( $default_text as $key => $value ) {
+			$key                            = sanitize_key( $key );
+			$value                          = sanitize_text_field( $value );
+			$sanitized_text_options[ $key ] = $value;
+		}
+
+		add_option( 'discourse_configurable_text', $sanitized_text_options );
 
 		$configurable_text_url = add_query_arg(
 			array(
 				'page' => 'wp_discourse_options',
 				'tab'  => 'text_content_options',
-			), admin_url( 'admin.php' )
+			),
+			admin_url( 'admin.php' )
 		);
 
 		wp_safe_redirect( esc_url_raw( $configurable_text_url ) );

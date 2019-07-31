@@ -629,17 +629,23 @@ class DiscourseSidebar extends Component {
     }
 
     getDiscourseCategories() {
-        wp.apiFetch( { path: 'wp-discourse/v1/get-discourse-categories', method: 'GET' } ).then(
+        wp.apiRequest( {
+            path: '/wp-discourse/v1/get-discourse-categories',
+            method: 'GET',
+            data: {
+                get_categories_nonce: pluginOptions.get_categories_nonce,
+            },
+        } ).then(
             ( data ) => {
                 this.setState( {
                     discourseCategories: data,
-                } );
+                    }
+                );
             },
             ( err ) => {
-                // Todo: this should be handled. Categories won't be available until the plugin is configured.
                 return null;
             }
-        );
+        )
     }
 
     updateStateFromDatabase( postId ) {
@@ -701,6 +707,7 @@ class DiscourseSidebar extends Component {
                 path: '/wp-discourse/v1/set-publish-meta',
                 method: 'POST',
                 data: {
+                    set_publish_meta_nonce: pluginOptions.set_publish_meta_nonce,
                     id: this.props.postId,
                     publish_to_discourse: this.state.publishToDiscourse ? 1 : 0,
                 }
@@ -721,6 +728,7 @@ class DiscourseSidebar extends Component {
                 path: '/wp-discourse/v1/set-category-meta',
                 method: 'POST',
                 data: {
+                    set_category_meta_nonce: pluginOptions.set_category_meta_nonce,
                     id: this.props.postId,
                     publish_post_category: categoryId,
                 }
@@ -744,6 +752,7 @@ class DiscourseSidebar extends Component {
                 path: '/wp-discourse/v1/set-pin-meta',
                 method: 'Post',
                 data: {
+                    set_pin_meta_nonce: pluginOptions.set_pin_meta_nonce,
                     id: this.props.postId,
                     wpdc_pin_topic: pinTopic ? 1 : 0,
                     wpdc_pin_until: pinUntil
@@ -766,6 +775,7 @@ class DiscourseSidebar extends Component {
                 path: '/wp-discourse/v1/set-tag-meta',
                 method: 'POST',
                 data: {
+                    set_tag_meta_nonce: pluginOptions.set_tag_meta_nonce,
                     id: this.props.postId,
                     wpdc_topic_tags: tagString,
                 }
@@ -788,7 +798,11 @@ class DiscourseSidebar extends Component {
         wp.apiRequest( {
             path: '/wp-discourse/v1/link-topic',
             method: 'POST',
-            data: { id: this.props.postId, topic_url: topicUrl }
+            data: {
+                link_topic_nonce: pluginOptions.link_topic_nonce,
+                id: this.props.postId,
+                topic_url: topicUrl
+            }
         }).then(
             ( data ) => {
                 this.setState( {
@@ -828,7 +842,10 @@ class DiscourseSidebar extends Component {
         wp.apiRequest( {
             path: '/wp-discourse/v1/unlink-post',
             method: 'POST',
-            data: { id: this.props.postId }
+            data: {
+                unlink_post_nonce: pluginOptions.unlink_post_nonce,
+                id: this.props.postId
+            }
         }).then(
             ( data ) => {
                 this.setState( {
@@ -854,7 +871,10 @@ class DiscourseSidebar extends Component {
         wp.apiRequest( {
             path: '/wp-discourse/v1/publish-topic',
             method: 'POST',
-            data: { id: this.props.postId }
+            data: {
+                publish_topic_nonce: pluginOptions.publish_topic_nonce,
+                id: this.props.postId
+            }
         }).then(
             ( data ) => {
                 const success = 'success' === data.publish_response;
@@ -887,7 +907,10 @@ class DiscourseSidebar extends Component {
         wp.apiRequest( {
             path: '/wp-discourse/v1/update-topic',
             method: 'POST',
-            data: { id: this.props.postId }
+            data: {
+                update_topic_nonce: pluginOptions.update_topic_nonce,
+                id: this.props.postId
+            }
         }).then(
             ( data ) => {
                 const response = data.update_response,

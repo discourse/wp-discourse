@@ -96,7 +96,6 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_force_publish', array( $this, 'validate_checkbox' ) );
-		add_filter( 'wpdc_validate_add_featured_link', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
 		add_filter( 'wpdc_validate_publish_failure_notice', array( $this, 'validate_checkbox' ) );
@@ -105,7 +104,6 @@ class SettingsValidator {
 
 		add_filter( 'wpdc_validate_enable_discourse_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_comment_type', array( $this, 'validate_radio_string_value' ) );
-		add_filter( 'wpdc_validate_cache_html', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_clear_cached_comment_html', array( $this, 'validate_clear_comments_html' ) );
 		add_filter( 'wpdc_validate_ajax_load', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_load_comment_css', array( $this, 'validate_checkbox' ) );
@@ -313,9 +311,12 @@ class SettingsValidator {
 		$new_value = $this->sanitize_checkbox( $input );
 		if ( 1 === $new_value && $this->use_discourse_comments ) {
 			add_settings_error(
-				'discourse', 'add_join_link', __(
+				'discourse',
+				'add_join_link',
+				__(
 					"The 'Add Join Link' option can only be used when the 'Use Discourse Comments' option is not set.
-			If you would like to use it, deselect the 'Use Discourse Comments' option.", 'wp-discourse'
+			If you would like to use it, deselect the 'Use Discourse Comments' option.",
+					'wp-discourse'
 				)
 			);
 
@@ -360,7 +361,10 @@ class SettingsValidator {
 	 */
 	public function validate_max_comments( $input ) {
 		return $this->validate_int(
-			$input, 'max_comments', 0, null,
+			$input,
+			'max_comments',
+			0,
+			null,
 			__( 'The max visible comments must be set to at least 0.', 'wp-discourse' ),
 			$this->use_discourse_comments
 		);
@@ -375,7 +379,10 @@ class SettingsValidator {
 	 */
 	public function validate_min_replies( $input ) {
 		return $this->validate_int(
-			$input, 'min_replies', 0, null,
+			$input,
+			'min_replies',
+			0,
+			null,
 			__( 'The min number of replies setting requires a number greater than or equal to 0.', 'wp-discourse' ),
 			$this->use_discourse_comments
 		);
@@ -390,7 +397,10 @@ class SettingsValidator {
 	 */
 	public function validate_min_score( $input ) {
 		return $this->validate_int(
-			$input, 'min_score', 0, null,
+			$input,
+			'min_score',
+			0,
+			null,
 			__( 'The min score of posts setting requires a number greater than or equal to 0.', 'wp-discourse' ),
 			$this->use_discourse_comments
 		);
@@ -405,7 +415,10 @@ class SettingsValidator {
 	 */
 	public function validate_min_trust_level( $input ) {
 		return $this->validate_int(
-			$input, 'min_trust_level', 0, 5,
+			$input,
+			'min_trust_level',
+			0,
+			5,
 			__( 'The trust level setting requires a number between 0 and 5.', 'wp-discourse' ),
 			$this->use_discourse_comments
 		);
@@ -420,7 +433,10 @@ class SettingsValidator {
 	 */
 	public function validate_bypass_trust_level_score( $input ) {
 		return $this->validate_int(
-			$input, 'bypass_trust_level', 0, null,
+			$input,
+			'bypass_trust_level',
+			0,
+			null,
 			__( 'The bypass trust level score setting requires an integer greater than or equal to 0.', 'wp-discourse' ),
 			$this->use_discourse_comments
 		);
@@ -436,7 +452,10 @@ class SettingsValidator {
 	public function validate_custom_excerpt_length( $input ) {
 
 		return $this->validate_int(
-			$input, 'excerpt_length', 0, null,
+			$input,
+			'excerpt_length',
+			0,
+			null,
 			__( 'The custom excerpt length setting requires a positive integer.', 'wp-discourse' ),
 			true
 		);
@@ -521,9 +540,12 @@ class SettingsValidator {
 
 		if ( 1 === $new_value && $this->sso_client_enabled ) {
 			add_settings_error(
-				'discourse', 'sso_client_enabled', __(
+				'discourse',
+				'sso_client_enabled',
+				__(
 					"You have the 'SSO Client' option enabled. Visit the 'SSO Client' settings tab
-			to disable it before enabling your site to function as the SSO provider.", 'wp-discourse'
+			to disable it before enabling your site to function as the SSO provider.",
+					'wp-discourse'
 				)
 			);
 
@@ -532,9 +554,12 @@ class SettingsValidator {
 
 		if ( 1 === $new_value && ! $this->sso_secret_set ) {
 			add_settings_error(
-				'discourse', 'sso_provider_no_secret', __(
+				'discourse',
+				'sso_provider_no_secret',
+				__(
 					'Before enabling your site to function as the SSO provider,
-            you need to set the SSO Secret Key.', 'wp-discourse'
+            you need to set the SSO Secret Key.',
+					'wp-discourse'
 				)
 			);
 
@@ -542,9 +567,7 @@ class SettingsValidator {
 		}
 
 		// When the SSO Provider option is updated, clear the comment cache to update links to Discourse.
-		if ( ! empty( $this->options['cache-html'] ) ) {
-			$this->clear_cached_html();
-		}
+		$this->clear_cached_html();
 
 		return $new_value;
 	}
@@ -561,9 +584,12 @@ class SettingsValidator {
 
 		if ( 1 === $new_value && $this->sso_provider_enabled ) {
 			add_settings_error(
-				'discourse', 'sso_provider_enabled', __(
+				'discourse',
+				'sso_provider_enabled',
+				__(
 					"You have the 'SSO Provider' option enabled. Click on the 'SSO Provider' settings tab
-			to disable it before enabling your site to function as an SSO client.", 'wp-discourse'
+			to disable it before enabling your site to function as an SSO client.",
+					'wp-discourse'
 				)
 			);
 
@@ -572,9 +598,12 @@ class SettingsValidator {
 
 		if ( 1 === $new_value && ! $this->sso_secret_set ) {
 			add_settings_error(
-				'discourse', 'sso_client_no_secret', __(
+				'discourse',
+				'sso_client_no_secret',
+				__(
 					'Before enabling your site to function as an SSO client,
-            you need to set the SSO Secret Key.', 'wp-discourse'
+            you need to set the SSO Secret Key.',
+					'wp-discourse'
 				)
 			);
 
@@ -826,7 +855,9 @@ class SettingsValidator {
 		}
 
 		$input = filter_var(
-			$input, FILTER_VALIDATE_INT, array(
+			$input,
+			FILTER_VALIDATE_INT,
+			array(
 				'options' => $options,
 			)
 		);
