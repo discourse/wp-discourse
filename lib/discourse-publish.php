@@ -56,7 +56,7 @@ class DiscoursePublish {
 	/**
 	 * Published a post to Discourse after it has been saved.
 	 *
-	 * @param int $post_id The id of the post that has been saved.
+	 * @param int    $post_id The id of the post that has been saved.
 	 * @param object $post The Post object.
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
@@ -119,7 +119,7 @@ class DiscoursePublish {
 	/**
 	 * Calls `sync_to_discourse_work` after getting the lock.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The title.
 	 * @param string $raw The raw content of the post.
 	 */
@@ -137,7 +137,7 @@ class DiscoursePublish {
 	/**
 	 * Syncs a post to Discourse.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int    $post_id The post id.
 	 * @param string $title The post title.
 	 * @param string $raw The content of the post.
 	 *
@@ -366,8 +366,8 @@ class DiscoursePublish {
 	/**
 	 * Pins a Discourse topic.
 	 *
-	 * @param int $post_id The WordPress id of the pinned post.
-	 * @param int $topic_id The Discourse topic_id of the pinned post.
+	 * @param int    $post_id The WordPress id of the pinned post.
+	 * @param int    $topic_id The Discourse topic_id of the pinned post.
 	 * @param string $pin_until A string that sets the pin_until date.
 	 *
 	 * @return null|\WP_Error
@@ -403,9 +403,9 @@ class DiscoursePublish {
 	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
 	 *
 	 * @param \WP_Post $current_post The post for which the notifications are being created.
-	 * @param int $post_id The current post id.
-	 * @param string $error_message The error message returned from the request.
-	 * @param int $error_code The error code returned from the request.
+	 * @param int      $post_id The current post id.
+	 * @param string   $error_message The error message returned from the request.
+	 * @param int      $error_code The error code returned from the request.
 	 */
 	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );

@@ -75,7 +75,7 @@ trait TemplateFunctions {
 		}
 
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
-		$use_internal_errors = libxml_use_internal_errors( true );
+		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
 
 		$doc = new \DOMDocument( '1.0', 'utf-8' );
@@ -131,9 +131,9 @@ trait TemplateFunctions {
 			return $cooked;
 		}
 
-		$use_internal_errors = libxml_use_internal_errors( true );
+		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc                 = new \DOMDocument( '1.0', 'utf-8' );
+		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		$finder = new \DOMXPath( $doc );
