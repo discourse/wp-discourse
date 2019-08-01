@@ -568,7 +568,7 @@ class SSOSettings {
 				"Used for syncing a WordPress account created through the WordPress registration process with
             an account created by the same user on Discourse. If not enabled, accounts can be synced by clicking on the
             'Link account with Discourse' link on the user's profile page. Accounts created through the SSO login process
-             are automatically synced. Note: WordPress email addresses can be changed without requiring confirmation.",
+             are automatically synced.",
 				'wp-discourse'
 			)
 		);
