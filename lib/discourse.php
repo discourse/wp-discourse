@@ -50,6 +50,7 @@ class Discourse {
 		'max-tags'                  => 5,
 		'publish-as-unlisted'       => 0,
 		'custom-excerpt-length'     => 55,
+		'add-featured-link'         => 0,
 		'auto-publish'              => 0,
 		'force-publish'             => 0,
 		'publish-failure-notice'    => 0,

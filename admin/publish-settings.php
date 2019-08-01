@@ -150,9 +150,14 @@ class PublishSettings {
 			array(
 				$this,
 				'custom_excerpt_length',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
+			), 'discourse_publish', 'discourse_publishing_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_add_featured_link', __( 'Add Featured Links', 'wp-discourse' ), array(
+				$this,
+				'add_featured_link_checkbox',
+			), 'discourse_publish', 'discourse_publishing_settings_section'
 		);
 
 			add_settings_field(
