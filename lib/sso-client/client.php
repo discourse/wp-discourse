@@ -378,7 +378,7 @@ class Client extends SSOClientBase {
 
 		if ( 'raw' === $return_key ) {
 
-			return sanitize_text_field( $_GET['sso'] ); // Input var okay.
+			return sanitize_text_field( wp_unslash( $_GET['sso'] ) ); // Input var okay.
 		}
 
 		$sso = base64_decode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ), true ); // Input var okay.
