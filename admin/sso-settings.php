@@ -411,7 +411,7 @@ class SSOSettings {
 			$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
 			$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
 		}
-	}
+	}// End if().
 
 	/**
 	 * Outputs markup for the auto-create-sso-user checkbox.
