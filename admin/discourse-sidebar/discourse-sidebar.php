@@ -454,7 +454,9 @@ class DiscourseSidebar {
 
 		if ( empty( $post->post_title ) ) {
 
-			return array( 'update_response' => 'You need to add a title to the post before it can be updated on Discourse.' );
+			return array(
+				'update_response' => 'You need to add a title to the post before it can be updated on Discourse.',
+				);
 		}
 		update_post_meta( $post_id, 'update_discourse_topic', 1 );
 
@@ -485,7 +487,9 @@ class DiscourseSidebar {
 
 		if ( empty( $post->post_title ) ) {
 
-			return array( 'publish_response' => 'You need to add a title to the post before it can be published to Discourse.' );
+			return array(
+				'publish_response' => 'You need to add a title to the post before it can be published to Discourse.',
+				);
 		}
 
 		update_post_meta( $post_id, 'publish_to_discourse', 1 );
