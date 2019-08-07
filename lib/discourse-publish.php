@@ -72,7 +72,7 @@ class DiscoursePublish {
 		$force_publish_post = false;
 		if ( $force_publish_enabled ) {
 			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
-			$min_date = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U');
+			$min_date = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
 			$post_time = strtotime( $post->post_date );
 
 			if ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) {

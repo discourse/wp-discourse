@@ -736,7 +736,7 @@ class SettingsValidator {
 	/**
 	 * Validates the `force-publish-max-age` input.
 	 *
-	 * @param string $input The input to be validated
+	 * @param string $input The input to be validated.
 	 *
 	 * @return int
 	 */

@@ -419,6 +419,9 @@ class PublishSettings {
 		);
 	}
 
+	/**
+	 * Outputs markup for the force-publish-max-age input.
+	 */
 	public function force_publish_max_age_input() {
 		$this->form_helper->input(
 			'force-publish-max-age',
