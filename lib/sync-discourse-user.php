@@ -5,14 +5,14 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\DiscourseUser;
+namespace WPDiscourse\SyncDiscourseUser;
 
 use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseUser
  */
-class DiscourseUser extends Webhook {
+class SyncDiscourseUser extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.

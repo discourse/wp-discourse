@@ -5,14 +5,14 @@
  * @package WPDiscourse\DiscourseWebhookRefresh
  */
 
-namespace WPDiscourse\DiscourseWebhookRefresh;
+namespace WPDiscourse\SyncDiscourseTopic;
 
 use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseWebhookRefresh
  */
-class DiscourseWebhookRefresh extends Webhook {
+class SyncDiscourseTopic extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.
