@@ -4,7 +4,9 @@
  *
  * @package WPDiscourse
  */
+
 namespace WPDiscourse\Admin;
+
 use WPDiscourse\Shared\PluginUtilities;
 /**
  * Class UserProfile
@@ -45,32 +47,31 @@ class UserProfile {
 	 * @param \WP_User $profile_user The WordPress user who is being updated.
 	 */
 	public function add_discourse_fields_to_profile( $profile_user ) {
-		$is_admin                      = current_user_can( 'administrator' );
+		$is_admin = current_user_can( 'administrator' );
+		// Todo: possibly this option can be removed now that there is a discourse-username-editable option.
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
+		$username_editable             = $is_admin || ! empty( $this->options['discourse-username-editable'] );
 		// Only create the table if there is content to display.
 		if ( $is_admin || $show_discourse_username_field ) :
 			?>
 			<table class="form-table">
 				<h2><?php esc_html_e( 'Discourse', 'wp-discourse' ); ?></h2>
 				<?php
-				// TOdo: possibly the field should be displayed, but disabled when the 'hide-discourse-name-field' option is enabled.
 				wp_nonce_field( 'update_discourse_usermeta', 'update_discourse_usermeta_nonce' );
-				if ( empty( $this->options['hide-discourse-name-field'] ) || $is_admin ) :
 					$discourse_username = get_user_meta( $profile_user->ID, 'discourse_username', true );
-					?>
+				?>
 					<tr>
 						<th>
 							<label for="discourse_username"><?php esc_html_e( 'Discourse Username', 'wp-discourse' ); ?></label>
 						</th>
 						<td>
 							<input type="text" name="discourse_username"
-							       value="<?php echo esc_html( $discourse_username ); ?>">
-							<em><?php esc_html_e( "Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.", 'wp-discourse' ); ?></em>
+								   value="<?php echo esc_html( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
+							<em><?php esc_html_e( 'Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.', 'wp-discourse' ); ?></em>
 						</td>
 					</tr>
-
 				<?php
-				endif;
+
 				// Only show the email verification field to admins on sites with SSO enabled.
 				if ( $is_admin && ! empty( $this->options['enable-sso'] ) ) :
 					$email_verified = empty( get_user_meta( $profile_user->ID, 'discourse_email_not_verified', true ) );
@@ -81,12 +82,12 @@ class UserProfile {
 						</th>
 						<td>
 							<input type="checkbox" name="email_verified" value="1" <?php checked( $email_verified ); ?>>
-							<em><?php esc_html_e( "Marking the user's email as verified will allow them to bypass email authentication checks on Discourse.", 'wp-discourse' ); ?></em>
+							<em><?php esc_html_e( "Marking the user's email as verified will allow them to bypass email authentication on Discourse.", 'wp-discourse' ); ?></em>
 						</td>
 					</tr>
 				<?php endif; ?>
 			</table>
-		<?php
+			<?php
 		endif;
 	}
 	/**
@@ -98,8 +99,9 @@ class UserProfile {
 	 */
 	public function update_discourse_user_metadata( $user_id ) {
 		if ( ! isset( $_POST['update_discourse_usermeta_nonce'] ) || // Input var okay.
-		     ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_usermeta_nonce'] ) ), 'update_discourse_usermeta' ) // Input var okay.
+			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_usermeta_nonce'] ) ), 'update_discourse_usermeta' ) // Input var okay.
 		) {
+
 			return 0;
 		}
 		$is_admin = current_user_can( 'administrator' );
@@ -113,9 +115,10 @@ class UserProfile {
 		}
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
 		if ( isset( $_POST['discourse_username'] ) && $is_admin || $show_discourse_username_field ) { // Input var okay.
-			$discourse_username = esc_attr( wp_unslash( $_POST['discourse_username'] ) ); // Input var okay.
+			$discourse_username = sanitize_text_field( wp_unslash( $_POST['discourse_username'] ) ); // Input var okay.
 			update_user_meta( $user_id, 'discourse_username', $discourse_username );
 		}
+
 		return $user_id;
 	}
 }
