@@ -22,6 +22,7 @@ if ( is_admin() ) {
 	require_once __DIR__ . '/webhook-settings.php';
 	require_once __DIR__ . '/admin-notice.php';
 	require_once __DIR__ . '/meta-box.php';
+	require_once __DIR__ . '/user-profile.php';
 
 	$form_helper  = FormHelper::get_instance();
 	$options_page = OptionsPage::get_instance();
@@ -38,6 +39,7 @@ if ( is_admin() ) {
 	new SettingsValidator();
 	new AdminNotice();
 	new MetaBox();
+	new UserProfile();
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 	if ( is_multisite() ) {
