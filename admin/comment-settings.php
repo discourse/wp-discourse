@@ -69,17 +69,6 @@ class CommentSettings {
 		);
 
 		add_settings_field(
-			'discourse_ajax_load',
-			__( 'Load Comments With Ajax', 'wp-discourse' ),
-			array(
-				$this,
-				'ajax_load_checkbox',
-			),
-			'discourse_comment',
-			'discourse_commenting_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_load_comment_css',
 			__( 'Load Comment CSS', 'wp-discourse' ),
 			array(
@@ -295,22 +284,6 @@ class CommentSettings {
 				'wp-discourse'
 			),
 			__( 'Only enabled for a single request.', 'wp-discourse' )
-		);
-	}
-
-	/**
-	 * Outputs markup for the discourse-new-tab checkbox.
-	 */
-	public function ajax_load_checkbox() {
-		$this->form_helper->checkbox_input(
-			'ajax-load',
-			'discourse_comment',
-			__( 'Load comments with Ajax.', 'wp-discourse' ),
-			__(
-				'This is useful if page caching is preventing Discourse comments from updating on WordPress. When this setting is enabled, old WordPress comments
-			cannot be displayed beneath the Discourse comments.',
-				'wp-discourse'
-			)
 		);
 	}
 
