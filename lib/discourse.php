@@ -123,47 +123,6 @@ class Discourse {
 	protected $discourse_webhook = array(
 		'use-discourse-webhook'      => 0,
 		'webhook-secret'             => '',
-		'webhook-match-old-topics'   => 0,
-		'use-discourse-user-webhook' => 0,
-		'webhook-match-user-email'   => 0,
-	);
-
-	/**
-	 * The sso_common options array.
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	protected $discourse_sso_common = array(
-		'sso-secret' => '',
-	);
-
-	/**
-	 * The sso_provider options.
-	 *
-	 * @access protected
-	 * @var array
-	 */
-	protected $discourse_sso_provider = array(
-		'enable-sso'                  => 0,
-		'auto-create-sso-user'        => 0,
-		'login-path'                  => '',
-		'real-name-as-discourse-name' => 0,
-		'force-avatar-update'         => 0,
-		'redirect-without-login'      => 0,
-	);
-
-	/**
-	 * The sso_client options.
-	 *
-	 * @var array
-	 */
-	protected $discourse_sso_client = array(
-		'sso-client-enabled'             => 0,
-		'sso-client-login-form-change'   => 0,
-		'sso-client-login-form-redirect' => '',
-		'sso-client-sync-by-email'       => 0,
-		'sso-client-sync-logout'         => 0,
 	);
 
 	/**
@@ -177,9 +136,6 @@ class Discourse {
 		'discourse_comment',
 		'discourse_configurable_text',
 		'discourse_webhook',
-		'discourse_sso_common',
-		'discourse_sso_provider',
-		'discourse_sso_client',
 	);
 
 	/**
