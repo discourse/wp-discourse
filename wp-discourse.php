@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: WP-Discourse
+ * Plugin Name: WP-Discourse VIP
  * Description: Use Discourse as a community engine for your WordPress blog
  * Version: 1.9.3
  * Author: Discourse
