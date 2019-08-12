@@ -32,14 +32,6 @@ class ConnectionSettings {
 	protected $options;
 
 	/**
-	 * Whether or not to display the connection_options fields.
-	 *
-	 * @access protected
-	 * @var bool
-	 */
-	protected $display_connection_options;
-
-	/**
 	 * ConnectionSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -55,7 +47,6 @@ class ConnectionSettings {
 	 */
 	public function register_connection_settings() {
 		$this->options                    = $this->get_options();
-		$this->display_connection_options = ! is_multisite() || empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(
 			'discourse_connection_settings_section',
@@ -67,7 +58,6 @@ class ConnectionSettings {
 			'discourse_connect'
 		);
 
-		if ( $this->display_connection_options ) {
 			add_settings_field(
 				'discourse_url',
 				__( 'Discourse URL', 'wp-discourse' ),
@@ -100,7 +90,6 @@ class ConnectionSettings {
 				'discourse_connect',
 				'discourse_connection_settings_section'
 			);
-		}// End if().
 
 		register_setting(
 			'discourse_connect',
@@ -208,29 +197,11 @@ class ConnectionSettings {
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 			</em>
 		</p>
-		<?php if ( $this->display_connection_options ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
 					<strong><?php esc_html_e( 'The following settings are used to establish a connection between your site and your forum:', 'wp-discourse' ); ?></strong>
 				</em>
 			</p>
-		<?php else : ?>
-			<p class="wpdc-options-documentation wpdc-subsite-documentation">
-				<em>
-					<strong>
-					<?php
-					esc_html_e(
-						"You are using the WP Discourse plugin in a subsite of a multisite installation.
-                    The plugin's API credentials are being managed through the installation's main site. If you have difficulty
-                    connecting to the Discourse forum. Please contact the network administrator.",
-						'wp-discourse'
-					);
-					?>
-</strong>
-				</em>
-			</p>
-		<?php endif; ?>
-
 		<?php
 	}
 }
