@@ -128,7 +128,6 @@ class DiscoursePublish {
 		$current_post                = get_post( $post_id );
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
-		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
@@ -181,7 +180,6 @@ class DiscoursePublish {
 
 			$data         = array(
 				'embed_url'        => $permalink,
-				'featured_link'    => $add_featured_link ? $permalink : null,
 				'api_key'          => $options['api-key'],
 				'api_username'     => $username,
 				'title'            => $title,
