@@ -147,28 +147,6 @@ class PublishSettings {
 			);
 
 		add_settings_field(
-			'discourse_publish_failure_notice',
-			__( 'Send Email Notification on Publish Failure', 'wp-discourse' ),
-			array(
-				$this,
-				'publish_failure_notice_checkbox',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_publish_failure_email_address',
-			__( 'Email Address for Failure Notification', 'wp-discourse' ),
-			array(
-				$this,
-				'publish_failure_email_address',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_auto_track',
 			__( 'Auto Track Published Topics', 'wp-discourse' ),
 			array(
@@ -323,29 +301,6 @@ class PublishSettings {
 			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
 			__( 'This setting is not supported when using the Block Editor.', 'wp-discourse' )
 		);
-	}
-
-	/**
-	 * Outputs markup for the publish-failure-notice checkbox.
-	 */
-	public function publish_failure_notice_checkbox() {
-		$this->form_helper->checkbox_input(
-			'publish-failure-notice',
-			'discourse_publish',
-			__( 'Send an email notification if publishing to Discourse fails.', 'wp-discourse' ),
-			__(
-				"If the 'auto publish' option is selected, this will send a notification for any posts that fail to publish to Discourse. If that setting is not enabled, it
-            will only send a notification if an error is returned from Discourse.",
-				'wp-discourse'
-			)
-		);
-	}
-
-	/**
-	 * Outputs markup for the publish-failure-email-address checkbox.
-	 */
-	public function publish_failure_email_address() {
-		$this->form_helper->input( 'publish-failure-email', 'discourse_publish', __( "Email address to notify on publishing failure (defaults to the site's admin email address.)", 'wp-discourse' ), 'email' );
 	}
 
 	/**
