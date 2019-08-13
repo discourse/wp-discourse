@@ -51,8 +51,6 @@ class Discourse {
 		'custom-excerpt-length'     => 55,
 		'add-featured-link'         => 0,
 		'auto-publish'              => 0,
-		'force-publish'             => 0,
-		'force-publish-max-age'     => 0,
 		'publish-failure-notice'    => 0,
 		'publish-failure-email'     => '',
 		'auto-track'                => 1,

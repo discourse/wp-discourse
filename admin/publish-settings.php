@@ -158,28 +158,6 @@ class PublishSettings {
 			);
 
 		add_settings_field(
-			'discourse_force_publish',
-			__( 'Force Publish', 'wp-discourse' ),
-			array(
-				$this,
-				'force_publish_checkbox',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
-			'discourse_force_publish_max_age',
-			__( 'Force Publish Max Age', 'wp-discourse' ),
-			array(
-				$this,
-				'force_publish_max_age_input',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_publish_failure_notice',
 			__( 'Send Email Notification on Publish Failure', 'wp-discourse' ),
 			array(
@@ -370,35 +348,6 @@ class PublishSettings {
 			'discourse_publish',
 			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
 			__( 'This setting is not supported when using the Block Editor.', 'wp-discourse' )
-		);
-	}
-
-	/**
-	 * Outputs markup for force-publish checkbox.
-	 */
-	public function force_publish_checkbox() {
-		$this->form_helper->checkbox_input(
-			'force-publish',
-			'discourse_publish',
-			__( 'Automatically publish all new posts and updates. Posts will be published to the Default Discourse Category.', 'wp-discourse' ),
-			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
-		);
-	}
-
-	/**
-	 * Outputs markup for the force-publish-max-age input.
-	 */
-	public function force_publish_max_age_input() {
-		$this->form_helper->input(
-			'force-publish-max-age',
-			'discourse_publish',
-			__(
-				"Max post age in days for force published posts. Older posts will not be published to Discourse.
-			Only applied if 'Force Publish' is enabled. Leave blank or set to 0 to allow all posts to be force published.",
-				'wp-discourse'
-			),
-			'number',
-			0
 		);
 	}
 

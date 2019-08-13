@@ -55,29 +55,16 @@ class DiscoursePublish {
 
 		$publish_to_discourse  = get_post_meta( $post_id, 'publish_to_discourse', true );
 		$publish_to_discourse  = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-
-		$force_publish_enabled = ! empty( $this->options['force-publish'] );
-		$force_publish_post = false;
-		if ( $force_publish_enabled ) {
-			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
-			$min_date = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
-			$post_time = strtotime( $post->post_date );
-
-			if ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) {
-				$force_publish_post = true;
-				update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
-			}
-		}
-
 		$already_published      = get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 		$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 
+		// Todo: this logic can be simplified now that force_publish has been removed.
 		if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 
-			if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
+			if ( ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 				$this->sync_to_discourse( $post_id, $title, $post->post_content );
 			}
 		}
