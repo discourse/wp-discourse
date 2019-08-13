@@ -114,17 +114,6 @@ class PublishSettings {
 		);
 
 		add_settings_field(
-			'discourse_publish_as_unlisted',
-			__( 'Publish as Unlisted Topics', 'wp-discourse' ),
-			array(
-				$this,
-				'publish_as_unlisted_checkbox',
-			),
-			'discourse_publish',
-			'discourse_publishing_settings_section'
-		);
-
-		add_settings_field(
 			'discourse_full_post_content',
 			__( 'Use Full Post Content', 'wp-discourse' ),
 			array(
@@ -298,18 +287,6 @@ class PublishSettings {
 	 */
 	public function max_tags_input() {
 		$this->form_helper->input( 'max-tags', 'discourse_publish', __( 'The maximum number of tags to allow.', 'wp-discourse' ), 'number', 0 );
-	}
-
-	/**
-	 * Outputs markup for publish-as-unlisted checkbox.
-	 */
-	public function publish_as_unlisted_checkbox() {
-		$this->form_helper->checkbox_input(
-			'publish-as-unlisted',
-			'discourse_publish',
-			__( 'Publish posts as unlisted Discourse topics.', 'wp-discourse' ),
-			__( 'If you have enabled the Sync Comment Data webhook, topics will be listed when they receive a comment.', 'wp-discourse' )
-		);
 	}
 
 	/**
