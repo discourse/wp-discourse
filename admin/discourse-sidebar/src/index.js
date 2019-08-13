@@ -67,31 +67,11 @@ class Notification extends Component {
     render() {
         return (
             <div>
-                <ForcePublishMessage forcePublish={this.props.forcePublish} published={this.props.published}/>
                 <StatusMessage statusMessage={this.props.statusMessage}/>
                 <ErrorMessage publishingError={this.props.publishingError}/>
                 <DiscoursePermalink discoursePermalink={this.props.discoursePermalink}/>
             </div>
         );
-    }
-}
-
-class ForcePublishMessage extends Component {
-    constructor( props ) {
-        super( props );
-    }
-
-    render() {
-        if ( this.props.forcePublish && !this.props.published ) {
-            return (
-                <p className={ 'wpdc-force-publish-message' }>
-                    { __( 'The Force Publish option is enabled for your site. All posts published on WordPress will be automatically published to Discourse.', 'wp-discourse' ) }
-                </p>
-
-            );
-        } else {
-            return '';
-        }
     }
 }
 
@@ -595,7 +575,6 @@ class DiscourseSidebar extends Component {
             published: false,
             postStatus: '',
             publishingMethod: 'publish_post',
-            forcePublish: pluginOptions.forcePublish,
             publishToDiscourse: false,
             publishPostCategory: pluginOptions.defaultCategory,
             allowTags: pluginOptions.allowTags,
@@ -964,10 +943,9 @@ class DiscourseSidebar extends Component {
 
     render() {
         if ( this.isAllowedPostType() ) {
-            const isPublished = this.state.published,
-                forcePublish = this.state.forcePublish;
+            const isPublished = this.state.published;
             let actions;
-            if ( !isPublished && !forcePublish ) {
+            if ( !isPublished ) {
                 actions =
                     <div className={'wpdc-not-published'}>
                         <PublishingOptions handlePublishMethodChange={ this.handlePublishMethodChange }
@@ -1005,25 +983,22 @@ class DiscourseSidebar extends Component {
                                 />
                             </div> ) }
                     </div>
-            } else if ( !forcePublish ) {
+            } else {
                 actions =
                     <div className={ 'wpdc-published-post' }>
                         <UpdateDiscourseTopic
                             published={ this.state.published }
                             busy={ this.state.busyUpdating }
                             handleUpdateChange={ this.handleUpdateChange }
-                            forcePublish={ this.state.forcePublish }
                         />
                         <UnlinkFromDiscourse
                             published={ this.state.published }
                             handleUnlinkFromDiscourseChange={ this.handleUnlinkFromDiscourseChange }
                             busy={ this.state.busyUnlinking }
-                            forcePublish={ this.state.forcePublish }
                         />
                     </div>
-            } else {
-                actions = null;
             }
+
             return (
                 <Fragment>
                     <PluginSidebarMoreMenuItem target='discourse-sidebar'>
@@ -1034,7 +1009,6 @@ class DiscourseSidebar extends Component {
                             <div className={ 'wpdc-sidebar' }>
                                 <Notification
                                     published={ this.state.published }
-                                    forcePublish={ this.state.forcePublish }
                                     publishingError={ this.state.publishingError }
                                     discoursePermalink={ this.state.discoursePermalink }
                                     statusMessage={ this.state.statusMessage }
