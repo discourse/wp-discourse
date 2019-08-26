@@ -1,17 +1,17 @@
 {
   "name": "discourse-sidebar",
-  "version": "1.0.0",
-  "description": "Adds a Discourse Sidebar to the Block Editor",
-  "main": "build/index.js",
+  "description": "Adds a Discourse Sidebar to the WordPress block editor.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/discourse/wp-discourse"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "wp-scripts start",
     "build": "wp-scripts build"
   },
-  "author": "Discourse",
-  "license": "ISC",
   "devDependencies": {
-    "@babel/core": "^7.5.5",
-    "@babel/preset-env": "^7.5.5",
-    "@wordpress/scripts": "3.4.0"
+    "@wordpress/scripts": "3.4.0",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6"
   }
 }
