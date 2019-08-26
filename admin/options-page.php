@@ -90,6 +90,13 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=webhook_options"
 				   class="nav-tab <?php echo 'webhook_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?>
 				</a>
+
+				<?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
+
+				<a href="?page=wp_discourse_options&tab=sso_options"
+				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
+				</a>
+
 				<?php
 				/**
 				 * Can be used for adding tabs.

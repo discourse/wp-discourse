@@ -113,6 +113,16 @@ class AdminMenu {
 			array( $this, 'webhook_options_tab' )
 		);
 		add_action( 'load-' . $webhook_settings, array( $this->form_helper, 'connection_status_notice' ) );
+
+		$sso_settings = add_submenu_page(
+			'wp_discourse_options',
+			__( 'SSO', 'wp-discourse' ),
+			__( 'SSO', 'wp-discourse' ),
+			'manage_options',
+			'sso_options',
+			array( $this, 'sso_options_tab' )
+		);
+		add_action( 'load-' . $sso_settings, array( $this->form_helper, 'connection_status_notice' ) );
 	}
 
 	/**
@@ -157,6 +167,15 @@ class AdminMenu {
 	public function webhook_options_tab() {
 		if ( current_user_can( 'manage_options' ) ) {
 			$this->options_page->display( 'webhook_options' );
+		}
+	}
+
+	/**
+	 * Called to display the 'sso_options' tab.
+	 */
+	public function sso_options_tab() {
+		if ( current_user_can( 'manage_options' ) ) {
+			$this->options_page->display( 'sso_options' );
 		}
 	}
 }
