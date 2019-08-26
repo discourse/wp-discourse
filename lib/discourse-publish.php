@@ -25,9 +25,21 @@ class DiscoursePublish {
 	protected $options;
 
 	/**
-	 * DiscoursePublish constructor.
+	 * An email_notification object that has a publish_failure_notification method.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\EmailNotification\EmailNotification
 	 */
-	public function __construct() {
+	protected $email_notifier;
+
+	/**
+	 * DiscoursePublish constructor.
+	 *
+	 * @param object $email_notifier An object for sending an email verification notice.
+	 */
+	public function __construct( $email_notifier ) {
+		$this->email_notifier = $email_notifier;
+
 		add_action( 'init', array( $this, 'setup_options' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
@@ -105,6 +117,13 @@ class DiscoursePublish {
 		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
+			$this->email_notifier->publish_failure_notification(
+				$post,
+				array(
+					'location' => 'after_xmlrpc_publish',
+				)
+			);
 		}
 	}
 
@@ -141,6 +160,7 @@ class DiscoursePublish {
 		$current_post                = get_post( $post_id );
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
+		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration-enabled'] );
 		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
 
@@ -252,6 +272,8 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			}
 
+			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
+
 			return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 		}
 
@@ -276,6 +298,10 @@ class DiscoursePublish {
 
 			// Used for resetting the error notification, if one was being displayed.
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+			if ( $use_multisite_configuration ) {
+				$blog_id = intval( get_current_blog_id() );
+				$this->save_topic_blog_id( $body->topic_id, $blog_id );
+			}
 
 			$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
 			if ( ! empty( $pin_until ) ) {
@@ -306,15 +332,26 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
+				if ( $use_multisite_configuration ) {
+					// Used when use_multisite_configuration is enabled, if an existing post is not yet associated with a topic_id/blog_id.
+					if ( ! $this->topic_blog_id_exists( $topic_id ) ) {
+						$blog_id = get_current_blog_id();
+						$this->save_topic_blog_id( $topic_id, $blog_id );
+					}
+				}
+
 				// The topic has been updated, and its associated post's metadata has been updated.
 				return null;
 			} else {
+				$this->create_bad_response_notifications( $current_post, $post_id );
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}
 		}// End if().
 
 		// Neither the 'id' or the 'post' property existed on the response body.
+		$this->create_bad_response_notifications( $current_post, $post_id );
+
 		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 	}
 
@@ -374,6 +411,26 @@ class DiscoursePublish {
 	}
 
 	/**
+	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
+	 *
+	 * @param \WP_Post $current_post The post for which the notifications are being created.
+	 * @param int      $post_id The current post id.
+	 * @param string   $error_message The error message returned from the request.
+	 * @param int      $error_code The error code returned from the request.
+	 */
+	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
+		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+		$this->email_notifier->publish_failure_notification(
+			$current_post,
+			array(
+				'location'      => 'after_bad_response',
+				'error_message' => $error_message,
+				'error_code'    => $error_code,
+			)
+		);
+	}
+
+	/**
 	 * Checks if a post_type can be synced.
 	 *
 	 * @param null| $post_id The ID of the post in question.
@@ -413,5 +470,47 @@ class DiscoursePublish {
 	 */
 	protected function sanitize_title( $title ) {
 		return wp_strip_all_tags( $title );
+	}
+
+	/**
+	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
+	 *
+	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
+	 *
+	 * @param int $topic_id The topic_id to save to the database.
+	 * @param int $blog_id The blog_id to save to the database.
+	 */
+	protected function save_topic_blog_id( $topic_id, $blog_id ) {
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+		$wpdb->insert(
+			$table_name,
+			array(
+				'topic_id' => $topic_id,
+				'blog_id'  => $blog_id,
+			),
+			array(
+				'%d',
+				'%d',
+			)
+		);
+	}
+
+	/**
+	 * Checks if a given topic_id already exists in the wpdc_topic_blog table.
+	 *
+	 * Only used for multisite installations.
+	 *
+	 * @param int $topic_id The topic_id to search for in the database.
+	 *
+	 * @return bool
+	 */
+	protected function topic_blog_id_exists( $topic_id ) {
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+		$query      = "SELECT * FROM $table_name WHERE topic_id = %d";
+		$row        = $wpdb->get_row( $wpdb->prepare( $query, $topic_id ) );
+
+		return $row ? true : false;
 	}
 }

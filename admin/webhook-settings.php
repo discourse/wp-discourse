@@ -54,7 +54,8 @@ class WebhookSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_webhook_settings() {
-		$this->options = $this->get_options();
+		$this->options                 = $this->get_options();
+		$this->display_webhook_options = ! is_multisite() || empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(
 			'discourse_webhook_settings_section',
@@ -66,6 +67,7 @@ class WebhookSettings {
 			'discourse_webhook'
 		);
 
+		if ( $this->display_webhook_options ) {
 			add_settings_field(
 				'discourse_use_discourse_webhook',
 				__( 'Sync Comment Data', 'wp-discourse' ),
@@ -89,6 +91,28 @@ class WebhookSettings {
 			);
 
 			add_settings_field(
+				'discourse_use_discourse_user_webhook',
+				__( 'Update Userdata', 'wp-discourse' ),
+				array(
+					$this,
+					'use_discourse_user_webhook_checkbox',
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
+			);
+
+			add_settings_field(
+				'discourse_webhook_match_user_email',
+				__( 'Match Users by Email Address', 'wp-discourse' ),
+				array(
+					$this,
+					'webhook_match_user_email_checkbox',
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
+			);
+
+			add_settings_field(
 				'discourse_webhook_secret',
 				__( 'Webhook Secret Key', 'wp-discourse' ),
 				array(
@@ -98,6 +122,8 @@ class WebhookSettings {
 				'discourse_webhook',
 				'discourse_webhook_settings_section'
 			);
+
+		}// End if().
 
 		register_setting(
 			'discourse_webhook',
@@ -169,6 +195,66 @@ class WebhookSettings {
 	}
 
 	/**
+	 * Outputs markup for use-discourse-user-webhook checkbox.
+	 */
+	public function use_discourse_user_webhook_checkbox() {
+		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user' );
+		if ( ! empty( $this->options['url'] ) ) {
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+									  esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
+		} else {
+			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
+		}
+
+		$description = sprintf(
+			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
+			__(
+				'Used to automatically fill in the WordPress user\'s Discourse Name field and store their Discourse Id as metadata.
+This setting will only be activated if your site is functioning as the SSO provider for Discourse (this can be overridden by hooking into the
+\'wpdc_use_discourse_user_webhook\' filter.) Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
+ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
+				'wp-discourse'
+			),
+			$discourse_webhooks_url,
+			$webhook_payload_url
+		);
+
+		$this->form_helper->checkbox_input(
+			'use-discourse-user-webhook',
+			'discourse_webhook',
+			__(
+				'Use a webhook
+		to sync user data with Discourse.',
+				'wp-discourse'
+			),
+			$description
+		);
+
+	}
+
+	/**
+	 * Outputs markup for webhook-match-user-email checkbox.
+	 */
+	public function webhook_match_user_email_checkbox() {
+		$this->form_helper->checkbox_input(
+			'webhook-match-user-email',
+			'discourse_webhook',
+			__(
+				'Match users with Discourse
+        through their email address.',
+				'wp-discourse'
+			),
+			__(
+				'Used for syncing accounts that were created before enabling the
+        Update Userdata webhook. Existing accounts are synced when the user updates and saves their profile on Discourse.
+        <strong>Note: only enable this setting if you are certain that email addresses match between Discourse
+        and WordPress.</strong>',
+				'wp-discourse'
+			)
+		);
+	}
+
+	/**
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
@@ -215,6 +301,7 @@ class WebhookSettings {
 				?>
 			</em>
 		</p>
+		<?php if ( $this->display_webhook_options ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
 					<?php
@@ -238,6 +325,21 @@ class WebhookSettings {
 					<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 				</em>
 			</p>
+		<?php else : ?>
+			<p class="wpdc-options-documentation wpdc-subsite-documentation">
+				<em>
+					<strong>
+					<?php
+					esc_html_e(
+						"You are using the WP Discourse plugin in a subsite of a multisite installation.
+                    The plugin's webhook configuration is being managed through the installation's main site.",
+						'wp-discourse'
+					);
+					?>
+</strong>
+				</em>
+			</p>
+		<?php endif; ?>
 		<?php
 	}
 }

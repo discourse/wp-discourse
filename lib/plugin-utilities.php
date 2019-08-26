@@ -29,6 +29,14 @@ trait PluginUtilities {
 						$options = array_merge( $options, $option );
 					}
 				}
+
+				$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
+				if ( 1 === intval( $multisite_configuration_enabled ) ) {
+					$site_options = get_site_option( 'wpdc_site_options' );
+					foreach ( $site_options as $key => $value ) {
+						$options[ $key ] = $value;
+					}
+				}
 			}
 		}
 

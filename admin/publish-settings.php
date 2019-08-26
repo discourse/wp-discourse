@@ -32,6 +32,14 @@ class PublishSettings {
 	protected $options;
 
 	/**
+	 * Whether or not to use some network publish settings.
+	 *
+	 * @access protected
+	 * @var bool
+	 */
+	protected $use_network_publish_settings;
+
+	/**
 	 * PublishSettings constructor.
 	 *
 	 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
@@ -47,6 +55,7 @@ class PublishSettings {
 	 */
 	public function register_publish_settings() {
 		$this->options                      = $this->get_options();
+		$this->use_network_publish_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 
 		add_settings_section(
 			'discourse_publishing_settings_section',
@@ -234,6 +243,7 @@ class PublishSettings {
 			'discourse_publishing_settings_section'
 		);
 
+		if ( ! $this->use_network_publish_settings ) {
 			add_settings_field(
 				'discourse_hide_name_field',
 				__( 'Do Not Display Discourse Name Field', 'wp-discourse' ),
@@ -244,6 +254,7 @@ class PublishSettings {
 				'discourse_publish',
 				'discourse_publishing_settings_section'
 			);
+		}
 
 		register_setting(
 			'discourse_publish',

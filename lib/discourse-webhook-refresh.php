@@ -36,6 +36,7 @@ class DiscourseWebhookRefresh extends Webhook {
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
+		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
 	}
 
 	/**
@@ -83,10 +84,59 @@ class DiscourseWebhookRefresh extends Webhook {
 
 		if ( ! is_wp_error( $json ) && ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
-			$this->update_post_metadata( $post_data );
+			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+
+			if ( $use_multisite_configuration ) {
+				global $wpdb;
+				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+				$topic_id   = intval( $post_data['topic_id'] );
+				$query      = "SELECT blog_id FROM $table_name WHERE topic_id = %d";
+				$blog_id    = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
+
+				if ( $blog_id ) {
+					switch_to_blog( $blog_id );
+					$this->update_post_metadata( $post_data );
+					restore_current_blog();
+				}
+			} else {
+				$this->update_post_metadata( $post_data );
+			}
 		}
 
 		return null;
+	}
+
+	/**
+	 * Creates the wpdc_topic_blog database table using the site's base table prefix.
+	 *
+	 * The database table is only created in multisite installations when the multisite_configuration option is enabled.
+	 * The table is used to associate the topic_id that's returned from a Discourse webhook request, with a post that's
+	 * been published on a WordPress subsite.
+	 */
+	public function maybe_create_db() {
+		global $wpdb;
+		if ( is_multisite() ) {
+			$use_multisite_configuration = ( 1 === intval( get_site_option( 'wpdc_multisite_configuration' ) ) );
+			$create_or_update_db         = get_site_option( 'wpdc_topic_blog_db_version' ) !== $this->db_version;
+
+			if ( $use_multisite_configuration && $create_or_update_db ) {
+				$table_name      = $wpdb->base_prefix . 'wpdc_topic_blog';
+				$charset_collate = $wpdb->get_charset_collate();
+
+				$sql = "CREATE TABLE $table_name (
+                  topic_id mediumint(9) NOT NULL,
+                  blog_id mediumint(9) NOT NULL,
+                  PRIMARY KEY  (topic_id)
+	             ) $charset_collate;";
+
+				require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+				$result = dbDelta( $sql );
+
+				if ( ! empty( $result[ $table_name ] ) ) {
+					update_site_option( 'wpdc_topic_blog_db_version', $this->db_version );
+				}
+			}
+		}
 	}
 
 	/**
