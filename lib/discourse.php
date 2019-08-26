@@ -49,6 +49,7 @@ class Discourse {
 		'allow-tags'                => 0,
 		'max-tags'                  => 5,
 		'custom-excerpt-length'     => 55,
+		'add-featured-link'         => 0,
 		'auto-publish'              => 0,
 		'publish-failure-notice'    => 0,
 		'publish-failure-email'     => '',
