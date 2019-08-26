@@ -23,6 +23,14 @@ class DiscourseWebhookRefresh extends Webhook {
 	protected $options;
 
 	/**
+	 * The current version of the wpdc_topic_blog database table.
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $db_version = '1.0';
+
+	/**
 	 * DiscourseWebhookRefresh constructor.
 	 */
 	public function __construct() {
@@ -127,9 +135,58 @@ class DiscourseWebhookRefresh extends Webhook {
 							update_post_meta( $post_id, 'discourse_comments_count', $post_number - 1 );
 						}
 					}
+
+					$unlisted = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
+					if ( ! empty( $unlisted ) && $comments_count > 0 && 1 === $post_type ) {
+						$this->list_topic( $post_id, $topic_id );
+					}
 				}
 			}
 		}
+
+		return null;
+	}
+
+	/**
+	 * Changes a post's Discourse topic status from unlisted to listed.
+	 *
+	 * @param int $post_id The id of the post that needs to be listed.
+	 * @param int $topic_id The id of the topic that needs to be listed.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function list_topic( $post_id, $topic_id ) {
+		$url          = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
+		$api_key      = ! empty( $this->options['api-key'] ) ? $this->options['api-key'] : null;
+		$api_username = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : null;
+
+		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
+
+			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+		}
+
+		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
+
+		$data         = array(
+			'api_key'      => $api_key,
+			'api_username' => $api_username,
+			'status'       => 'visible',
+			'enabled'      => 'true',
+		);
+		$post_options = array(
+			'timeout' => 30,
+			'method'  => 'PUT',
+			'body'    => http_build_query( $data ),
+		);
+
+		$response = wp_remote_post( $status_url, $post_options );
+
+		if ( ! $this->validate( $response ) ) {
+
+			return new \WP_Error( 'discourse_response_error', 'Unable to unlist the Discourse topic.' );
+		}
+
+		delete_post_meta( $post_id, 'wpdc_unlisted_topic' );
 
 		return null;
 	}
