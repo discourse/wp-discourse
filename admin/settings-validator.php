@@ -96,6 +96,8 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
+		add_filter( 'wpdc_validate_publish_failure_notice', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_discourse_comments', array( $this, 'validate_checkbox' ) );
