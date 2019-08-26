@@ -45,6 +45,7 @@ class DiscourseComment {
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
+		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
 	}
 
 	/**
@@ -105,10 +106,63 @@ class DiscourseComment {
 			}
 		}
 
+		if ( ! empty( $this->options['ajax-load'] ) ) {
+			wp_register_script( 'load_comments_js', plugins_url( '../js/load-comments.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+			$data = array(
+				'commentsURL' => home_url( '/wp-json/wp-discourse/v1/discourse-comments' ),
+			);
+			wp_enqueue_script( 'load_comments_js' );
+			wp_localize_script( 'load_comments_js', 'wpdc', $data );
+		}
+
 		if ( ! empty( $this->options['load-comment-css'] ) ) {
 			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
 			wp_enqueue_style( 'comment_styles' );
 		}
+	}
+
+	/**
+	 * Registers a Rest API route for returning comments at /wp-json/wp-discourse/v1/discourse-comments.
+	 */
+	public function initialize_comment_route() {
+		if ( ! empty( $this->options['ajax-load'] ) ) {
+			register_rest_route(
+				'wp-discourse/v1',
+				'discourse-comments',
+				array(
+					array(
+						'methods'  => \WP_REST_Server::READABLE,
+						'callback' => array( $this, 'get_discourse_comments' ),
+					),
+				)
+			);
+		}
+	}
+
+	/**
+	 * Handles the REST request for Discourse comments.
+	 *
+	 * @param \WP_REST_Request Object $request The WP_REST_Request for Discourse comments.
+	 *
+	 * @return string
+	 */
+	public function get_discourse_comments( $request ) {
+		$post_id = isset( $request['post_id'] ) ? intval( ( $request['post_id'] ) ) : 0;
+
+		if ( empty( $post_id ) ) {
+
+			return '';
+		}
+
+		$status = get_post_status( $post_id );
+		$post   = get_post( $post_id );
+
+		if ( 'publish' !== $status || ! empty( $post->post_password ) ) {
+
+			return '';
+		}
+
+		return wp_kses_post( $this->comment_formatter->format( $post_id ) );
 	}
 
 	/**
