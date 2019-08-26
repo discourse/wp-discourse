@@ -94,6 +94,8 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_max_tags', array( $this, 'validate_max_tags' ) );
 		add_filter( 'wpdc_validate_full_post_content', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_publish', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_force_publish', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_force_publish_max_age', array( $this, 'validate_force_publish_max_age' ) );
 		add_filter( 'wpdc_validate_add_featured_link', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
@@ -728,6 +730,17 @@ class SettingsValidator {
 
 		// Sanitize, but don't validate. SSO is not enabled.
 		return $this->sanitize_text( $input );
+	}
+
+	/**
+	 * Validates the `force-publish-max-age` input.
+	 *
+	 * @param string $input The input to be validated.
+	 *
+	 * @return int
+	 */
+	public function validate_force_publish_max_age( $input ) {
+		return $this->sanitize_int( $input );
 	}
 
 	/**
