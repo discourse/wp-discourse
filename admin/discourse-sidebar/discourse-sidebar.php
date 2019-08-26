@@ -84,14 +84,14 @@ class DiscourseSidebar {
 
 			return null;
 		}
-		$blockPath = '/dist/block.js';
-		$stylePath = '/dist/block.css';
+		$block_path = '/build/index.js';
+		$style_path = '/build/styles.css';
 
 		wp_register_script(
 			'discourse-sidebar-js',
-			plugins_url( $blockPath, __FILE__ ),
+			plugins_url( $block_path, __FILE__ ),
 			[ 'wp-i18n', 'wp-blocks', 'wp-edit-post', 'wp-element', 'wp-editor', 'wp-components', 'wp-data', 'wp-plugins', 'wp-edit-post', 'wp-api' ],
-			filemtime( plugin_dir_path( __FILE__ ) . $blockPath ),
+			filemtime( plugin_dir_path( __FILE__ ) . $block_path ),
 			true
 		);
 
@@ -122,9 +122,9 @@ class DiscourseSidebar {
 
 		wp_enqueue_style(
 			'discourse-sidebar-css',
-			plugins_url( $stylePath, __FILE__ ),
+			plugins_url( $style_path, __FILE__ ),
 			'',
-			filemtime( plugin_dir_path( __FILE__ ) . $stylePath )
+			filemtime( plugin_dir_path( __FILE__ ) . $style_path )
 		);
 
 		return null;
