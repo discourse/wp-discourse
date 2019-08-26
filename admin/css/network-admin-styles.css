@@ -1,0 +1,22 @@
+.discourse-options-section-end hr.discourse-options-section-hr,
+.wp-discourse-network-options-form .discourse-doc-section-end hr.discourse-options-section-hr {
+	margin-top: 40px;
+	border-top: 1px solid #bbbbbb;
+	border-bottom: 1px solid #eeeeee;
+}
+
+@media screen and (min-width: 784px ) {
+	.discourse-options-section-end {
+		margin-left: -224px;
+		margin-right: -10px;
+	}
+}
+
+.network-admin #adminmenu .toplevel_page_discourse_network_options .wp-menu-image img,
+.toplevel_page_discourse_network_options  #adminmenumain .wp-menu-image img {
+	padding-top: 5px;
+}
+
+.wp-discourse-network-options-form {
+	max-width: 800px;
+}
