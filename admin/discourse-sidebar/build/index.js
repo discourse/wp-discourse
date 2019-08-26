@@ -353,7 +353,10 @@ function (_Component) {
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(Notification, [{
     key: "render",
     value: function render() {
-      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(StatusMessage, {
+      return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(ForcePublishMessage, {
+        forcePublish: this.props.forcePublish,
+        published: this.props.published
+      }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(StatusMessage, {
         statusMessage: this.props.statusMessage
       }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(ErrorMessage, {
         publishingError: this.props.publishingError
@@ -366,10 +369,37 @@ function (_Component) {
   return Notification;
 }(Component);
 
-var StatusMessage =
+var ForcePublishMessage =
 /*#__PURE__*/
 function (_Component2) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(StatusMessage, _Component2);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(ForcePublishMessage, _Component2);
+
+  function ForcePublishMessage(props) {
+    _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ForcePublishMessage);
+
+    return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(ForcePublishMessage).call(this, props));
+  }
+
+  _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(ForcePublishMessage, [{
+    key: "render",
+    value: function render() {
+      if (this.props.forcePublish && !this.props.published) {
+        return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("p", {
+          className: 'wpdc-force-publish-message'
+        }, __('The Force Publish option is enabled for your site. All posts published on WordPress will be automatically published to Discourse.', 'wp-discourse'));
+      } else {
+        return '';
+      }
+    }
+  }]);
+
+  return ForcePublishMessage;
+}(Component);
+
+var StatusMessage =
+/*#__PURE__*/
+function (_Component3) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(StatusMessage, _Component3);
 
   function StatusMessage(props) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, StatusMessage);
@@ -397,8 +427,8 @@ function (_Component2) {
 
 var ErrorMessage =
 /*#__PURE__*/
-function (_Component3) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(ErrorMessage, _Component3);
+function (_Component4) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(ErrorMessage, _Component4);
 
   function ErrorMessage(props) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, ErrorMessage);
@@ -453,8 +483,8 @@ function (_Component3) {
 
 var DiscoursePermalink =
 /*#__PURE__*/
-function (_Component4) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscoursePermalink, _Component4);
+function (_Component5) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscoursePermalink, _Component5);
 
   function DiscoursePermalink(props) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, DiscoursePermalink);
@@ -486,8 +516,8 @@ function (_Component4) {
 
 var PublishingOptions =
 /*#__PURE__*/
-function (_Component5) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishingOptions, _Component5);
+function (_Component6) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishingOptions, _Component6);
 
   function PublishingOptions(props) {
     var _this;
@@ -534,8 +564,8 @@ function (_Component5) {
 
 var PublishToDiscourse =
 /*#__PURE__*/
-function (_Component6) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishToDiscourse, _Component6);
+function (_Component7) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishToDiscourse, _Component7);
 
   function PublishToDiscourse(props) {
     var _this2;
@@ -597,8 +627,8 @@ function (_Component6) {
 
 var CategorySelect =
 /*#__PURE__*/
-function (_Component7) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(CategorySelect, _Component7);
+function (_Component8) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(CategorySelect, _Component8);
 
   function CategorySelect(props) {
     var _this3;
@@ -650,8 +680,8 @@ function (_Component7) {
 
 var LinkToDiscourseTopic =
 /*#__PURE__*/
-function (_Component8) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(LinkToDiscourseTopic, _Component8);
+function (_Component9) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(LinkToDiscourseTopic, _Component9);
 
   function LinkToDiscourseTopic(props) {
     var _this5;
@@ -704,8 +734,8 @@ function (_Component8) {
 
 var UnlinkFromDiscourse =
 /*#__PURE__*/
-function (_Component9) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UnlinkFromDiscourse, _Component9);
+function (_Component10) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UnlinkFromDiscourse, _Component10);
 
   function UnlinkFromDiscourse(props) {
     var _this6;
@@ -763,8 +793,8 @@ function (_Component9) {
 
 var UpdateDiscourseTopic =
 /*#__PURE__*/
-function (_Component10) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UpdateDiscourseTopic, _Component10);
+function (_Component11) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UpdateDiscourseTopic, _Component11);
 
   function UpdateDiscourseTopic(props) {
     var _this7;
@@ -822,8 +852,8 @@ function (_Component10) {
 
 var TagTopic =
 /*#__PURE__*/
-function (_Component11) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(TagTopic, _Component11);
+function (_Component12) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(TagTopic, _Component12);
 
   function TagTopic(props) {
     var _this8;
@@ -989,8 +1019,8 @@ function (_Component11) {
 
 var PinTopic =
 /*#__PURE__*/
-function (_Component12) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PinTopic, _Component12);
+function (_Component13) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PinTopic, _Component13);
 
   function PinTopic(props) {
     var _this12;
@@ -1052,8 +1082,8 @@ function (_Component12) {
 
 var DiscourseSidebar =
 /*#__PURE__*/
-function (_Component13) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscourseSidebar, _Component13);
+function (_Component14) {
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscourseSidebar, _Component14);
 
   function DiscourseSidebar(props) {
     var _this13;
@@ -1065,6 +1095,7 @@ function (_Component13) {
       published: false,
       postStatus: '',
       publishingMethod: 'publish_post',
+      forcePublish: pluginOptions.forcePublish,
       publishToDiscourse: false,
       publishPostCategory: pluginOptions.defaultCategory,
       allowTags: pluginOptions.allowTags,
@@ -1464,10 +1495,11 @@ function (_Component13) {
     key: "render",
     value: function render() {
       if (this.isAllowedPostType()) {
-        var isPublished = this.state.published;
+        var isPublished = this.state.published,
+            forcePublish = this.state.forcePublish;
         var actions;
 
-        if (!isPublished) {
+        if (!isPublished && !forcePublish) {
           actions = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
             className: 'wpdc-not-published'
           }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(PublishingOptions, {
@@ -1500,18 +1532,22 @@ function (_Component13) {
             busy: this.state.busyLinking,
             handleLinkTopicClick: this.handleLinkTopicClick
           })));
-        } else {
+        } else if (!forcePublish) {
           actions = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
             className: 'wpdc-published-post'
           }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(UpdateDiscourseTopic, {
             published: this.state.published,
             busy: this.state.busyUpdating,
-            handleUpdateChange: this.handleUpdateChange
+            handleUpdateChange: this.handleUpdateChange,
+            forcePublish: this.state.forcePublish
           }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(UnlinkFromDiscourse, {
             published: this.state.published,
             handleUnlinkFromDiscourseChange: this.handleUnlinkFromDiscourseChange,
-            busy: this.state.busyUnlinking
+            busy: this.state.busyUnlinking,
+            forcePublish: this.state.forcePublish
           }));
+        } else {
+          actions = null;
         }
 
         return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(Fragment, null, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(PluginSidebarMoreMenuItem, {
@@ -1523,6 +1559,7 @@ function (_Component13) {
           className: 'wpdc-sidebar'
         }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(Notification, {
           published: this.state.published,
+          forcePublish: this.state.forcePublish,
           publishingError: this.state.publishingError,
           discoursePermalink: this.state.discoursePermalink,
           statusMessage: this.state.statusMessage
