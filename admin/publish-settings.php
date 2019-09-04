@@ -243,6 +243,7 @@ class PublishSettings {
 			'discourse_publishing_settings_section'
 		);
 
+		// These options should be set for the whole network when multi-site support is enabled.
 		if ( ! $this->use_network_publish_settings ) {
 			add_settings_field(
 				'discourse_hide_name_field',
@@ -250,6 +251,18 @@ class PublishSettings {
 				array(
 					$this,
 					'hide_discourse_name_field_checkbox',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+
+			// Todo: add this setting to network-options.php.
+			add_settings_field(
+				'discourse-username_editable',
+				__( 'Discourse Username Editable', 'wp-discourse' ),
+				array(
+					$this,
+					'discourse_username_editable_checkbox',
 				),
 				'discourse_publish',
 				'discourse_publishing_settings_section'
@@ -485,6 +498,24 @@ class PublishSettings {
 			)
 		);
 	}
+
+	/**
+	 * Outputs markup for the discourse-username-editable checkbox.
+	 */
+	public function discourse_username_editable_checkbox() {
+		$this->form_helper->checkbox_input(
+			'discourse-username-editable',
+			'discourse_publish',
+			__(
+				'Allow users to edit their Discourse username on their WordPress profile page.',
+				'wp-discourse'
+			),
+			__(
+				"The Discourse username can always be edited by site admins from the user's profile page.",
+				'wp-discourse'
+			)
+		);
+    }
 
 	/**
 	 * Outputs markup for the post-types select input.

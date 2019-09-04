@@ -5,14 +5,14 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\DiscourseUser;
+namespace WPDiscourse\SyncDiscourseUser;
 
 use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseUser
  */
-class DiscourseUser extends Webhook {
+class SyncDiscourseUser extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.
@@ -28,7 +28,6 @@ class DiscourseUser extends Webhook {
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_user_route' ) );
-		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ) );
 	}
 
 	/**
@@ -36,24 +35,6 @@ class DiscourseUser extends Webhook {
 	 */
 	public function setup_options() {
 		$this->options = $this->get_options();
-	}
-
-	/**
-	 * Adds 'discourse_username' to the user_contactmethods array.
-	 *
-	 * @param array $fields The array of contact methods.
-	 *
-	 * @return mixed
-	 */
-	public function extend_user_profile( $fields ) {
-		if ( ! empty( $this->options['hide-discourse-name-field'] ) ) {
-
-			return $fields;
-		} else {
-			$fields['discourse_username'] = 'Discourse Username';
-		}
-
-		return $fields;
 	}
 
 	/**
