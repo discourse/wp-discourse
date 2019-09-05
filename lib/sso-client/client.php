@@ -390,7 +390,7 @@ class Client extends SSOClientBase {
 		$response = array();
 
 		parse_str( $sso, $response );
-		$response = array_map( 'urldecode', $response );
+		$response = array_map( 'rawurldecode', $response );
 		$response = array_map( 'sanitize_text_field', $response );
 
 		if ( empty( $response['external_id'] ) ) {
