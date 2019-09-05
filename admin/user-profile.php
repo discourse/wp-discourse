@@ -47,11 +47,9 @@ class UserProfile {
 	 * @param \WP_User $profile_user The WordPress user who is being updated.
 	 */
 	public function add_discourse_fields_to_profile( $profile_user ) {
-		$is_admin = current_user_can( 'administrator' );
-		// Todo: possibly this option can be removed now that there is a discourse-username-editable option.
+		$is_admin = current_user_can( 'manage_options' );
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
 		$username_editable             = $is_admin || ! empty( $this->options['discourse-username-editable'] );
-		// Only create the table if there is content to display.
 		if ( $is_admin || $show_discourse_username_field ) :
 			?>
 			<table class="form-table">
@@ -66,7 +64,7 @@ class UserProfile {
 						</th>
 						<td>
 							<input type="text" name="discourse_username"
-								   value="<?php echo esc_html( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
+								   value="<?php echo esc_attr( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
 							<em><?php esc_html_e( 'Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.', 'wp-discourse' ); ?></em>
 						</td>
 					</tr>
@@ -104,7 +102,7 @@ class UserProfile {
 
 			return 0;
 		}
-		$is_admin = current_user_can( 'administrator' );
+		$is_admin = current_user_can( 'manage_options' );
 		if ( $is_admin && ! empty( $this->options['enable-sso'] ) ) {
 			$email_verified = isset( $_POST['email_verified'] ) && ! empty( intval( wp_unslash( $_POST['email_verified'] ) ) );
 			if ( $email_verified ) {
@@ -114,7 +112,7 @@ class UserProfile {
 			}
 		}
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
-		if ( isset( $_POST['discourse_username'] ) && $is_admin || $show_discourse_username_field ) { // Input var okay.
+		if ( isset( $_POST['discourse_username'] ) && ( $is_admin || $show_discourse_username_field ) ) { // Input var okay.
 			$discourse_username = sanitize_text_field( wp_unslash( $_POST['discourse_username'] ) ); // Input var okay.
 			update_user_meta( $user_id, 'discourse_username', $discourse_username );
 		}
