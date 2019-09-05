@@ -51,6 +51,11 @@ class UserProfile {
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
 		$username_editable             = $is_admin || ! empty( $this->options['discourse-username-editable'] );
 		if ( $is_admin || $show_discourse_username_field ) :
+			if ( ! $is_admin && ! $username_editable ) {
+				$discourse_username_description = __( 'Used for publishing posts from WordPress to Discourse. Needs to be set by a site administrator.', 'wp-discourse' );
+			} else {
+				$discourse_username_description = __( 'Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.', 'wp-discourse' );
+			}
 			?>
 			<table class="form-table">
 				<h2><?php esc_html_e( 'Discourse', 'wp-discourse' ); ?></h2>
@@ -65,7 +70,7 @@ class UserProfile {
 						<td>
 							<input type="text" name="discourse_username"
 								   value="<?php echo esc_attr( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
-							<em><?php esc_html_e( 'Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.', 'wp-discourse' ); ?></em>
+							<em><?php esc_html_e( $discourse_username_description ); ?></em>
 						</td>
 					</tr>
 				<?php
