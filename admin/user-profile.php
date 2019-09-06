@@ -112,7 +112,12 @@ class UserProfile {
 		$is_admin = current_user_can( 'manage_options' );
 		$sso_enabled = ! empty( $this->options['enable-sso'] );
 		if ( $is_admin && $sso_enabled ) {
-			$email_verified = isset( $_POST['email_verified'] ) && ! empty( intval( wp_unslash( $_POST['email_verified'] ) ) );
+		    // This gets ugly because of support for php 5.4.
+		    $email_verified = false;
+		    if ( isset( $_POST['email_verified'] ) ) {
+		        $email_verified_value = intval( wp_unslash( $_POST['email_verified'] ) );
+		        $email_verified = ! empty( $email_verified_value );
+            }
 			if ( $email_verified ) {
 				delete_user_meta( $user_id, 'discourse_email_not_verified' );
 			} else {
