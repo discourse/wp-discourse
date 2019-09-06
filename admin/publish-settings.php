@@ -515,7 +515,7 @@ class PublishSettings {
 				'wp-discourse'
 			)
 		);
-    }
+	}
 
 	/**
 	 * Outputs markup for the post-types select input.
