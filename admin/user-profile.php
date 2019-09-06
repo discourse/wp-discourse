@@ -47,7 +47,7 @@ class UserProfile {
 	 * @param \WP_User $profile_user The WordPress user who is being updated.
 	 */
 	public function add_discourse_fields_to_profile( $profile_user ) {
-		$is_admin = current_user_can( 'manage_options' );
+		$is_admin                      = current_user_can( 'manage_options' );
 		$show_discourse_username_field = empty( $this->options['hide-discourse-name-field'] );
 		$username_editable             = $is_admin || ! empty( $this->options['discourse-username-editable'] );
 		if ( $is_admin || $show_discourse_username_field ) :
@@ -70,7 +70,7 @@ class UserProfile {
 						<td>
 							<input type="text" name="discourse_username"
 								   value="<?php echo esc_attr( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
-							<em><?php esc_html_e( $discourse_username_description ); ?></em>
+							<em><?php echo esc_html( $discourse_username_description ); ?></em>
 						</td>
 					</tr>
 				<?php
