@@ -78,7 +78,8 @@ class UserProfile {
 				// Only show the email verification field to admins on sites with SSO enabled.
                 $sso_enabled = ! empty( $this->options['enable-sso'] );
 				if ( $is_admin && $sso_enabled ) :
-					$email_verified = empty( get_user_meta( $profile_user->ID, 'discourse_email_not_verified', true ) );
+					$email_verified_meta = get_user_meta( $profile_user->ID, 'discourse_email_not_verified', true );
+                    $email_verified = empty( $email_verified_meta );
 					?>
 					<tr>
 						<th>
