@@ -140,6 +140,8 @@ class SyncDiscourseUser extends Webhook {
 	 * @param object $user_data The json data from the Discourse webhook.
 	 */
 	protected function update_user_data( $user_id, $user_data ) {
+		do_action( 'wpdc_webhook_update_user_data', $user_id, $user_data );
+		
 		$discourse_username = sanitize_text_field( $user_data['username'] );
 		$discourse_id       = intval( $user_data['id'] );
 
