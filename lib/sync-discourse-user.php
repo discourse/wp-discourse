@@ -125,8 +125,6 @@ class SyncDiscourseUser extends Webhook {
 			}
 
 			if ( $wordpress_user && ! is_wp_error( $wordpress_user ) ) {
-				do_action( 'wpdc_webhook_before_update_user_data', $wordpress_user, $discourse_user, $event_type );
-				
 				$user_id = $wordpress_user->ID;
 				$this->update_user_data( $user_id, $discourse_user );
 			}
