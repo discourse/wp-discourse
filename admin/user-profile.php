@@ -57,8 +57,8 @@ class UserProfile {
 				$discourse_username_description = __( 'Used for publishing posts from WordPress to Discourse. Needs to match the username on Discourse.', 'wp-discourse' );
 			}
 			?>
+			<h2><?php esc_html_e( 'Discourse', 'wp-discourse' ); ?></h2>
 			<table class="form-table">
-				<h2><?php esc_html_e( 'Discourse', 'wp-discourse' ); ?></h2>
 				<?php
 				wp_nonce_field( 'update_discourse_usermeta', 'update_discourse_usermeta_nonce' );
 					$discourse_username = get_user_meta( $profile_user->ID, 'discourse_username', true );
