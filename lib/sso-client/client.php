@@ -231,7 +231,7 @@ class Client extends SSOClientBase {
 					break;
 
 				case 'existing_user_login':
-					$message = __( 'There is already an account registed with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
+					$message = __( 'There is already an account registered with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
 					$errors->add( 'existing_user_login', $message );
 					break;
 
