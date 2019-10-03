@@ -492,8 +492,7 @@ class PublishSettings {
 				'wp-discourse'
 			),
 			__(
-				"Unless SSO is enabled, this setting will cause all posts published
-	    to Discourse to be published by the 'Publishing Username.'",
+				'The username field is always visible to site admins.',
 				'wp-discourse'
 			)
 		);
