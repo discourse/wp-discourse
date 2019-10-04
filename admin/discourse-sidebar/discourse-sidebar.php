@@ -60,6 +60,7 @@ class DiscourseSidebar {
 		$meta_keys          = array(
 			'publish_to_discourse',
 			'publish_post_category',
+			'wpdc_auto_publish_overridden',
 			'wpdc_topic_tags',
 			'wpdc_pin_topic',
 			'wpdc_pin_until',
@@ -95,12 +96,16 @@ class DiscourseSidebar {
 			true
 		);
 
+		$plugin_unconfigured = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
+		$auto_publish        = ! empty( $this->options['auto-publish'] );
 		$default_category   = $this->options['publish-category'];
 		$allowed_post_types = $this->options['allowed_post_types'];
 		$force_publish      = ! empty( $this->options['force-publish'] );
 		$allow_tags         = ! empty( $this->options['allow-tags'] );
 		$max_tags           = isset( $this->options['max-tags'] ) ? $this->options['max-tags'] : 5;
 		$data               = array(
+			'pluginUnconfigured'      => $plugin_unconfigured,
+			'autoPublish'             => $auto_publish,
 			'defaultCategory'         => $default_category,
 			'allowedPostTypes'        => $allowed_post_types,
 			'forcePublish'            => $force_publish,
@@ -361,6 +366,11 @@ class DiscourseSidebar {
 		$post_id              = intval( wp_unslash( $data['id'] ) ); // Input var okay.
 		$publish_to_discourse = intval( wp_unslash( $data['publish_to_discourse'] ) ); // Input var okay.
 		update_post_meta( $post_id, 'publish_to_discourse', $publish_to_discourse );
+
+		// The auto-publish option is overridden if the author explicitly sets the publish state in the Discourse sidebar.
+		if ( ! empty( $this->options['auto-publish'] ) ) {
+			update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
+		}
 	}
 
 	/**
