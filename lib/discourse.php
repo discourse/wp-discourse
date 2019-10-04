@@ -112,7 +112,7 @@ class Discourse {
 		'more-replies-more-text'      => 'more',
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
-		'linked-to-discourse-text'    => "You're already linked to Discourse!",
+		'linked-to-discourse-text'    => "You're account is linked with Discourse!",
 	);
 
 	/**
