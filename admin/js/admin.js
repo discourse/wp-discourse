@@ -74,7 +74,15 @@
 			if ( tags ) {
 				tagArr = tags.split( ',' ).map(
 					function( e ) {
+						// Only allow alphanumeric characters, dashes, underscores, and spaces.
+						var allowedChars = new RegExp("^[a-zA-Z0-9\-\_ ]+$");
+						if ( allowedChars.test( e ) ) {
+
 							return e.trim().replace( / /g, '-' );
+						} else {
+
+							return '';
+						}
 					}
 				);
 
