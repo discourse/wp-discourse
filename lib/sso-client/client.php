@@ -459,7 +459,7 @@ class Client extends SSOClientBase {
 			$logout_url,
 			array(
 				'method' => 'POST',
-				'body'   => array(
+				'headers'   => array(
 					'api_key'      => $api_key,
 					'api_username' => $api_username,
 				),
