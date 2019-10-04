@@ -609,6 +609,12 @@ class MetaBox {
 
 				return 'handled_error';
 
+			case 'The tag you selected cannot be used':
+				esc_html_e( 'The tags you selected cannot be used in the Discourse category. Try removing the tags and republishing your post.', 'discourse-integration' );
+				echo '<hr>';
+
+				return 'unhandled_error';
+
 			default:
 				$action = $already_published ? __( 'updating', 'wp-discourse' ) : __( 'publishing', 'wp-discourse' );
 				// translators: Publishing error message. Placeholder: publishing or updating.
