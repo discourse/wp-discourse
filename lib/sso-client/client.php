@@ -36,6 +36,29 @@ class Client extends SSOClientBase {
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
 		add_action( 'login_form', array( $this, 'discourse_sso_alter_login_form' ) );
 		add_action( 'show_user_profile', array( $this, 'discourse_sso_alter_user_profile' ) );
+		add_action( 'admin_notices', array( $this, 'set_user_notice' ) );
+	}
+
+	public function set_user_notice() {
+		global $pagenow;
+
+		write_log( 'pagenow', $pagenow );
+		if ( 'profile.php' === $pagenow ) {
+			$user_id           = get_current_user_id();
+			$mismatched_emails = get_user_meta( $user_id, 'discourse_mismatched_emails', true );
+
+			if ( $mismatched_emails ) {
+				$error_message = __(
+					'<div class="notice notice-error is-dismissible"><p>To link existing WordPress accounts with Discourse, the email addresses of both accounts must match. Make sure you
+are logged into the correct Discourse account. If you are unable to edit your email addresses to match, contact a site administrator.</p></div>',
+					'wp-discourse'
+				);
+
+				delete_user_meta( $user_id, 'discourse_mismatched_emails' );
+
+				echo wp_kses_post( $error_message );
+			}
+		}
 	}
 
 	/**
@@ -95,7 +118,8 @@ class Client extends SSOClientBase {
 						echo wp_kses_post( $linked_text );
 					} else {
 
-						echo wp_kses_data( $this->get_discourse_sso_link_markup() );
+						// Todo: clean this up.
+						echo wp_kses_data( $this->get_discourse_sso_link_markup() ) . ' <em>' . __( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
 					}
 					?>
 				</td>
@@ -154,30 +178,28 @@ class Client extends SSOClientBase {
 	 */
 	private function get_user_id() {
 		if ( is_user_logged_in() ) {
-			$user_id = get_current_user_id();
+			$user_id  = get_current_user_id();
+			$redirect = $this->get_sso_response( 'return_sso_url' );
 			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-
-				// Don't reauthenticate the user, just redirect them to the 'return_sso_url'.
-				$redirect = $this->get_sso_response( 'return_sso_url' );
 				wp_safe_redirect( $redirect );
 
 				exit;
 			} else {
-                $discourse_email = $this->get_sso_response( 'email' );
-                $wp_email = wp_get_current_user()->user_email;
-                write_log('discourse_email', $discourse_email, 'wp_email', $wp_email);
-                if ( $discourse_email === $wp_email ) {
-                    update_user_meta( $user_id, 'discourse_sso_user_id', $this->get_sso_response( 'external_id'));
+				$discourse_email = $this->get_sso_response( 'email' );
+				$wp_email        = wp_get_current_user()->user_email;
+				if ( $discourse_email === $wp_email ) {
+					update_user_meta( $user_id, 'discourse_sso_user_id', $this->get_sso_response( 'external_id' ) );
+					wp_safe_redirect( $redirect );
 
-                    $redirect = $this->get_sso_response( 'return_sso_url');
+					exit;
+				} else {
+					update_user_meta( $user_id, 'discourse_mismatched_emails', 1 );
+					$profile_url = get_edit_profile_url();
+					wp_safe_redirect( $profile_url );
 
-                    wp_safe_redirect( $redirect );
-                    exit;
-                } else {
-                    // something needs to happen here
-                    exit;
-                }
-            }
+					exit;
+				}
+			}
 		} else {
 			$user_query = new \WP_User_Query(
 				array(
@@ -229,7 +251,7 @@ class Client extends SSOClientBase {
 			return new \WP_Error( 'expired_nonce' );
 		}
 
-		$username = $query['username'];
+		$username     = $query['username'];
 		$updated_user = array(
 			'ID'            => $user_id,
 			'user_nicename' => $username,
