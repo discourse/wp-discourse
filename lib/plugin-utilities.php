@@ -59,16 +59,16 @@ trait PluginUtilities {
 			return 0;
 		}
 
-		$url = add_query_arg(
+		$url          = esc_url_raw( "{$url}/users/{$api_username}.json" );
+		$response     = wp_remote_get(
+			$url,
 			array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
-			),
-			$url . '/users/' . $api_username . '.json'
+				'headers' => array(
+					'Api-Key'      => $api_key,
+					'Api-Username' => $api_username,
+				),
+			)
 		);
-
-		$url      = esc_url_raw( $url );
-		$response = wp_remote_get( $url );
 
 		return $this->validate( $response );
 	}
@@ -171,17 +171,16 @@ trait PluginUtilities {
 		}
 
 		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
-		$external_user_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+
+		$response = wp_remote_get(
+			$external_user_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => $api_credentials['api_key'],
+					'Api-Username' => $api_credentials['api_username'],
 				),
-				$external_user_url
 			)
 		);
-
-		$response = wp_remote_get( $external_user_url );
 
 		if ( $this->validate( $response ) ) {
 
@@ -225,16 +224,22 @@ trait PluginUtilities {
 		$users_url = esc_url_raw(
 			add_query_arg(
 				array(
-					'email'        => rawurlencode_deep( $email ),
-					'filter'       => rawurlencode_deep( $email ),
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+					'email'  => rawurlencode_deep( $email ),
+					'filter' => rawurlencode_deep( $email ),
 				),
 				$users_url
 			)
 		);
 
-		$response = wp_remote_get( $users_url );
+		$response = wp_remote_get(
+			$users_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => $api_credentials['api_key'],
+					'Api-Username' => $api_credentials['api_username'],
+				),
+			)
+		);
 		if ( $this->validate( $response ) ) {
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 			// The reqest returns a valid response even if the user isn't found, so check for empty.
@@ -267,15 +272,16 @@ trait PluginUtilities {
 		}
 
 		$topic_url = esc_url_raw( "{$topic_url}.json" );
-		$topic_url = add_query_arg(
-			array(
-				'api_key'      => $api_credentials['api_key'],
-				'api_username' => $api_credentials['api_username'],
-			),
-			$topic_url
-		);
 
-		$response = wp_remote_get( $topic_url );
+		$response = wp_remote_get(
+			$topic_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => $api_credentials['api_key'],
+					'Api-Username' => $api_credentials['api_username'],
+				),
+			)
+		);
 
 		if ( ! $this->validate( $response ) ) {
 
