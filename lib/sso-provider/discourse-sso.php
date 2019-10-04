@@ -233,7 +233,7 @@ class DiscourseSSO {
 			$logout_url,
 			array(
 				'method' => 'POST',
-				'body'   => array(
+				'headers'   => array(
 					'api_key'      => $api_key,
 					'api_username' => $api_username,
 				),
@@ -334,6 +334,8 @@ class DiscourseSSO {
 				'body' => array(
 					'sso'          => $sso_payload,
 					'sig'          => $sig,
+				),
+				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
 				),
