@@ -222,8 +222,6 @@ class DiscoursePublish {
 			$data         = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
-				'api_key'          => $options['api-key'],
-				'api_username'     => $username,
 				'title'            => $title,
 				'raw'              => $baked,
 				'category'         => $category,
@@ -235,14 +233,16 @@ class DiscoursePublish {
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
+				'headers' => array(
+					'api_key'          => $options['api-key'],
+					'api_username'     => $username,
+				),
 				'body'    => http_build_query( $data ) . $tags_param,
 			);
 
 		} else {
 			// The post has already been published.
 			$data         = array(
-				'api_key'          => $options['api-key'],
-				'api_username'     => $username,
 				'title'            => $title,
 				'post[raw]'        => $baked,
 				'skip_validations' => 'true',
@@ -251,6 +251,10 @@ class DiscoursePublish {
 			$post_options = array(
 				'timeout' => 30,
 				'method'  => 'PUT',
+				'headers' => array(
+					'api_key'          => $options['api-key'],
+					'api_username'     => $username,
+				),
 				'body'    => http_build_query( $data ),
 			);
 		}// End if().
@@ -388,8 +392,6 @@ class DiscoursePublish {
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
 		$status_url   = esc_url_raw( $this->options['url'] . "/t/$topic_id/status" );
 		$data         = array(
-			'api_key'      => $this->options['api-key'],
-			'api_username' => $this->options['publish-username'],
 			'status'       => 'pinned',
 			'enabled'      => 'true',
 			'until'        => $pin_until,
@@ -397,6 +399,10 @@ class DiscoursePublish {
 		$post_options = array(
 			'timeout' => 30,
 			'method'  => 'PUT',
+			'headers' => array(
+				'Api-Key'      => $this->options['api-key'],
+				'Api-Username' => $this->options['publish-username'],
+			),
 			'body'    => http_build_query( $data ),
 		);
 
