@@ -218,14 +218,16 @@ class SyncDiscourseTopic extends Webhook {
 		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
 
 		$data         = array(
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
 			'status'       => 'visible',
 			'enabled'      => 'true',
 		);
 		$post_options = array(
 			'timeout' => 30,
 			'method'  => 'PUT',
+			'headers' => array(
+				'api_key'      => $api_key,
+				'api_username' => $api_username,
+			),
 			'body'    => http_build_query( $data ),
 		);
 
