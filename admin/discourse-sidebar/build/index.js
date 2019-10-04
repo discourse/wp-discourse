@@ -1121,7 +1121,7 @@ function (_Component14) {
       postStatus: '',
       publishingMethod: 'publish_post',
       forcePublish: pluginOptions.forcePublish,
-      publishToDiscourse: false,
+      publishToDiscourse: pluginOptions.autoPublish,
       publishPostCategory: pluginOptions.defaultCategory,
       allowTags: pluginOptions.allowTags,
       maxTags: pluginOptions.maxTags,
@@ -1210,7 +1210,17 @@ function (_Component14) {
           }
 
           var meta = data.meta,
-              publishToDiscourse = 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ? false : 1 === parseInt(meta.publish_to_discourse, 10);
+              autoPublish = pluginOptions.autoPublish;
+          var publishToDiscourse;
+
+          if ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) {
+            publishToDiscourse = false;
+          } else if (autoPublish) {
+            var autoPublishOverridden = 1 === parseInt(meta.wpdc_auto_publish_overridden, 10);
+            publishToDiscourse = autoPublishOverridden ? 1 === parseInt(meta.wpdc_publish_to_discourse, 10) : true;
+          } else {
+            publishToDiscourse = 1 === parseInt(meta.wpdc_publish_to_discourse, 10);
+          }
 
           _this15.setState({
             published: meta.discourse_post_id > 0,
@@ -1526,10 +1536,15 @@ function (_Component14) {
     value: function render() {
       if (this.isAllowedPostType()) {
         var isPublished = this.state.published,
-            forcePublish = this.state.forcePublish;
+            forcePublish = this.state.forcePublish,
+            pluginUnconfigured = pluginOptions.pluginUnconfigured;
         var actions;
 
-        if (!isPublished && !forcePublish) {
+        if (pluginUnconfigured) {
+          actions = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
+            className: 'wpdc-plugin-unconfigured'
+          }, __("Before you can publish posts from WordPress to Discourse, you need to configure the plugin's Connection Settings tab.", 'discourse-integration'));
+        } else if (!isPublished && !forcePublish) {
           actions = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
             className: 'wpdc-not-published'
           }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(PublishingOptions, {

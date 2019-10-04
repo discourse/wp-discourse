@@ -608,7 +608,7 @@ class DiscourseSidebar extends Component {
             postStatus: '',
             publishingMethod: 'publish_post',
             forcePublish: pluginOptions.forcePublish,
-            publishToDiscourse: false,
+            publishToDiscourse: pluginOptions.autoPublish,
             publishPostCategory: pluginOptions.defaultCategory,
             allowTags: pluginOptions.allowTags,
             maxTags: pluginOptions.maxTags,
@@ -683,7 +683,18 @@ class DiscourseSidebar extends Component {
                         return;
                     }
                     const meta = data.meta,
-                        publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) ? false : 1 === parseInt( meta.publish_to_discourse, 10 );
+                        autoPublish = pluginOptions.autoPublish;
+                    let publishToDiscourse;
+                    if ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
+                        publishToDiscourse = false;
+
+                    } else if ( autoPublish ) {
+                        const autoPublishOverridden = 1 === parseInt( meta.wpdc_auto_publish_overridden, 10 );
+                        publishToDiscourse =  autoPublishOverridden ? 1 === parseInt( meta.wpdc_publish_to_discourse, 10 ) : true;
+
+                    } else {
+                        publishToDiscourse = 1 === parseInt( meta.wpdc_publish_to_discourse, 10 );
+                    }
                     this.setState( {
                         published: meta.discourse_post_id > 0,
                         postStatus: data.status,
@@ -980,9 +991,15 @@ class DiscourseSidebar extends Component {
     render() {
         if ( this.isAllowedPostType() ) {
             const isPublished = this.state.published,
-                forcePublish = this.state.forcePublish;
+                forcePublish = this.state.forcePublish,
+                pluginUnconfigured = pluginOptions.pluginUnconfigured;
             let actions;
-            if ( !isPublished && !forcePublish ) {
+            if ( pluginUnconfigured ) {
+                actions =
+                    <div className={ 'wpdc-plugin-unconfigured' }>
+                        { __( "Before you can publish posts from WordPress to Discourse, you need to configure the plugin's Connection Settings tab.", 'discourse-integration' ) }
+                    </div>
+            } else if ( !isPublished && !forcePublish ) {
                 actions =
                     <div className={'wpdc-not-published'}>
                         <PublishingOptions handlePublishMethodChange={ this.handlePublishMethodChange }
