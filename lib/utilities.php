@@ -159,14 +159,16 @@ class Utilities {
 			array(
 				'method' => 'POST',
 				'body'   => array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
 					'name'         => $name,
 					'email'        => $email,
 					'password'     => $password,
 					'username'     => $username,
 					'active'       => $require_activation ? 'false' : 'true',
 					'approved'     => 'true',
+				),
+				'headers' => array(
+					'api_key'      => $api_credentials['api_key'],
+					'api_username' => $api_credentials['api_username'],
 				),
 			)
 		);
@@ -204,18 +206,16 @@ class Utilities {
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
-		$groups_url = "{$api_credentials['url']}/groups.json";
-		$groups_url = esc_url_raw(
-			add_query_arg(
-				array(
+		$groups_url = esc_url_raw( "{$api_credentials['url']}/groups.json" );
+
+		$response = wp_remote_get(
+			$groups_url,
+			array(
+				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
 				),
-				$groups_url
-			)
-		);
-
-		$response = wp_remote_get( $groups_url );
+			) );
 
 		if ( ! self::validate( $response ) ) {
 
@@ -327,6 +327,8 @@ class Utilities {
 				'body' => array(
 					'sso'          => $sso_payload,
 					'sig'          => $sig,
+				),
+				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
 				),
@@ -414,18 +416,17 @@ class Utilities {
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
 		}
 
-		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
-		$external_user_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+		$external_user_url = esc_url_raw( "{$api_credentials['url']}/users/by-external/{$user_id}.json" );
+
+		$response = wp_remote_get(
+			$external_user_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => $api_credentials['api_key'],
+					'Api-Username' => $api_credentials['api_username'],
 				),
-				$external_user_url
 			)
 		);
-
-		$response = wp_remote_get( $external_user_url );
 
 		if ( self::validate( $response ) ) {
 
@@ -471,14 +472,20 @@ class Utilities {
 				array(
 					'email'        => rawurlencode_deep( $email ),
 					'filter'       => rawurlencode_deep( $email ),
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
 				),
 				$users_url
 			)
 		);
 
-		$response = wp_remote_get( $users_url );
+		$response = wp_remote_get(
+			$users_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => $api_credentials['api_key'],
+					'Api-Username' => $api_credentials['api_username'],
+				),
+			)
+		);
 		if ( self::validate( $response ) ) {
 			$body = json_decode( wp_remote_retrieve_body( $response ) );
 			// The reqest returns a valid response even if the user isn't found, so check for empty.
