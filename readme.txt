@@ -131,6 +131,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 - Fix WordPress as SSO client checking for matched email addresses after SSO external_id has been set
 - Fix incorrect markup on user profile page
 - Fix tag errors not being correctly handled
+- Fix disallowed tags not being able to be deleted through the Classic Editor meta box
 
 #### 1.9.4 09/05/2019
 
