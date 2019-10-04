@@ -165,7 +165,7 @@ class DiscourseSidebar {
 
 						return $this->get_api_category_permissions( $data, 'get_categories_nonce' );
 					},
-					'callback'            => array( $this, 'get_discourse_categories' ),
+					'callback'            => array( $this, 'get_categories' ),
 				),
 			)
 		);
@@ -511,9 +511,9 @@ class DiscourseSidebar {
 	 *
 	 * @return array|null
 	 */
-	public function get_discourse_categories() {
+	public function get_categories() {
 
-		return get_option( 'wpdc_discourse_categories' );
+		return $this->get_discourse_categories();
 	}
 
 	/**
