@@ -252,7 +252,9 @@ class MetaBox {
 		if ( ! empty( $_POST['wpdc_topic_tags'] ) ) { // Input var okay.
 			$tags = array_map( 'sanitize_text_field', wp_unslash( $_POST['wpdc_topic_tags'] ) ); // Input var okay.
 			update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
-		}
+		} else {
+		    delete_post_meta( $post_id, 'wpdc_topic_tags' );
+        }
 
 		if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
 			update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
