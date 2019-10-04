@@ -274,8 +274,13 @@ class CategorySelect extends Component {
                     <hr className={ 'wpdc-sidebar-hr' }/>
                 </div>
             );
+        } else if ( this.props.categoryError ) {
+            return (
+                <div className={'wpdc-api-error error'}>{
+                    __( 'There was an error returning the category list from Discourse.', 'discourse-integration' ) }
+                </div>
+            )
         } else {
-            // Todo: handle this.
             return null;
         }
     }
@@ -619,6 +624,7 @@ class DiscourseSidebar extends Component {
             busyPublishing: false,
             statusMessage: null,
             discourseCategories: null,
+            categoryError: false,
         };
 
         this.updateStateFromDatabase( this.props.postId );
@@ -636,23 +642,25 @@ class DiscourseSidebar extends Component {
     }
 
     getDiscourseCategories() {
-        wp.apiRequest( {
-            path: '/wp-discourse/v1/get-discourse-categories',
-            method: 'GET',
-            data: {
-                get_categories_nonce: pluginOptions.get_categories_nonce,
-            },
-        } ).then(
-            ( data ) => {
-                this.setState( {
-                    discourseCategories: data,
-                    }
-                );
-            },
-            ( err ) => {
-                return null;
-            }
-        )
+        if ( ! pluginOptions.pluginUnconfigured ) {
+            wp.apiRequest({
+                path: '/wp-discourse/v1/get-discourse-categories',
+                method: 'GET',
+                data: {
+                    get_categories_nonce: pluginOptions.get_categories_nonce,
+                },
+            }).then(
+                (data) => {
+                    this.setState({
+                            discourseCategories: data,
+                        }
+                    );
+                },
+                (err) => {
+                    this.setState( { categoryError: true } );
+                }
+            )
+        }
     }
 
     updateStateFromDatabase( postId ) {
@@ -986,6 +994,7 @@ class DiscourseSidebar extends Component {
                                     category_id={ this.state.publishPostCategory }
                                     handleCategoryChange={ this.handleCategoryChange }
                                     discourseCategories={ this.state.discourseCategories }
+                                    categoryError={ this.state.categoryError }
                                 />
                                 <TagTopic
                                     handleTagChange={ this.handleTagChange }

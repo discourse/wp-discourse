@@ -683,8 +683,11 @@ function (_Component8) {
         }, options), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("hr", {
           className: 'wpdc-sidebar-hr'
         }));
+      } else if (this.props.categoryError) {
+        return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
+          className: 'wpdc-api-error error'
+        }, __('There was an error returning the category list from Discourse.', 'discourse-integration'));
       } else {
-        // Todo: handle this.
         return null;
       }
     }
@@ -1133,7 +1136,8 @@ function (_Component14) {
       busyLinking: false,
       busyPublishing: false,
       statusMessage: null,
-      discourseCategories: null
+      discourseCategories: null,
+      categoryError: false
     };
 
     _this13.updateStateFromDatabase(_this13.props.postId);
@@ -1157,19 +1161,23 @@ function (_Component14) {
     value: function getDiscourseCategories() {
       var _this14 = this;
 
-      wp.apiRequest({
-        path: '/wp-discourse/v1/get-discourse-categories',
-        method: 'GET',
-        data: {
-          get_categories_nonce: pluginOptions.get_categories_nonce
-        }
-      }).then(function (data) {
-        _this14.setState({
-          discourseCategories: data
+      if (!pluginOptions.pluginUnconfigured) {
+        wp.apiRequest({
+          path: '/wp-discourse/v1/get-discourse-categories',
+          method: 'GET',
+          data: {
+            get_categories_nonce: pluginOptions.get_categories_nonce
+          }
+        }).then(function (data) {
+          _this14.setState({
+            discourseCategories: data
+          });
+        }, function (err) {
+          _this14.setState({
+            categoryError: true
+          });
         });
-      }, function (err) {
-        return null;
-      });
+      }
     }
   }, {
     key: "updateStateFromDatabase",
@@ -1532,7 +1540,8 @@ function (_Component14) {
           }, Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(CategorySelect, {
             category_id: this.state.publishPostCategory,
             handleCategoryChange: this.handleCategoryChange,
-            discourseCategories: this.state.discourseCategories
+            discourseCategories: this.state.discourseCategories,
+            categoryError: this.state.categoryError
           }), Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])(TagTopic, {
             handleTagChange: this.handleTagChange,
             tags: this.state.topicTags,
