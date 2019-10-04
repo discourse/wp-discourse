@@ -266,8 +266,10 @@ class DiscoursePublish {
 				$result_body = json_decode( wp_remote_retrieve_body( $result ) );
 				if ( ! empty( $result_body) && ! empty( $result_body->errors ) && ! empty( $result_body->errors[0] ) ) {
 					$error_message = $result_body->errors[0];
+					$error_code    = null;
 				} else {
 					$error_message = wp_remote_retrieve_response_message( $result );
+					$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
 				}
 				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			}
