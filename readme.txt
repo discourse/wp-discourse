@@ -132,6 +132,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 - Fix incorrect markup on user profile page
 - Fix tag errors not being correctly handled
 - Fix disallowed tags not being able to be deleted through the Classic Editor meta box
+- Enable the auto-publish option for both the Block and the Classic editors
 
 #### 1.9.4 09/05/2019
 
