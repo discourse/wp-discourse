@@ -21,13 +21,6 @@ class Client extends SSOClientBase {
 	protected $options;
 
 	/**
-	 * The user meta key name that would store the Discourse user id
-	 *
-	 * @var string
-	 */
-	private $sso_meta_key = 'discourse_sso_user_id';
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -39,18 +32,21 @@ class Client extends SSOClientBase {
 		add_action( 'admin_notices', array( $this, 'set_user_notice' ) );
 	}
 
+	/**
+	 * Sets a notice for users who have failed to link their account with Discourse due to mismatched email addresses.
+	 */
 	public function set_user_notice() {
 		global $pagenow;
 
-		write_log( 'pagenow', $pagenow );
 		if ( 'profile.php' === $pagenow ) {
 			$user_id           = get_current_user_id();
 			$mismatched_emails = get_user_meta( $user_id, 'discourse_mismatched_emails', true );
 
 			if ( $mismatched_emails ) {
 				$error_message = __(
-					'<div class="notice notice-error is-dismissible"><p>To link existing WordPress accounts with Discourse, the email addresses of both accounts must match. Make sure you
-are logged into the correct Discourse account. If you are unable to edit your email addresses to match, contact a site administrator.</p></div>',
+					'<div class="notice notice-error is-dismissible"><p>To link an existing WordPress account with Discourse,
+                     the email addresses of both accounts must match. Make sure you are logged into the correct Discourse account.
+                     If you are unable to edit your email addresses to match, contact a site administrator.</p></div>',
 					'wp-discourse'
 				);
 
@@ -118,8 +114,8 @@ are logged into the correct Discourse account. If you are unable to edit your em
 						echo wp_kses_post( $linked_text );
 					} else {
 
-						// Todo: clean this up.
-						echo wp_kses_data( $this->get_discourse_sso_link_markup() ) . ' <em>' . __( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
+						echo wp_kses_data( $this->get_discourse_sso_link_markup() ) .
+							 ' <em>' . __( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
 					}
 					?>
 				</td>
@@ -172,7 +168,15 @@ are logged into the correct Discourse account. If you are unable to edit your em
 	}
 
 	/**
-	 * Get user id or create an user
+	 * Get user id or create a user.
+     *
+     * For logged in users, the function checks if the 'discourse_sso_user_id' is set. If it isn't set, the user's email
+     * is checked against the email from the SSO payload. If this doesn't match, the user is redirected to their profile
+     * page where an error notice is displayed.
+     *
+     * For non-logged-in users, the function checks if there's an existing user with the payload's 'discourse_sso_user_id',
+     * if there isn't, there is an optional check for a user with a matching email address. If both checks fail, a new user
+     * is created.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -180,7 +184,7 @@ are logged into the correct Discourse account. If you are unable to edit your em
 		if ( is_user_logged_in() ) {
 			$user_id  = get_current_user_id();
 			$redirect = $this->get_sso_response( 'return_sso_url' );
-			if ( get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
+			if ( get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
 				wp_safe_redirect( $redirect );
 
 				exit;
@@ -203,7 +207,7 @@ are logged into the correct Discourse account. If you are unable to edit your em
 		} else {
 			$user_query = new \WP_User_Query(
 				array(
-					'meta_key'   => $this->sso_meta_key,
+					'meta_key'   => 'discourse_sso_user_id',
 					'meta_value' => $this->get_sso_response( 'external_id' ),
 				)
 			);
@@ -269,8 +273,8 @@ are logged into the correct Discourse account. If you are unable to edit your em
 		if ( ! is_wp_error( $update ) ) {
 			update_user_meta( $user_id, 'discourse_username', $username );
 
-			if ( ! get_user_meta( $user_id, $this->sso_meta_key, true ) ) {
-				update_user_meta( $user_id, $this->sso_meta_key, $query['external_id'] );
+			if ( ! get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
+				update_user_meta( $user_id, 'discourse_sso_user_id', $query['external_id'] );
 			}
 		}
 
@@ -336,19 +340,9 @@ are logged into the correct Discourse account. If you are unable to edit your em
 					$errors->add( 'discourse_sso_expired_nonce', $message );
 					break;
 
-				case 'discourse_already_logged_in':
-					$message = __( "It seems that you're already logged in!", 'wp-discourse' );
-					$errors->add( 'discourse_already_logged_in', $message );
-					break;
-
 				case 'existing_user_login':
 					$message = __( 'There is already an account registered with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
 					$errors->add( 'existing_user_login', $message );
-					break;
-
-				case 'mismatched_users':
-					$message = __( 'Neither the username or email address returned by Discourse match your WordPress account. There is probably another user logged into Discourse on your device. Please try visiting the Discourse forum and logging that user out.', 'wp-discourse' );
-					$errors->add( 'mismatched_users', $message );
 					break;
 
 				default:
