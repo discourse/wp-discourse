@@ -908,8 +908,9 @@ function (_Component12) {
     value: function handleKeyPress(e) {
       var _this9 = this;
 
-      var keyVal = e.key;
-      var val = e.target.value;
+      var keyVal = e.key,
+          val = e.target.value,
+          allowedChars = new RegExp("^[a-zA-Z0-9\-\_ ]+$");
 
       if ('Enter' === keyVal || ',' === keyVal) {
         var currentChoices = this.state.chosenTags;
@@ -922,14 +923,20 @@ function (_Component12) {
           return null;
         }
 
-        currentChoices.push(val.trim().replace(/ /g, '-'));
-        currentChoices = TagTopic.sanitizeArray(currentChoices);
-        this.setState({
-          chosenTags: currentChoices,
-          inputContent: ''
-        }, function () {
-          _this9.props.handleTagChange(currentChoices);
-        });
+        if (allowedChars.test(val)) {
+          currentChoices.push(val.trim().replace(/ /g, '-'));
+          currentChoices = TagTopic.sanitizeArray(currentChoices);
+          this.setState({
+            chosenTags: currentChoices,
+            inputContent: ''
+          }, function () {
+            _this9.props.handleTagChange(currentChoices);
+          });
+        } else {
+          this.setState({
+            inputContent: ''
+          });
+        }
       }
     }
   }, {

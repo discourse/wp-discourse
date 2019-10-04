@@ -441,8 +441,9 @@ class TagTopic extends Component {
     }
 
     handleKeyPress( e ) {
-        const keyVal = e.key;
-        const val = e.target.value;
+        const keyVal = e.key,
+            val = e.target.value,
+            allowedChars = new RegExp("^[a-zA-Z0-9\-\_ ]+$");
 
         if ( 'Enter' === keyVal || ',' === keyVal ) {
             let currentChoices = this.state.chosenTags;
@@ -453,14 +454,20 @@ class TagTopic extends Component {
                 } );
                 return null;
             }
-            currentChoices.push( val.trim().replace( / /g, '-' ) );
-            currentChoices = TagTopic.sanitizeArray( currentChoices );
-            this.setState( {
-                chosenTags: currentChoices,
-                inputContent: '',
-            }, () => {
-                this.props.handleTagChange( currentChoices );
-            });
+            if ( allowedChars.test( val ) ) {
+                currentChoices.push( val.trim().replace( / /g, '-' ) );
+                currentChoices = TagTopic.sanitizeArray( currentChoices );
+                this.setState( {
+                    chosenTags: currentChoices,
+                    inputContent: '',
+                }, () => {
+                    this.props.handleTagChange( currentChoices );
+                });
+            } else {
+                this.setState( {
+                    inputContent: '',
+                });
+            }
         }
     }
 
