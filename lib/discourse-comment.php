@@ -246,7 +246,6 @@ class DiscourseComment {
 					if ( isset( $discourse_options['only-show-moderator-liked'] ) && 1 === intval( $discourse_options['only-show-moderator-liked'] ) ) {
 						$options = $options . '&only_moderator_liked=true';
 					}
-					$options = $options . '&api_key=' . $discourse_options['api-key'] . '&api_username=' . $discourse_options['publish-username'];
 
 					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
 					$topic_id            = get_post_meta( $postid, 'discourse_topic_id', true );
@@ -256,7 +255,15 @@ class DiscourseComment {
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
 
-					$result = wp_remote_get( $permalink );
+					$result = wp_remote_get(
+						$permalink,
+						array(
+							'headers' => array(
+								'Api-Key'      => $discourse_options['api-key'],
+								'Api-Username' => $discourse_options['publish-username'],
+							),
+						)
+					);
 
 					if ( $this->validate( $result ) ) {
 
