@@ -263,11 +263,11 @@ class DiscoursePublish {
 				$error_code    = null;
 				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			} else {
-				$error_message = wp_remote_retrieve_response_message( $result );
-				$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
-				if ( 500 === $error_code ) {
-					// For older versions of Discourse, publishing to a deleted topic is returning a 500 response code.
-					update_post_meta( $post_id, 'wpdc_publishing_error', 'deleted_topic' );
+				$result_body = json_decode( wp_remote_retrieve_body( $result ) );
+				if ( ! empty( $result_body) && ! empty( $result_body->errors ) && ! empty( $result_body->errors[0] ) ) {
+					$error_message = $result_body->errors[0];
+				} else {
+					$error_message = wp_remote_retrieve_response_message( $result );
 				}
 				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
 			}
