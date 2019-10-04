@@ -162,10 +162,22 @@ class Client extends SSOClientBase {
 				wp_safe_redirect( $redirect );
 
 				exit;
-			}
+			} else {
+                $discourse_email = $this->get_sso_response( 'email' );
+                $wp_email = wp_get_current_user()->user_email;
+                write_log('discourse_email', $discourse_email, 'wp_email', $wp_email);
+                if ( $discourse_email === $wp_email ) {
+                    update_user_meta( $user_id, 'discourse_sso_user_id', $this->get_sso_response( 'external_id'));
 
-			return $user_id;
+                    $redirect = $this->get_sso_response( 'return_sso_url');
 
+                    wp_safe_redirect( $redirect );
+                    exit;
+                } else {
+                    // something needs to happen here
+                    exit;
+                }
+            }
 		} else {
 			$user_query = new \WP_User_Query(
 				array(
@@ -176,7 +188,7 @@ class Client extends SSOClientBase {
 
 			$user_query_results = $user_query->get_results();
 
-			if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-sync-by-email'] ) && 1 === intval( $this->options['sso-client-sync-by-email'] ) ) {
+			if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-sync-by-email'] ) ) {
 				$user = get_user_by( 'email', $this->get_sso_response( 'email' ) );
 				if ( $user ) {
 
@@ -218,19 +230,8 @@ class Client extends SSOClientBase {
 		}
 
 		$username = $query['username'];
-		$email    = $query['email'];
-
-		// If the logged in user's credentials don't match the credentials returned from Discourse, return an error.
-		$wp_user = get_user_by( 'ID', $user_id );
-		if ( $wp_user->user_login !== $username && $wp_user->user_email !== $email ) {
-
-			return new \WP_Error( 'mismatched_users' );
-		}
-
 		$updated_user = array(
 			'ID'            => $user_id,
-			'user_login'    => $username,
-			'user_email'    => $email,
 			'user_nicename' => $username,
 		);
 
