@@ -105,34 +105,30 @@ trait PluginUtilities {
 	 */
 	protected function get_discourse_categories() {
 		$options      = $this->get_options();
-		$force_update = false;
-
-		$categories = get_option( 'wpdc_discourse_categories' );
+		$categories   = get_transient( 'wpdc_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
-			$force_update = true;
-		}
+			$api_credentials = $this->get_api_credentials();
+			if ( is_wp_error( $api_credentials ) ) {
 
-		if ( $force_update ) {
-			$base_url     = ! empty( $options['url'] ) ? $options['url'] : null;
-			$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-			$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
-
-			if ( ! ( $base_url && $api_key && $api_username ) ) {
-
-				return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 			}
 
-			$site_url = esc_url_raw( "{$base_url}/site.json" );
-			$site_url = add_query_arg(
-				array(
-					'api_key'      => $api_key,
-					'api_username' => $api_username,
-				),
-				$site_url
-			);
+			$base_url     = $api_credentials['url'];
+			$api_username = $api_credentials['api_username'];
+			$api_key      = $api_credentials['api_key'];
 
-			$remote = wp_remote_get( $site_url );
+			$site_url = esc_url_raw( "{$base_url}/site.json" );
+
+			$remote = wp_remote_get(
+				$site_url,
+				array(
+					'headers' => array(
+						'Api-Key'      => $api_key,
+						'Api-Username' => $api_username,
+					),
+				)
+			);
 
 			if ( ! $this->validate( $remote ) ) {
 
@@ -149,7 +145,7 @@ trait PluginUtilities {
 						}
 					}
 				}
-				update_option( 'wpdc_discourse_categories', $categories );
+				set_transient( 'wpdc_discourse_categories', $categories, 1 * MINUTE_IN_SECONDS );
 			} else {
 
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );

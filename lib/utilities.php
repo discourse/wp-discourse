@@ -73,11 +73,58 @@ class Utilities {
 	/**
 	 * Gets the Discourse categories.
 	 *
-	 * @return array
+	 * @return \WP_Error|array
 	 */
 	public static function get_discourse_categories() {
+		$options      = self::get_options();
+		$categories   = get_transient( 'wpdc_discourse_categories' );
 
-		return get_option( 'wpdc_discourse_categories' );
+		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
+			$api_credentials = self::get_api_credentials();
+			if ( is_wp_error( $api_credentials ) ) {
+
+				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+			}
+
+			$base_url     = $api_credentials['url'];
+			$api_username = $api_credentials['api_username'];
+			$api_key      = $api_credentials['api_key'];
+
+			$site_url = esc_url_raw( "{$base_url}/site.json" );
+
+			$remote = wp_remote_get(
+				$site_url,
+				array(
+					'headers' => array(
+						'Api-Key'      => $api_key,
+						'Api-Username' => $api_username,
+					),
+				)
+			);
+
+			if ( ! self::validate( $remote ) ) {
+
+				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
+			}
+
+			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
+			if ( array_key_exists( 'categories', $remote ) ) {
+				$categories = $remote['categories'];
+				if ( empty( $options['display-subcategories'] ) ) {
+					foreach ( $categories as $category => $values ) {
+						if ( array_key_exists( 'parent_category_id', $values ) ) {
+							unset( $categories[ $category ] );
+						}
+					}
+				}
+				set_transient( 'wpdc_discourse_categories', $categories, 1 * MINUTE_IN_SECONDS );
+			} else {
+
+				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
+			}
+		}// End if().
+
+		return $categories;
 	}
 
 	/**
