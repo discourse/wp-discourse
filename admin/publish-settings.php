@@ -415,8 +415,7 @@ class PublishSettings {
 		$this->form_helper->checkbox_input(
 			'auto-publish',
 			'discourse_publish',
-			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-			__( 'This setting is not supported when using the Block Editor.', 'wp-discourse' )
+			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' )
 		);
 	}
 
