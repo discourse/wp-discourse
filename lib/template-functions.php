@@ -78,8 +78,9 @@ trait TemplateFunctions {
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
 
-		$doc = new \DOMDocument( '1.0', 'utf-8' );
-		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
+		$doc  = new \DOMDocument( '1.0', 'utf-8' );
+		$html = $this->wrap_html_fragment( $content );
+		$doc->loadHTML( $html );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
@@ -111,21 +112,18 @@ trait TemplateFunctions {
 
 		$parsed = $doc->saveHTML( $doc->documentElement );
 
-		// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
-		$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
-
-		return $parsed;
+		return $this->remove_outer_html_elements( $parsed );
 	}
 
 	/**
 	 * Replaces polls in posts with a link to the post.
 	 *
 	 * @param string $cooked The post's cooked content.
-	 * @param string $url The post's Discourse URL.
+	 * @param string $post_url The post's Discourse URL.
 	 *
 	 * @return string
 	 */
-	protected function add_poll_links( $cooked, $url ) {
+	protected function add_poll_links( $cooked, $post_url ) {
 		if ( ! extension_loaded( 'libxml' ) ) {
 
 			return $cooked;
@@ -134,41 +132,66 @@ trait TemplateFunctions {
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
 		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
-		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
+		$html                  = $this->wrap_html_fragment( $cooked );
+		$doc->loadHTML( $html );
 
 		$finder = new \DOMXPath( $doc );
 		// See: http://www.a-basketful-of-papayas.net/2010/04/css-selectors-and-xpath-expressions.html.
 		$polls = $finder->query( "//div[contains(concat(' ', normalize-space(@class), ' '), ' poll ')]" );
 		if ( $polls->length ) {
+			$poll_number = 0;
 			foreach ( $polls as $poll ) {
-				$link = $doc->createElement( 'a' );
-				$link->setAttribute( 'class', 'wpdc-poll-link' );
-				$link->setAttribute( 'href', esc_url( $url ) );
-				$link_text = sprintf(
-					// translators: Poll replacement text. Placeholder: discourse_url.
-					__( 'This post includes a poll. Visit it at %1$s', 'wp-discourse' ),
-					esc_url( $this->options['url'] )
-				);
-				$link_text = $doc->createTextNode( $link_text );
-				$link->appendChild( $link_text );
+				if ( 0 === $poll_number ) {
+					$link_text = __( 'Vote in the poll.', 'discourse-integration' );
+					$link      = $doc->createElement( 'a', $link_text );
+					$link->setAttribute( 'class', 'wpdc-poll-link' );
+					$link->setAttribute( 'href', esc_url( $post_url ) );
+					$poll->parentNode->replaceChild( $link, $poll );
+				} else {
+					$poll->parentNode->removeChild( $poll );
+				}
 
-				$poll->parentNode->replaceChild( $link, $poll );
+				$poll_number ++;
 			}
 
 			$parsed = $doc->saveHTML( $doc->documentElement );
-			$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
 
 			libxml_clear_errors();
 			libxml_use_internal_errors( $use_internal_errors );
 			libxml_disable_entity_loader( $disable_entity_loader );
 
-			return $parsed;
+			return $this->remove_outer_html_elements( $parsed );
 		}
 
 		libxml_clear_errors();
 		libxml_use_internal_errors( $use_internal_errors );
+		libxml_disable_entity_loader( $disable_entity_loader );
 
 		return $cooked;
+	}
+
+	/**
+	 * Sets the outer elements for an HTML fragment so that it can be correctly parsed with the DOMDocument functions.
+	 *
+	 * @param string $fragment The HTML to wrap with outer elements.
+	 *
+	 * @return string
+	 */
+	protected function wrap_html_fragment( $fragment ) {
+
+		return '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $fragment . '</body></html>';
+	}
+
+	/**
+	 * Removes DOCTYPE, html, head, meta, and body elements from the parsed HTML.
+	 *
+	 * @param string $html The HTML to remove elements from.
+	 *
+	 * @return string|null
+	 */
+	protected function remove_outer_html_elements( $html ) {
+
+		return preg_replace( '~<(?:!DOCTYPE|/?(?:html|head|meta|body))[^>]*>\s*~i', '', $html );
 	}
 
 	/**
