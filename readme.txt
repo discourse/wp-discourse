@@ -4,7 +4,7 @@ Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.2.3
 Requires PHP: 5.4.0
-Stable tag: 1.9.4
+Stable tag: 1.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -133,6 +133,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 - Fix tag errors not being correctly handled
 - Fix disallowed tags not being able to be deleted through the Classic Editor meta box
 - Enable the auto-publish option for both the Block and the Classic editors
+- Remove mbstring dependency
 
 #### 1.9.4 09/05/2019
 
