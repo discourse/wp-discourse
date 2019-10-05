@@ -59,8 +59,8 @@ trait PluginUtilities {
 			return 0;
 		}
 
-		$url          = esc_url_raw( "{$url}/users/{$api_username}.json" );
-		$response     = wp_remote_get(
+		$url      = esc_url_raw( "{$url}/users/{$api_username}.json" );
+		$response = wp_remote_get(
 			$url,
 			array(
 				'headers' => array(
@@ -104,8 +104,8 @@ trait PluginUtilities {
 	 * @return array|\WP_Error
 	 */
 	protected function get_discourse_categories() {
-		$options      = $this->get_options();
-		$categories   = get_transient( 'wpdc_discourse_categories' );
+		$options    = $this->get_options();
+		$categories = get_transient( 'wpdc_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
 			$api_credentials = $this->get_api_credentials();

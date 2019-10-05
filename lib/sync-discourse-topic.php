@@ -218,8 +218,8 @@ class SyncDiscourseTopic extends Webhook {
 		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
 
 		$data         = array(
-			'status'       => 'visible',
-			'enabled'      => 'true',
+			'status'  => 'visible',
+			'enabled' => 'true',
 		);
 		$post_options = array(
 			'timeout' => 30,

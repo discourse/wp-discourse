@@ -76,8 +76,8 @@ class Utilities {
 	 * @return \WP_Error|array
 	 */
 	public static function get_discourse_categories() {
-		$options      = self::get_options();
-		$categories   = get_transient( 'wpdc_discourse_categories' );
+		$options    = self::get_options();
+		$categories = get_transient( 'wpdc_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
 			$api_credentials = self::get_api_credentials();
@@ -157,14 +157,14 @@ class Utilities {
 		$response           = wp_remote_post(
 			$create_user_url,
 			array(
-				'method' => 'POST',
-				'body'   => array(
-					'name'         => $name,
-					'email'        => $email,
-					'password'     => $password,
-					'username'     => $username,
-					'active'       => $require_activation ? 'false' : 'true',
-					'approved'     => 'true',
+				'method'  => 'POST',
+				'body'    => array(
+					'name'     => $name,
+					'email'    => $email,
+					'password' => $password,
+					'username' => $username,
+					'active'   => $require_activation ? 'false' : 'true',
+					'approved' => 'true',
 				),
 				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],
@@ -215,7 +215,8 @@ class Utilities {
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
 				),
-			) );
+			)
+		);
 
 		if ( ! self::validate( $response ) ) {
 
@@ -324,9 +325,9 @@ class Utilities {
 		$response = wp_remote_post(
 			esc_url_raw( $url ),
 			array(
-				'body' => array(
-					'sso'          => $sso_payload,
-					'sig'          => $sig,
+				'body'    => array(
+					'sso' => $sso_payload,
+					'sig' => $sig,
 				),
 				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],
@@ -470,8 +471,8 @@ class Utilities {
 		$users_url = esc_url_raw(
 			add_query_arg(
 				array(
-					'email'        => rawurlencode_deep( $email ),
-					'filter'       => rawurlencode_deep( $email ),
+					'email'  => rawurlencode_deep( $email ),
+					'filter' => rawurlencode_deep( $email ),
 				),
 				$users_url
 			)

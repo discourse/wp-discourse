@@ -232,8 +232,8 @@ class DiscourseSSO {
 		$logout_response = wp_remote_post(
 			$logout_url,
 			array(
-				'method' => 'POST',
-				'headers'   => array(
+				'method'  => 'POST',
+				'headers' => array(
 					'api_key'      => $api_key,
 					'api_username' => $api_username,
 				),
@@ -331,9 +331,9 @@ class DiscourseSSO {
 		$response = wp_remote_post(
 			esc_url_raw( $url ),
 			array(
-				'body' => array(
-					'sso'          => $sso_payload,
-					'sig'          => $sig,
+				'body'    => array(
+					'sso' => $sso_payload,
+					'sig' => $sig,
 				),
 				'headers' => array(
 					'api_key'      => $api_credentials['api_key'],

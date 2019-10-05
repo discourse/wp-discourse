@@ -169,14 +169,14 @@ class Client extends SSOClientBase {
 
 	/**
 	 * Get user id or create a user.
-     *
-     * For logged in users, the function checks if the 'discourse_sso_user_id' is set. If it isn't set, the user's email
-     * is checked against the email from the SSO payload. If this doesn't match, the user is redirected to their profile
-     * page where an error notice is displayed.
-     *
-     * For non-logged-in users, the function checks if there's an existing user with the payload's 'discourse_sso_user_id',
-     * if there isn't, there is an optional check for a user with a matching email address. If both checks fail, a new user
-     * is created.
+	 *
+	 * For logged in users, the function checks if the 'discourse_sso_user_id' is set. If it isn't set, the user's email
+	 * is checked against the email from the SSO payload. If this doesn't match, the user is redirected to their profile
+	 * page where an error notice is displayed.
+	 *
+	 * For non-logged-in users, the function checks if there's an existing user with the payload's 'discourse_sso_user_id',
+	 * if there isn't, there is an optional check for a user with a matching email address. If both checks fail, a new user
+	 * is created.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -458,8 +458,8 @@ class Client extends SSOClientBase {
 		$logout_response = wp_remote_post(
 			$logout_url,
 			array(
-				'method' => 'POST',
-				'headers'   => array(
+				'method'  => 'POST',
+				'headers' => array(
 					'api_key'      => $api_key,
 					'api_username' => $api_username,
 				),
