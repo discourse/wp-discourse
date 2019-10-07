@@ -83,31 +83,14 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Enqueues the `comments.js` script.
+	 * Enqueues the comment scripts and styles.
 	 *
 	 * Hooks into 'wp_enqueue_scripts'.
 	 */
 	public function discourse_comments_js() {
-		// Is the query for an existing single post of any of the allowed_post_types?
-		if ( isset( $this->options['allowed_post_types'] ) && is_singular( $this->options['allowed_post_types'] ) ) {
-			if ( $this->use_discourse_comments( get_the_ID() ) ) {
-				wp_enqueue_script(
-					'discourse-comments-js',
-					WPDISCOURSE_URL . '/js/comments.js',
-					array( 'jquery' ),
-					get_option( 'discourse_version' ),
-					true
-				);
-				// Localize script.
-				$data = array(
-					'url' => $this->options['url'],
-				);
-				wp_localize_script( 'discourse-comments-js', 'discourse', $data );
-			}
-		}
-
 		if ( ! empty( $this->options['ajax-load'] ) ) {
-			wp_register_script( 'load_comments_js', plugins_url( '../js/load-comments.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+			$script_path = '../js/load-comments.js';
+			wp_register_script( 'load_comments_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 			$data = array(
 				'commentsURL' => home_url( '/wp-json/wp-discourse/v1/discourse-comments' ),
 			);
