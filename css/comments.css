@@ -98,6 +98,9 @@ article.onebox-body:after {
 	margin-right: 0;
 	margin-bottom: 0;
 	margin-left: 0;
+	border-top: none;
+	border-right: none;
+	border-bottom: none;
 	clear: both;
 }
 
