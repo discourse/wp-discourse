@@ -116,7 +116,8 @@ class DiscourseComment {
 		}
 
 		if ( ! empty( $this->options['load-comment-css'] ) ) {
-			wp_register_style( 'comment_styles', WPDISCOURSE_URL . '/css/comments.css', array(), WPDISCOURSE_VERSION );
+			$style_path = '../css/comments.css';
+			wp_register_style( 'comment_styles', plugins_url( $style_path, __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . $style_path ) );
 			wp_enqueue_style( 'comment_styles' );
 		}
 	}
