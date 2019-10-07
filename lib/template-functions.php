@@ -171,6 +171,53 @@ trait TemplateFunctions {
 	}
 
 	/**
+	 * Replaces divs with that have the data attribute `youtube-id` with a link to the video.
+	 *
+	 * @param string $cooked The cooked post content returned from Discourse.
+	 *
+	 * @return string
+	 */
+	protected function fix_youtube_onebox_links( $cooked ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+
+			return $cooked;
+		}
+
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
+		$html                  = $this->wrap_html_fragment( $cooked );
+		$doc->loadHTML( $html );
+		$finder        = new \DOMXPath( $doc );
+		$youtube_links = $finder->query( '//div[@data-youtube-id]' );
+
+		if ( $youtube_links->length ) {
+			foreach ( $youtube_links as $youtube_link ) {
+
+				$youtube_id  = $youtube_link->getAttribute( 'data-youtube-id' );
+				$youtube_url = esc_url( "https://www.youtube.com/watch?v={$youtube_id}" );
+				$new_link    = $doc->createElement( 'a', $youtube_url );
+				$new_link->setAttribute( 'href', esc_url( $youtube_url ) );
+				$new_link->setAttribute( 'class', 'wpdc-onebox-link' );
+				$youtube_link->parentNode->replaceChild( $new_link, $youtube_link );
+			}
+
+			$parsed = $doc->saveHTML( $doc->documentElement );
+
+			libxml_clear_errors();
+			libxml_use_internal_errors( $use_internal_errors );
+			libxml_disable_entity_loader( $disable_entity_loader );
+
+			return $this->remove_outer_html_elements( $parsed );
+		}
+		libxml_clear_errors();
+		libxml_use_internal_errors( $use_internal_errors );
+		libxml_disable_entity_loader( $disable_entity_loader );
+
+		return $cooked;
+	}
+
+	/**
 	 * Sets the outer elements for an HTML fragment so that it can be correctly parsed with the DOMDocument functions.
 	 *
 	 * @param string $fragment The HTML to wrap with outer elements.
