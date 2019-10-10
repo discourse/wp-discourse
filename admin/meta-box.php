@@ -225,6 +225,11 @@ class MetaBox {
 			update_post_meta( $post_id, 'publish_to_discourse', intval( wp_unslash( $_POST['publish_to_discourse'] ) ) ); // Input var okay.
 		} else {
 			update_post_meta( $post_id, 'publish_to_discourse', 0 );
+			if ( ! empty( $this->options['auto-publish'] ) ) {
+				// Handling the auto-publish setting for both the Block and Classic editors is awkward. This flag is used to prevent posts from being published
+				// after the publish-to-discourse status is changed.
+				update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
+            }
 		}
 
 		if ( isset( $_POST['update_discourse_topic'] ) ) { // Input var okay.
@@ -253,8 +258,8 @@ class MetaBox {
 			$tags = array_map( 'sanitize_text_field', wp_unslash( $_POST['wpdc_topic_tags'] ) ); // Input var okay.
 			update_post_meta( $post_id, 'wpdc_topic_tags', $tags );
 		} else {
-		    delete_post_meta( $post_id, 'wpdc_topic_tags' );
-        }
+			delete_post_meta( $post_id, 'wpdc_topic_tags' );
+		}
 
 		if ( ! empty( $_POST['unlist_discourse_topic'] ) ) { // Input var okay.
 			update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
