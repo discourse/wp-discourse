@@ -33,12 +33,13 @@ class Client extends SSOClientBase {
 	}
 
 	/**
-	 * Sets a notice for users who have failed to link their account with Discourse due to mismatched email addresses.
+	 * Sets a notice for users when they link their account with Discourse.
 	 */
 	public function set_user_notice() {
 		global $pagenow;
+		$sso_client_enabled = ! empty( $this->options['sso-client-enabled'] );
 
-		if ( 'profile.php' === $pagenow ) {
+		if ( $sso_client_enabled && 'profile.php' === $pagenow ) {
 			$user_id           = get_current_user_id();
 			$mismatched_emails = get_user_meta( $user_id, 'discourse_mismatched_emails', true );
 
@@ -53,7 +54,19 @@ class Client extends SSOClientBase {
 				delete_user_meta( $user_id, 'discourse_mismatched_emails' );
 
 				echo wp_kses_post( $error_message );
-			}
+			} else {
+			    $user_synced = get_user_meta( $user_id, 'discourse_sso_client_synced', true );
+			    if ( $user_synced ) {
+				    $success_message = __(
+					    '<div class="notice notice-success is-dismissible"><p>Your account is synced with Discourse!.</p></div>',
+					    'wp-discourse'
+				    );
+
+				    delete_user_meta( $user_id, 'discourse_sso_client_synced' );
+
+				    echo wp_kses_post( $success_message );
+                }
+            }
 		}
 	}
 
@@ -193,6 +206,7 @@ class Client extends SSOClientBase {
 				$wp_email        = wp_get_current_user()->user_email;
 				if ( $discourse_email === $wp_email ) {
 					update_user_meta( $user_id, 'discourse_sso_user_id', $this->get_sso_response( 'external_id' ) );
+					update_user_meta( $user_id, 'discourse_sso_client_synced', 1 );
 					wp_safe_redirect( $redirect );
 
 					exit;
