@@ -65,11 +65,12 @@ class DiscoursePublish {
 		$plugin_unconfigured    = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
 		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
 		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
-		if ( wp_is_post_revision( $post_id ) ||
-			( $publish_status_not_set && ! $publish_private ) ||
-			$plugin_unconfigured ||
-			empty( $post->post_title ) ||
-			! $this->is_valid_sync_post_type( $post_id ) ) {
+		if ( wp_is_post_revision( $post_id )
+			 || ( $publish_status_not_set && ! $publish_private )
+			 || $plugin_unconfigured
+			 || empty( $post->post_title )
+			 || ! $this->is_valid_sync_post_type( $post_id )
+		) {
 
 			return null;
 		}
