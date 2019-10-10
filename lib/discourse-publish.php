@@ -75,7 +75,7 @@ class DiscoursePublish {
 			return null;
 		}
 
-		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden in the Discourse sidebar.
+		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
 		$auto_publish_overridden = 1 === intval( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) );
 		$auto_publish            = ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
 
