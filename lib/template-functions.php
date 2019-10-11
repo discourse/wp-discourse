@@ -195,17 +195,12 @@ trait TemplateFunctions {
 	}
 
 	/**
-	 * Sets the outer elements for an HTML fragment so that it can be correctly parsed with the DOMDocument functions.
+	 * Converts a fragment of HTML into a DomDocument object.
 	 *
-	 * @param string $fragment The HTML to wrap with outer elements.
+	 * @param string $fragment The HTML fragment to convert.
 	 *
-	 * @return string
+	 * @return \DOMDocument
 	 */
-	protected function wrap_html_fragment( $fragment ) {
-
-		return '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $fragment . '</body></html>';
-	}
-
 	protected function create_dom_document( $fragment ) {
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $fragment . '</body></html>';
 		$doc  = new \DOMDocument( '1.0', 'utf-8' );
