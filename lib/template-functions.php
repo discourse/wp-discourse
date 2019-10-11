@@ -103,12 +103,7 @@ trait TemplateFunctions {
 				$image->setAttribute( 'src', $url . $src );
 			}
 		}
-
-		// Clear the libxml error buffer.
-		libxml_clear_errors();
-		// Restore the previous value of libxml_use_internal_errors and libxml_disable_entity_loader.
-		libxml_use_internal_errors( $use_internal_errors );
-		libxml_disable_entity_loader( $disable_entity_loader );
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		$parsed = $doc->saveHTML( $doc->documentElement );
 
@@ -155,17 +150,11 @@ trait TemplateFunctions {
 			}
 
 			$parsed = $doc->saveHTML( $doc->documentElement );
-
-			libxml_clear_errors();
-			libxml_use_internal_errors( $use_internal_errors );
-			libxml_disable_entity_loader( $disable_entity_loader );
+			$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 			return $this->remove_outer_html_elements( $parsed );
 		}
-
-		libxml_clear_errors();
-		libxml_use_internal_errors( $use_internal_errors );
-		libxml_disable_entity_loader( $disable_entity_loader );
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		return $cooked;
 	}
@@ -203,16 +192,11 @@ trait TemplateFunctions {
 			}
 
 			$parsed = $doc->saveHTML( $doc->documentElement );
-
-			libxml_clear_errors();
-			libxml_use_internal_errors( $use_internal_errors );
-			libxml_disable_entity_loader( $disable_entity_loader );
+			$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 			return $this->remove_outer_html_elements( $parsed );
 		}
-		libxml_clear_errors();
-		libxml_use_internal_errors( $use_internal_errors );
-		libxml_disable_entity_loader( $disable_entity_loader );
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		return $cooked;
 	}
@@ -239,6 +223,18 @@ trait TemplateFunctions {
 	protected function remove_outer_html_elements( $html ) {
 
 		return preg_replace( '~<(?:!DOCTYPE|/?(?:html|head|meta|body))[^>]*>\s*~i', '', $html );
+	}
+
+	/**
+	 * Clears libxml errors and restores previous state of libxml_use_internal_errors and libxml_disable_entity_loader.
+	 *
+	 * @param bool $use_internal_errors The site's use_internal_errors setting.
+	 * @param bool $disable_entity_loader The site's disable_entity_loader setting.
+	 */
+	protected function clear_libxml_errors( $use_internal_errors, $disable_entity_loader ) {
+		libxml_clear_errors();
+		libxml_use_internal_errors( $use_internal_errors );
+		libxml_disable_entity_loader( $disable_entity_loader );
 	}
 
 	/**
