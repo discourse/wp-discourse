@@ -77,10 +77,7 @@ trait TemplateFunctions {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-
-		$doc  = new \DOMDocument( '1.0', 'utf-8' );
-		$html = $this->wrap_html_fragment( $content );
-		$doc->loadHTML( $html );
+		$doc = $this->create_dom_document( $content );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
@@ -126,9 +123,7 @@ trait TemplateFunctions {
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
-		$html                  = $this->wrap_html_fragment( $cooked );
-		$doc->loadHTML( $html );
+		$doc = $this->create_dom_document( $cooked );
 
 		$finder = new \DOMXPath( $doc );
 		// See: http://www.a-basketful-of-papayas.net/2010/04/css-selectors-and-xpath-expressions.html.
@@ -174,9 +169,7 @@ trait TemplateFunctions {
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
-		$html                  = $this->wrap_html_fragment( $cooked );
-		$doc->loadHTML( $html );
+		$doc = $this->create_dom_document( $cooked );
 		$finder        = new \DOMXPath( $doc );
 		$youtube_links = $finder->query( '//div[@data-youtube-id]' );
 
@@ -211,6 +204,14 @@ trait TemplateFunctions {
 	protected function wrap_html_fragment( $fragment ) {
 
 		return '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $fragment . '</body></html>';
+	}
+
+	protected function create_dom_document( $fragment ) {
+		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' . $fragment . '</body></html>';
+		$doc  = new \DOMDocument( '1.0', 'utf-8' );
+		$doc->loadHTML( $html );
+
+		return $doc;
 	}
 
 	/**
