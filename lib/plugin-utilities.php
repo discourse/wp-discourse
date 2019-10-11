@@ -145,12 +145,6 @@ trait PluginUtilities {
 					$current_category = [];
 					$current_category['id'] = intval( $category['id'] );
 					$current_category['name'] = sanitize_text_field( $category['name'] );
-					$current_category['color'] = sanitize_key( $category['color'] );
-					$current_category['text_color'] = sanitize_key( $category['text_color'] );
-					$current_category['slug'] = sanitize_text_field( $category['slug'] );
-					$current_category['topic_count'] = intval( $category['topic_count'] );
-					$current_category['post_count'] = intval( $category['post_count'] );
-					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
 
 					$discourse_categories[] = $current_category;
 				}
