@@ -287,7 +287,7 @@ class DiscoursePublish {
 					$error_message = wp_remote_retrieve_response_message( $result );
 					$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
 				}
-				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
+				update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $error_message ) );
 			}
 
 			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
