@@ -243,8 +243,8 @@ class DiscourseComment {
 						$permalink,
 						array(
 							'headers' => array(
-								'Api-Key'      => $discourse_options['api-key'],
-								'Api-Username' => $discourse_options['publish-username'],
+								'Api-Key'      => sanitize_key( $discourse_options['api-key'] ),
+								'Api-Username' => sanitize_text_field( $discourse_options['publish-username'] ),
 							),
 						)
 					);

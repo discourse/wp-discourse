@@ -96,8 +96,8 @@ class Utilities {
 				$site_url,
 				array(
 					'headers' => array(
-						'Api-Key'      => $api_key,
-						'Api-Username' => $api_username,
+						'Api-Key'      => sanitize_key( $api_key ),
+						'Api-Username' => sanitize_text_field( $api_username ),
 					),
 				)
 			);
@@ -167,8 +167,8 @@ class Utilities {
 					'approved' => 'true',
 				),
 				'headers' => array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
+					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -212,8 +212,8 @@ class Utilities {
 			$groups_url,
 			array(
 				'headers' => array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
+					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -330,8 +330,8 @@ class Utilities {
 					'sig' => $sig,
 				),
 				'headers' => array(
-					'api_key'      => $api_credentials['api_key'],
-					'api_username' => $api_credentials['api_username'],
+					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
+					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -423,8 +423,8 @@ class Utilities {
 			$external_user_url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_credentials['api_key'],
-					'Api-Username' => $api_credentials['api_username'],
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -482,8 +482,8 @@ class Utilities {
 			$users_url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_credentials['api_key'],
-					'Api-Username' => $api_credentials['api_username'],
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);

@@ -49,22 +49,20 @@ trait PluginUtilities {
 	 * @return int|\WP_Error
 	 */
 	public function check_connection_status() {
-		$options      = $this->get_options();
-		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
+		$api_credentials = $this->get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
 
-		if ( ! ( $url && $api_key && $api_username ) ) {
-
-			return 0;
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
-		$url      = esc_url_raw( "{$url}/users/{$api_username}.json" );
+		$api_username = sanitize_text_field( $api_credentials['api_username'] );
+
+		$url      = esc_url_raw( "{$api_credentials['url']}/users/{$api_username}.json" );
 		$response = wp_remote_get(
 			$url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_key,
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
 					'Api-Username' => $api_username,
 				),
 			)
@@ -124,8 +122,8 @@ trait PluginUtilities {
 				$site_url,
 				array(
 					'headers' => array(
-						'Api-Key'      => $api_key,
-						'Api-Username' => $api_username,
+						'Api-Key'      => sanitize_key( $api_key ),
+						'Api-Username' => sanitize_text_field( $api_username ),
 					),
 				)
 			);
@@ -170,14 +168,14 @@ trait PluginUtilities {
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
 		}
 
-		$external_user_url = "{$api_credentials['url']}/users/by-external/{$user_id}.json";
+		$external_user_url = esc_url_raw( "{$api_credentials['url']}/users/by-external/{$user_id}.json" );
 
 		$response = wp_remote_get(
 			$external_user_url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_credentials['api_key'],
-					'Api-Username' => $api_credentials['api_username'],
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -220,23 +218,21 @@ trait PluginUtilities {
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
-		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
-		$users_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'email'  => rawurlencode_deep( $email ),
-					'filter' => rawurlencode_deep( $email ),
-				),
-				$users_url
-			)
+		$users_url = esc_url_raw( "{$api_credentials['url']}/admin/users/list/all.json" );
+		$users_url = add_query_arg(
+			array(
+				'email'  => rawurlencode_deep( $email ),
+				'filter' => rawurlencode_deep( $email ),
+			),
+			$users_url
 		);
 
 		$response = wp_remote_get(
 			$users_url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_credentials['api_key'],
-					'Api-Username' => $api_credentials['api_username'],
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -277,8 +273,8 @@ trait PluginUtilities {
 			$topic_url,
 			array(
 				'headers' => array(
-					'Api-Key'      => $api_credentials['api_key'],
-					'Api-Username' => $api_credentials['api_username'],
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);

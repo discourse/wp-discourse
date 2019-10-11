@@ -225,8 +225,8 @@ class SyncDiscourseTopic extends Webhook {
 			'timeout' => 30,
 			'method'  => 'PUT',
 			'headers' => array(
-				'api_key'      => $api_key,
-				'api_username' => $api_username,
+				'api_key'      => sanitize_key( $api_key ),
+				'api_username' => sanitize_text_field( $api_username ),
 			),
 			'body'    => http_build_query( $data ),
 		);

@@ -474,8 +474,8 @@ class Client extends SSOClientBase {
 			array(
 				'method'  => 'POST',
 				'headers' => array(
-					'api_key'      => $api_key,
-					'api_username' => $api_username,
+					'api_key'      => sanitize_key( $api_key ),
+					'api_username' => sanitize_text_field( $api_username ),
 				),
 			)
 		);
