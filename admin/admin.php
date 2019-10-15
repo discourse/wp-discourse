@@ -52,10 +52,12 @@ if ( is_admin() ) {
  * Enqueue admin styles and scripts.
  */
 function enqueue_admin_scripts() {
-	wp_register_style( 'wp_discourse_admin', WPDISCOURSE_URL . '/admin/css/admin-styles.css' );
-	wp_enqueue_style( 'wp_discourse_admin' );
+	$style_path = '/css/admin-styles.css';
+	wp_register_style( 'admin_styles', plugins_url( $style_path, __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . $style_path ) );
+	wp_enqueue_style( 'admin_styles' );
 
-	wp_register_script( 'admin_js', plugins_url( '../admin/js/admin.js', __FILE__ ), array( 'jquery' ), WPDISCOURSE_VERSION, true );
+	$script_path = '/js/admin.js';
+	wp_register_script( 'admin_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 	wp_enqueue_script( 'admin_js' );
 	$commenting_options = get_option( 'discourse-comment' );
 	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];
