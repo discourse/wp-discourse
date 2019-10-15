@@ -55,18 +55,18 @@ class Client extends SSOClientBase {
 
 				echo wp_kses_post( $error_message );
 			} else {
-			    $user_synced = get_user_meta( $user_id, 'discourse_sso_client_synced', true );
-			    if ( $user_synced ) {
-				    $success_message = __(
-					    '<div class="notice notice-success is-dismissible"><p>Your account is linked to Discourse!.</p></div>',
-					    'wp-discourse'
-				    );
+				$user_synced = get_user_meta( $user_id, 'discourse_sso_client_synced', true );
+				if ( $user_synced ) {
+					$success_message = __(
+						'<div class="notice notice-success is-dismissible"><p>Your account is linked to Discourse!.</p></div>',
+						'wp-discourse'
+					);
 
-				    delete_user_meta( $user_id, 'discourse_sso_client_synced' );
+					delete_user_meta( $user_id, 'discourse_sso_client_synced' );
 
-				    echo wp_kses_post( $success_message );
-                }
-            }
+					echo wp_kses_post( $success_message );
+				}
+			}
 		}
 	}
 
@@ -128,7 +128,7 @@ class Client extends SSOClientBase {
 					} else {
 
 						echo wp_kses_data( $this->get_discourse_sso_link_markup() ) .
-							 ' <em>' . __( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
+							 ' <em>' . esc_html__( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
 					}
 					?>
 				</td>
