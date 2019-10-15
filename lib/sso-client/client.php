@@ -58,7 +58,7 @@ class Client extends SSOClientBase {
 			    $user_synced = get_user_meta( $user_id, 'discourse_sso_client_synced', true );
 			    if ( $user_synced ) {
 				    $success_message = __(
-					    '<div class="notice notice-success is-dismissible"><p>Your account is synced with Discourse!.</p></div>',
+					    '<div class="notice notice-success is-dismissible"><p>Your account is linked to Discourse!.</p></div>',
 					    'wp-discourse'
 				    );
 
