@@ -150,6 +150,8 @@ trait PluginUtilities {
 				}
 
 				set_transient( 'wpdc_discourse_categories', $discourse_categories, 1 * MINUTE_IN_SECONDS );
+
+				return $discourse_categories;
 			} else {
 
 				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
