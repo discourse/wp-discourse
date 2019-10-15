@@ -84,7 +84,7 @@
 							return '';
 						}
 					}
-				).filter( function( tag) {
+				).filter( function( tag ) {
 
 					return tag.length > 0;
 				});
