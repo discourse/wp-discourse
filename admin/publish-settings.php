@@ -415,7 +415,8 @@ class PublishSettings {
 		$this->form_helper->checkbox_input(
 			'auto-publish',
 			'discourse_publish',
-			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' )
+			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
+                __( 'This can be overridden in the Discourse Sidebar before you publish a post.', 'wp-discourse' )
 		);
 	}
 
