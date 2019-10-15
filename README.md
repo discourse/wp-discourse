@@ -7,18 +7,19 @@
 The WP Discourse plugin acts as an interface between your WordPress site and your
 [Discourse](http://www.discourse.org/) community.
 
-### Use Discourse for comments:
+The plugin is not a substitute for Disqus-like commenting systems.
+
+### Use Discourse for Comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
 - Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
 - Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
 based on post score and commenter "trust level" -- see docs.
 
-#### See it live
+#### See it Live
 
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
-- [howtogeek.com](http://www.howtogeek.com/)
 
 ### Single Sign On
 
@@ -29,8 +30,6 @@ This will override Discourse's native (and powerful) login flow and is only reco
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
 
 ### Contact
-
-- The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
 
 - Bug reports and other developer inquiries should be directed at our GitHub Issues:
 [https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
@@ -70,9 +69,7 @@ Or manually add it to your `composer.json`:
 }
 ```
 
-For more detailed instructions please see the [setup](https://github.com/discourse/wp-discourse/wiki/Setup) page of the
-[wp-discourse wiki](https://github.com/discourse/wp-discourse/wiki)
-
+For more detailed instructions please see the [WP Discourse plugin installation and setup](https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752).
 ### Frequently Asked Questions
 
 #### Does this plugin install Discourse for me?
