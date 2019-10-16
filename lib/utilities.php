@@ -181,8 +181,8 @@ class Utilities {
 					'approved' => 'true',
 				),
 				'headers' => array(
-					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
-					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -226,8 +226,8 @@ class Utilities {
 			$groups_url,
 			array(
 				'headers' => array(
-					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
-					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);
@@ -344,8 +344,8 @@ class Utilities {
 					'sig' => $sig,
 				),
 				'headers' => array(
-					'api_key'      => sanitize_key( $api_credentials['api_key'] ),
-					'api_username' => sanitize_text_field( $api_credentials['api_username'] ),
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
 				),
 			)
 		);

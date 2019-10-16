@@ -246,8 +246,8 @@ class DiscoursePublish {
 				'timeout' => 30,
 				'method'  => 'POST',
 				'headers' => array(
-					'api_key'      => sanitize_key( $options['api-key'] ),
-					'api_username' => sanitize_text_field( $username ),
+					'Api-Key'      => sanitize_key( $options['api-key'] ),
+					'Api-Username' => sanitize_text_field( $username ),
 				),
 				'body'    => http_build_query( $data ) . $tags_param,
 			);
@@ -264,8 +264,8 @@ class DiscoursePublish {
 				'timeout' => 30,
 				'method'  => 'PUT',
 				'headers' => array(
-					'api_key'      => sanitize_key( $options['api-key'] ),
-					'api_username' => sanitize_text_field( $username ),
+					'Api-Key'      => sanitize_key( $options['api-key'] ),
+					'Api-Username' => sanitize_text_field( $username ),
 				),
 				'body'    => http_build_query( $data ),
 			);
