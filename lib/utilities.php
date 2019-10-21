@@ -77,7 +77,7 @@ class Utilities {
 	 */
 	public static function get_discourse_categories() {
 		$options    = self::get_options();
-		$categories = get_transient( 'wpdc_discourse_categories' );
+		$categories = get_transient( 'wpdcu_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
 			$api_credentials = self::get_api_credentials();
@@ -129,7 +129,7 @@ class Utilities {
 					$discourse_categories[] = $current_category;
 				}
 
-				set_transient( 'wpdc_discourse_categories', $discourse_categories, 1 * MINUTE_IN_SECONDS );
+				set_transient( 'wpdcu_discourse_categories', $discourse_categories, 1 * MINUTE_IN_SECONDS );
 
 				return $discourse_categories;
 			} else {
