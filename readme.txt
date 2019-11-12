@@ -2,7 +2,7 @@
 Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.2.4
+Tested up to: 5.3
 Requires PHP: 5.4.0
 Stable tag: 1.9.7
 License: GPLv2 or later
