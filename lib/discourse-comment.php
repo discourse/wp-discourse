@@ -346,6 +346,7 @@ class DiscourseComment {
 	 */
 	public function join_link( $post_id ) {
 		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		$new_tab             = ! empty( $this->options['discourse-new-tab'] ) ? ' target="_blank"' : '';
 
 		if ( empty( $discourse_permalink ) ) {
 
@@ -370,7 +371,7 @@ class DiscourseComment {
 
 		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
 
-		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '">' . esc_html( $link_text ) . '</a></div>';
+		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '"' . $new_tab . '>' . esc_html( $link_text ) . '</a></div>';
 	}
 
 	/**
