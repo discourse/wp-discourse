@@ -53,11 +53,13 @@ class Discourse {
 		'add-featured-link'         => 0,
 		'auto-publish'              => 0,
 		'force-publish'             => 0,
+		'force-publish-max-age'     => 0,
 		'publish-failure-notice'    => 0,
 		'publish-failure-email'     => '',
 		'auto-track'                => 1,
 		'allowed_post_types'        => array( 'post' ),
 		'hide-discourse-name-field' => 0,
+		'discourse-username-editable' => 0,
 	);
 
 	/**

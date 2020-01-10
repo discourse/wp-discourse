@@ -59,9 +59,9 @@ class HTMLTemplates {
 		ob_start();
 		?>
 		<div id="comments" class="comments-area discourse-comments-area">
-            <div class="comments-title-wrap">
-                <h2 class="comments-title discourse-comments-title"><?php echo esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
-            </div>
+			<div class="comments-title-wrap">
+				<h2 class="comments-title discourse-comments-title"><?php echo esc_html( self::get_text_options( 'notable-replies-text' ) ); ?></h2>
+			</div>
 			<ol class="comment-list">{comments}</ol>
 			<div class="respond comment-respond">
 				<h3 id="reply-title" class="comment-reply-title">
@@ -209,7 +209,7 @@ class HTMLTemplates {
 	 * Available tags:
 	 * {excerpt}, {blogurl}, {author}, {thumbnail}, {featuredimage}
 	 *
-     * @param int|null $post_id The ID of the post being published.
+	 * @param int|null $post_id The ID of the post being published.
 	 * @static
 	 * @return string
 	 */

@@ -127,7 +127,9 @@ class DiscourseComment {
 	public function initialize_comment_route() {
 		if ( ! empty( $this->options['ajax-load'] ) ) {
 			register_rest_route(
-				'wp-discourse/v1', 'discourse-comments', array(
+				'wp-discourse/v1',
+				'discourse-comments',
+				array(
 					array(
 						'methods'  => \WP_REST_Server::READABLE,
 						'callback' => array( $this, 'get_discourse_comments' ),
@@ -153,7 +155,7 @@ class DiscourseComment {
 		}
 
 		$status = get_post_status( $post_id );
-		$post = get_post( $post_id );
+		$post   = get_post( $post_id );
 
 		if ( 'publish' !== $status || ! empty( $post->post_password ) ) {
 
@@ -260,9 +262,8 @@ class DiscourseComment {
 
 						$json = json_decode( $result['body'] );
 
-						// Look at using the filtered_posts_count property here. Moderator posts are being added to the comment count.
-						if ( isset( $json->posts_count ) ) {
-							$posts_count = $json->posts_count - 1;
+						if ( isset( $json->filtered_posts_count ) ) {
+							$posts_count = $json->filtered_posts_count - 1;
 							if ( $posts_count < 0 ) {
 								$posts_count = 0;
 							}
@@ -298,7 +299,14 @@ class DiscourseComment {
 	 */
 	public function comments_template( $old ) {
 		global $post;
-		$post_id = $post->ID;
+		$post_id                = $post->ID;
+		$current_user           = wp_get_current_user();
+		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
+
+		if ( ! $load_comments_template ) {
+
+			return WPDISCOURSE_PATH . 'templates/blank.php';
+		}
 
 		if ( $this->use_discourse_comments( $post_id ) ) {
 			if ( ! empty( $this->options['ajax-load'] ) ) {

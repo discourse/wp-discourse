@@ -8,6 +8,7 @@
 namespace WPDiscourse\DiscourseSSO;
 
 use \WPDiscourse\Shared\PluginUtilities;
+use \WPDiscourse\SSO\SSO;
 
 /**
  * Class DiscourseSSO
@@ -52,7 +53,7 @@ class DiscourseSSO {
 
 		if ( ! $bypass_sync ) {
 			// Make sure the login hasn't been initiated by clicking on a SSO login link.
-			$query_string = parse_url( wp_get_referer(), PHP_URL_QUERY );
+			$query_string = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
 			$query_params = [];
 			parse_str( $query_string, $query_params );
 			$sso_referer = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
@@ -89,7 +90,7 @@ class DiscourseSSO {
 			$login_url = $this->options['login-path'];
 
 			if ( ! empty( $redirect ) ) {
-				return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
+				return esc_url_raw( add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url ) );
 
 			} else {
 				return $login_url;
@@ -97,9 +98,9 @@ class DiscourseSSO {
 		}
 
 		if ( ! empty( $redirect ) ) {
-			return add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url );
+			return esc_url_raw( add_query_arg( 'redirect_to', rawurlencode( $redirect ), $login_url ) );
 		} else {
-			return $login_url;
+			return esc_url_raw( $login_url );
 		}
 
 	}
@@ -127,68 +128,33 @@ class DiscourseSSO {
 	 * Hooks into the 'parse_query' filter.
 	 *
 	 * @param \WP_Query $wp The query object that parsed the query.
-	 *
-	 * @throws \Exception Throws an exception it SSO helper class is not included, or the payload can't be validated against the sig.
+	 * @return null
 	 */
 	public function sso_parse_request( $wp ) {
+		if ( empty( $this->options['enable-sso'] ) ) {
 
-		/**
-		 * Sync logout from Discourse to WordPress from Adam Capirola : https://meta.discourse.org/t/wordpress-integration-guide/27531.
-		 * To make this work, enter a URL of the form "http://my-wp-blog.com/?request=logout" in the "logout redirect"
-		 * field in your Discourse admin
-		 */
-		if ( ! empty( $this->options['enable-sso'] ) &&
-			 isset( $_GET['request'] ) && // Input var okay.
-			 'logout' === $_GET['request'] // Input var okay.
-		) {
-
-			wp_logout();
-			wp_safe_redirect( $this->options['url'] );
-
-			exit;
+			return null;
 		}
-		// End logout processing.
-		if ( ! empty( $this->options['enable-sso'] ) &&
-			 array_key_exists( 'sso', $wp->query_vars ) &&
-			 array_key_exists( 'sig', $wp->query_vars )
-		) {
+
+		$this->handle_logout_request();
+
+		if ( array_key_exists( 'sso', $wp->query_vars ) && array_key_exists( 'sig', $wp->query_vars ) ) {
+			$payload = sanitize_text_field( $wp->query_vars['sso'] );
+			$sig     = sanitize_text_field( $wp->query_vars['sig'] );
+
 			// Not logged in to WordPress, redirect to WordPress login page with redirect back to here.
 			if ( ! is_user_logged_in() ) {
-
-				// Preserve sso and sig parameters.
-				$redirect = add_query_arg( null, null );
-
-				// Change %0A to %0B so it's not stripped out in wp_sanitize_redirect.
-				$redirect = str_replace( '%0A', '%0B', $redirect );
-
+				$redirect = add_query_arg( $payload, $sig );
 				// Build login URL.
 				$login = wp_login_url( esc_url_raw( $redirect ) );
-
 				do_action( 'wpdc_sso_before_login_redirect', $redirect, $login );
-
 				// Redirect to login.
-				wp_safe_redirect( $login );
+				wp_safe_redirect( esc_url_raw( $login ) );
 
 				exit;
 			} else {
-
-				// Check for helper class.
-				if ( ! class_exists( '\WPDiscourse\SSO\SSO' ) ) {
-					echo( 'Helper class is not properly included.' );
-
-					exit;
-				}
-
-				// Payload and signature.
-				$payload = $wp->query_vars['sso'];
-				$sig     = $wp->query_vars['sig'];
-
-				// Change %0B back to %0A.
-				$payload = rawurldecode( str_replace( '%0B', '%0A', rawurlencode( $payload ) ) );
-
-				// Validate signature.
 				$sso_secret = $this->options['sso-secret'];
-				$sso        = new \WPDiscourse\SSO\SSO( $sso_secret );
+				$sso        = new SSO( $sso_secret );
 
 				if ( ! ( $sso->validate( $payload, $sig ) ) ) {
 					echo( 'Invalid request.' );
@@ -196,19 +162,34 @@ class DiscourseSSO {
 					exit;
 				}
 
-				$nonce           = $sso->get_nonce( $payload );
+				try {
+					$nonce = $sso->get_nonce( $payload );
+				} catch ( \Exception $e ) {
+					echo esc_html( $e->getMessage() );
+
+					exit;
+				}
+
 				$current_user    = wp_get_current_user();
 				$params          = $this->get_sso_params( $current_user );
 				$params['nonce'] = $nonce;
-				$q               = $sso->build_login_string( $params );
 
+				try {
+					$q = $sso->build_login_string( $params );
+				} catch ( \Exception $e ) {
+					echo esc_html( $e->getMessage() );
+
+					exit;
+				}
 				do_action( 'wpdc_sso_provider_before_sso_redirect', $current_user->ID, $current_user );
 				// Redirect back to Discourse.
-				wp_safe_redirect( $this->options['url'] . '/session/sso_login?' . $q );
+				wp_safe_redirect( esc_url_raw( $this->options['url'] . '/session/sso_login?' . $q ) );
 
 				exit;
 			}// End if().
 		}// End if().
+
+		return null;
 	}
 
 	/**
@@ -217,7 +198,9 @@ class DiscourseSSO {
 	 * This function hooks into the 'clear_auth_cookie' action. It is the last action hook before logout
 	 * where it is possible to access the user_id.
 	 *
-	 * @return \WP_Error
+	 * Todo: this function duplicates code from `client.php`.
+	 *
+	 * @return null|\WP_Error
 	 */
 	public function logout_from_discourse() {
 		// If SSO is not enabled, don't make the request.
@@ -247,7 +230,8 @@ class DiscourseSSO {
 		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
 		$logout_url      = esc_url_raw( $logout_url );
 		$logout_response = wp_remote_post(
-			$logout_url, array(
+			$logout_url,
+			array(
 				'method' => 'POST',
 				'body'   => array(
 					'api_key'      => $api_key,
@@ -278,11 +262,12 @@ class DiscourseSSO {
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
 		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
 		$avatar_url          = get_avatar_url(
-			$user_id, array(
+			$user_id,
+			array(
 				'default' => '404',
 			)
 		);
-		$avatar_url          = apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
+		$avatar_url          = esc_url_raw( apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id ) );
 
 		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
 			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
@@ -344,7 +329,8 @@ class DiscourseSSO {
 		$sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
 
 		$response = wp_remote_post(
-			esc_url_raw( $url ), array(
+			esc_url_raw( $url ),
+			array(
 				'body' => array(
 					'sso'          => $sso_payload,
 					'sig'          => $sig,
@@ -362,13 +348,25 @@ class DiscourseSSO {
 		$discourse_user = json_decode( wp_remote_retrieve_body( $response ) );
 
 		if ( ! empty( $discourse_user->id ) ) {
-			$wordpress_user_id = $sso_params['external_id'];
-			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', $discourse_user->id );
-			update_user_meta( $wordpress_user_id, 'discourse_username', $discourse_user->username );
+			$wordpress_user_id = intval( $sso_params['external_id'] );
+			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', intval( $discourse_user->id ) );
+			update_user_meta( $wordpress_user_id, 'discourse_username', sanitize_text_field( $discourse_user->username ) );
 
 			do_action( 'wpdc_after_sync_sso', $discourse_user, $user_id );
 		}
 
 		return wp_remote_retrieve_response_code( $response );
+	}
+
+	/**
+	 * Syncs Discourse logout requests with WordPress.
+	 */
+	protected function handle_logout_request() {
+		if ( isset( $_GET['request'] ) && 'logout' === $_GET['request'] ) { // Input var okay.
+			wp_logout();
+			wp_safe_redirect( esc_url_raw( $this->options['url'] ) );
+
+			exit;
+		}
 	}
 }

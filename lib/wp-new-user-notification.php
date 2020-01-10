@@ -113,11 +113,11 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 			update_user_meta( $user_id, 'discourse_email_verification_key', $email_verification_sig );
 
 			/* translators: %s: user login */
-			$message = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
+			$message  = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
 			$message .= __( 'To set your password, visit the following address:' ) . "\r\n\r\n";
-			$message .= '<' . network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ), 'login' ) . ">\r\n\r\n";
+			$message .= '<' . esc_url_raw( network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ) ), 'login' ) . ">\r\n\r\n";
 
-			$message .= wp_login_url() . "\r\n";
+			$message .= esc_url( wp_login_url() ) . "\r\n";
 
 			$wp_new_user_notification_email = array(
 				'to'      => $user->user_email,

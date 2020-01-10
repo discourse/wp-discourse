@@ -57,7 +57,8 @@ class Client extends SSOClientBase {
 		}
 
 		printf(
-			'<p>%s</p><p>&nbsp;</p>', wp_kses_data(
+			'<p>%s</p><p>&nbsp;</p>',
+			wp_kses_data(
 				$this->get_discourse_sso_link_markup(
 					array(
 						'redirect' => $this->options['sso-client-login-form-redirect'],
@@ -376,10 +377,8 @@ class Client extends SSOClientBase {
 		};
 
 		if ( 'raw' === $return_key ) {
-			// Since sanitization do bad things to our sso payload, we must pass it raw in order to be validated
-			// @codingStandardsIgnoreStart
-			return $_GET['sso']; // Input var okay.
-			// @codingStandardsIgnoreEnd
+
+			return sanitize_text_field( wp_unslash( $_GET['sso'] ) ); // Input var okay.
 		}
 
 		$sso = base64_decode( sanitize_text_field( wp_unslash( $_GET['sso'] ) ), true ); // Input var okay.
@@ -391,7 +390,7 @@ class Client extends SSOClientBase {
 		$response = array();
 
 		parse_str( $sso, $response );
-		$response = array_map( 'urldecode', $response );
+		$response = array_map( 'rawurldecode', $response );
 		$response = array_map( 'sanitize_text_field', $response );
 
 		if ( empty( $response['external_id'] ) ) {
@@ -441,7 +440,8 @@ class Client extends SSOClientBase {
 		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
 		$logout_url      = esc_url_raw( $logout_url );
 		$logout_response = wp_remote_post(
-			$logout_url, array(
+			$logout_url,
+			array(
 				'method' => 'POST',
 				'body'   => array(
 					'api_key'      => $api_key,

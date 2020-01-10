@@ -1,4 +1,2 @@
-admin/discourse-sidebar/src/index.js
-admin/discourse-sidebar/webpack.config.js
 admin/discourse-sidebar/src/*
-admin/discourse-sidebar/dist/*
+admin/discourse-sidebar/build/*

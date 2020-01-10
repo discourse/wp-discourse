@@ -75,7 +75,8 @@ trait TemplateFunctions {
 		}
 
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
-		$use_internal_errors = libxml_use_internal_errors( true );
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = libxml_disable_entity_loader( true );
 
 		$doc = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
@@ -104,8 +105,9 @@ trait TemplateFunctions {
 
 		// Clear the libxml error buffer.
 		libxml_clear_errors();
-		// Restore the previous value of libxml_use_internal_errors.
+		// Restore the previous value of libxml_use_internal_errors and libxml_disable_entity_loader.
 		libxml_use_internal_errors( $use_internal_errors );
+		libxml_disable_entity_loader( $disable_entity_loader );
 
 		$parsed = $doc->saveHTML( $doc->documentElement );
 
@@ -129,8 +131,9 @@ trait TemplateFunctions {
 			return $cooked;
 		}
 
-		$use_internal_errors = libxml_use_internal_errors( true );
-		$doc                 = new \DOMDocument( '1.0', 'utf-8' );
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $cooked, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		$finder = new \DOMXPath( $doc );
@@ -140,10 +143,11 @@ trait TemplateFunctions {
 			foreach ( $polls as $poll ) {
 				$link = $doc->createElement( 'a' );
 				$link->setAttribute( 'class', 'wpdc-poll-link' );
-				$link->setAttribute( 'href', $url );
+				$link->setAttribute( 'href', esc_url( $url ) );
 				$link_text = sprintf(
 					// translators: Poll replacement text. Placeholder: discourse_url.
-					__( 'This post includes a poll. Visit it at %1$s', 'wp-discourse' ), esc_url( $this->options['url'] )
+					__( 'This post includes a poll. Visit it at %1$s', 'wp-discourse' ),
+					esc_url( $this->options['url'] )
 				);
 				$link_text = $doc->createTextNode( $link_text );
 				$link->appendChild( $link_text );
@@ -156,6 +160,7 @@ trait TemplateFunctions {
 
 			libxml_clear_errors();
 			libxml_use_internal_errors( $use_internal_errors );
+			libxml_disable_entity_loader( $disable_entity_loader );
 
 			return $parsed;
 		}

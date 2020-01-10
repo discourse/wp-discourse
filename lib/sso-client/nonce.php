@@ -42,7 +42,7 @@ class Nonce {
 		 *
 		 * @var int
 		 */
-		$this->nonce_life = apply_filters( 'wpdc_nonce_life', 600 );
+		$this->nonce_life = intval( apply_filters( 'wpdc_nonce_life', 600 ) );
 
 		$this->maybe_create_db();
 	}
@@ -113,7 +113,7 @@ class Nonce {
 		$expired_nonces = $this->wpdb->get_results( "SELECT id FROM {$table_name} WHERE added_on < DATE_SUB(NOW(), INTERVAL {$this->nonce_life} SECOND)" );
 
 		if ( count( $expired_nonces ) ) {
-			$expired_nonces = wp_list_pluck( $expired_nonces, 'id' );
+			$expired_nonces = array_map( 'intval', wp_list_pluck( $expired_nonces, 'id' ) );
 			$expired_nonces = implode( ',', $expired_nonces );
 			$this->wpdb->get_results( "DELETE FROM {$table_name} WHERE id IN ({$expired_nonces})" );
 		}
@@ -132,10 +132,12 @@ class Nonce {
 		$nonce = wp_hash( uniqid( $action, true ), 'nonce' );
 
 		$this->wpdb->insert(
-			$this->get_table_name(), array(
+			$this->get_table_name(),
+			array(
 				'nonce'  => $nonce,
 				'action' => $action,
-			), array( '%s', '%s' )
+			),
+			array( '%s', '%s' )
 		);
 
 		return $nonce;
@@ -174,9 +176,11 @@ class Nonce {
 	 */
 	private function invalidate_nonce( $id ) {
 		return $this->wpdb->delete(
-			$this->get_table_name(), array(
+			$this->get_table_name(),
+			array(
 				'id' => $id,
-			), array( '%d' )
+			),
+			array( '%d' )
 		);
 	}
 }

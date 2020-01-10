@@ -108,7 +108,8 @@ class Utilities {
 		$email              = $user->user_email;
 		$password           = wp_generate_password( 20 );
 		$response           = wp_remote_post(
-			$create_user_url, array(
+			$create_user_url,
+			array(
 				'method' => 'POST',
 				'body'   => array(
 					'api_key'      => $api_credentials['api_key'],
@@ -162,7 +163,8 @@ class Utilities {
 				array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
-				), $groups_url
+				),
+				$groups_url
 			)
 		);
 
@@ -207,7 +209,8 @@ class Utilities {
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
 		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
 		$avatar_url          = get_avatar_url(
-			$user_id, array(
+			$user_id,
+			array(
 				'default' => '404',
 			)
 		);
@@ -272,7 +275,8 @@ class Utilities {
 		$sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
 
 		$response = wp_remote_post(
-			esc_url_raw( $url ), array(
+			esc_url_raw( $url ),
+			array(
 				'body' => array(
 					'sso'          => $sso_payload,
 					'sig'          => $sig,
@@ -291,8 +295,8 @@ class Utilities {
 
 		if ( ! empty( $discourse_user->id ) ) {
 			$wordpress_user_id = $sso_params['external_id'];
-			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', $discourse_user->id );
-			update_user_meta( $wordpress_user_id, 'discourse_username', $discourse_user->username );
+			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', intval( $discourse_user->id ) );
+			update_user_meta( $wordpress_user_id, 'discourse_username', sanitize_text_field( $discourse_user->username ) );
 		}
 
 		return wp_remote_retrieve_response_code( $response );
@@ -314,7 +318,8 @@ class Utilities {
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
-			$user, array(
+			$user,
+			array(
 				'add_groups' => $group_names,
 			)
 		);
@@ -338,7 +343,8 @@ class Utilities {
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
-			$user, array(
+			$user,
+			array(
 				'remove_groups' => $group_names,
 			)
 		);
@@ -367,7 +373,8 @@ class Utilities {
 				array(
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
-				), $external_user_url
+				),
+				$external_user_url
 			)
 		);
 
@@ -419,7 +426,8 @@ class Utilities {
 					'filter'       => rawurlencode_deep( $email ),
 					'api_key'      => $api_credentials['api_key'],
 					'api_username' => $api_credentials['api_username'],
-				), $users_url
+				),
+				$users_url
 			)
 		);
 

@@ -95,12 +95,12 @@ class FormHelper {
 			if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
 			}
-?>
+			?>
 			<?php
 			if ( isset( $max ) ) {
 				echo 'max="' . esc_attr( $max ) . '"';
 			}
-?>
+			?>
 			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
@@ -281,12 +281,7 @@ class FormHelper {
 
 		if ( ! empty( $inputs ) ) {
 			foreach ( $inputs as $key => $input ) {
-				$filter = 'wpdc_validate_' . str_replace( '-', '_', $key );
-
-				if ( ! has_filter( $filter ) ) {
-					// It's safe to log errors here. This should never have to be called on a production site.
-					error_log( 'Missing validation filter: ' . $filter );
-				}
+				$filter         = 'wpdc_validate_' . str_replace( '-', '_', $key );
 				$output[ $key ] = apply_filters( $filter, $input );
 			}
 		}
@@ -344,8 +339,10 @@ class FormHelper {
 							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
                                              an existing Discourse admin account, before enabling SSO please ensure that your email
                                              addresses on Discourse and WordPress match. This is required for SSO login to an
-                                             existing Discourse account.', 'wp-discourse'
-						), esc_attr( $current_user_email )
+                                             existing Discourse account.',
+							'wp-discourse'
+						),
+						esc_attr( $current_user_email )
 					);
 
 					$allowed = array(
@@ -370,9 +367,10 @@ class FormHelper {
 				<?php
 				esc_html_e(
 					'You are not connected to Discourse. If you are setting up the plugin, this
-                notice should go away after completing the form on this page.', 'wp-discourse'
+                notice should go away after completing the form on this page.',
+					'wp-discourse'
 				);
-?>
+				?>
 </strong>
 			</p>
 		</div>

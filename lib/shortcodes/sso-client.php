@@ -34,7 +34,8 @@ class SSOClientShortcode extends SSOClientBase {
 				'login'    => null,
 				'link'     => null,
 				'redirect' => null,
-			), $atts
+			),
+			$atts
 		);
 
 		return $this->get_discourse_sso_link_markup( $options );

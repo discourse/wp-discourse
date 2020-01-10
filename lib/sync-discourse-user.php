@@ -5,14 +5,14 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\DiscourseUser;
+namespace WPDiscourse\SyncDiscourseUser;
 
 use WPDiscourse\Webhook\Webhook;
 
 /**
  * Class DiscourseUser
  */
-class DiscourseUser extends Webhook {
+class SyncDiscourseUser extends Webhook {
 
 	/**
 	 * Gives access to the plugin options.
@@ -28,7 +28,6 @@ class DiscourseUser extends Webhook {
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_user_route' ) );
-		add_filter( 'user_contactmethods', array( $this, 'extend_user_profile' ) );
 	}
 
 	/**
@@ -39,32 +38,16 @@ class DiscourseUser extends Webhook {
 	}
 
 	/**
-	 * Adds 'discourse_username' to the user_contactmethods array.
-	 *
-	 * @param array $fields The array of contact methods.
-	 *
-	 * @return mixed
-	 */
-	public function extend_user_profile( $fields ) {
-		if ( ! empty( $this->options['hide-discourse-name-field'] ) ) {
-
-			return $fields;
-		} else {
-			$fields['discourse_username'] = 'Discourse Username';
-		}
-
-		return $fields;
-	}
-
-	/**
-	 * Registers the Rest API route wp-discourse/v1/update-topic-content.
+	 * Registers the Rest API route wp-discourse/v1/update-user.
 	 */
 	public function initialize_update_user_route() {
 		$initialize_route = ! empty( $this->options['enable-sso'] ) && ! empty( $this->options['use-discourse-user-webhook'] );
 		$initialize_route = apply_filters( 'wpdc_use_discourse_user_webhook', $initialize_route );
 		if ( $initialize_route ) {
 			register_rest_route(
-				'wp-discourse/v1', 'update-user', array(
+				'wp-discourse/v1',
+				'update-user',
+				array(
 					array(
 						'methods'  => \WP_REST_Server::CREATABLE,
 						'callback' => array( $this, 'update_user' ),
@@ -100,11 +83,11 @@ class DiscourseUser extends Webhook {
 		$event_action = $data->get_header( 'x_discourse_event' );
 		$json         = $data->get_json_params();
 
-		if ( ! empty( $json['user'] ) ) {
+		if ( ! is_wp_error( $json ) && ! empty( $json['user'] ) ) {
 			$discourse_user  = $json['user'];
-			$discourse_email = $discourse_user['email'];
-			$discourse_id    = $discourse_user['id'];
-			$external_id     = ! empty( $discourse_user['external_id'] ) ? $discourse_user['external_id'] : null;
+			$discourse_email = sanitize_email( $discourse_user['email'] );
+			$discourse_id    = intval( $discourse_user['id'] );
+			$external_id     = ! empty( $discourse_user['external_id'] ) ? intval( $discourse_user['external_id'] ) : null;
 			$wordpress_user  = null;
 
 			if ( 'user_created' === $event_action ) {
@@ -157,8 +140,8 @@ class DiscourseUser extends Webhook {
 	 * @param object $user_data The json data from the Discourse webhook.
 	 */
 	protected function update_user_data( $user_id, $user_data ) {
-		$discourse_username = $user_data['username'];
-		$discourse_id       = $user_data['id'];
+		$discourse_username = sanitize_text_field( $user_data['username'] );
+		$discourse_id       = intval( $user_data['id'] );
 
 		update_user_meta( $user_id, 'discourse_username', $discourse_username );
 		// The unique flag is important here.

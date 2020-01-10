@@ -2,12 +2,13 @@
 Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.1
-Stable tag: 1.8.9
+Tested up to: 5.2.3
+Requires PHP: 5.4.0
+Stable tag: 1.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin allows you to use Discourse as a community engine for your WordPress website.
+This plugin allows you to use Discourse as a community engine for your WordPress website. __The plugin is not a substitute for Disqus type commenting systems. Users will need to visit your Discourse forum to comment on your posts.__
 
 == Description ==
 
@@ -125,7 +126,27 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-**Note:** The wp-discourse plugin requires >=PHP-5.4.0 to be running on your server.
+#### 1.9.4 09/05/2019
+
+- Move Discourse Username field to its own section of the user profile page
+- Allow admins to mark an email address as valid from the user profile page
+- Fix bug that was removing `+` character from email addresses when Discourse is the SSO Provider for WordPress
+
+#### 1.9.3 08/06/2019
+
+- Add 'Force Publish Max Age' option
+
+#### 1.9.2 08/01/2019
+
+- Various minor bug fixes
+
+#### 1.9.1 06/07/2019
+
+- Add 'wpdc_load_comments_template_for_user' filter to allow the comments template to be loaded conditionally
+
+#### 1.9.0 04/25/2019
+
+- Fix don't enqueue Discourse sidebar script if no post types have been selected
 
 #### 1.8.9 04/02/2019
 

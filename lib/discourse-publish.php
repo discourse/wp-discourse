@@ -65,20 +65,31 @@ class DiscoursePublish {
 			return;
 		}
 
-		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
-		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-		$force_publish        = ! empty( $this->options['force-publish'] );
-		if ( $force_publish ) {
-			update_post_meta( $post_id, 'publish_post_category', $this->options['publish-category'] );
+		$publish_to_discourse  = get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_to_discourse  = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+
+		$force_publish_enabled = ! empty( $this->options['force-publish'] );
+		$force_publish_post = false;
+		if ( $force_publish_enabled ) {
+			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
+			$min_date = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
+			$post_time = strtotime( $post->post_date );
+
+			if ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) {
+				$force_publish_post = true;
+				update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
+			}
 		}
+
 		$already_published      = get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
 		$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
+
 		if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
-			if ( $force_publish || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
+
+			if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 				$this->sync_to_discourse( $post_id, $title, $post->post_content );
 			}
 		}
@@ -108,7 +119,8 @@ class DiscoursePublish {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
 			$this->email_notifier->publish_failure_notification(
-				$post, array(
+				$post,
+				array(
 					'location' => 'after_xmlrpc_publish',
 				)
 			);
@@ -206,6 +218,7 @@ class DiscoursePublish {
 			if ( $unlisted ) {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
+
 			$data         = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
@@ -242,7 +255,7 @@ class DiscoursePublish {
 			);
 		}// End if().
 
-		$result = wp_remote_post( $url, $post_options );
+		$result = wp_remote_post( esc_url_raw( $url ), $post_options );
 
 		if ( ! $this->validate( $result ) ) {
 			if ( is_wp_error( $result ) ) {
@@ -274,23 +287,23 @@ class DiscoursePublish {
 
 		// The response when a topic is first created.
 		if ( ! empty( $body->id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
-			$discourse_id   = (int) $body->id;
-				$topic_slug = $body->topic_slug;
-				$topic_id   = $body->topic_id;
+			$discourse_id = intval( $body->id );
+			$topic_slug   = sanitize_text_field( $body->topic_slug );
+			$topic_id     = intval( $body->topic_id );
 
-				delete_post_meta( $post_id, 'wpdc_publishing_error' );
-				add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
-				add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
-				add_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id, true );
+			delete_post_meta( $post_id, 'wpdc_publishing_error' );
+			add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
+			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
+			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
 
-				// Used for resetting the error notification, if one was being displayed.
-				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+			// Used for resetting the error notification, if one was being displayed.
+			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 			if ( $use_multisite_configuration ) {
-				$blog_id = get_current_blog_id();
+				$blog_id = intval( get_current_blog_id() );
 				$this->save_topic_blog_id( $body->topic_id, $blog_id );
 			}
 
-				$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
+			$pin_until = get_post_meta( $post_id, 'wpdc_pin_until', true );
 			if ( ! empty( $pin_until ) ) {
 				$pin_response = $this->pin_discourse_topic( $post_id, $topic_id, $pin_until );
 
@@ -303,8 +316,8 @@ class DiscoursePublish {
 		} elseif ( ! empty( $body->post ) ) {
 
 			$discourse_post = $body->post;
-			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? $discourse_post->topic_slug : null;
-			$topic_id       = ! empty( $discourse_post->topic_id ) ? (int) $discourse_post->topic_id : null;
+			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? sanitize_text_field( $discourse_post->topic_slug ) : null;
+			$topic_id       = ! empty( $discourse_post->topic_id ) ? intval( $discourse_post->topic_id ) : null;
 
 			// Handles deleted topics for recent versions of Discourse.
 			if ( ! empty( $discourse_post->deleted_at ) ) {
@@ -315,8 +328,8 @@ class DiscoursePublish {
 
 			if ( $topic_slug && $topic_id ) {
 				delete_post_meta( $post_id, 'wpdc_publishing_error' );
-				update_post_meta( $post_id, 'discourse_permalink', $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
-				update_post_meta( $post_id, 'discourse_topic_id', (int) $topic_id );
+				update_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ) );
+				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
 				if ( $use_multisite_configuration ) {
@@ -353,7 +366,7 @@ class DiscoursePublish {
 		$tags_string = '';
 		if ( ! empty( $tags ) ) {
 			foreach ( $tags as $tag ) {
-				$tag          = trim( $tag );
+				$tag          = sanitize_text_field( $tag );
 				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
 			}
 		}
@@ -371,7 +384,7 @@ class DiscoursePublish {
 	 * @return null|\WP_Error
 	 */
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
-		$status_url   = esc_url( $this->options['url'] . "/t/$topic_id/status" );
+		$status_url   = esc_url_raw( $this->options['url'] . "/t/$topic_id/status" );
 		$data         = array(
 			'api_key'      => $this->options['api-key'],
 			'api_username' => $this->options['publish-username'],
@@ -408,7 +421,8 @@ class DiscoursePublish {
 	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
 		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
 		$this->email_notifier->publish_failure_notification(
-			$current_post, array(
+			$current_post,
+			array(
 				'location'      => 'after_bad_response',
 				'error_message' => $error_message,
 				'error_code'    => $error_code,

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 1.8.9
+ * Version: 1.9.4
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +34,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '1.8.9' );
+define( 'WPDISCOURSE_VERSION', '1.9.4' );
 
 require_once __DIR__ . '/lib/plugin-utilities.php';
 require_once __DIR__ . '/lib/template-functions.php';
@@ -45,8 +45,8 @@ require_once __DIR__ . '/lib/discourse-publish.php';
 require_once __DIR__ . '/lib/sso-provider/sso.php';
 require_once __DIR__ . '/lib/sso-provider/discourse-sso.php';
 require_once __DIR__ . '/lib/webhook.php';
-require_once __DIR__ . '/lib/discourse-user.php';
-require_once __DIR__ . '/lib/discourse-webhook-refresh.php';
+require_once __DIR__ . '/lib/sync-discourse-user.php';
+require_once __DIR__ . '/lib/sync-discourse-topic.php';
 require_once __DIR__ . '/lib/email-notification.php';
 require_once __DIR__ . '/lib/sso-client/sso-client-base.php';
 require_once __DIR__ . '/lib/wordpress-email-verification.php';
@@ -67,8 +67,8 @@ $discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\Discour
 new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );
 new WPDiscourse\WordPressEmailVerification\WordPressEmailVerification( 'discourse_email_verification_key', 'discourse' );
 new WPDiscourse\DiscourseSSO\DiscourseSSO();
-new WPDiscourse\DiscourseUser\DiscourseUser();
-new WPDiscourse\DiscourseWebhookRefresh\DiscourseWebhookRefresh();
+new WPDiscourse\SyncDiscourseUser\SyncDiscourseUser();
+new WPDiscourse\SyncDiscourseTopic\SyncDiscourseTopic();
 new WPDiscourse\SSOClient\Client();
 new WPDiscourse\SSOClient\QueryRedirect();
 new WPDiscourse\SSOClient\SSOClientShortcode();
