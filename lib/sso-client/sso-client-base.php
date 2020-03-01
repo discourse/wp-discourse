@@ -40,8 +40,17 @@ class SSOClientBase {
 			$anchor     = ! empty( $options['login'] ) ? $options['login'] : $login_text;
 		}
 
-		$redirect      = ! empty( $options['redirect'] ) ? $options['redirect'] : null;
-		$sso_login_url = $this->get_discourse_sso_url( $redirect );
+		if ( isset( $_GET['redirect_to'] ) ) {
+			$redirect_to = wp_validate_redirect(
+				esc_url_raw( $_GET['redirect_to'] ),
+				null
+			);
+		} else if ( ! empty( $options['redirect'] ) ) {
+			$redirect_to = $options['redirect'];
+		} else {
+			$redirect_to = null;
+		}
+		$sso_login_url = $this->get_discourse_sso_url( $redirect_to );
 
 		$anchor = apply_filters( 'wpdc_sso_client_login_anchor', $anchor );
 		$button = sprintf( '<a class="wpdc-sso-client-login-link" href="%s">%s</a>', esc_url( $sso_login_url ), sanitize_text_field( $anchor ) );
@@ -68,7 +77,10 @@ class SSOClientBase {
 		return add_query_arg(
 			array(
 				'discourse_sso' => sanitize_key( apply_filters( 'wpdc_sso_client_query', 1 ) ),
-				'redirect_to'   => esc_url( apply_filters( 'wpdc_sso_client_redirect_url', esc_url( $redirect_to ), $redirect_to ) ),
+				'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url',
+					urlencode( esc_url_raw( $redirect_to ) ),
+					$redirect_to
+				),
 			),
 			home_url( '/' )
 		);
