@@ -42,7 +42,7 @@ class SSOClientBase {
 
 		if ( isset( $_GET['redirect_to'] ) ) {
 			$redirect_to = wp_validate_redirect(
-				esc_url_raw( $_GET['redirect_to'] ),
+				esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ),
 				null
 			);
 		} else if ( ! empty( $options['redirect'] ) ) {
