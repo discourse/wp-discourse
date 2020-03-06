@@ -250,7 +250,7 @@ class Client extends SSOClientBase {
 				return $user_id;
 			}
 
-			return $user_query_results{0}->ID;
+			return $user_query_results[0]->ID;
 		}// End if().
 	}
 
