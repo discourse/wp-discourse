@@ -79,7 +79,7 @@ class DiscoursePublish {
 		$auto_publish_overridden = intval( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
 		$auto_publish            = ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
 
-		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true ) || $auto_publish;
 		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
 
 		$force_publish_enabled = ! empty( $this->options['force-publish'] );
@@ -100,7 +100,7 @@ class DiscoursePublish {
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 
-		if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $auto_publish || $update_discourse_topic ) {
+		if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		}
 
