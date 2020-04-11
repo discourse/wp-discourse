@@ -100,6 +100,19 @@ trait TemplateFunctions {
 				$image->setAttribute( 'src', $url . $src );
 			}
 		}
+
+
+		// HTML 5 Video/Audio
+		$sources = $doc->getElementsByTagName( 'source' );
+		foreach ( $sources as $source ) {
+			$src       = $source->getAttribute( 'src' );
+			$url_parts = wp_parse_url( $src );
+
+			if ( empty( $url_parts['host'] ) ) {
+				$source->setAttribute( 'src', $url . $src );
+			}
+		}
+
 		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		$parsed = $doc->saveHTML( $doc->documentElement );
