@@ -80,38 +80,26 @@ trait TemplateFunctions {
 		$doc = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
 
-		// Mentions and hashtags.
-		$links = $doc->getElementsByTagName( 'a' );
-		foreach ( $links as $link ) {
-			$href      = $link->getAttribute( 'href' );
-			$url_parts = wp_parse_url( $href );
+		$set_tag_attribute = static function($tag, $attribute, $url ) use ( $doc ) {
+			$links = $doc->getElementsByTagName( $tag );
+			foreach ( $links as $link ) {
+				$href      = $link->getAttribute( $attribute );
+				$url_parts = wp_parse_url( $href );
 
-			if ( empty( $url_parts['host'] ) ) {
-				$link->setAttribute( 'href', $url . $href );
+				if ( empty( $url_parts['host'] ) ) {
+					$link->setAttribute( $attribute, $url . $href );
+				}
 			}
-		}
+		};
+
+		// Mentions and hashtags.
+		$set_tag_attribute( 'a', 'href', $url );
 
 		// Images, emojis etc.
-		$images = $doc->getElementsByTagName( 'img' );
-		foreach ( $images as $image ) {
-			$src       = $image->getAttribute( 'src' );
-			$url_parts = wp_parse_url( $src );
+		$set_tag_attribute( 'img', 'src', $url );
 
-			if ( empty( $url_parts['host'] ) ) {
-				$image->setAttribute( 'src', $url . $src );
-			}
-		}
-
-		// HTML5 <source>
-		$images = $doc->getElementsByTagName( 'source' );
-		foreach ( $images as $image ) {
-			$src       = $image->getAttribute( 'src' );
-			$url_parts = wp_parse_url( $src );
-
-			if ( empty( $url_parts['host'] ) ) {
-				$image->setAttribute( 'src', $url . $src );
-			}
-		}
+		// HTML5 audio/video
+		$set_tag_attribute( 'source', 'src', $url );
 
 		// Clear the libxml error buffer.
 		libxml_clear_errors();
