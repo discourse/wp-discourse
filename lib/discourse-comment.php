@@ -57,6 +57,7 @@ class DiscourseComment {
 
 	/**
 	 * Adds data-youtube-id to the allowable div attributes.
+	 * Adds src to the allowable source attributes.
 	 *
 	 * Discourse returns the youtube video id as the value of the 'data-youtube-attribute',
 	 * this function makes it possible to filter the comments with `wp_kses_post` without
@@ -77,6 +78,10 @@ class DiscourseComment {
 				'role'            => true,
 				'data-youtube-id' => array(),
 			);
+
+			$allowedposttags['source'] = [
+				'src' => true,
+			];
 		}
 
 		return $allowedposttags;
