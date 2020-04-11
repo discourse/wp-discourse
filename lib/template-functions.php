@@ -101,17 +101,11 @@ trait TemplateFunctions {
 		// HTML5 audio/video
 		$set_tag_attribute( 'source', 'src', $url );
 
-		// Clear the libxml error buffer.
-		libxml_clear_errors();
-		// Restore the previous value of libxml_use_internal_errors.
-		libxml_use_internal_errors( $use_internal_errors );
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		$parsed = $doc->saveHTML( $doc->documentElement );
 
-		// Remove DOCTYPE, html, and body tags that have been added to the DOMDocument.
-		$parsed = preg_replace( '~<(?:!DOCTYPE|/?(?:html|body))[^>]*>\s*~i', '', $parsed );
-
-		return $parsed;
+		return $this->remove_outer_html_elements( $parsed );
 	}
 
 	/**
