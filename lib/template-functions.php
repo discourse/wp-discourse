@@ -101,8 +101,7 @@ trait TemplateFunctions {
 			}
 		}
 
-
-		// HTML 5 Video/Audio
+		// HTML 5 Video/Audio.
 		$sources = $doc->getElementsByTagName( 'source' );
 		foreach ( $sources as $source ) {
 			$src       = $source->getAttribute( 'src' );
