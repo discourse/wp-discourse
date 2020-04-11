@@ -102,6 +102,17 @@ trait TemplateFunctions {
 			}
 		}
 
+		// HTML5 <source>
+		$images = $doc->getElementsByTagName( 'source' );
+		foreach ( $images as $image ) {
+			$src       = $image->getAttribute( 'src' );
+			$url_parts = wp_parse_url( $src );
+
+			if ( empty( $url_parts['host'] ) ) {
+				$image->setAttribute( 'src', $url . $src );
+			}
+		}
+
 		// Clear the libxml error buffer.
 		libxml_clear_errors();
 		// Restore the previous value of libxml_use_internal_errors.
