@@ -67,9 +67,6 @@ will fail.
 2. Upload the 'wp-discourse' directory to your '/wp-content/plugins/' directory
 3. Activate WP Discourse from your Plugins page
 
-For more detailed instructions please see the [setup](https://github.com/discourse/wp-discourse/wiki/Setup) page of the
-[wp-discourse wiki](https://github.com/discourse/wp-discourse/wiki)
-
 == Frequently Asked Questions ==
 
 = Does it work with a WordPress multisite configuration? =

@@ -94,7 +94,7 @@ In fact, we strongly recommend hosting the two applications separately, since th
 Yes, the html templates used for publishing posts on Discourse and for displaying comments on WordPress can be customized in your theme.
 This is done by hooking into the filters that are applied to each template.
 
-For more details on template customization, take a look at this section of our wiki: [Template Customization](https://github.com/discourse/wp-discourse/wiki/Template-Customization)
+For more details on template customization, see: [WP Discourse template customization](https://meta.discourse.org/t/wp-discourse-template-customization/50754)
 
 #### Contributing
 
