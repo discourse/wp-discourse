@@ -9,12 +9,14 @@ namespace WPDiscourse\DiscoursePublish;
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Shared\PluginUtilities;
+use WPDiscourse\Shared\TemplateFunctions;
 
 /**
  * Class DiscoursePublish
  */
 class DiscoursePublish {
 	use PluginUtilities;
+	use TemplateFunctions;
 
 	/**
 	 * Gives access to the plugin options.
@@ -177,8 +179,22 @@ class DiscoursePublish {
 		$permalink                   = get_permalink( $post_id );
 
 		if ( $use_full_post ) {
-			$excerpt = apply_filters( 'the_content', $raw );
-			$excerpt = apply_filters( 'wp_discourse_excerpt', $excerpt, $options['custom-excerpt-length'], $use_full_post );
+			$blocks = parse_blocks( $raw );
+			$parsed = '';
+			foreach ( $blocks as $block ) {
+				if ( 'core/image' === $block['blockName'] || 'core/gallery' === $block['blockName'] ) {
+					$parsed .= $this->extract_images_from_html( $block['innerHTML'] );
+				} elseif ( 'core-embed/youtube' === $block['blockName'] || 'core-embed/vimeo' === $block['blockName'] ) {
+					if ( ! empty( $block['attrs'] ) && ! empty( $block['attrs']['url'] ) ) {
+						$video_url = esc_url( $block['attrs']['url'] );
+						$parsed   .= "\r\n\r\n{$video_url}\r\n\r\n";
+					}
+				} else {
+					$parsed .= apply_filters( 'the_content', render_block( $block ) );
+				}
+			}
+
+			$excerpt = apply_filters( 'wp_discourse_excerpt', $parsed, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
 				$wp_excerpt = apply_filters( 'get_the_excerpt', $current_post->post_excerpt );
