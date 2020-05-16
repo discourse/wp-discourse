@@ -77,7 +77,7 @@ trait TemplateFunctions {
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc = $this->create_dom_document( $content );
+		$doc                   = $this->create_dom_document( $content );
 
 		// Mentions and hashtags.
 		$links = $doc->getElementsByTagName( 'a' );
@@ -123,7 +123,7 @@ trait TemplateFunctions {
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc = $this->create_dom_document( $cooked );
+		$doc                   = $this->create_dom_document( $cooked );
 
 		$finder = new \DOMXPath( $doc );
 		// See: http://www.a-basketful-of-papayas.net/2010/04/css-selectors-and-xpath-expressions.html.
@@ -169,9 +169,9 @@ trait TemplateFunctions {
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = libxml_disable_entity_loader( true );
-		$doc = $this->create_dom_document( $cooked );
-		$finder        = new \DOMXPath( $doc );
-		$youtube_links = $finder->query( '//div[@data-youtube-id]' );
+		$doc                   = $this->create_dom_document( $cooked );
+		$finder                = new \DOMXPath( $doc );
+		$youtube_links         = $finder->query( '//div[@data-youtube-id]' );
 
 		if ( $youtube_links->length ) {
 			foreach ( $youtube_links as $youtube_link ) {
@@ -192,6 +192,41 @@ trait TemplateFunctions {
 		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		return $cooked;
+	}
+
+	/**
+	 * Extracts image src from HTML and returns an image tag for each image.
+	 *
+	 * This function is used when full post content is published to Discourse. Its purpose is to remove the surrounding
+	 * <figure> tags from images. Unless that is done, images will break when they are downloaded by Discourse.
+	 *
+	 * @param string $html The HTML to extract the image URL from.
+	 *
+	 * @return string
+	 */
+	protected function extract_images_from_html( $html ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+
+			return $html;
+		}
+
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$doc                   = $this->create_dom_document( $html );
+		$finder                = new \DOMXPath( $doc );
+		$images                = $finder->query( '//img' );
+		$output                = '';
+
+		if ( $images->length ) {
+			foreach ( $images as $image ) {
+				$src     = esc_url( $image->getAttribute( 'src' ) );
+				$output .= "<img src='$src'>";
+			}
+		}
+
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
+
+		return $output;
 	}
 
 	/**
