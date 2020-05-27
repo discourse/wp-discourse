@@ -4,7 +4,7 @@ Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.4
 Requires PHP: 5.4.0
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
+
+#### 2.0.3 05/27/2020
+
+- Update wpdc_auto_publish_overridden post metadata when a post is unlinked from Discourse to prevent the plugin from attempting
+to publish updates to the post to Discourse
 
 #### 2.0.2 05/15/2020
 
