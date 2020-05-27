@@ -447,6 +447,10 @@ class DiscourseSidebar {
 		delete_post_meta( $post_id, 'wpdc_publishing_response' );
 		delete_post_meta( $post_id, 'wpdc_publishing_error' );
 		delete_post_meta( $post_id, 'wpdc_deleted_topic' );
+
+		if ( ! empty( $this->options['auto-publish'] ) ) {
+			update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
+		}
 	}
 
 	/**
