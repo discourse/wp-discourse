@@ -109,21 +109,21 @@ class Utilities {
 
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
-				$categories = $remote['categories'];
+				$categories           = $remote['categories'];
 				$discourse_categories = [];
 				foreach ( $categories as $category ) {
 					if ( ( empty( $options['display-subcategories'] ) ) && array_key_exists( 'parent_category_id', $category ) ) {
 
 						continue;
 					}
-					$current_category = [];
-					$current_category['id'] = intval( $category['id'] );
-					$current_category['name'] = sanitize_text_field( $category['name'] );
-					$current_category['color'] = sanitize_key( $category['color'] );
-					$current_category['text_color'] = sanitize_key( $category['text_color'] );
-					$current_category['slug'] = sanitize_text_field( $category['slug'] );
-					$current_category['topic_count'] = intval( $category['topic_count'] );
-					$current_category['post_count'] = intval( $category['post_count'] );
+					$current_category                     = [];
+					$current_category['id']               = intval( $category['id'] );
+					$current_category['name']             = sanitize_text_field( $category['name'] );
+					$current_category['color']            = sanitize_key( $category['color'] );
+					$current_category['text_color']       = sanitize_key( $category['text_color'] );
+					$current_category['slug']             = sanitize_text_field( $category['slug'] );
+					$current_category['topic_count']      = intval( $category['topic_count'] );
+					$current_category['post_count']       = intval( $category['post_count'] );
 					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
 
 					$discourse_categories[] = $current_category;
@@ -516,6 +516,19 @@ class Utilities {
 
 			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
 		}
+	}
+
+	/**
+	 * Get the Discourse comment HTML so that it can be displayed without loading the comments template.
+	 *
+	 * @param int $post_id The post ID to display the comments for.
+	 *
+	 * @return string
+	 */
+	public static function get_discourse_comments( $post_id ) {
+		$comment_formatter = new \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
+
+		return $comment_formatter->format( $post_id );
 	}
 
 	/**
