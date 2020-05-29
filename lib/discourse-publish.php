@@ -77,6 +77,9 @@ class DiscoursePublish {
 			return null;
 		}
 
+		// Clear existing publishing errors.
+		delete_post_meta( $post_id, 'wpdc_publishing_error' );
+
 		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
 		$auto_publish_overridden = intval( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
 		$auto_publish            = ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
@@ -303,8 +306,17 @@ class DiscoursePublish {
 					$error_message = wp_remote_retrieve_response_message( $result );
 					$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
 				}
+				// This is a fix for a bug that was introduced by not setting the wpdc_auto_publish_overridden post_metadata
+				// when posts are unlined from Discourse. That metadata is now being set. This fix is for dealing with
+				// previously unlinked posts.
+				if ( 'Embed url has already been taken' === $error_message ) {
+					update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
+				}
 				update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $error_message ) );
 			}
+
+			// Delete to avoid attempts to republish posts that are returning errors.
+			delete_post_meta( $post_id, 'publish_to_discourse' );
 
 			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
 
@@ -325,7 +337,6 @@ class DiscoursePublish {
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
 
-			delete_post_meta( $post_id, 'wpdc_publishing_error' );
 			add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
@@ -361,7 +372,6 @@ class DiscoursePublish {
 			}
 
 			if ( $topic_slug && $topic_id ) {
-				delete_post_meta( $post_id, 'wpdc_publishing_error' );
 				update_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ) );
 				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
