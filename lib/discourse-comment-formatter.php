@@ -19,28 +19,6 @@ class DiscourseCommentFormatter {
 	use TemplateFunctions;
 
 	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
-
-	/**
-	 * DiscourseCommentFormatter constructor.
-	 */
-	public function __construct() {
-		add_action( 'init', array( $this, 'setup_options' ) );
-	}
-
-	/**
-	 * Setup options.
-	 */
-	public function setup_options() {
-		$this->options = $this->get_options();
-	}
-
-	/**
 	 * Formats the Discourse comments for a given post.
 	 *
 	 * @param int $post_id The post_id to retrieve comments for.
@@ -50,6 +28,7 @@ class DiscourseCommentFormatter {
 	public function format( $post_id ) {
 		// Sync the comments.
 		do_action( 'wpdc_sync_discourse_comments', $post_id );
+		$options = $this->get_options();
 
 		$custom = get_post_custom( $post_id );
 		if ( empty( $custom['discourse_permalink'] ) || empty( $custom['discourse_comments_raw'] ) ) {
@@ -62,7 +41,7 @@ class DiscourseCommentFormatter {
 		// The topic_id may not be available for posts that were published before version 1.4.0.
 		$topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
 
-		if ( ! empty( $topic_id ) && ! empty( $this->options['cache-html'] ) ) {
+		if ( ! empty( $topic_id ) && ! empty( $options['cache-html'] ) ) {
 			$transient_key = "wpdc_comment_html_{$topic_id}";
 			$html          = get_transient( $transient_key );
 
@@ -74,30 +53,30 @@ class DiscourseCommentFormatter {
 
 		$permalink = (string) $custom['discourse_permalink'][0];
 
-		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
-			$permalink = esc_url( $this->options['url'] ) . '/session/sso?return_path=' . $permalink;
+		if ( ! empty( $options['enable-sso'] ) && empty( $options['redirect-without-login'] ) ) {
+			$permalink = esc_url( $options['url'] ) . '/session/sso?return_path=' . $permalink;
 		}
 
-		if ( ! empty( $this->options['discourse-link-text'] ) ) {
-			$discourse_url_name = esc_html( $this->options['discourse-link-text'] );
+		if ( ! empty( $options['discourse-link-text'] ) ) {
+			$discourse_url_name = esc_html( $options['discourse-link-text'] );
 		} else {
-			$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $this->options['url'] ) );
+			$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
 		}
 
 		// Use custom datetime format string if provided, else global date format.
-		$datetime_format = empty( $this->options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $this->options['custom-datetime-format'];
+		$datetime_format = empty( $options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
 		$more_replies_number = intval( ( $topic_data->filtered_posts_count - count( $topic_data->posts ) - 1 ) );
-		$more_text           = esc_html( strtolower( $this->options['more-replies-more-text'] ) ) . ' ';
+		$more_text           = esc_html( strtolower( $options['more-replies-more-text'] ) ) . ' ';
 		if ( 0 >= $more_replies_number ) {
 			$more_replies = '';
 		} elseif ( 1 === $more_replies_number ) {
-			$more_replies = '1 ' . $more_text . esc_html( strtolower( $this->options['single-reply-text'] ) );
+			$more_replies = '1 ' . $more_text . esc_html( strtolower( $options['single-reply-text'] ) );
 		} else {
-			$more_replies = $more_replies_number . ' ' . $more_text . esc_html( strtolower( $this->options['many-replies-text'] ) );
+			$more_replies = $more_replies_number . ' ' . $more_text . esc_html( strtolower( $options['many-replies-text'] ) );
 		}
 
-		$discourse_url     = esc_url( $this->options['url'] );
+		$discourse_url     = esc_url( $options['url'] );
 		$comments_html     = '';
 		$participants_html = '';
 
@@ -118,7 +97,7 @@ class DiscourseCommentFormatter {
 				$comment_html   = str_replace( '{comment_url}', $post_url, $comment_html );
 				$avatar_url     = $this->avatar( $post->avatar_template, apply_filters( 'discourse_post_avatar_template_size', 64 ) );
 				$comment_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $comment_html );
-				$user_url       = $this->homepage( $this->options['url'], $post );
+				$user_url       = $this->homepage( $options['url'], $post );
 				$comment_html   = str_replace( '{user_url}', esc_url( $user_url ), $comment_html );
 				$comment_html   = str_replace( '{username}', esc_html( $post->username ), $comment_html );
 				$comment_html   = str_replace( '{fullname}', esc_html( $name ), $comment_html );
@@ -139,7 +118,7 @@ class DiscourseCommentFormatter {
 				$participant_html   = str_replace( '{topic_url}', $permalink, $participant_html );
 				$avatar_url         = $this->avatar( $participant->avatar_template, apply_filters( 'discourse_participant_avatar_template_size', 64 ) );
 				$participant_html   = str_replace( '{avatar_url}', esc_url( $avatar_url ), $participant_html );
-				$user_url           = $this->homepage( $this->options['url'], $participant );
+				$user_url           = $this->homepage( $options['url'], $participant );
 				$participant_html   = str_replace( '{user_url}', esc_url( $user_url ), $participant_html );
 				$participant_html   = str_replace( '{username}', esc_html( $participant->username ), $participant_html );
 				$participants_html .= $participant_html;
