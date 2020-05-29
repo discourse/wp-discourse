@@ -140,3 +140,15 @@ span.badge-category-bg {
 	display: none;
 }
 
+.discourse-comments-area ol {
+	list-style: none;
+}
+
+.discourse-comments-area .comment-reply-title {
+	text-align: left;
+}
+
+.discourse-comments-area .comment-respond p:not(.comment-notes) {
+	max-width: none;
+}
+
