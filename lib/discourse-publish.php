@@ -413,7 +413,7 @@ class DiscoursePublish {
 				$this->create_bad_response_notifications( $current_post, $post_id );
 
 				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
-			}
+			}// End if().
 		}// End if().
 
 		// Neither the 'id' or the 'post' property existed on the response body.
