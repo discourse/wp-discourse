@@ -372,7 +372,8 @@ class DiscoursePublish {
 			}
 
 			if ( $topic_slug && $topic_id ) {
-				update_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ) );
+				$discourse_topic_url = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+				update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
 				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 
@@ -381,6 +382,28 @@ class DiscoursePublish {
 					if ( ! $this->topic_blog_id_exists( $topic_id ) ) {
 						$blog_id = get_current_blog_id();
 						$this->save_topic_blog_id( $topic_id, $blog_id );
+					}
+				}
+
+				// Update the topic's featured_link property.
+				if ( ! empty( $options['add-featured-link'] ) ) {
+					$data         = array(
+						'featured_link' => $permalink,
+					);
+					$post_options = array(
+						'timeout' => 30,
+						'method'  => 'PUT',
+						'headers' => array(
+							'Api-Key'      => sanitize_key( $options['api-key'] ),
+							'Api-Username' => sanitize_text_field( $username ),
+						),
+						'body'    => http_build_query( $data ),
+					);
+
+					$result = wp_remote_post( esc_url_raw( $discourse_topic_url ), $post_options );
+					if ( ! $this->validate( $result ) ) {
+
+						return new \WP_Error( 'discourse_publishing_response_error', 'An error was returned when attempting to update the Discourse featured link.' );
 					}
 				}
 
