@@ -4,7 +4,7 @@ Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.4
 Requires PHP: 5.4.0
-Stable tag: 2.0.4
+Stable tag: 2.0.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
+#### 2.0.5 06/03/2020
+
+- If the Add Featured Links option is enabled, update the Discourse topic's featured link when post updates are pushed from
+WordPress to Discourse
 
 #### 2.0.4 05/29/2020
 
