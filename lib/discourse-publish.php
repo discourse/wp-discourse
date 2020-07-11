@@ -196,7 +196,7 @@ class DiscoursePublish {
 					$parsed .= apply_filters( 'the_content', render_block( $block ) );
 				}
 			}
-
+			$parsed  = $this->remove_html_comments( $parsed );
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $parsed, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
