@@ -98,12 +98,12 @@ class DiscourseSidebar {
 
 		$plugin_unconfigured = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
 		$auto_publish        = ! empty( $this->options['auto-publish'] );
-		$default_category   = $this->options['publish-category'];
-		$allowed_post_types = $this->options['allowed_post_types'];
-		$force_publish      = ! empty( $this->options['force-publish'] );
-		$allow_tags         = ! empty( $this->options['allow-tags'] );
-		$max_tags           = isset( $this->options['max-tags'] ) ? $this->options['max-tags'] : 5;
-		$data               = array(
+		$default_category    = $this->options['publish-category'];
+		$allowed_post_types  = $this->options['allowed_post_types'];
+		$force_publish       = ! empty( $this->options['force-publish'] );
+		$allow_tags          = ! empty( $this->options['allow-tags'] );
+		$max_tags            = isset( $this->options['max-tags'] ) ? $this->options['max-tags'] : 5;
+		$data                = array(
 			'pluginUnconfigured'      => $plugin_unconfigured,
 			'autoPublish'             => $auto_publish,
 			'defaultCategory'         => $default_category,
@@ -470,7 +470,7 @@ class DiscourseSidebar {
 
 			return array(
 				'update_response' => 'You need to add a title to the post before it can be updated on Discourse.',
-				);
+			);
 		}
 		update_post_meta( $post_id, 'update_discourse_topic', 1 );
 
@@ -503,7 +503,7 @@ class DiscourseSidebar {
 
 			return array(
 				'publish_response' => 'You need to add a title to the post before it can be published to Discourse.',
-				);
+			);
 		}
 
 		update_post_meta( $post_id, 'publish_to_discourse', 1 );
@@ -523,6 +523,7 @@ class DiscourseSidebar {
 	/**
 	 * Gets the wpdc_discourse_categories option.
 	 *
+	 * @param object $data The data sent with the API request.
 	 * @return array|null
 	 */
 	public function get_categories( $data ) {
