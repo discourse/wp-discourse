@@ -525,9 +525,11 @@ class DiscourseSidebar {
 	 *
 	 * @return array|null
 	 */
-	public function get_categories() {
+	public function get_categories( $data ) {
+		$post_id = intval( wp_unslash( $data['id'] ) ); // Input var okay.
+		$post    = get_post( $post_id );
 
-		return $this->get_discourse_categories();
+		return apply_filters( 'wp_discourse_publish_categories', $this->get_discourse_categories(), $post );
 	}
 
 	/**
