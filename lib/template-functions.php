@@ -230,6 +230,40 @@ trait TemplateFunctions {
 	}
 
 	/**
+	 * Removes HTML comments before publishing the post to Discourse.
+	 *
+	 * @param string $html The HTML to remove comment blocks from.
+	 *
+	 * @return string
+	 */
+	protected function remove_html_comments( $html ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+
+			return $html;
+		}
+
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$doc                   = $this->create_dom_document( $html );
+		$finder                = new \DOMXPath( $doc );
+		$comments              = $finder->query( '//comment()' );
+		if ( $comments->length ) {
+			foreach ( $comments as $comment ) {
+				$comment->parentNode->removeChild( $comment );
+			}
+
+			$parsed = $doc->saveHTML( $doc->documentElement );
+			$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
+
+			return $this->remove_outer_html_elements( $parsed );
+
+		}
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
+
+		return $html;
+	}
+
+	/**
 	 * Converts a fragment of HTML into a DomDocument object.
 	 *
 	 * @param string $fragment The HTML fragment to convert.
