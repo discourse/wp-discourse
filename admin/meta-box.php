@@ -229,7 +229,7 @@ class MetaBox {
 				// Handling the auto-publish setting for both the Block and Classic editors is awkward. This flag is used to prevent posts from being published
 				// after the publish-to-discourse status is changed.
 				update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
-            }
+			}
 		}
 
 		if ( isset( $_POST['update_discourse_topic'] ) ) { // Input var okay.
@@ -516,8 +516,8 @@ class MetaBox {
 	/**
 	 * Outputs the category select input.
 	 *
-	 * @param int $publish_category_id The Discourse category_id.
-     * @param \WP_Post $post The post to retrieve the categories for.
+	 * @param int      $publish_category_id The Discourse category_id.
+	 * @param \WP_Post $post The post to retrieve the categories for.
 	 */
 	protected function category_select_input( $publish_category_id, $post ) {
 		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories, $post );
