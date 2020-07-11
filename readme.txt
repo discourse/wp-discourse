@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.4
+Tested up to: 5.4.3
 Requires PHP: 5.4.0
-Stable tag: 2.0.5
+Stable tag: 2.0.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,13 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
+
+#### 2.0.6 07/11/2020
+
+- Pass WordPress post to wp_discourse_publish_categories filter; apply the wp_discourse_publish_categories filter when Block Editor is used
+- Add wpdc_after_sso_client_user_update action hook to allow WordPress user to be updated from returned Discourse user-data
+- Strip HTML comment blocks from WordPress post before publishing post to Discourse
+
 #### 2.0.5 06/03/2020
 
 - If the Add Featured Links option is enabled, update the Discourse topic's featured link when post updates are pushed from
