@@ -517,6 +517,7 @@ class MetaBox {
 	 * Outputs the category select input.
 	 *
 	 * @param int $publish_category_id The Discourse category_id.
+     * @param \WP_Post $post The post to retrieve the categories for.
 	 */
 	protected function category_select_input( $publish_category_id, $post ) {
 		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories, $post );
