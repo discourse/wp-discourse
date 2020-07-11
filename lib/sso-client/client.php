@@ -290,6 +290,8 @@ class Client extends SSOClientBase {
 			if ( ! get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
 				update_user_meta( $user_id, 'discourse_sso_user_id', $query['external_id'] );
 			}
+
+			do_action( 'wpdc_after_sso_client_user_update', $user_id, $query );
 		}
 
 		return $update;
