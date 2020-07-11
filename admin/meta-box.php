@@ -155,7 +155,7 @@ class MetaBox {
 						$this->publish_to_discourse_checkbox( $publish_text, $publish_to_discourse );
 						?>
 						<br>
-						<?php $this->category_select_input( $publish_category_id ); ?>
+						<?php $this->category_select_input( $publish_category_id, $post ); ?>
 						<hr>
 						<?php $this->advanced_options_input( $pin_topic, $pin_until, $unlisted, $post_id ); ?>
 					</div>
@@ -518,8 +518,8 @@ class MetaBox {
 	 *
 	 * @param int $publish_category_id The Discourse category_id.
 	 */
-	protected function category_select_input( $publish_category_id ) {
-		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories );
+	protected function category_select_input( $publish_category_id, $post ) {
+		$categories = apply_filters( 'wp_discourse_publish_categories', $this->categories, $post );
 		?>
 		<label for="publish_post_category"><?php esc_html_e( 'Category', 'wp-discourse' ); ?>
 			<select class="widefat" name="publish_post_category" id="publish_post_category">
