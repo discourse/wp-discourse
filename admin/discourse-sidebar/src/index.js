@@ -648,6 +648,7 @@ class DiscourseSidebar extends Component {
                 method: 'GET',
                 data: {
                     get_categories_nonce: pluginOptions.get_categories_nonce,
+                    id: this.props.postId
                 },
             }).then(
                 (data) => {
