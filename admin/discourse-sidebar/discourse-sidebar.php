@@ -555,7 +555,7 @@ class DiscourseSidebar {
 		$topic = $this->get_discourse_topic( $topic_url );
 
 		// Check for the topic->post_stream here just to make sure it's a valid topic.
-		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) ) {
+		if ( is_wp_error( $topic ) || empty( $topic->post_stream ) || 'regular' !== $topic->archetype ) {
 			update_post_meta( $post_id, 'wpdc_linking_response', 'error' );
 
 			return new \WP_Error( 'wpdc_response_error', 'Unable to link to Discourse topic.' );
