@@ -260,10 +260,16 @@ class CommentSettings {
 ">
 		<label for="display-comments">
 		<input type="radio" name="discourse_comment[comment-type]" value="display-comments" <?php checked( 'display-comments', $comment_type ); ?>>
-		<?php esc_html_e( 'Display comments', 'wp-discourse' ); ?></label><br>
+		<?php esc_html_e( 'Display comments for all topics', 'wp-discourse' ); ?>
+		</label><br>
+			<label for="display-public-comments-only">
+				<input type="radio" name="discourse_comment[comment-type]" value="display-public-comments-only" <?php checked( 'display-public-comments-only', $comment_type ); ?>>
+				<?php esc_html_e( 'Display comments from public categories', 'wp-discourse' ); ?>
+			</label><br>
 		<label for="display-comments-link">
 		<input type="radio" name="discourse_comment[comment-type]" value="display-comments-link" <?php checked( 'display-comments-link', $comment_type ); ?>>
-		<?php esc_html_e( 'Display a link to the comments', 'wp-discourse' ); ?></label>
+		<?php esc_html_e( 'Display a link to the comments', 'wp-discourse' ); ?>
+		</label>
 		</div>
 		<?php
 
