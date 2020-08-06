@@ -145,11 +145,19 @@ trait PluginUtilities {
 					$current_category = [];
 					$current_category['id'] = intval( $category['id'] );
 					$current_category['name'] = sanitize_text_field( $category['name'] );
+					$current_category['name']             = sanitize_text_field( $category['name'] );
+					$current_category['color']            = sanitize_key( $category['color'] );
+					$current_category['text_color']       = sanitize_key( $category['text_color'] );
+					$current_category['slug']             = sanitize_text_field( $category['slug'] );
+					$current_category['topic_count']      = intval( $category['topic_count'] );
+					$current_category['post_count']       = intval( $category['post_count'] );
+					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
+					$current_category['read_restricted']  = intval( $category['read_restricted'] );
 
 					$discourse_categories[] = $current_category;
 				}
 
-				set_transient( 'wpdc_discourse_categories', $discourse_categories, 1 * MINUTE_IN_SECONDS );
+				set_transient( 'wpdc_discourse_categories', $discourse_categories, 10 * MINUTE_IN_SECONDS );
 
 				return $discourse_categories;
 			} else {
@@ -159,6 +167,29 @@ trait PluginUtilities {
 		}// End if().
 
 		return $categories;
+	}
+
+	/**
+	 * Returns a category from the wpdc_discourse_categories array if it is available.
+	 * Todo: I think the categories are going to have to be cached for longer since this will get called every time a post is synced with Discourse.
+	 * @param $category_id
+	 *
+	 * @return mixed|\WP_Error|null
+	 */
+	function get_discourse_category_by_id( $category_id ) {
+		$categories = $this->get_discourse_categories();
+		if ( ! is_wp_error( $categories ) ) {
+			foreach( $categories as $category ) {
+				if ( intval( $category_id ) === $category['id'] ) {
+
+					return $category;
+				}
+			}
+
+			return null;
+		}
+
+		return new \WP_Error( 'wpdc_categories_error', 'The Discourse category list could not be returned. Check your Connection settings.' );
 	}
 
 	/**
