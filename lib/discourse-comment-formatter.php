@@ -148,4 +148,42 @@ class DiscourseCommentFormatter {
 
 		return $discourse_html;
 	}
+
+	/**
+	 * Displays a link to the associated Discourse topic.
+	 *
+	 * @param int $post_id The post_id that the link is being displayed for.
+	 *
+	 * @return string
+	 */
+	public function comment_link( $post_id ) {
+		$options = $this->get_options();
+		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+		$new_tab             = ! empty( $options['discourse-new-tab'] ) ? ' target="_blank"' : '';
+
+		if ( empty( $discourse_permalink ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The join link can not be added for the post. It is missing the discourse_permalink metadata.' );
+		}
+
+		if ( ! empty( $options['enable-sso'] ) && empty( $options['redirect-without-login'] ) ) {
+			$discourse_permalink = $options['url'] . '/session/sso?return_path=' . $discourse_permalink;
+		}
+		$comments_count = get_comments_number( $post_id );
+
+		switch ( $comments_count ) {
+			case 0:
+				$link_text = $options['no-comments-text'];
+				break;
+			case 1:
+				$link_text = '1 ' . $options['comments-singular-text'];
+				break;
+			default:
+				$link_text = $comments_count . ' ' . $options['comments-plural-text'];
+		}
+
+		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
+
+		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '"' . $new_tab . '>' . esc_html( $link_text ) . '</a></div>';
+	}
 }
