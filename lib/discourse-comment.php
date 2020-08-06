@@ -157,14 +157,22 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function use_discourse_comments( $post_id ) {
-		if ( empty( $this->options['enable-discourse-comments'] ) || 'display-comments' !== $this->options['comment-type'] ) {
+		$comment_type = $this->options['comment-type'];
+		if ( empty( $this->options['enable-discourse-comments'] ) || ( 'display-comments' !== $comment_type && 'display-public-comments-only' !== $comment_type ) ) {
 
 			return 0;
 		}
 
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+		if ( 'display-comments' === $comment_type ) {
 
-		return $discourse_post_id > 0;
+			return $discourse_post_id > 0;
+		} else {
+			$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
+
+			return $discourse_post_id > 0 && ! $discourse_category['read_restricted'];
+		}
 	}
 
 	/**
@@ -175,39 +183,49 @@ class DiscourseComment {
 	 * @return bool|int
 	 */
 	protected function add_join_link( $post_id ) {
-		if ( empty( $this->options['enable-discourse-comments'] ) || 'display-comments-link' !== $this->options['comment-type'] ) {
+		$comment_type = $this->options['comment-type'];
+		if ( empty( $this->options['enable-discourse-comments'] ) || ! empty( $this->options['display-comments'] ) ) {
 
 			return 0;
 		}
 
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
 
-		return $discourse_post_id > 0;
+		if ('display-comments-link' === $comment_type ) {
+
+			return $discourse_post_id > 0;
+		} else {
+			$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
+
+			return $discourse_post_id > 0 && $discourse_category['read_restricted'];
+		}
 	}
 
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int $postid The WordPress post id.
+	 * @param int $post_id The WordPress post id.
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $postid ) {
+	public function sync_comments( $post_id ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );
 		// Every 10 minutes do a json call to sync comments.
-		$last_sync   = (int) get_post_meta( $postid, 'discourse_last_sync', true );
-		$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $postid );
+		$last_sync   = (int) get_post_meta( $post_id, 'discourse_last_sync', true );
+		$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $post_id );
 		$sync_post   = $last_sync + $sync_period < $time;
+		$comment_type = $discourse_options['comment-type'];
 
 		// If the comments webhook is enabled, comments may be synced more often than once every 10 minutes.
 		// For now, the 10 minute sync period is used as a fallback even when the webhook is enabled.
 		// Once we give authors some feedback about the webhooks success after a post is published, the fallback can be removed.
 		if ( $use_discourse_webhook ) {
-			$sync_post = $sync_post || 1 === intval( get_post_meta( $postid, 'wpdc_sync_post_comments', true ) );
+			$sync_post = $sync_post || 1 === intval( get_post_meta( $post_id, 'wpdc_sync_post_comments', true ) );
 		}
 
 		if ( $sync_post ) {
@@ -215,10 +233,12 @@ class DiscourseComment {
 			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
 			if ( 1 === intval( $got_lock->got_it ) ) {
 
-				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $postid );
-				if ( 'publish' === get_post_status( $postid ) || $publish_private ) {
+				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
+				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 
-					$comment_count            = $this->add_join_link( $postid ) ? 0 : intval( $discourse_options['max-comments'] );
+					// Todo: comments for private Discourse categories may get returned here, but will not be saved to the database if the display-public-comments-only option is enabled.
+					// Todo: keep syncing with the add-option-to-hide-comments-from-private-categories branch.
+					$comment_count            = $this->add_join_link( $post_id ) ? 0 : intval( $discourse_options['max-comments'] );
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -231,8 +251,8 @@ class DiscourseComment {
 						$options = $options . '&only_moderator_liked=true';
 					}
 
-					$discourse_permalink = get_post_meta( $postid, 'discourse_permalink', true );
-					$topic_id            = get_post_meta( $postid, 'discourse_topic_id', true );
+					$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
+					$topic_id            = get_post_meta( $post_id, 'discourse_topic_id', true );
 					if ( ! $discourse_permalink ) {
 
 						return 0;
@@ -259,8 +279,30 @@ class DiscourseComment {
 								$posts_count = 0;
 							}
 
-							update_post_meta( $postid, 'discourse_comments_count', $posts_count );
-							update_post_meta( $postid, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							update_post_meta( $post_id, 'discourse_comments_count', $posts_count );
+
+							// Check if the site is on a recent version of Discourse that's returning the category_id (Aug 5, 2020.)
+							if ( property_exists( $json, 'category_id' ) ) {
+								if ( ! empty( $json->category_id ) ) {
+									if ('display-comments' === $comment_type ) {
+										update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+									} elseif ('display-public-comments-only' === $comment_type ) {
+										$discourse_category_id = $json->category_id;
+										$discourse_category = $this->get_discourse_category_by_id( $discourse_category_id );
+										if ( ! $discourse_category['read_restricted'] ) {
+											update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+										}
+									}
+								} else {
+									// It's possible to get into this state if a Discourse topic has been converted to a PM.
+									// Delete comments from the WordPress server. The "Comments are not available" template will be displayed.
+									delete_post_meta( $post_id, 'discourse_comments_raw' );
+								}
+							} else {
+								// For Discourse sites that are not yet returning the category_id in the WordPress payload.
+								update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							}
+
 							if ( isset( $topic_id ) ) {
 								// Delete the cached html.
 								delete_transient( "wpdc_comment_html_{$topic_id}" );
@@ -268,8 +310,8 @@ class DiscourseComment {
 						}
 					}
 
-					update_post_meta( $postid, 'discourse_last_sync', $time );
-					update_post_meta( $postid, 'wpdc_sync_post_comments', 0 );
+					update_post_meta( $post_id, 'discourse_last_sync', $time );
+					update_post_meta( $post_id, 'wpdc_sync_post_comments', 0 );
 				}// End if().
 			}// End if().
 
@@ -299,7 +341,11 @@ class DiscourseComment {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
-		if ( $this->use_discourse_comments( $post_id ) ) {
+		$use_discourse_comments = $this->use_discourse_comments( $post_id );
+		$use_join_link = $this->add_join_link( $post_id );
+
+		// Todo: dry this up!!!
+		if ( $use_discourse_comments ) {
 			if ( ! empty( $this->options['ajax-load'] ) ) {
 
 				return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
@@ -319,12 +365,20 @@ class DiscourseComment {
 
 				return $old;
 			}
-		}
+		} elseif ( $use_join_link ) {
+			$discourse_comments = $this->comment_formatter->comment_link( $post_id );
+			// Use $post->comment_count because get_comments_number will return the Discourse comments
+			// number for posts that are published to Discourse.
+			$num_wp_comments = $post->comment_count;
+			if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+				echo wp_kses_post( $discourse_comments );
 
-		if ( $this->add_join_link( $post_id ) ) {
-			echo wp_kses_post( $this->join_link( $post_id ) );
+				return WPDISCOURSE_PATH . 'templates/blank.php';
+			} else {
+				echo wp_kses_post( $discourse_comments ) . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
 
-			return WPDISCOURSE_PATH . 'templates/blank.php';
+				return $old;
+			}
 		}
 
 		// Don't display the WordPress comments template for posts not published to Discourse if comments have been enabled sitewide.
@@ -335,43 +389,6 @@ class DiscourseComment {
 
 		// Discourse comments are not being used. Return the default comments tempate.
 		return $old;
-	}
-
-	/**
-	 * Displays a link to the associated Discourse topic.
-	 *
-	 * @param int $post_id The post_id that the link is being displayed for.
-	 *
-	 * @return string
-	 */
-	public function join_link( $post_id ) {
-		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-		$new_tab             = ! empty( $this->options['discourse-new-tab'] ) ? ' target="_blank"' : '';
-
-		if ( empty( $discourse_permalink ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The join link can not be added for the post. It is missing the discourse_permalink metadata.' );
-		}
-
-		if ( ! empty( $this->options['enable-sso'] ) && empty( $this->options['redirect-without-login'] ) ) {
-			$discourse_permalink = $this->options['url'] . '/session/sso?return_path=' . $discourse_permalink;
-		}
-		$comments_count = get_comments_number( $post_id );
-
-		switch ( $comments_count ) {
-			case 0:
-				$link_text = $this->options['no-comments-text'];
-				break;
-			case 1:
-				$link_text = '1 ' . $this->options['comments-singular-text'];
-				break;
-			default:
-				$link_text = $comments_count . ' ' . $this->options['comments-plural-text'];
-		}
-
-		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
-
-		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '"' . $new_tab . '>' . esc_html( $link_text ) . '</a></div>';
 	}
 
 	/**
