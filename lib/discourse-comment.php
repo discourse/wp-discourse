@@ -150,61 +150,37 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Checks if a post is using Discourse comments.
+	 * Returns the comment type for posts that have been published to Discourse, 0 if the post has not been published
+	 * to Discourse, or if the 'enable-discourse-comments' option is not enabled.
 	 *
-	 * @param int $post_id The ID of the post.
+	 * @param int $post_id The post ID to check.
 	 *
-	 * @return bool|int
+	 * @return int|mixed|string
 	 */
-	protected function use_discourse_comments( $post_id ) {
-		$comment_type = $this->options['comment-type'];
-		if ( empty( $this->options['enable-discourse-comments'] ) || ( 'display-comments' !== $comment_type && 'display-public-comments-only' !== $comment_type ) ) {
+	protected function get_comment_type_for_post( $post_id ) {
+		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+		if ( empty( $this->options['enable-discourse-comments'] ) || empty( $discourse_post_id ) ) {
 
 			return 0;
 		}
 
-		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
-		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
-		// $publish_category_id will be empty for posts published prior to WP Discourse version 2.7. The property can be
-		// set for these posts by clicking the "Update Discourse Topic" button.
-		if ( 'display-comments' === $comment_type || empty( $publish_category_id ) ) {
-
-			return $discourse_post_id > 0;
-		} else {
-
-			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
-
-			return $discourse_post_id > 0 && ! $discourse_category['read_restricted'];
-		}
-	}
-
-	/**
-	 * Checks if a post is using the Join Conversation link.
-	 *
-	 * @param int $post_id The ID of the post.
-	 *
-	 * @return bool|int
-	 */
-	protected function add_join_link( $post_id ) {
 		$comment_type = $this->options['comment-type'];
-		if ( empty( $this->options['enable-discourse-comments'] ) || ! empty( $this->options['display-comments'] ) ) {
-
-			return 0;
-		}
-
-		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
 
-		// $publish_category_id will be empty for posts published prior to WP Discourse version 2.7. The property can be
-		// set for these posts by clicking the "Update Discourse Topic" button.
-		if ('display-comments-link' === $comment_type || empty( $publish_category_id ) ) {
+		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
+		// clicked for the 'publish_post_category' metadata to get set for the post.
+		if ( 'display-comments' === $comment_type || 'display-comments-link' === $comment_type || empty( $publish_category_id ) ) {
 
-			return $discourse_post_id > 0;
+			return $comment_type;
 		} else {
-
 			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
+			if ( empty( $discourse_category ) || 1 === intval( $discourse_category['read_restricted'] ) ) {
 
-			return $discourse_post_id > 0 && $discourse_category['read_restricted'];
+				return 'display-comments-link';
+			} else {
+
+				return 'display-comments';
+			}
 		}
 	}
 
@@ -218,6 +194,7 @@ class DiscourseComment {
 	public function sync_comments( $post_id ) {
 		global $wpdb;
 
+		// Todo: maybe just use the get_comment_type_for_post function to figure out if Discourse comments should be saved on the server.
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );
@@ -225,7 +202,7 @@ class DiscourseComment {
 		$last_sync   = (int) get_post_meta( $post_id, 'discourse_last_sync', true );
 		$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $post_id );
 		$sync_post   = $last_sync + $sync_period < $time;
-		$comment_type = $discourse_options['comment-type'];
+
 
 		// If the comments webhook is enabled, comments may be synced more often than once every 10 minutes.
 		// For now, the 10 minute sync period is used as a fallback even when the webhook is enabled.
@@ -241,10 +218,9 @@ class DiscourseComment {
 
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
-
-					// Todo: comments for private Discourse categories may get returned here, but will not be saved to the database if the display-public-comments-only option is enabled.
-					// Todo: keep syncing with the add-option-to-hide-comments-from-private-categories branch.
-					$comment_count            = $this->add_join_link( $post_id ) ? 0 : intval( $discourse_options['max-comments'] );
+					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'
+					$comment_type = $this->get_comment_type_for_post( $post_id );
+					$comment_count            = 'display-comments' === $comment_type ? intval( $discourse_options['max-comments'] ) : 0;
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
 					$min_replies              = intval( $discourse_options['min-replies'] );
@@ -288,20 +264,11 @@ class DiscourseComment {
 							update_post_meta( $post_id, 'discourse_comments_count', $posts_count );
 
 							// Check if the site is on a recent version of Discourse that's returning the category_id (Aug 5, 2020.)
+							// If a topic has been recategorized to a private Discourse category and $comment_type is not 'display-comment', delete any existing Discourse comments from the server.
 							if ( property_exists( $json, 'category_id' ) ) {
-								if ( ! empty( $json->category_id ) ) {
-									if ('display-comments' === $comment_type ) {
+								if ( ! empty( $json->category_id ) && 'display-comments' === $comment_type ) {
 										update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
-									} elseif ('display-public-comments-only' === $comment_type ) {
-										$discourse_category_id = $json->category_id;
-										$discourse_category = $this->get_discourse_category_by_id( $discourse_category_id );
-										if ( ! $discourse_category['read_restricted'] ) {
-											update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
-										}
-									}
 								} else {
-									// It's possible to get into this state if a Discourse topic has been converted to a PM.
-									// Delete comments from the WordPress server. The "Comments are not available" template will be displayed.
 									delete_post_meta( $post_id, 'discourse_comments_raw' );
 								}
 							} else {
@@ -328,7 +295,7 @@ class DiscourseComment {
 	}
 
 	/**
-	 * Loads the comments template.
+	 * Displays either the Discourse comments or a link to the comments, depending on the value of $comment_type.
 	 *
 	 * Hooks into 'comments_template'.
 	 *
@@ -347,54 +314,39 @@ class DiscourseComment {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
-		$use_discourse_comments = $this->use_discourse_comments( $post_id );
-		$use_join_link = $this->add_join_link( $post_id );
+		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'
+		$comment_type = $this->get_comment_type_for_post( $post_id );
 
-		// Todo: dry this up!!!
-		if ( $use_discourse_comments ) {
-			if ( ! empty( $this->options['ajax-load'] ) ) {
+		switch ( $comment_type ) {
+			case 'display-comments':
+				if ( ! empty( $this->options['ajax-load'] ) ) {
 
-				return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
-			}
+					return WPDISCOURSE_PATH . 'templates/ajax-comments.php';
+				}
+				$discourse_comments = $this->comment_formatter->format( $post_id );
 
-			$discourse_comments = $this->comment_formatter->format( $post_id );
+				break;
+			case 'display-comments-link':
+				$discourse_comments = $this->comment_formatter->comment_link( $post_id );
 
-			// Use $post->comment_count because get_comments_number will return the Discourse comments
-			// number for posts that are published to Discourse.
-			$num_wp_comments = $post->comment_count;
-			if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
-				echo wp_kses_post( $discourse_comments );
-
-				return WPDISCOURSE_PATH . 'templates/blank.php';
-			} else {
-				echo wp_kses_post( $discourse_comments ) . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
+				break;
+			default:
 
 				return $old;
-			}
-		} elseif ( $use_join_link ) {
-			$discourse_comments = $this->comment_formatter->comment_link( $post_id );
-			// Use $post->comment_count because get_comments_number will return the Discourse comments
-			// number for posts that are published to Discourse.
-			$num_wp_comments = $post->comment_count;
-			if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
-				echo wp_kses_post( $discourse_comments );
-
-				return WPDISCOURSE_PATH . 'templates/blank.php';
-			} else {
-				echo wp_kses_post( $discourse_comments ) . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
-
-				return $old;
-			}
 		}
 
-		// Don't display the WordPress comments template for posts not published to Discourse if comments have been enabled sitewide.
-		if ( ! empty( $this->options['hide-wordpress-comments'] ) ) {
+		// Use $post->comment_count because get_comments_number will return the Discourse comments
+		// number for posts that are published to Discourse.
+		$num_wp_comments = $post->comment_count;
+		if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+			echo wp_kses_post( $discourse_comments );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
-		}
+		} else {
+			echo wp_kses_post( $discourse_comments ) . '<div class="discourse-existing-comments-heading">' . wp_kses_post( $this->options['existing-comments-heading'] ) . '</div>';
 
-		// Discourse comments are not being used. Return the default comments tempate.
-		return $old;
+			return $old;
+		}
 	}
 
 	/**
@@ -408,7 +360,8 @@ class DiscourseComment {
 	 * @return mixed
 	 */
 	public function get_comments_number( $count, $post_id ) {
-		if ( $this->use_discourse_comments( $post_id ) || $this->add_join_link( $post_id ) ) {
+		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+		if ( ! empty( $discourse_post_id ) ) {
 
 			$single_page = is_single( $post_id ) || is_page( $post_id );
 			$single_page = apply_filters( 'wpdc_single_page_comment_number_sync', $single_page, $post_id );
