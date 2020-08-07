@@ -164,11 +164,14 @@ class DiscourseComment {
 		}
 
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
-		if ( 'display-comments' === $comment_type ) {
+		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+		// $publish_category_id will be empty for posts published prior to WP Discourse version 2.7. The property can be
+		// set for these posts by clicking the "Update Discourse Topic" button.
+		if ( 'display-comments' === $comment_type || empty( $publish_category_id ) ) {
 
 			return $discourse_post_id > 0;
 		} else {
-			$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+
 			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
 
 			return $discourse_post_id > 0 && ! $discourse_category['read_restricted'];
@@ -190,12 +193,15 @@ class DiscourseComment {
 		}
 
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
+		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
 
-		if ('display-comments-link' === $comment_type ) {
+		// $publish_category_id will be empty for posts published prior to WP Discourse version 2.7. The property can be
+		// set for these posts by clicking the "Update Discourse Topic" button.
+		if ('display-comments-link' === $comment_type || empty( $publish_category_id ) ) {
 
 			return $discourse_post_id > 0;
 		} else {
-			$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+
 			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
 
 			return $discourse_post_id > 0 && $discourse_category['read_restricted'];
