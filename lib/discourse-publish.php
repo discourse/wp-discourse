@@ -218,10 +218,13 @@ class DiscoursePublish {
 		$author   = get_the_author_meta( 'display_name', $author_id );
 		$baked    = str_replace( '{author}', $author, $baked );
 		$thumb    = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
-		$baked    = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
+		if ( ! empty( $thumb ) ) {
+			$baked    = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
+		}
 		$featured = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'full' );
-		$baked    = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
-
+		if ( ! empty( $featured ) ) {
+			$baked    = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
+		}
 		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $current_post->post_author ), $author_id );
 		if ( ! $username || strlen( $username ) < 2 ) {
 			$username = $options['publish-username'];
@@ -340,6 +343,7 @@ class DiscoursePublish {
 			add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
+			update_post_meta( $post_id, 'publish_post_category', $category );
 
 			// Used for resetting the error notification, if one was being displayed.
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
@@ -376,6 +380,7 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
 				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+				update_post_meta( $post_id, 'publish_post_category', $category );
 
 				if ( $use_multisite_configuration ) {
 					// Used when use_multisite_configuration is enabled, if an existing post is not yet associated with a topic_id/blog_id.
