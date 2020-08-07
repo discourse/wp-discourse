@@ -157,7 +157,10 @@ trait PluginUtilities {
 					$discourse_categories[] = $current_category;
 				}
 
-				set_transient( 'wpdc_discourse_categories', $discourse_categories, 10 * MINUTE_IN_SECONDS );
+				// Note that setting the cache to 0 will disable transient expiration.
+				$category_cache_period = apply_filters( 'wpdc_category_cache_minutes', 10 );
+
+				set_transient( 'wpdc_discourse_categories', $discourse_categories, intval( $category_cache_period ) * MINUTE_IN_SECONDS );
 
 				return $discourse_categories;
 			} else {
