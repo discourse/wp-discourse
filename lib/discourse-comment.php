@@ -165,7 +165,9 @@ class DiscourseComment {
 		}
 
 		$comment_type = $this->options['comment-type'];
+		write_log('comment type', $comment_type);
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+		write_log('publish category id', $publish_category_id);
 
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
 		// clicked for the 'publish_post_category' metadata to get set for the post.
@@ -266,7 +268,9 @@ class DiscourseComment {
 							// Check if the site is on a recent version of Discourse that's returning the category_id (Aug 5, 2020.)
 							// If a topic has been recategorized to a private Discourse category and $comment_type is not 'display-comment', delete any existing Discourse comments from the server.
 							if ( property_exists( $json, 'category_id' ) ) {
-								if ( ! empty( $json->category_id ) && 'display-comments' === $comment_type ) {
+								$category_id = $json->category_id;
+								update_post_meta( $post_id, 'publish_post_category', intval( $category_id ) );
+								if ( ! empty( $category_id ) && 'display-comments' === $comment_type ) {
 										update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
 								} else {
 									delete_post_meta( $post_id, 'discourse_comments_raw' );
@@ -316,6 +320,9 @@ class DiscourseComment {
 
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'
 		$comment_type = $this->get_comment_type_for_post( $post_id );
+		$raw_comments = get_post_meta( $post_id, 'discourse_comments_raw', true );
+		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
+		$comment_type = empty( $raw_comments ) && 'display-comments' === $comment_type ? 'display-comments-link' : $comment_type;
 
 		switch ( $comment_type ) {
 			case 'display-comments':
