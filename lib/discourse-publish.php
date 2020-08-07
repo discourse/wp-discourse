@@ -380,6 +380,7 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
 				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+				// Allows the publish_post_category to be set by clicking the "Update Discourse Topic" button.
 				update_post_meta( $post_id, 'publish_post_category', $category );
 
 				if ( $use_multisite_configuration ) {
