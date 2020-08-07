@@ -291,46 +291,6 @@ class SettingsValidator {
 	}
 
 	/**
-	 * Validates the 'use_discourse_comments' checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_use_discourse_comments( $input ) {
-		$new_value                    = $this->sanitize_checkbox( $input );
-		$this->use_discourse_comments = 1 === $new_value ? true : false;
-
-		return $new_value;
-	}
-
-	/**
-	 * Validates the add_join_link checkbox.
-	 *
-	 * @param string $input The input to be validated.
-	 *
-	 * @return int
-	 */
-	public function validate_add_join_link( $input ) {
-		$new_value = $this->sanitize_checkbox( $input );
-		if ( 1 === $new_value && $this->use_discourse_comments ) {
-			add_settings_error(
-				'discourse',
-				'add_join_link',
-				__(
-					"The 'Add Join Link' option can only be used when the 'Use Discourse Comments' option is not set.
-			If you would like to use it, deselect the 'Use Discourse Comments' option.",
-					'wp-discourse'
-				)
-			);
-
-			return 0;
-		}
-
-		return $new_value;
-	}
-
-	/**
 	 * Validates the 'clear_cached_comment_html input.
 	 *
 	 * @param string $input The input to be validated.
