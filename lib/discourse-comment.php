@@ -176,6 +176,8 @@ class DiscourseComment {
 			return $comment_type;
 		} else {
 			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
+			// If the Display Subcategories option is not enabled and a linked Discourse topic is moved to a subcategory, comments will not be displayed on WordPress.
+			// If the Display Subcategories option is enabled, the subcategory security settings will be respected.
 			if ( empty( $discourse_category ) || 1 === intval( $discourse_category['read_restricted'] ) ) {
 
 				return 'display-comments-link';
