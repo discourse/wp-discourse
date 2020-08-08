@@ -438,7 +438,7 @@ class CommentSettings {
 			'discourse_comment',
 			__( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
 																				  get_option( 'date_format' ) . '").' .
-																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank">' .
+																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank" rel="noreferrer noopener">' .
 			__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' )
 		);
 	}
