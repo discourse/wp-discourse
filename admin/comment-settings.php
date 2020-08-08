@@ -465,12 +465,12 @@ class CommentSettings {
 			<em>
 				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'and', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $template_customization_url ); ?>"
-				   target="_blank"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
+				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topics on the ', 'wp-discourse' ); ?>
-				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 			</em>
 		</p>
