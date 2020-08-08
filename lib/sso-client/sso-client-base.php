@@ -45,7 +45,7 @@ class SSOClientBase {
 				esc_url_raw( wp_unslash( $_GET['redirect_to'] ) ),
 				null
 			);
-		} else if ( ! empty( $options['redirect'] ) ) {
+		} elseif ( ! empty( $options['redirect'] ) ) {
 			$redirect_to = $options['redirect'];
 		} else {
 			$redirect_to = null;
@@ -77,7 +77,8 @@ class SSOClientBase {
 		return add_query_arg(
 			array(
 				'discourse_sso' => sanitize_key( apply_filters( 'wpdc_sso_client_query', 1 ) ),
-				'redirect_to'   => apply_filters( 'wpdc_sso_client_redirect_url',
+				'redirect_to'   => apply_filters(
+					'wpdc_sso_client_redirect_url',
 					urlencode( esc_url_raw( $redirect_to ) ),
 					$redirect_to
 				),

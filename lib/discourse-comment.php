@@ -164,7 +164,7 @@ class DiscourseComment {
 			return 0;
 		}
 
-		$comment_type = $this->options['comment-type'];
+		$comment_type        = $this->options['comment-type'];
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
 
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
@@ -204,7 +204,6 @@ class DiscourseComment {
 		$sync_period = apply_filters( 'wpdc_comment_sync_period', 600, $post_id );
 		$sync_post   = $last_sync + $sync_period < $time;
 
-
 		// If the comments webhook is enabled, comments may be synced more often than once every 10 minutes.
 		// For now, the 10 minute sync period is used as a fallback even when the webhook is enabled.
 		// Once we give authors some feedback about the webhooks success after a post is published, the fallback can be removed.
@@ -219,8 +218,8 @@ class DiscourseComment {
 
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
-					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'
-					$comment_type = $this->get_comment_type_for_post( $post_id );
+					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
+					$comment_type             = $this->get_comment_type_for_post( $post_id );
 					$comment_count            = 'display-comments' === $comment_type ? intval( $discourse_options['max-comments'] ) : 0;
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
@@ -317,7 +316,7 @@ class DiscourseComment {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
-		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'
+		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
 		$comment_type = $this->get_comment_type_for_post( $post_id );
 		$raw_comments = get_post_meta( $post_id, 'discourse_comments_raw', true );
 		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
@@ -337,7 +336,6 @@ class DiscourseComment {
 
 				break;
 			default:
-
 				return $old;
 		}
 

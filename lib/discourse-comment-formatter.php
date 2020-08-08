@@ -157,7 +157,7 @@ class DiscourseCommentFormatter {
 	 * @return string
 	 */
 	public function comment_link( $post_id ) {
-		$options = $this->get_options();
+		$options             = $this->get_options();
 		$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
 		$new_tab             = ! empty( $options['discourse-new-tab'] ) ? ' target="_blank"' : '';
 

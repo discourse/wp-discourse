@@ -54,7 +54,7 @@ class DiscourseSSO {
 		if ( ! $bypass_sync ) {
 			// Make sure the login hasn't been initiated by clicking on a SSO login link.
 			$query_string = wp_parse_url( wp_get_referer(), PHP_URL_QUERY );
-			$query_params = [];
+			$query_params = array();
 			parse_str( $query_string, $query_params );
 			$sso_referer = ! empty( $query_params['redirect_to'] ) && preg_match( '/^\/\?sso/', $query_params['redirect_to'] );
 			if ( ! $sso_referer ) {

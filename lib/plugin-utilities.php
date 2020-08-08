@@ -135,16 +135,16 @@ trait PluginUtilities {
 
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
-				$categories = $remote['categories'];
-				$discourse_categories = [];
+				$categories           = $remote['categories'];
+				$discourse_categories = array();
 				foreach ( $categories as $category ) {
 					if ( ( empty( $options['display-subcategories'] ) ) && array_key_exists( 'parent_category_id', $category ) ) {
 
 						continue;
 					}
-					$current_category = [];
-					$current_category['id'] = intval( $category['id'] );
-					$current_category['name'] = sanitize_text_field( $category['name'] );
+					$current_category                     = array();
+					$current_category['id']               = intval( $category['id'] );
+					$current_category['name']             = sanitize_text_field( $category['name'] );
 					$current_category['name']             = sanitize_text_field( $category['name'] );
 					$current_category['color']            = sanitize_key( $category['color'] );
 					$current_category['text_color']       = sanitize_key( $category['text_color'] );
@@ -175,14 +175,14 @@ trait PluginUtilities {
 	/**
 	 * Returns a category from the wpdc_discourse_categories array if it is available.
 	 *
-	 * @param $category_id
+	 * @param int $category_id The id of the post's Discourse category.
 	 *
 	 * @return mixed|\WP_Error|null
 	 */
-	function get_discourse_category_by_id( $category_id ) {
+	protected function get_discourse_category_by_id( $category_id ) {
 		$categories = $this->get_discourse_categories();
 		if ( ! is_wp_error( $categories ) ) {
-			foreach( $categories as $category ) {
+			foreach ( $categories as $category ) {
 				if ( intval( $category_id ) === $category['id'] ) {
 
 					return $category;

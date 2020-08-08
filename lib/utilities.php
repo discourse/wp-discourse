@@ -110,13 +110,13 @@ class Utilities {
 			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
 			if ( array_key_exists( 'categories', $remote ) ) {
 				$categories           = $remote['categories'];
-				$discourse_categories = [];
+				$discourse_categories = array();
 				foreach ( $categories as $category ) {
 					if ( ( empty( $options['display-subcategories'] ) ) && array_key_exists( 'parent_category_id', $category ) ) {
 
 						continue;
 					}
-					$current_category                     = [];
+					$current_category                     = array();
 					$current_category['id']               = intval( $category['id'] );
 					$current_category['name']             = sanitize_text_field( $category['name'] );
 					$current_category['color']            = sanitize_key( $category['color'] );
@@ -241,7 +241,7 @@ class Utilities {
 
 		if ( ! empty( $response->groups ) ) {
 			$groups               = $response->groups;
-			$non_automatic_groups = [];
+			$non_automatic_groups = array();
 
 			foreach ( $groups as $group ) {
 				if ( empty( $group->automatic ) ) {

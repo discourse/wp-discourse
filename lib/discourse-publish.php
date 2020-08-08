@@ -212,18 +212,18 @@ class DiscoursePublish {
 		}
 
 		// Trim to keep the Discourse markdown parser from treating this as code.
-		$baked    = trim( Templates::publish_format_html( $post_id ) );
-		$baked    = str_replace( '{excerpt}', $excerpt, $baked );
-		$baked    = str_replace( '{blogurl}', $permalink, $baked );
-		$author   = get_the_author_meta( 'display_name', $author_id );
-		$baked    = str_replace( '{author}', $author, $baked );
-		$thumb    = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
+		$baked  = trim( Templates::publish_format_html( $post_id ) );
+		$baked  = str_replace( '{excerpt}', $excerpt, $baked );
+		$baked  = str_replace( '{blogurl}', $permalink, $baked );
+		$author = get_the_author_meta( 'display_name', $author_id );
+		$baked  = str_replace( '{author}', $author, $baked );
+		$thumb  = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
 		if ( ! empty( $thumb ) ) {
-			$baked    = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
+			$baked = str_replace( '{thumbnail}', '![image](' . $thumb['0'] . ')', $baked );
 		}
 		$featured = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'full' );
 		if ( ! empty( $featured ) ) {
-			$baked    = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
+			$baked = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 		}
 		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $current_post->post_author ), $author_id );
 		if ( ! $username || strlen( $username ) < 2 ) {

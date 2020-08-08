@@ -287,7 +287,7 @@ class SyncDiscourseTopic extends Webhook {
 		$topic_posts = $wpdb->get_results( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key = 'discourse_topic_id' AND meta_value = %d", $topic_id ) );
 
 		if ( ! empty( $topic_posts ) ) {
-			$topic_post_ids = [];
+			$topic_post_ids = array();
 			foreach ( $topic_posts as $topic_post ) {
 				$topic_post_ids[] = $topic_post->post_id;
 			}
