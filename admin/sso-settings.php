@@ -618,7 +618,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>
@@ -671,7 +671,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>
@@ -763,7 +763,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>

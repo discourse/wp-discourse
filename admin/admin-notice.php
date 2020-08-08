@@ -73,7 +73,7 @@ class AdminNotice {
 
 					if ( 'success' === $discourse_publishing_response ) {
 						$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-						$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . __( 'View post', 'wp-discourse' ) . '</a>';
+						$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank" rel="noreferrer noopener">' . __( 'View post', 'wp-discourse' ) . '</a>';
 
 						$success_message = sprintf(
 							// translators: Discourse post-published success message. Placeholder: discourse_permalink.

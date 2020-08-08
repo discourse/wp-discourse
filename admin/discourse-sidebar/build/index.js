@@ -519,7 +519,8 @@ var DiscoursePermalink = /*#__PURE__*/function (_Component5) {
         var link = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("a", {
           href: permalink,
           className: 'wpdc-permalink-link',
-          target: '_blank'
+          target: '_blank',
+          rel: 'noreferrer noopener'
         }, permalink);
         return Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElement"])("div", {
           className: 'wpdc-permalink'

@@ -237,7 +237,7 @@ class HTMLTemplates {
 	public static function discourse_topic_link( $new_tab ) {
 		if ( $new_tab ) {
 			?>
-			<a class="wpdc-discourse-topic-link" target="_blank" href="{topic_url}">{discourse_url_name}</a>
+			<a class="wpdc-discourse-topic-link" target="_blank" rel="noreferrer noopener" href="{topic_url}">{discourse_url_name}</a>
 			<?php
 		} else {
 			?>

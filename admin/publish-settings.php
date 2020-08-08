@@ -363,7 +363,7 @@ class PublishSettings {
 	public function full_post_checkbox() {
 		$discourse_admin_posting_url = isset( $this->options['url'] ) && ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/posting' : null;
 		if ( $discourse_admin_posting_url ) {
-			$discourse_admin_posting_link = '<a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank">' . esc_url( $discourse_admin_posting_url ) . '</a>.';
+			$discourse_admin_posting_link = '<a href="' . esc_url_raw( $discourse_admin_posting_url ) . '" target="_blank" rel="noreferrer noopener">' . esc_url( $discourse_admin_posting_url ) . '</a>.';
 			$description                  = __(
 				"<strong>Note:</strong> to keep the 'Show Full Post' button
             from appearing under your post on Discourse, you must unselect the 'embed truncate' setting on Discourse.
@@ -543,9 +543,9 @@ class PublishSettings {
 			<em>
 				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
-				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 			</em>
 		</p>
