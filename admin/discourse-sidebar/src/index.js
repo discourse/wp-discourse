@@ -159,7 +159,7 @@ class DiscoursePermalink extends Component {
     render() {
         if ( this.props.discoursePermalink ) {
             const permalink = encodeURI( this.props.discoursePermalink );
-            const link = <a href={ permalink } className={ 'wpdc-permalink-link' } target={ '_blank' }>{ permalink }</a>;
+            const link = <a href={ permalink } className={ 'wpdc-permalink-link' } target={ '_blank' } rel={'noreferrer noopener'}>{ permalink }</a>;
             return <div className={ 'wpdc-permalink' }>{ __( 'Your post is linked with', 'wp-discourse' ) } { link }</div>;
         }
         return '';
