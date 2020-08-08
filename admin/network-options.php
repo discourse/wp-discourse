@@ -247,7 +247,7 @@ class NetworkOptions {
 			$this->input(
 				'api-key',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
-									 '/admin/api/keys" target="_blank">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
+									 '/admin/api/keys" target="_blank" rel="noreferrer noopener">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
 				"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
@@ -295,7 +295,7 @@ class NetworkOptions {
 		$webhook_payload_url = network_site_url( '/wp-json/wp-discourse/v1/update-topic-content' );
 		$discourse_url       = $this->get_site_option( 'url' );
 		if ( ! empty( $discourse_url ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $discourse_url ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $discourse_url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $discourse_url ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -351,7 +351,7 @@ class NetworkOptions {
 		$webhook_payload_url = network_site_url( '/wp-json/wp-discourse/v1/update-user' );
 		$url                 = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $url ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -401,7 +401,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	public function webhook_secret_input() {
 		$url = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $url ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -460,7 +460,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_provider_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_provider input. Placeholder: sso_documentation_link.
@@ -475,7 +475,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_client_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
 		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
@@ -491,7 +491,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	public function sso_secret_input() {
 		$url = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
-			$discourse_sso_url = '<a href="' . esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso" target="_blank">' .
+			$discourse_sso_url = '<a href="' . esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso" target="_blank" rel="noreferrer noopener">' .
 								 esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso</a>';
 		} else {
 			$discourse_sso_url = 'http://forum.example.com/admin/site_settings/category/all_results?filter=sso';
