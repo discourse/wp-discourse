@@ -177,7 +177,7 @@ class MetaBox {
 				}
 			}
 			$discourse_permalink = get_post_meta( $post_id, 'discourse_permalink', true );
-			$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank">' . esc_url( $discourse_permalink ) . '</a>';
+			$discourse_link      = '<a href="' . esc_url( $discourse_permalink ) . '" target="_blank" rel="noreferrer noopener">' . esc_url( $discourse_permalink ) . '</a>';
 			// translators: Discourse post_is_linked_to_discourse message. Placeholder: A link to the Discourse topic.
 			$message = sprintf( __( 'This post is linked to %1$s.<br><hr>', 'wp-discourse' ), $discourse_link );
 			echo wp_kses_post( $message );
@@ -301,7 +301,7 @@ class MetaBox {
 			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
 		} else {
 			$publishing_url  = admin_url( '/admin.php?page=publishing_options' );
-			$publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
+			$publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
 			// translators: Discourse force-publish-category-not-set message. Placeholder: publishing_options_link.
 			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled, but you have not set a default publishing category. You can set that category on your %1s tab.', 'wp-discourse' ), $publishing_link );
 
@@ -393,7 +393,7 @@ class MetaBox {
 	 */
 	protected function unlisted_topic_checkbox( $unlisted ) {
 		$webhook_url          = admin_url( '/admin.php?page=webhook_options' );
-		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
+		$webhook_options_link = '<a href="' . esc_url( $webhook_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'Sync Comment Data webhook', 'wp-discourse' ) . '</a>';
 		$info_message         = sprintf(
 			// translators: Unlisted topic option description. Placeholder: webhook options link.
 			__( 'If you have configured the %1s, topics will be listed when they receive a comment.', 'wp-discourse' ),
