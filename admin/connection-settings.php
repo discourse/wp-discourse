@@ -129,7 +129,7 @@ class ConnectionSettings {
 				'api-key',
 				'discourse_connect',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
-																	   '/admin/api/keys" target="_blank">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
+																	   '/admin/api/keys" target="_blank" rel="norefferer noopener">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
 				"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
@@ -185,15 +185,15 @@ class ConnectionSettings {
 		<ul class="wpdc-documentation-list">
 			<em>
 				<li>
-					<a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank">install it yourself for
+					<a href="<?php echo esc_url( $self_install_url ); ?>" target="_blank" rel="noreferrer noopener">install it yourself for
 						free</a>
 				</li>
 				<li>
-					<a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank">self-supported community
+					<a href="<?php echo esc_url( $community_install_url ); ?>" target="_blank" rel="noreferrer noopener">self-supported community
 						installation</a>
 				</li>
 				<li>
-					<a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank">discourse.org
+					<a href="<?php echo esc_url( $discourse_org_install_url ); ?>" target="_blank" rel="noreferrer noopener">discourse.org
 						hosting</a>
 				</li>
 			</em>
@@ -202,9 +202,9 @@ class ConnectionSettings {
 			<em>
 				<?php esc_html_e( 'For detailed instructions on setting up the plugin, please see the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-				   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
-				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 			</em>
 		</p>
