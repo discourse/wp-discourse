@@ -46,7 +46,7 @@ will fail.
 
 ### Contact
 
-- The plugin is being developed by [scossar](https://github.com/scossar) on behalf of the Discourse team.
+- The plugin is being developed by [Simon Cossar](https://meta.discourse.org/u/Simon_Cossar/summary) on behalf of the Discourse team.
 
 - Bug reports and other developer inquiries should be directed at our GitHub Issues:
 [https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
