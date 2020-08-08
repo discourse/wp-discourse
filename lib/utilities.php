@@ -125,11 +125,12 @@ class Utilities {
 					$current_category['topic_count']      = intval( $category['topic_count'] );
 					$current_category['post_count']       = intval( $category['post_count'] );
 					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
+					$current_category['read_restricted']  = intval( $category['read_restricted'] );
 
 					$discourse_categories[] = $current_category;
 				}
 
-				set_transient( 'wpdcu_discourse_categories', $discourse_categories, 1 * MINUTE_IN_SECONDS );
+				set_transient( 'wpdcu_discourse_categories', $discourse_categories, 10 * MINUTE_IN_SECONDS );
 
 				return $discourse_categories;
 			} else {
