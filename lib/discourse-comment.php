@@ -165,9 +165,7 @@ class DiscourseComment {
 		}
 
 		$comment_type = $this->options['comment-type'];
-		write_log('comment type', $comment_type);
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
-		write_log('publish category id', $publish_category_id);
 
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
 		// clicked for the 'publish_post_category' metadata to get set for the post.
@@ -198,7 +196,6 @@ class DiscourseComment {
 	public function sync_comments( $post_id ) {
 		global $wpdb;
 
-		// Todo: maybe just use the get_comment_type_for_post function to figure out if Discourse comments should be saved on the server.
 		$discourse_options     = $this->options;
 		$use_discourse_webhook = ! empty( $discourse_options['use-discourse-webhook'] );
 		$time                  = date_create()->format( 'U' );

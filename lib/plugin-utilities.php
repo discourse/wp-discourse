@@ -174,7 +174,7 @@ trait PluginUtilities {
 
 	/**
 	 * Returns a category from the wpdc_discourse_categories array if it is available.
-	 * Todo: I think the categories are going to have to be cached for longer since this will get called every time a post is synced with Discourse.
+	 *
 	 * @param $category_id
 	 *
 	 * @return mixed|\WP_Error|null
