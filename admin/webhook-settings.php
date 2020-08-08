@@ -319,7 +319,7 @@ This setting will only be activated if your site is functioning as the SSO provi
 				<em>
 					<?php esc_html_e( 'For detailed instructions on setting up webhooks, see the ', 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-					   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 					<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 					<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
