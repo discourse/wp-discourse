@@ -264,7 +264,7 @@ class CommentSettings {
 		</label><br>
 			<label for="display-public-comments-only">
 				<input type="radio" name="discourse_comment[comment-type]" value="display-public-comments-only" <?php checked( 'display-public-comments-only', $comment_type ); ?>>
-				<?php esc_html_e( 'Display comments for topics in public Discourse categories', 'wp-discourse' ); ?>
+				<?php esc_html_e( 'Display comments for public topics. Display a link for private topics.', 'wp-discourse' ); ?>
 			</label><br>
 		<label for="display-comments-link">
 		<input type="radio" name="discourse_comment[comment-type]" value="display-comments-link" <?php checked( 'display-comments-link', $comment_type ); ?>>
