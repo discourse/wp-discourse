@@ -143,7 +143,7 @@ class WebhookSettings {
 		$webhook_payload_url = get_rest_url( $blog_id, '/wp-discourse/v1/update-topic-content' );
 		if ( ! empty( $this->options['url'] ) ) {
 
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -200,7 +200,7 @@ class WebhookSettings {
 	public function use_discourse_user_webhook_checkbox() {
 		$webhook_payload_url = home_url( '/wp-json/wp-discourse/v1/update-user' );
 		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -259,7 +259,7 @@ This setting will only be activated if your site is functioning as the SSO provi
 	 */
 	public function webhook_secret_input() {
 		if ( ! empty( $this->options['url'] ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank">' .
+			$discourse_webhooks_url = '<a href="' . esc_url( $this->options['url'] ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
 									  esc_url( $this->options['url'] ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
@@ -321,7 +321,7 @@ This setting will only be activated if your site is functioning as the SSO provi
 					<a href="<?php echo esc_url( $setup_howto_url ); ?>"
 					   target="_blank"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 					<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
-					<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank">Discourse Meta</a>
+					<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 					<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>
 				</em>
 			</p>
