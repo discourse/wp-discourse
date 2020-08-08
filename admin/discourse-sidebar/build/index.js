@@ -280,12 +280,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @babel/runtime/helpers/createClass */ "./node_modules/@babel/runtime/helpers/createClass.js");
 /* harmony import */ var _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
-/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
-/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
-/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @babel/runtime/helpers/inherits */ "./node_modules/@babel/runtime/helpers/inherits.js");
+/* harmony import */ var _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @babel/runtime/helpers/possibleConstructorReturn */ "./node_modules/@babel/runtime/helpers/possibleConstructorReturn.js");
+/* harmony import */ var _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @babel/runtime/helpers/getPrototypeOf */ "./node_modules/@babel/runtime/helpers/getPrototypeOf.js");
+/* harmony import */ var _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @wordpress/element */ "@wordpress/element");
 /* harmony import */ var _wordpress_element__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__);
 
@@ -296,7 +296,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-function _createSuper(Derived) { return function () { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_4___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_3___default()(this, result); }; }
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _babel_runtime_helpers_getPrototypeOf__WEBPACK_IMPORTED_MODULE_5___default()(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _babel_runtime_helpers_possibleConstructorReturn__WEBPACK_IMPORTED_MODULE_4___default()(this, result); }; }
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
 
@@ -359,7 +359,7 @@ var upArrow = Object(_wordpress_element__WEBPACK_IMPORTED_MODULE_6__["createElem
 })));
 
 var Notification = /*#__PURE__*/function (_Component) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(Notification, _Component);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(Notification, _Component);
 
   var _super = _createSuper(Notification);
 
@@ -389,7 +389,7 @@ var Notification = /*#__PURE__*/function (_Component) {
 }(Component);
 
 var ForcePublishMessage = /*#__PURE__*/function (_Component2) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(ForcePublishMessage, _Component2);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(ForcePublishMessage, _Component2);
 
   var _super2 = _createSuper(ForcePublishMessage);
 
@@ -416,7 +416,7 @@ var ForcePublishMessage = /*#__PURE__*/function (_Component2) {
 }(Component);
 
 var StatusMessage = /*#__PURE__*/function (_Component3) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(StatusMessage, _Component3);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(StatusMessage, _Component3);
 
   var _super3 = _createSuper(StatusMessage);
 
@@ -445,7 +445,7 @@ var StatusMessage = /*#__PURE__*/function (_Component3) {
 }(Component);
 
 var ErrorMessage = /*#__PURE__*/function (_Component4) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(ErrorMessage, _Component4);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(ErrorMessage, _Component4);
 
   var _super4 = _createSuper(ErrorMessage);
 
@@ -501,7 +501,7 @@ var ErrorMessage = /*#__PURE__*/function (_Component4) {
 }(Component);
 
 var DiscoursePermalink = /*#__PURE__*/function (_Component5) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscoursePermalink, _Component5);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(DiscoursePermalink, _Component5);
 
   var _super5 = _createSuper(DiscoursePermalink);
 
@@ -534,7 +534,7 @@ var DiscoursePermalink = /*#__PURE__*/function (_Component5) {
 }(Component);
 
 var PublishingOptions = /*#__PURE__*/function (_Component6) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishingOptions, _Component6);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(PublishingOptions, _Component6);
 
   var _super6 = _createSuper(PublishingOptions);
 
@@ -582,7 +582,7 @@ var PublishingOptions = /*#__PURE__*/function (_Component6) {
 }(Component);
 
 var PublishToDiscourse = /*#__PURE__*/function (_Component7) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PublishToDiscourse, _Component7);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(PublishToDiscourse, _Component7);
 
   var _super7 = _createSuper(PublishToDiscourse);
 
@@ -645,7 +645,7 @@ var PublishToDiscourse = /*#__PURE__*/function (_Component7) {
 }(Component);
 
 var CategorySelect = /*#__PURE__*/function (_Component8) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(CategorySelect, _Component8);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(CategorySelect, _Component8);
 
   var _super8 = _createSuper(CategorySelect);
 
@@ -701,7 +701,7 @@ var CategorySelect = /*#__PURE__*/function (_Component8) {
 }(Component);
 
 var LinkToDiscourseTopic = /*#__PURE__*/function (_Component9) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(LinkToDiscourseTopic, _Component9);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(LinkToDiscourseTopic, _Component9);
 
   var _super9 = _createSuper(LinkToDiscourseTopic);
 
@@ -755,7 +755,7 @@ var LinkToDiscourseTopic = /*#__PURE__*/function (_Component9) {
 }(Component);
 
 var UnlinkFromDiscourse = /*#__PURE__*/function (_Component10) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UnlinkFromDiscourse, _Component10);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(UnlinkFromDiscourse, _Component10);
 
   var _super10 = _createSuper(UnlinkFromDiscourse);
 
@@ -814,7 +814,7 @@ var UnlinkFromDiscourse = /*#__PURE__*/function (_Component10) {
 }(Component);
 
 var UpdateDiscourseTopic = /*#__PURE__*/function (_Component11) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(UpdateDiscourseTopic, _Component11);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(UpdateDiscourseTopic, _Component11);
 
   var _super11 = _createSuper(UpdateDiscourseTopic);
 
@@ -873,7 +873,7 @@ var UpdateDiscourseTopic = /*#__PURE__*/function (_Component11) {
 }(Component);
 
 var TagTopic = /*#__PURE__*/function (_Component12) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(TagTopic, _Component12);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(TagTopic, _Component12);
 
   var _super12 = _createSuper(TagTopic);
 
@@ -1047,7 +1047,7 @@ var TagTopic = /*#__PURE__*/function (_Component12) {
 }(Component);
 
 var PinTopic = /*#__PURE__*/function (_Component13) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(PinTopic, _Component13);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(PinTopic, _Component13);
 
   var _super13 = _createSuper(PinTopic);
 
@@ -1110,7 +1110,7 @@ var PinTopic = /*#__PURE__*/function (_Component13) {
 }(Component);
 
 var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
-  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_5___default()(DiscourseSidebar, _Component14);
+  _babel_runtime_helpers_inherits__WEBPACK_IMPORTED_MODULE_3___default()(DiscourseSidebar, _Component14);
 
   var _super14 = _createSuper(DiscourseSidebar);
 
