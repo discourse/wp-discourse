@@ -325,6 +325,7 @@ class DiscourseComment {
 		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
 		$comment_type = empty( $raw_comments ) && 'display-comments' === $comment_type ? 'display-comments-link' : $comment_type;
 
+		// Todo: clean this up.
 		if ( 0 === $comment_type ) {
 
 			return $old;
