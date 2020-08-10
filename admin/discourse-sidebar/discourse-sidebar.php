@@ -451,6 +451,9 @@ class DiscourseSidebar {
 		if ( ! empty( $this->options['auto-publish'] ) ) {
 			update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
 		}
+
+		// We need to return something here so that the UI gets updated.
+		return 1;
 	}
 
 	/**
