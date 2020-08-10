@@ -325,7 +325,8 @@ class DiscourseComment {
 		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
 		$comment_type = empty( $raw_comments ) && 'display-comments' === $comment_type ? 'display-comments-link' : $comment_type;
 
-		// Todo: clean this up.
+		// It's not possible to catch the int 0 in a switch statement. THe get_comment_type_for_post function should probably
+		// return a string for this case, but for now, this will fix the issue.
 		if ( 0 === $comment_type ) {
 
 			return $old;
@@ -345,6 +346,7 @@ class DiscourseComment {
 
 				break;
 			default:
+
 				return $old;
 		}
 
