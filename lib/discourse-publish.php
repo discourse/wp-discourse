@@ -236,12 +236,16 @@ class DiscoursePublish {
 		$default_category = isset( $options['publish-category'] ) ? $options['publish-category'] : '';
 		$category         = ! empty( $publish_post_category ) ? $publish_post_category : $default_category;
 		$category         = apply_filters( 'wpdc_publish_post_category', $category, $post_id );
-		$tags             = get_post_meta( $post_id, 'wpdc_topic_tags', true );
-		// For the Block Editor, tags are being set through the API. For this case, it's easier to handle the data as a string.
-		if ( ! is_array( $tags ) ) {
-			$tags = explode( ',', $tags );
+		if ( ! empty( $this->options['allow-tags'] ) ) {
+			$tags = get_post_meta( $post_id, 'wpdc_topic_tags', true );
+			// For the Block Editor, tags are being set through the API. For this case, it's easier to handle the data as a string.
+			if ( ! is_array( $tags ) ) {
+				$tags = explode( ',', $tags );
+			}
+			$tags_param = $this->tags_param( $tags );
+		} else {
+			$tags_param = '';
 		}
-		$tags_param = $this->tags_param( $tags );
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
@@ -439,7 +443,11 @@ class DiscoursePublish {
 		$tags_string = '';
 		if ( ! empty( $tags ) ) {
 			foreach ( $tags as $tag ) {
-				$tag          = sanitize_text_field( $tag );
+				$tag = sanitize_text_field( $tag );
+				if ( empty( $tag ) ) {
+
+					break;
+				}
 				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
 			}
 		}
