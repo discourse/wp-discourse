@@ -115,11 +115,11 @@ class DiscourseComment {
 				'discourse-comments',
 				array(
 					array(
-						'methods'  => \WP_REST_Server::READABLE,
+						'methods'             => \WP_REST_Server::READABLE,
 						'permission_callback' => function() {
 							return true;
 						},
-						'callback' => array( $this, 'get_discourse_comments' ),
+						'callback'            => array( $this, 'get_discourse_comments' ),
 					),
 				)
 			);
@@ -310,28 +310,24 @@ class DiscourseComment {
 	 */
 	public function comments_template( $old ) {
 		global $post;
-		$post_id                = $post->ID;
-		$current_user           = wp_get_current_user();
-		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
-
-		if ( ! $load_comments_template ) {
-
-			return WPDISCOURSE_PATH . 'templates/blank.php';
-		}
+		$post_id      = $post->ID;
+		$current_user = wp_get_current_user();
 
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
 		$comment_type = $this->get_comment_type_for_post( $post_id );
 		$raw_comments = get_post_meta( $post_id, 'discourse_comments_raw', true );
 		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
 		$comment_type = empty( $raw_comments ) && 'display-comments' === $comment_type ? 'display-comments-link' : $comment_type;
+		$load_blank   = empty( $comment_type ) && ! empty( $this->options['hide-wordpress-comments'] );
+		// A switch that can be used to prevent loading the comments template for a user.
+		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
 
-		// It's not possible to catch the int 0 in a switch statement. THe get_comment_type_for_post function should probably
-		// return a string for this case, but for now, this will fix the issue.
-		if ( 0 === $comment_type ) {
+		if ( ! $load_comments_template || $load_blank ) {
 
-			return $old;
+			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
+		$discourse_comments = null;
 		switch ( $comment_type ) {
 			case 'display-comments':
 				if ( ! empty( $this->options['ajax-load'] ) ) {
@@ -345,15 +341,15 @@ class DiscourseComment {
 				$discourse_comments = $this->comment_formatter->comment_link( $post_id );
 
 				break;
-			default:
-
-				return $old;
 		}
 
 		// Use $post->comment_count because get_comments_number will return the Discourse comments
 		// number for posts that are published to Discourse.
 		$num_wp_comments = $post->comment_count;
-		if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+		if ( empty( $comment_type ) ) {
+
+			return $old;
+		} elseif ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 			echo wp_kses_post( $discourse_comments );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
