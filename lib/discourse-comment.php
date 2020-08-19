@@ -309,9 +309,7 @@ class DiscourseComment {
 
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
 		$comment_type = $this->get_comment_type_for_post( $post_id );
-		$raw_comments = get_post_meta( $post_id, 'discourse_comments_raw', true );
-		// In case a Discourse topic has been moved from a private to a public category display just the comment link until the comment sync is run again.
-		$comment_type = empty( $raw_comments ) && 'display-comments' === $comment_type ? 'display-comments-link' : $comment_type;
+		// Discourse comments are not being used for the post and the hide-wordpress-comments option has been selected.
 		$load_blank   = empty( $comment_type ) && ! empty( $this->options['hide-wordpress-comments'] );
 		// A switch that can be used to prevent loading the comments template for a user.
 		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
