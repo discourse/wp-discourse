@@ -171,7 +171,7 @@ class DiscourseComment {
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
 
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
-		// clicked for the 'publish_post_category' metadata to get set for the post.
+		// clicked for the 'publish_post_category' metadata to get set as post_metadata.
 		if ( 'display-comments' === $comment_type || 'display-comments-link' === $comment_type || empty( $publish_category_id ) ) {
 
 			return $comment_type;
@@ -310,7 +310,7 @@ class DiscourseComment {
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
 		$comment_type = $this->get_comment_type_for_post( $post_id );
 		// Discourse comments are not being used for the post and the hide-wordpress-comments option has been selected.
-		$load_blank   = empty( $comment_type ) && ! empty( $this->options['hide-wordpress-comments'] );
+		$load_blank = empty( $comment_type ) && ! empty( $this->options['hide-wordpress-comments'] );
 		// A switch that can be used to prevent loading the comments template for a user.
 		$load_comments_template = apply_filters( 'wpdc_load_comments_template_for_user', true, $current_user, $post_id );
 
