@@ -168,11 +168,11 @@ class DiscourseComment {
 		}
 
 		$comment_type        = $this->options['comment-type'];
-		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
-
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
 		// clicked for the 'publish_post_category' metadata to get set as post_metadata.
-		if ( 'display-comments' === $comment_type || 'display-comments-link' === $comment_type || empty( $publish_category_id ) ) {
+		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
+
+		if ( 'display-comments' === $comment_type || 'display-comments-link' === $comment_type ) {
 
 			return $comment_type;
 		} else {
