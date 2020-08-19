@@ -267,19 +267,13 @@ class DiscourseComment {
 							update_post_meta( $post_id, 'discourse_comments_count', $posts_count );
 
 							// Check if the site is on a recent version of Discourse that's returning the category_id (Aug 5, 2020.)
-							// If a topic has been recategorized to a private Discourse category and $comment_type is not 'display-comment', delete any existing Discourse comments from the server.
+							// Allows comment type to be set for topics that are recategorized on Discourse when the display-public-comments-only comment option is selected.
 							if ( property_exists( $json, 'category_id' ) ) {
 								$category_id = $json->category_id;
 								update_post_meta( $post_id, 'publish_post_category', intval( $category_id ) );
-								if ( ! empty( $category_id ) && 'display-comments' === $comment_type ) {
-										update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
-								} else {
-									delete_post_meta( $post_id, 'discourse_comments_raw' );
-								}
-							} else {
-								// For Discourse sites that are not yet returning the category_id in the WordPress payload.
-								update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
 							}
+
+							update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
 
 							if ( isset( $topic_id ) ) {
 								// Delete the cached html.
