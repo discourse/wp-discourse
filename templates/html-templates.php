@@ -158,7 +158,7 @@ class HTMLTemplates {
 			<article class="comment-body">
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
-						<img alt="" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
+						<img alt="Avatar for {username}" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
 							 height="64"
 							 width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
