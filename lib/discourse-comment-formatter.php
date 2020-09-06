@@ -104,6 +104,7 @@ class DiscourseCommentFormatter {
 				$comment_body   = $this->convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 				$comment_body   = $this->add_poll_links( $comment_body, $post_url );
 				$comment_body   = $this->fix_youtube_onebox_links( $comment_body );
+				$comment_body   = $this->add_avatar_alt( $comment_body );
 				$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
 				$comment_body   = str_replace( '{comment_url}', $post_url, $comment_body );
 				$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
