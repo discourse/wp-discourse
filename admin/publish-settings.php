@@ -428,7 +428,7 @@ class PublishSettings {
 			'force-publish',
 			'discourse_publish',
 			__( 'Automatically publish all new posts and updates. Posts will be published to the Default Discourse Category.', 'wp-discourse' ),
-			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
+			__( '<strong>This setting is only applied when the Block Editor is used to publish posts.</strong>', 'wp-discourse' )
 		);
 	}
 
