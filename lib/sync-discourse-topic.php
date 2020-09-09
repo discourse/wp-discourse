@@ -57,6 +57,9 @@ class SyncDiscourseTopic extends Webhook {
 				array(
 					array(
 						'methods'  => \WP_REST_Server::CREATABLE,
+						'permission_callback' => function() {
+							return true;
+						},
 						'callback' => array( $this, 'update_topic_content' ),
 					),
 				)
@@ -72,6 +75,7 @@ class SyncDiscourseTopic extends Webhook {
 	 * @return null|\WP_Error
 	 */
 	public function update_topic_content( $data ) {
+		// This function call is used to verify the request. For clarity, the permission callback should be updated to call this function.
 		$data = $this->verify_discourse_webhook_request( $data );
 
 		if ( is_wp_error( $data ) ) {
