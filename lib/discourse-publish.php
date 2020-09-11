@@ -92,7 +92,7 @@ class DiscoursePublish {
 		if ( $force_publish_enabled ) {
 			// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
 			// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
-			$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
+			$is_rest_request       = defined( 'REST_REQUEST' ) && REST_REQUEST;
 			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
 			$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
 			$post_time             = strtotime( $post->post_date );
