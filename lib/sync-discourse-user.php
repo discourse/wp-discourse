@@ -49,8 +49,11 @@ class SyncDiscourseUser extends Webhook {
 				'update-user',
 				array(
 					array(
-						'methods'  => \WP_REST_Server::CREATABLE,
-						'callback' => array( $this, 'update_user' ),
+						'methods'             => \WP_REST_Server::CREATABLE,
+						'permission_callback' => function() {
+							return true;
+						},
+						'callback'            => array( $this, 'update_user' ),
 					),
 				)
 			);
@@ -73,6 +76,7 @@ class SyncDiscourseUser extends Webhook {
 			return new \WP_Error( 'discourse_webhook_error', __( 'The Discourse User webhook is not enabled for your site.' ) );
 		}
 
+		// This function call is used to verify the request. For clarity, the permission callback should be updated to call this function.
 		$data = $this->verify_discourse_webhook_request( $data );
 		if ( is_wp_error( $data ) ) {
 
