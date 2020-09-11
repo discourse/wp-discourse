@@ -130,8 +130,8 @@ class MetaBox {
 
 					return null;
 				}
-			} else {
-				?>
+			}
+			?>
 				<label for="wpdc_publish_option">
 					<input type="radio" name="wpdc_publish_options" value="new" checked><?php esc_html_e( 'Create new Topic' ); ?>
 				</label><br>
@@ -161,7 +161,6 @@ class MetaBox {
 					</div>
 					<?php
 				}
-			} // End if().
 		} else {
 			// The post has already been published to Discourse.
 			if ( ! empty( $publishing_error ) ) {
