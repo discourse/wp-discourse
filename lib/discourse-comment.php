@@ -307,8 +307,9 @@ class DiscourseComment {
 		$post_id      = $post->ID;
 		$current_user = wp_get_current_user();
 
-		// don't do anything if post type is not in allowed types
-		if ( ! in_array(get_post_type($post_id), $this->options['allowed_post_types'])) {
+		// don't do anything if post type is not in allowed types.
+		if ( ! in_array( get_post_type( $post_id ), $this->options['allowed_post_types'], true ) ) {
+
 			return $old;
 		}
 
