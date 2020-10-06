@@ -1524,7 +1524,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
             meta = this.props.post.meta,
             prevMeta = prevProps.post.meta;
 
-        if (meta && prevMeta && (post.status !== prevPost.status || meta.discourse_post_id !== prevMeta.discourse_post_id || meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response || meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error)) {
+        if (meta && prevMeta && ((post.status === 'publish' || prevPost.status === 'publish') && post.status !== prevPost.status || meta.discourse_post_id !== prevMeta.discourse_post_id || meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response || meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error)) {
           var publishToDiscourse = 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ? false : 1 === parseInt(meta.publish_to_discourse, 10);
           this.setState({
             published: meta.discourse_post_id > 0,

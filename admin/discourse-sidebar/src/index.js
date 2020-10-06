@@ -972,7 +972,8 @@ class DiscourseSidebar extends Component {
                 prevMeta = prevProps.post.meta;
 
             if ( meta &&
-                prevMeta && ( post.status !== prevPost.status ||
+                prevMeta && ( 
+                ( ( post.status === 'publish' || prevPost.status === 'publish' ) && ( post.status !== prevPost.status ) ) ||
                 meta.discourse_post_id !== prevMeta.discourse_post_id ||
                 meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
                 meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error ) ) {
