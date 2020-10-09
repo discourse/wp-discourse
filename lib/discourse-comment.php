@@ -307,12 +307,6 @@ class DiscourseComment {
 		$post_id      = $post->ID;
 		$current_user = wp_get_current_user();
 
-		// don't do anything if post type is not in allowed types.
-		if ( ! in_array( get_post_type( $post_id ), $this->options['allowed_post_types'], true ) ) {
-
-			return $old;
-		}
-
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
 		$comment_type = $this->get_comment_type_for_post( $post_id );
 		// Discourse comments are not being used for the post and the hide-wordpress-comments option has been selected.
