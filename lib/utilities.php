@@ -208,53 +208,47 @@ class Utilities {
 	}
 
 	/**
-	 * Gets the Discourse groups and saves the non-automatic groups in a transient.
+	 * Gets the non-automatic Discourse groups and saves them in a transient.
 	 *
 	 * The transient has an expiry time of 10 minutes.
 	 *
 	 * @return array|\WP_Error
 	 */
 	public static function get_discourse_groups() {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		$groups = get_transient( 'wpdc_non_automatic_groups' );
+		if ( ! empty( $groups ) ) {
+			return $groups;
 		}
 
-		$groups_url = esc_url_raw( "{$api_credentials['url']}/groups.json" );
+		$response            = static::discourse_request( '/groups?type=non_automatic' );
+		$discourse_page_size = 36;
 
-		$response = wp_remote_get(
-			$groups_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
+		if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+			$groups         = $response->groups;
+			$total_groups   = $response->total_rows_groups;
+			$load_more_path = $response->load_more_groups;
 
-		if ( ! self::validate( $response ) ) {
+			if ( ( $total_groups > $discourse_page_size ) ) {
+				$last_page = ( ceil( $total_groups / $discourse_page_size ) ) - 1;
 
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
-		}
+				foreach ( range( 1, $last_page ) as $index ) {
+					if ( $load_more_path ) {
+						$response       = static::discourse_request( $load_more_path );
+						$load_more_path = $response->load_more_groups;
 
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( ! empty( $response->groups ) ) {
-			$groups               = $response->groups;
-			$non_automatic_groups = array();
-
-			foreach ( $groups as $group ) {
-				if ( empty( $group->automatic ) ) {
-					$non_automatic_groups[] = $group;
+						if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+						 	$groups = array_merge( $groups, $response->groups );
+						}
+					}
 				}
 			}
-			set_transient( 'wpdc_non_automatic_groups', $non_automatic_groups, 10 * MINUTE_IN_SECONDS );
 
-			return $non_automatic_groups;
+			set_transient( 'wpdc_non_automatic_groups', $groups, 10 * MINUTE_IN_SECONDS );
+
+			return $groups;
+		} else {
+			return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
 		}
-
-		return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
 	}
 
 	/**
@@ -587,5 +581,44 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	/**
+	 * Perform a Discourse request
+	 *
+	 * @param string $path Discourse request path.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public static function discourse_request( $path ) {
+		if ( ! $path ) {
+			return; }
+
+		$api_credentials = self::get_api_credentials();
+
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$groups_url = esc_url_raw( $api_credentials['url'] . $path );
+
+		$response = wp_remote_get(
+			$groups_url,
+			array(
+				'headers' => array(
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
+					'Accept'       => 'application/json',
+				),
+			)
+		);
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 }
