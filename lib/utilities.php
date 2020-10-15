@@ -207,6 +207,54 @@ class Utilities {
 		return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'The Discourse user could not be created.' );
 	}
 
+	const GROUP_SCHEMA = array(
+		'id'                          => 'int',
+		'name'                        => 'text',
+		'full_name'                   => 'text',
+		'user_count'                  => 'int',
+		'mentionable_level'           => 'int',
+		'messageable_level'           => 'int',
+		'visibility_level'            => 'int',
+		'primary_group'               => 'bool',
+		'title'                       => 'text',
+		'grant_trust_level'           => 'int',
+		'incoming_email'              => 'text',
+		'has_messages'                => 'bool',
+		'flair_url'                   => 'text',
+		'flair_bg_color'              => 'text',
+		'flair_color'                 => 'text',
+		'bio_raw'                     => 'textarea',
+		'bio_cooked'                  => 'html',
+		'bio_excerpt'                 => 'html',
+		'public_admission'            => 'bool',
+		'public_exit'                 => 'bool',
+		'allow_membership_requests'   => 'bool',
+		'default_notification_level'  => 'int',
+		'membership_request_template' => 'text',
+		'members_visibility_level'    => 'int',
+		'publish_read_state'          => 'bool',
+	);
+
+	/**
+	 * Helper function for get_discourse_groups().
+	 *
+	 * @param array $raw_groups raw groups data array
+	 *
+	 * @return array
+	 */
+	private static function extract_groups( $raw_groups ) {
+		return array_reduce(
+             $raw_groups,
+            function( $result, $group ) {
+			if ( empty( $group->automatic ) ) {
+					$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
+			}
+			return $result;
+		},
+            array()
+            );
+	}
+
 	/**
 	 * Gets the non-automatic Discourse groups and saves them in a transient.
 	 *
@@ -220,11 +268,12 @@ class Utilities {
 			return $groups;
 		}
 
-		$response            = static::discourse_request( '/groups?type=non_automatic' );
+		$path                = '/groups';
+		$response            = static::discourse_request( $path );
 		$discourse_page_size = 36;
 
 		if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
-			$groups         = $response->groups;
+			$groups         = static::extract_groups( $response->groups );
 			$total_groups   = $response->total_rows_groups;
 			$load_more_path = $response->load_more_groups;
 
@@ -237,7 +286,7 @@ class Utilities {
 						$load_more_path = $response->load_more_groups;
 
 						if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
-						 	$groups = array_merge( $groups, $response->groups );
+						 	$groups = array_merge( $groups, static::extract_groups( $response->groups ) );
 						}
 					}
 				}
@@ -581,6 +630,48 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	/**
+	 * Munge raw discourse data
+	 *
+	 * @param array  $data Data to munge.
+	 * @param   schema $schema Schema to apply.
+	 *
+	 * @return array
+	 */
+	public static function discourse_munge( $data, $schema ) {
+		$result = (object) array();
+
+		foreach ( $data as $key => $value ) {
+			if ( isset( $schema[ $key ] ) ) {
+				if ( $value !== null ) {
+					switch ( $schema[ $key ] ) {
+						case 'int':
+												$result->{$key} = intval( $value );
+                            break;
+						case 'bool':
+												$result->{$key} = true == $value;
+                            break;
+						case 'text':
+												$result->{$key} = sanitize_text_field( $value );
+                            break;
+						case 'textarea':
+												$result->{$key} = sanitize_textarea_field( $value );
+                            break;
+						case 'html':
+												$result->{$key} = $value;
+						default:
+												;
+                            break;
+					}
+				} else {
+					$result->{$key} = null;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	/**
