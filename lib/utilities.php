@@ -692,10 +692,8 @@ class Utilities {
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
-		$groups_url = esc_url_raw( $api_credentials['url'] . $path );
-
 		$response = wp_remote_get(
-			$groups_url,
+			esc_url_raw( $api_credentials['url'] . $path ),
 			array(
 				'headers' => array(
 					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
