@@ -638,7 +638,7 @@ class Utilities {
 	 * @param array  $data Data to munge.
 	 * @param   schema $schema Schema to apply.
 	 *
-	 * @return array
+	 * @return object
 	 */
 	public static function discourse_munge( $data, $schema ) {
 		$result = (object) array();
@@ -679,7 +679,7 @@ class Utilities {
 	 *
 	 * @param string $path Discourse request path.
 	 *
-	 * @return array|\WP_Error
+	 * @return array|\WP_Error|void
 	 */
 	public static function discourse_request( $path ) {
 		if ( ! $path ) {
