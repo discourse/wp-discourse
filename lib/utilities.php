@@ -238,7 +238,7 @@ class Utilities {
 	/**
 	 * Helper function for get_discourse_groups().
 	 *
-	 * @param array $raw_groups raw groups data array
+	 * @param array $raw_groups raw groups data array.
 	 *
 	 * @return array
 	 */
@@ -645,7 +645,7 @@ class Utilities {
 
 		foreach ( $data as $key => $value ) {
 			if ( isset( $schema[ $key ] ) ) {
-				if ( $value !== null ) {
+				if ( null !== $value ) {
 					switch ( $schema[ $key ] ) {
 						case 'int':
 												$result->{$key} = intval( $value );
