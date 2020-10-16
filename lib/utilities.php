@@ -207,54 +207,97 @@ class Utilities {
 		return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'The Discourse user could not be created.' );
 	}
 
+	const GROUP_SCHEMA = array(
+		'id'                          => 'int',
+		'name'                        => 'text',
+		'full_name'                   => 'text',
+		'user_count'                  => 'int',
+		'mentionable_level'           => 'int',
+		'messageable_level'           => 'int',
+		'visibility_level'            => 'int',
+		'primary_group'               => 'bool',
+		'title'                       => 'text',
+		'grant_trust_level'           => 'int',
+		'incoming_email'              => 'text',
+		'has_messages'                => 'bool',
+		'flair_url'                   => 'text',
+		'flair_bg_color'              => 'text',
+		'flair_color'                 => 'text',
+		'bio_raw'                     => 'textarea',
+		'bio_cooked'                  => 'html',
+		'bio_excerpt'                 => 'html',
+		'public_admission'            => 'bool',
+		'public_exit'                 => 'bool',
+		'allow_membership_requests'   => 'bool',
+		'default_notification_level'  => 'int',
+		'membership_request_template' => 'text',
+		'members_visibility_level'    => 'int',
+		'publish_read_state'          => 'bool',
+	);
+
 	/**
-	 * Gets the Discourse groups and saves the non-automatic groups in a transient.
+	 * Helper function for get_discourse_groups().
+	 *
+	 * @param array $raw_groups raw groups data array
+	 *
+	 * @return array
+	 */
+	private static function extract_groups( $raw_groups ) {
+		return array_reduce(
+             $raw_groups,
+            function( $result, $group ) {
+			if ( empty( $group->automatic ) ) {
+					$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
+			}
+			return $result;
+		},
+            array()
+            );
+	}
+
+	/**
+	 * Gets the non-automatic Discourse groups and saves them in a transient.
 	 *
 	 * The transient has an expiry time of 10 minutes.
 	 *
 	 * @return array|\WP_Error
 	 */
 	public static function get_discourse_groups() {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		$groups = get_transient( 'wpdc_non_automatic_groups' );
+		if ( ! empty( $groups ) ) {
+			return $groups;
 		}
 
-		$groups_url = esc_url_raw( "{$api_credentials['url']}/groups.json" );
+		$path                = '/groups';
+		$response            = static::discourse_request( $path );
+		$discourse_page_size = 36;
 
-		$response = wp_remote_get(
-			$groups_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
+		if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+			$groups         = static::extract_groups( $response->groups );
+			$total_groups   = $response->total_rows_groups;
+			$load_more_path = $response->load_more_groups;
 
-		if ( ! self::validate( $response ) ) {
+			if ( ( $total_groups > $discourse_page_size ) ) {
+				$last_page = ( ceil( $total_groups / $discourse_page_size ) ) - 1;
 
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
-		}
+				foreach ( range( 1, $last_page ) as $index ) {
+					if ( $load_more_path ) {
+						$response       = static::discourse_request( $load_more_path );
+						$load_more_path = $response->load_more_groups;
 
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( ! empty( $response->groups ) ) {
-			$groups               = $response->groups;
-			$non_automatic_groups = array();
-
-			foreach ( $groups as $group ) {
-				if ( empty( $group->automatic ) ) {
-					$non_automatic_groups[] = $group;
+						if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+						 	$groups = array_merge( $groups, static::extract_groups( $response->groups ) );
+						}
+					}
 				}
 			}
-			set_transient( 'wpdc_non_automatic_groups', $non_automatic_groups, 10 * MINUTE_IN_SECONDS );
 
-			return $non_automatic_groups;
+			set_transient( 'wpdc_non_automatic_groups', $groups, 10 * MINUTE_IN_SECONDS );
+
+			return $groups;
+		} else {
+			return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
 		}
-
-		return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
 	}
 
 	/**
@@ -587,5 +630,84 @@ class Utilities {
 		}
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+	}
+
+	/**
+	 * Munge raw discourse data
+	 *
+	 * @param array  $data Data to munge.
+	 * @param   schema $schema Schema to apply.
+	 *
+	 * @return array
+	 */
+	public static function discourse_munge( $data, $schema ) {
+		$result = (object) array();
+
+		foreach ( $data as $key => $value ) {
+			if ( isset( $schema[ $key ] ) ) {
+				if ( $value !== null ) {
+					switch ( $schema[ $key ] ) {
+						case 'int':
+												$result->{$key} = intval( $value );
+                            break;
+						case 'bool':
+												$result->{$key} = true == $value;
+                            break;
+						case 'text':
+												$result->{$key} = sanitize_text_field( $value );
+                            break;
+						case 'textarea':
+												$result->{$key} = sanitize_textarea_field( $value );
+                            break;
+						case 'html':
+												$result->{$key} = $value;
+						default:
+												;
+                            break;
+					}
+				} else {
+					$result->{$key} = null;
+				}
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Perform a Discourse request
+	 *
+	 * @param string $path Discourse request path.
+	 *
+	 * @return array|\WP_Error
+	 */
+	public static function discourse_request( $path ) {
+		if ( ! $path ) {
+			return; }
+
+		$api_credentials = self::get_api_credentials();
+
+		if ( is_wp_error( $api_credentials ) ) {
+
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
+
+		$response = wp_remote_get(
+			esc_url_raw( $api_credentials['url'] . $path ),
+			array(
+				'headers' => array(
+					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
+					'Accept'       => 'application/json',
+				),
+			)
+		);
+
+		if ( ! self::validate( $response ) ) {
+
+			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
+		}
+
+		return json_decode( wp_remote_retrieve_body( $response ) );
 	}
 }
