@@ -103,7 +103,7 @@ class DiscoursePublish {
 			}
 		}
 
-		$already_published      = get_post_meta( $post_id, 'discourse_post_id', true );
+		$already_published      = $this->get_post_meta_from_db( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
@@ -176,7 +176,7 @@ class DiscoursePublish {
 	 */
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
 		$options                     = $this->options;
-		$discourse_id                = get_post_meta( $post_id, 'discourse_post_id', true );
+		$discourse_id                = $this->get_post_meta_from_db( $post_id, 'discourse_post_id' );
 		$current_post                = get_post( $post_id );
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
@@ -347,7 +347,7 @@ class DiscoursePublish {
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
 
-			add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
+			$this->add_post_meta_to_db( $post_id, 'discourse_post_id', $discourse_id );
 			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
 			update_post_meta( $post_id, 'publish_post_category', $category );
@@ -598,5 +598,60 @@ class DiscoursePublish {
 		$row        = $wpdb->get_row( $wpdb->prepare( $query, $topic_id ) );
 
 		return $row ? true : false;
+	}
+	
+	/**
+	 * Gets post metadata directly from the db.
+	 *
+	 * @param int $post_id Post ID.
+	 * @param string $key The meta key to retrieve.
+	 *
+	 * @return string
+	 */
+	protected function get_post_meta_from_db( $post_id, $key ) {
+		global $wpdb;
+		
+		$value = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s;",
+				$post_id,
+				$key
+			)
+		);
+		
+		return $value;
+	}
+	
+	/**
+	 * Adds post metadata directly to the db, if it is not already present.
+	 *
+	 * @param int $post_id Post ID.
+	 * @param string $key The meta key.
+	 * @param string $value The meta value.
+	 *
+	 * @return bool
+	 */
+	protected function add_post_meta_to_db( $post_id, $key, $value ) {
+		global $wpdb;
+		
+		if ( ! is_null( $this->get_post_meta_from_db( $post_id, $key ) ) ) {
+    	return false;
+    }
+		
+		$result = $wpdb->insert(
+			$wpdb->postmeta,
+			array(
+				'post_id' => $post_id,
+				'meta_key' => $key,
+				'meta_value' => $value
+			),
+			array(
+				'%d',
+				'%s',
+				'%s'
+			)
+		);
+		
+		return $result ? true : false;
 	}
 }
