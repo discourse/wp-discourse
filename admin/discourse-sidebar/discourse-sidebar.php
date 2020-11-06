@@ -148,8 +148,9 @@ class DiscourseSidebar {
 					$post_type,
 					$meta_key,
 					array(
-						'single'       => true,
-						'show_in_rest' => true,
+						'single'        => true,
+						'show_in_rest'  => true,
+						'auth_callback' => __return_false(),
 					)
 				);
 			}
