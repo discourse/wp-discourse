@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, retlehs, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.5
+Tested up to: 5.6
 Requires PHP: 5.6.0
-Stable tag: 2.1.7
+Stable tag: 2.1.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
+
+#### 2.1.8 11/10/2020
+
+- Prevent Discourse post metadata from being updated via post API endpoints
 
 #### 2.1.7 10/16/2020
 
