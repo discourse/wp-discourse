@@ -202,7 +202,7 @@ module.exports = _inherits;
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-var _typeof = __webpack_require__(/*! ../helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
+var _typeof = __webpack_require__(/*! @babel/runtime/helpers/typeof */ "./node_modules/@babel/runtime/helpers/typeof.js");
 
 var assertThisInitialized = __webpack_require__(/*! ./assertThisInitialized */ "./node_modules/@babel/runtime/helpers/assertThisInitialized.js");
 
@@ -1121,31 +1121,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
     _babel_runtime_helpers_classCallCheck__WEBPACK_IMPORTED_MODULE_1___default()(this, DiscourseSidebar);
 
     _this13 = _super14.call(this, props);
-    _this13.state = {
-      published: false,
-      postStatus: '',
-      publishingMethod: 'publish_post',
-      forcePublish: pluginOptions.forcePublish,
-      publishToDiscourse: pluginOptions.autoPublish,
-      publishPostCategory: pluginOptions.defaultCategory,
-      allowTags: pluginOptions.allowTags,
-      maxTags: pluginOptions.maxTags,
-      topicTags: [],
-      pinTopic: false,
-      pinUntil: null,
-      discoursePostId: null,
-      discoursePermalink: null,
-      publishingError: null,
-      busyUnlinking: false,
-      busyUpdating: false,
-      busyLinking: false,
-      busyPublishing: false,
-      statusMessage: null,
-      discourseCategories: null,
-      categoryError: false
-    };
-
-    _this13.updateStateFromDatabase(_this13.props.postId);
+    _this13.state = _this13.initializePostState(_this13.props.post);
 
     _this13.getDiscourseCategories();
 
@@ -1162,6 +1138,120 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }
 
   _babel_runtime_helpers_createClass__WEBPACK_IMPORTED_MODULE_2___default()(DiscourseSidebar, [{
+    key: "componentDidUpdate",
+    value: function componentDidUpdate(prevProps) {
+      if (this.isAllowedPostType()) {
+        if (this.publishedPostHasChanged(prevProps.post, this.props.post)) {
+          this.updatePostState(this.props.post);
+        }
+      }
+    }
+  }, {
+    key: "publishedPostHasChanged",
+    value: function publishedPostHasChanged(prev, post) {
+      if (!prev || !post || !prev.meta || !post.meta) return false; // We don't refresh state if post is not yet published
+
+      if ([post.status, prev.status].every(function (s) {
+        return s !== 'publish';
+      })) return false; // We always refresh state on a status change
+
+      if (post.status !== prev.status) return true; // We refresh state on publishing error or linked post change
+
+      return ['discourse_post_id', 'wpdc_publishing_response', 'wpdc_publishing_error'].some(function (attr) {
+        return post.meta[attr] !== prev.meta[attr];
+      });
+    }
+  }, {
+    key: "initializePostState",
+    value: function initializePostState(post) {
+      var state = {
+        published: false,
+        postStatus: '',
+        publishingMethod: 'publish_post',
+        forcePublish: pluginOptions.forcePublish,
+        publishToDiscourse: pluginOptions.autoPublish,
+        publishPostCategory: pluginOptions.defaultCategory,
+        allowTags: pluginOptions.allowTags,
+        maxTags: pluginOptions.maxTags,
+        topicTags: [],
+        pinTopic: false,
+        pinUntil: null,
+        discoursePostId: null,
+        discoursePermalink: null,
+        publishingError: null,
+        busyUnlinking: false,
+        busyUpdating: false,
+        busyLinking: false,
+        busyPublishing: false,
+        statusMessage: null,
+        discourseCategories: null,
+        categoryError: false
+      };
+
+      if (post && post.meta) {
+        state = Object.assign(state, this.buildPostState(post));
+      }
+
+      return state;
+    }
+  }, {
+    key: "updatePostState",
+    value: function updatePostState(post) {
+      this.setState(this.buildPostState(post));
+    }
+  }, {
+    key: "buildPostState",
+    value: function buildPostState(post) {
+      if (!post || !post.meta) return {};
+      var meta = post.meta;
+      var postState = {
+        publishToDiscourse: this.determinePublishToDiscourse(meta),
+        published: meta.discourse_post_id > 0,
+        postStatus: post.status,
+        topicTags: meta.wpdc_topic_tags.split(','),
+        pinTopic: meta.wpdc_pin_topic > 0
+      };
+
+      if (meta.publish_post_category > 0) {
+        postState.publishPostCategory = meta.publish_post_category;
+      }
+
+      if (meta.wpdc_pin_until) {
+        postState.pinUntil = meta.wpdc_pin_until;
+      }
+
+      if (meta.discourse_post_id) {
+        postState.discoursePostId = meta.discourse_post_id;
+      }
+
+      if (meta.discourse_permalink) {
+        postState.discoursePermalink = meta.discourse_permalink;
+      }
+
+      if (meta.wpdc_publishing_error) {
+        postState.publishingError = meta.wpdc_publishing_error;
+      }
+
+      return postState;
+    }
+  }, {
+    key: "determinePublishToDiscourse",
+    value: function determinePublishToDiscourse(meta) {
+      var autoPublish = pluginOptions.autoPublish,
+          autoPublishOverridden = 1 === parseInt(meta.wpdc_auto_publish_overridden, 10);
+      var publishToDiscourse;
+
+      if (['deleted_topic', 'queued_topic'].includes(meta.wpdc_publishing_error)) {
+        publishToDiscourse = false;
+      } else if (autoPublish && !autoPublishOverridden) {
+        publishToDiscourse = true;
+      } else {
+        publishToDiscourse = 1 === parseInt(meta.wpdc_publish_to_discourse, 10);
+      }
+
+      return publishToDiscourse;
+    }
+  }, {
     key: "getDiscourseCategories",
     value: function getDiscourseCategories() {
       var _this14 = this;
@@ -1186,68 +1276,6 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
       }
     }
   }, {
-    key: "updateStateFromDatabase",
-    value: function updateStateFromDatabase(postId) {
-      var _this15 = this;
-
-      if (this.isAllowedPostType()) {
-        var postType = this.props.post.type;
-        var postRouteName;
-
-        switch (postType) {
-          case 'post':
-            postRouteName = 'posts';
-            break;
-
-          case 'page':
-            postRouteName = 'pages';
-            break;
-
-          default:
-            postRouteName = postType;
-        }
-
-        wp.apiFetch({
-          path: "/wp/v2/".concat(postRouteName, "/").concat(postId),
-          method: 'GET'
-        }).then(function (data) {
-          if (!data.meta) {
-            return;
-          }
-
-          var meta = data.meta,
-              autoPublish = pluginOptions.autoPublish;
-          var publishToDiscourse;
-
-          if ('deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) {
-            publishToDiscourse = false;
-          } else if (autoPublish) {
-            var autoPublishOverridden = 1 === parseInt(meta.wpdc_auto_publish_overridden, 10);
-            publishToDiscourse = autoPublishOverridden ? 1 === parseInt(meta.wpdc_publish_to_discourse, 10) : true;
-          } else {
-            publishToDiscourse = 1 === parseInt(meta.wpdc_publish_to_discourse, 10);
-          }
-
-          _this15.setState({
-            published: meta.discourse_post_id > 0,
-            postStatus: data.status,
-            publishToDiscourse: publishToDiscourse,
-            publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
-            topicTags: meta.wpdc_topic_tags.split(','),
-            pinTopic: meta.wpdc_pin_topic > 0,
-            pinUntil: meta.wpdc_pin_until,
-            discoursePostId: meta.discourse_post_id,
-            discoursePermalink: meta.discourse_permalink,
-            publishingError: meta.wpdc_publishing_error
-          });
-
-          return null;
-        }, function (err) {
-          return null;
-        });
-      }
-    }
-  }, {
     key: "isAllowedPostType",
     value: function isAllowedPostType() {
       return pluginOptions.allowedPostTypes.indexOf(this.props.post.type) >= 0;
@@ -1262,7 +1290,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleToBePublishedChange",
     value: function handleToBePublishedChange(publishToDiscourse) {
-      var _this16 = this;
+      var _this15 = this;
 
       this.setState({
         publishToDiscourse: publishToDiscourse,
@@ -1273,8 +1301,8 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           method: 'POST',
           data: {
             set_publish_meta_nonce: pluginOptions.set_publish_meta_nonce,
-            id: _this16.props.postId,
-            publish_to_discourse: _this16.state.publishToDiscourse ? 1 : 0
+            id: _this15.props.postId,
+            publish_to_discourse: _this15.state.publishToDiscourse ? 1 : 0
           }
         }).then(function (data) {
           return null;
@@ -1286,7 +1314,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleCategoryChange",
     value: function handleCategoryChange(categoryId) {
-      var _this17 = this;
+      var _this16 = this;
 
       this.setState({
         publishPostCategory: categoryId
@@ -1296,7 +1324,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           method: 'POST',
           data: {
             set_category_meta_nonce: pluginOptions.set_category_meta_nonce,
-            id: _this17.props.postId,
+            id: _this16.props.postId,
             publish_post_category: categoryId
           }
         }).then(function (data) {
@@ -1309,7 +1337,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handlePinChange",
     value: function handlePinChange(pinTopic, pinUntil) {
-      var _this18 = this;
+      var _this17 = this;
 
       this.setState({
         pinTopic: pinTopic,
@@ -1320,7 +1348,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           method: 'Post',
           data: {
             set_pin_meta_nonce: pluginOptions.set_pin_meta_nonce,
-            id: _this18.props.postId,
+            id: _this17.props.postId,
             wpdc_pin_topic: pinTopic ? 1 : 0,
             wpdc_pin_until: pinUntil
           }
@@ -1334,7 +1362,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleTagChange",
     value: function handleTagChange(tags) {
-      var _this19 = this;
+      var _this18 = this;
 
       this.setState({
         topicTags: tags
@@ -1345,7 +1373,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           method: 'POST',
           data: {
             set_tag_meta_nonce: pluginOptions.set_tag_meta_nonce,
-            id: _this19.props.postId,
+            id: _this18.props.postId,
             wpdc_topic_tags: tagString
           }
         }).then(function (data) {
@@ -1358,7 +1386,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleLinkTopicClick",
     value: function handleLinkTopicClick(topicUrl) {
-      var _this20 = this;
+      var _this19 = this;
 
       this.setState({
         busyLinking: true,
@@ -1373,18 +1401,18 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           topic_url: topicUrl
         }
       }).then(function (data) {
-        _this20.setState({
+        _this19.setState({
           busyLinking: false
         });
 
         if (data.discourse_permalink) {
-          _this20.setState({
+          _this19.setState({
             published: true,
             discoursePermalink: data.discourse_permalink,
             publishingError: null
           });
         } else {
-          _this20.setState({
+          _this19.setState({
             publishingError: __('There has been an error linking your post with Discourse.', 'wp-discourse')
           });
         }
@@ -1393,7 +1421,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
       }, function (err) {
         var message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : __('There has been an error linking your post with Discourse.', 'wp-discourse');
 
-        _this20.setState({
+        _this19.setState({
           busyLinking: false,
           published: false,
           publishingError: message
@@ -1405,7 +1433,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleUnlinkFromDiscourseChange",
     value: function handleUnlinkFromDiscourseChange(e) {
-      var _this21 = this;
+      var _this20 = this;
 
       this.setState({
         busyUnlinking: true,
@@ -1419,7 +1447,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           id: this.props.postId
         }
       }).then(function (data) {
-        _this21.setState({
+        _this20.setState({
           busyUnlinking: false,
           published: false,
           publishingMethod: 'link_post',
@@ -1435,7 +1463,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handlePublishChange",
     value: function handlePublishChange(e) {
-      var _this22 = this;
+      var _this21 = this;
 
       this.setState({
         busyPublishing: true,
@@ -1451,7 +1479,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
       }).then(function (data) {
         var success = 'success' === data.publish_response;
 
-        _this22.setState({
+        _this21.setState({
           busyPublishing: false,
           published: success,
           publishingError: success ? null : data.publish_response,
@@ -1463,7 +1491,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
       }, function (err) {
         var message = err.responseJSON && err.responseJSON.message ? err.responseJSON.message : __('There has been an error linking your post with Discourse.', 'wp-discourse');
 
-        _this22.setState({
+        _this21.setState({
           busyPublishing: false,
           published: false,
           publishingError: message
@@ -1475,7 +1503,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "handleUpdateChange",
     value: function handleUpdateChange(e) {
-      var _this23 = this;
+      var _this22 = this;
 
       this.setState({
         busyUpdating: true,
@@ -1497,7 +1525,7 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
           message = __('The Discourse topic has been updated!', 'wp-discourse');
         }
 
-        _this23.setState({
+        _this22.setState({
           busyUpdating: false,
           statusMessage: message,
           publishingError: success ? null : data.update_response
@@ -1507,35 +1535,13 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
       }, function (err) {
         var message = __('There was an error updating the Discourse topic.', 'wp-discourse');
 
-        _this23.setState({
+        _this22.setState({
           busyUpdating: false,
           statusMessage: message
         });
 
         return null;
       });
-    }
-  }, {
-    key: "componentDidUpdate",
-    value: function componentDidUpdate(prevProps) {
-      if (this.isAllowedPostType()) {
-        var post = this.props.post,
-            prevPost = prevProps.post,
-            meta = this.props.post.meta,
-            prevMeta = prevProps.post.meta;
-
-        if (meta && prevMeta && ((post.status === 'publish' || prevPost.status === 'publish') && post.status !== prevPost.status || meta.discourse_post_id !== prevMeta.discourse_post_id || meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response || meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error)) {
-          var publishToDiscourse = 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ? false : 1 === parseInt(meta.publish_to_discourse, 10);
-          this.setState({
-            published: meta.discourse_post_id > 0,
-            postStatus: post.status,
-            publishToDiscourse: publishToDiscourse,
-            discoursePostId: meta.discourse_post_id,
-            discoursePermalink: meta.discourse_permalink,
-            publishingError: meta.wpdc_publishing_error
-          });
-        }
-      }
     }
   }, {
     key: "render",

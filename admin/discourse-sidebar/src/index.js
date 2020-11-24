@@ -603,31 +603,7 @@ class PinTopic extends Component {
 class DiscourseSidebar extends Component {
     constructor( props ) {
         super( props );
-        this.state = {
-            published: false,
-            postStatus: '',
-            publishingMethod: 'publish_post',
-            forcePublish: pluginOptions.forcePublish,
-            publishToDiscourse: pluginOptions.autoPublish,
-            publishPostCategory: pluginOptions.defaultCategory,
-            allowTags: pluginOptions.allowTags,
-            maxTags: pluginOptions.maxTags,
-            topicTags: [],
-            pinTopic: false,
-            pinUntil: null,
-            discoursePostId: null,
-            discoursePermalink: null,
-            publishingError: null,
-            busyUnlinking: false,
-            busyUpdating: false,
-            busyLinking: false,
-            busyPublishing: false,
-            statusMessage: null,
-            discourseCategories: null,
-            categoryError: false,
-        };
-
-        this.updateStateFromDatabase( this.props.postId );
+        this.state = this.initializePostState(this.props.post);
         this.getDiscourseCategories();
 
         this.handleToBePublishedChange = this.handleToBePublishedChange.bind( this );
@@ -641,6 +617,116 @@ class DiscourseSidebar extends Component {
         this.handlePinChange = this.handlePinChange.bind( this );
     }
 
+    componentDidUpdate(prevProps) {
+      if (this.isAllowedPostType()) {
+        if (this.publishedPostHasChanged(prevProps.post, this.props.post)) {
+          this.updatePostState(this.props.post);
+        }
+      }
+    }
+    
+    publishedPostHasChanged(prev, post) {
+      if (!prev || !post || !prev.meta || !post.meta) return false;
+      
+      // We don't refresh state if post is not yet published
+      if ([post.status, prev.status].every(s => s !== 'publish')) return false;
+      
+      // We always refresh state on a status change
+      if (post.status !== prev.status) return true;
+      
+      // We refresh state on publishing error or linked post change
+      return [
+        'discourse_post_id',
+        'wpdc_publishing_response', 
+        'wpdc_publishing_error'
+      ].some(attr => post.meta[attr] !== prev.meta[attr]);
+    }
+    
+    initializePostState(post) {
+      let state = {
+        published: false,
+        postStatus: '',
+        publishingMethod: 'publish_post',
+        forcePublish: pluginOptions.forcePublish,
+        publishToDiscourse: pluginOptions.autoPublish,
+        publishPostCategory: pluginOptions.defaultCategory,
+        allowTags: pluginOptions.allowTags,
+        maxTags: pluginOptions.maxTags,
+        topicTags: [],
+        pinTopic: false,
+        pinUntil: null,
+        discoursePostId: null,
+        discoursePermalink: null,
+        publishingError: null,
+        busyUnlinking: false,
+        busyUpdating: false,
+        busyLinking: false,
+        busyPublishing: false,
+        statusMessage: null,
+        discourseCategories: null,
+        categoryError: false,
+      }
+      
+      if (post && post.meta) {
+        state = Object.assign(state, this.buildPostState(post));
+      }
+            
+      return state;
+    }
+    
+    updatePostState(post) {
+      this.setState(this.buildPostState(post));
+    }
+    
+    buildPostState(post) {
+      if (!post || !post.meta) return {};
+      
+      const meta = post.meta;
+      
+      let postState = {
+        publishToDiscourse: this.determinePublishToDiscourse(meta),
+        published: meta.discourse_post_id > 0,
+        postStatus: post.status,
+        topicTags: meta.wpdc_topic_tags.split(','),
+        pinTopic: meta.wpdc_pin_topic > 0
+      };
+
+      if (meta.publish_post_category > 0) {
+        postState.publishPostCategory = meta.publish_post_category;
+      }
+      if (meta.wpdc_pin_until) {
+        postState.pinUntil = meta.wpdc_pin_until;
+      }
+      if (meta.discourse_post_id) {
+        postState.discoursePostId = meta.discourse_post_id;
+      }
+      if (meta.discourse_permalink) {
+        postState.discoursePermalink = meta.discourse_permalink;
+      }
+      if (meta.wpdc_publishing_error) {
+        postState.publishingError = meta.wpdc_publishing_error;
+      }
+      
+      return postState;
+    }
+    
+    determinePublishToDiscourse(meta) {
+      const autoPublish = pluginOptions.autoPublish,
+            autoPublishOverridden = 1 === parseInt(meta.wpdc_auto_publish_overridden, 10);
+
+      let publishToDiscourse;
+
+      if (['deleted_topic','queued_topic'].includes(meta.wpdc_publishing_error)) {
+        publishToDiscourse = false;
+      } else if (autoPublish && !autoPublishOverridden) {
+        publishToDiscourse = true;
+      } else {
+        publishToDiscourse = 1 === parseInt(meta.wpdc_publish_to_discourse, 10);
+      }
+      
+      return publishToDiscourse;
+    }
+    
     getDiscourseCategories() {
         if ( ! pluginOptions.pluginUnconfigured ) {
             wp.apiRequest({
@@ -661,59 +747,6 @@ class DiscourseSidebar extends Component {
                     this.setState( { categoryError: true } );
                 }
             )
-        }
-    }
-
-    updateStateFromDatabase( postId ) {
-        if ( this.isAllowedPostType() ) {
-            const postType = this.props.post.type;
-            let postRouteName;
-            switch ( postType ) {
-                case 'post':
-                    postRouteName = 'posts';
-                    break;
-                case 'page':
-                    postRouteName = 'pages';
-                    break;
-                default:
-                    postRouteName = postType;
-            }
-            wp.apiFetch( { path: `/wp/v2/${postRouteName}/${postId}`, method: 'GET' } ).then(
-                ( data ) => {
-                    if ( ! data.meta ) {
-                        return;
-                    }
-                    const meta = data.meta,
-                        autoPublish = pluginOptions.autoPublish;
-                    let publishToDiscourse;
-                    if ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
-                        publishToDiscourse = false;
-
-                    } else if ( autoPublish ) {
-                        const autoPublishOverridden = 1 === parseInt( meta.wpdc_auto_publish_overridden, 10 );
-                        publishToDiscourse =  autoPublishOverridden ? 1 === parseInt( meta.wpdc_publish_to_discourse, 10 ) : true;
-
-                    } else {
-                        publishToDiscourse = 1 === parseInt( meta.wpdc_publish_to_discourse, 10 );
-                    }
-                    this.setState( {
-                        published: meta.discourse_post_id > 0,
-                        postStatus: data.status,
-                        publishToDiscourse: publishToDiscourse,
-                        publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
-                        topicTags: meta.wpdc_topic_tags.split( ',' ),
-                        pinTopic: meta.wpdc_pin_topic > 0,
-                        pinUntil: meta.wpdc_pin_until,
-                        discoursePostId: meta.discourse_post_id,
-                        discoursePermalink: meta.discourse_permalink,
-                        publishingError: meta.wpdc_publishing_error,
-                    });
-                    return null;
-                },
-                ( err ) => {
-                    return null;
-                }
-            );
         }
     }
 
@@ -962,32 +995,6 @@ class DiscourseSidebar extends Component {
                 return null;
             }
         );
-    }
-
-    componentDidUpdate( prevProps ) {
-        if ( this.isAllowedPostType() ) {
-            const post = this.props.post,
-                prevPost = prevProps.post,
-                meta = this.props.post.meta,
-                prevMeta = prevProps.post.meta;
-
-            if ( meta &&
-                prevMeta && ( 
-                ( ( post.status === 'publish' || prevPost.status === 'publish' ) && ( post.status !== prevPost.status ) ) ||
-                meta.discourse_post_id !== prevMeta.discourse_post_id ||
-                meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
-                meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error ) ) {
-                const publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : 1 === parseInt( meta.publish_to_discourse, 10 );
-                this.setState( {
-                    published: meta.discourse_post_id > 0,
-                    postStatus: post.status,
-                    publishToDiscourse: publishToDiscourse,
-                    discoursePostId: meta.discourse_post_id,
-                    discoursePermalink: meta.discourse_permalink,
-                    publishingError: meta.wpdc_publishing_error,
-                } );
-            }
-        }
     }
 
     render() {
