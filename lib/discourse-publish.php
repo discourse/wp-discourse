@@ -599,14 +599,14 @@ class DiscoursePublish {
 
 		return $row ? true : false;
 	}
-	
+
 	/**
 	 * Gets post metadata via wp method, or directly from db,
 	 * depending on the direct-db-publication-flags option.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
 	 * @param string $key The meta key to retrieve.
-	 * @param bool $single (optional) Whether to return a single value.
+	 * @param bool   $single (optional) Whether to return a single value.
 	 *
 	 * @return string
 	 */
@@ -614,28 +614,28 @@ class DiscoursePublish {
 		if ( empty( $this->options['direct-db-publication-flags'] ) ) {
 			return get_post_meta( $post_id, $key, $single );
 		}
-		
+
 		global $wpdb;
-		
+
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s" . ($single ? " LIMIT 1" : "") . ";",
+				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s" . ( $single ? ' LIMIT 1' : '' ) . ';',
 				$post_id,
 				$key
 			)
 		);
-				
+
 		return $value;
 	}
-	
+
 	/**
 	 * Adds post metadata via wp method, or directly to db,
 	 * depending on the direct-db-publication-flags option.
 	 *
-	 * @param int $post_id Post ID.
+	 * @param int    $post_id Post ID.
 	 * @param string $key The meta key.
 	 * @param string $value The meta value.
-	 * @param bool $unique (optional) Whether the same key should not be added.
+	 * @param bool   $unique (optional) Whether the same key should not be added.
 	 *
 	 * @return bool
 	 */
@@ -643,27 +643,27 @@ class DiscoursePublish {
 		if ( empty( $this->options['direct-db-publication-flags'] ) ) {
 			return add_post_meta( $post_id, $key, $value, $unique );
 		}
-		
+
 		global $wpdb;
-		
-		if ( $unique && !is_null( $this->dc_get_post_meta( $post_id, $key ) ) ) {
-    	return false;
-    }
-		
+
+		if ( $unique && ! is_null( $this->dc_get_post_meta( $post_id, $key ) ) ) {
+			return false;
+		}
+
 		$result = $wpdb->insert(
 			$wpdb->postmeta,
 			array(
-				'post_id' => $post_id,
-				'meta_key' => $key,
-				'meta_value' => $value
+				'post_id'    => $post_id,
+				'meta_key'   => $key,
+				'meta_value' => $value,
 			),
 			array(
 				'%d',
 				'%s',
-				'%s'
+				'%s',
 			)
 		);
-		
+
 		return $result ? true : false;
 	}
 }

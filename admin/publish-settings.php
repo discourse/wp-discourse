@@ -267,7 +267,7 @@ class PublishSettings {
 				'discourse_publish',
 				'discourse_publishing_settings_section'
 			);
-			
+
 			add_settings_field(
 				'discourse_direct_db_publication_flags',
 				__( 'Direct Database Publication Flags', 'wp-discourse' ),
@@ -427,7 +427,7 @@ class PublishSettings {
 			'auto-publish',
 			'discourse_publish',
 			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-                __( 'This can be overridden in the Discourse Sidebar before you publish a post.', 'wp-discourse' )
+			__( 'This can be overridden in the Discourse Sidebar before you publish a post.', 'wp-discourse' )
 		);
 	}
 
@@ -537,7 +537,7 @@ class PublishSettings {
 			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple post-types.', 'wp-discourse' )
 		);
 	}
-	
+
 	/**
 	 * Outputs markup for the discourse_direct_db_publication_meta checkbox.
 	 */
@@ -550,7 +550,7 @@ class PublishSettings {
 				'wp-discourse'
 			),
 			__(
-				"Potentially prevents concurrency issues arising from object cache usage.",
+				'Potentially prevents concurrency issues arising from object cache usage.',
 				'wp-discourse'
 			)
 		);
