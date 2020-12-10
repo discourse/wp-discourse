@@ -1164,6 +1164,10 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
   }, {
     key: "initializePostState",
     value: function initializePostState(post) {
+      if (!this.isAllowedPostType()) {
+        return {};
+      }
+
       var state = {
         published: false,
         postStatus: '',

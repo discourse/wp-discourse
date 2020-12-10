@@ -104,6 +104,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_discourse_username_editable', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_discourse_direct_db_publication_flags', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_enable_discourse_comments', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_comment_type', array( $this, 'validate_radio_string_value' ) );

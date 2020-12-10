@@ -643,6 +643,10 @@ class DiscourseSidebar extends Component {
     }
     
     initializePostState(post) {
+      if (!this.isAllowedPostType()) {
+        return {};
+      }
+      
       let state = {
         published: false,
         postStatus: '',
