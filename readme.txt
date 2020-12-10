@@ -126,6 +126,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 #### 2.2.0 12/10/2020
 
 - Add Direct Database Publication option to deal with concurrency issues that may arrise when the plugin is used in conjunction with object caching plugins
+- Fix state being initialized for unallowed post types
 
 #### 2.1.9 11/24/2020
 
