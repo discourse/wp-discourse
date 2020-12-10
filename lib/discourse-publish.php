@@ -103,7 +103,7 @@ class DiscoursePublish {
 			}
 		}
 
-		$already_published      = $this->get_post_meta_from_db( $post_id, 'discourse_post_id', true );
+		$already_published      = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
@@ -176,7 +176,7 @@ class DiscoursePublish {
 	 */
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
 		$options                     = $this->options;
-		$discourse_id                = $this->get_post_meta_from_db( $post_id, 'discourse_post_id' );
+		$discourse_id                = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
 		$current_post                = get_post( $post_id );
 		$author_id                   = $current_post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
@@ -347,9 +347,9 @@ class DiscoursePublish {
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
 
-			$this->add_post_meta_to_db( $post_id, 'discourse_post_id', $discourse_id );
-			add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
-			add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
+			$this->dc_add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
+			$this->dc_add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
+			$this->dc_add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
 			update_post_meta( $post_id, 'publish_post_category', $category );
 
 			// Used for resetting the error notification, if one was being displayed.
@@ -601,40 +601,52 @@ class DiscoursePublish {
 	}
 	
 	/**
-	 * Gets post metadata directly from the db.
+	 * Gets post metadata via wp method, or directly from db,
+	 * depending on the direct-db-publication-flags option.
 	 *
 	 * @param int $post_id Post ID.
 	 * @param string $key The meta key to retrieve.
+	 * @param bool $single (optional) Whether to return a single value.
 	 *
 	 * @return string
 	 */
-	protected function get_post_meta_from_db( $post_id, $key ) {
+	protected function dc_get_post_meta( $post_id, $key, $single = false ) {
+		if ( empty( $this->options['direct-db-publication-flags'] ) ) {
+			return get_post_meta( $post_id, $key, $single );
+		}
+		
 		global $wpdb;
 		
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s;",
+				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s" . ($single ? " LIMIT 1" : "") . ";",
 				$post_id,
 				$key
 			)
 		);
-		
+				
 		return $value;
 	}
 	
 	/**
-	 * Adds post metadata directly to the db, if it is not already present.
+	 * Adds post metadata via wp method, or directly to db,
+	 * depending on the direct-db-publication-flags option.
 	 *
 	 * @param int $post_id Post ID.
 	 * @param string $key The meta key.
 	 * @param string $value The meta value.
+	 * @param bool $unique (optional) Whether the same key should not be added.
 	 *
 	 * @return bool
 	 */
-	protected function add_post_meta_to_db( $post_id, $key, $value ) {
+	protected function dc_add_post_meta( $post_id, $key, $value, $unique = false ) {
+		if ( empty( $this->options['direct-db-publication-flags'] ) ) {
+			return add_post_meta( $post_id, $key, $value, $unique );
+		}
+		
 		global $wpdb;
 		
-		if ( ! is_null( $this->get_post_meta_from_db( $post_id, $key ) ) ) {
+		if ( $unique && !is_null( $this->dc_get_post_meta( $post_id, $key ) ) ) {
     	return false;
     }
 		
