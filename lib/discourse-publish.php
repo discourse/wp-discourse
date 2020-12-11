@@ -299,8 +299,8 @@ class DiscoursePublish {
 				'body'    => http_build_query( $data ),
 			);
 		}// End if().
-		
-		if ( function_exists( 'wp_get_environment_type' ) && wp_get_environment_type() !== 'production' ) {
+
+		if ( function_exists( 'wp_get_environment_type' ) && 'production' !== wp_get_environment_type() ) {
 			return null;
 		}
 
@@ -488,7 +488,7 @@ class DiscoursePublish {
 			'body'    => http_build_query( $data ),
 		);
 
-		if ( function_exists( 'wp_get_environment_type' ) && wp_get_environment_type() !== 'production' ) {
+		if ( function_exists( 'wp_get_environment_type' ) && 'production' !== wp_get_environment_type() ) {
 			return null;
 		}
 
