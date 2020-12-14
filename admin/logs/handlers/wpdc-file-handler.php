@@ -35,7 +35,7 @@ class WPDCLogFileHandler extends RotatingFileHandler {
         }
         
         $this->filename = $folder_manager->logs_dir . '/wp-discourse';
-        $this->maxFiles = 0;
+        $this->maxFiles = 10;
         $this->nextRotation = new \DateTimeImmutable('tomorrow');
         $this->filenameFormat = '{filename}-{date}-{hash}';
         $this->dateFormat = static::FILE_PER_DAY;
