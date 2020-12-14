@@ -12,14 +12,28 @@ namespace WPDiscourse\Admin;
 class LogsFolderManager {
   
   /**
-	 * wp-discourse uploads directory
+	 * Name of uploads folder.
+	 *
+	 * @var null|LogsFolderManager
+	 */
+  protected $uploads_folder = "wp-discourse";
+  
+  /**
+	 * Name of logs folder.
+	 *
+	 * @var null|LogsFolderManager
+	 */
+  protected $logs_folder = "logs";
+  
+  /**
+	 * Absolute path to uploads directory.
 	 *
 	 * @var null|LogsFolderManager
 	 */
   public $upload_dir;
   
   /**
-	 * wp-discourse logs directory
+	 * Absolute path to logs directory.
 	 *
 	 * @var null|LogsFolderManager
 	 */
@@ -37,8 +51,8 @@ class LogsFolderManager {
 	 */
   public function __construct() {
       $this->ready = false;
-      $this->upload_dir = wp_upload_dir()['basedir'] . "/discourse";
-      $this->logs_dir = $this->upload_dir . '/logs';
+      $this->upload_dir = wp_upload_dir()['basedir'] . "/" . $this->uploads_folder;
+      $this->logs_dir = $this->upload_dir . "/" . $this->logs_folder;
   }
   
   /**
