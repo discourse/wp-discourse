@@ -1,0 +1,53 @@
+name: WP-Discourse Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: PHP ${{ matrix.php }}
+    env:
+      PHPCS_DIR: "/tmp/phpcs"
+      SNIFFS_DIR: "/tmp/sniffs"
+    strategy:
+      matrix:
+        include:
+          - php: "5.6"
+            sniff: true
+          - php: "7.0"
+            sniff: true
+          - php: "7.1"
+            sniff: false
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+      - name: Install Tools
+        if: "matrix.sniff"
+        run: |
+          git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
+          export PATH="$HOME/.phpenv/bin:$PATH"
+          git clone -b 2.9.1 --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git $PHPCS_DIR
+          git clone -b 0.11.0 --depth 1 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git $SNIFFS_DIR
+          git clone -b 7.1.5 --depth 1 https://github.com/wimg/PHPCompatibility.git $SNIFFS_DIR/PHPCompatibility
+          $PHPCS_DIR/scripts/phpcs --config-set installed_paths $SNIFFS_DIR
+          phpenv rehash
+          sudo npm install -g jshint
+          wget https://develop.svn.wordpress.org/trunk/.jshintrc
+      - name: Syntax Check
+        run: |
+          find -L . -name '*.php' -print0 | xargs -0 -n 1 -P 4 php -l
+      - name: JSHint
+        if: "matrix.sniff"
+        run: |
+          jshint .
+      - name: WordPress Coding Standards
+        if: "matrix.sniff"
+        run: |
+          $PHPCS_DIR/scripts/phpcs -p -s -v -n . --standard=./codesniffer.ruleset.xml --ignore=*/tests/*,*/tests/lib/*,*/lib/wp-new-user-notification.php*,*/vendor/*,*/admin/discourse-sidebar/build/index.asset.php* --extensions=php
