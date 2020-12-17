@@ -59,6 +59,9 @@ require_once WPDISCOURSE_PATH . 'templates/html-templates.php';
 require_once WPDISCOURSE_PATH . 'admin/discourse-sidebar/discourse-sidebar.php';
 require_once WPDISCOURSE_PATH . 'admin/admin.php';
 
+require_once WPDISCOURSE_PATH . 'vendor/autoload.php';
+require_once WPDISCOURSE_PATH . 'lib/logs/logger.php';
+
 new WPDiscourse\Discourse\Discourse();
 $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();
 $discourse_publish = new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );

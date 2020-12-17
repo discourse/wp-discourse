@@ -4,50 +4,53 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\Admin;
+namespace WPDiscourse\Logs;
 
 /**
- * Class LogsFolderManager. Manages creation, access and validation of logs directory.
+ * Class FileManager. Manages creation, access and validation of logs directory.
  */
-class LogsFolderManager {
+class FileManager {
   
   /**
 	 * Name of uploads folder.
 	 *
-	 * @var null|LogsFolderManager
+   * @access protected
+	 * @var null|FileManager
 	 */
   protected $uploads_folder = "wp-discourse";
   
   /**
 	 * Name of logs folder.
 	 *
-	 * @var null|LogsFolderManager
+   * @access protected
+	 * @var null|FileManager
 	 */
   protected $logs_folder = "logs";
   
   /**
 	 * Absolute path to uploads directory.
 	 *
-	 * @var null|LogsFolderManager
+	 * @var null|FileManager
 	 */
   public $upload_dir;
   
   /**
 	 * Absolute path to logs directory.
 	 *
-	 * @var null|LogsFolderManager
+	 * @var null|FileManager
 	 */
   public $logs_dir;
   
   /**
-	 * Flag to determine whether logs folder is ready to be used.
+	 * Flag to determine whether files are ready.
 	 *
-	 * @var null|LogsFolderManager
+   * @access protected
+	 * @var null|FileManager
 	 */
-  public $ready;
+  protected $ready;
   
   /**
-	 * LogsFolderManager constructor
+	 * LogsFileManager constructor
 	 */
   public function __construct() {
       $this->ready = false;
@@ -56,10 +59,14 @@ class LogsFolderManager {
   }
   
   /**
-  * Validates that all log folders and access control files are created.
+  * Validates that all necessary files are ready.
   * Sets $ready to true if validation passes.
   */
   public function validate() {
+      if ( ! is_writable( wp_upload_dir()['basedir'] ) ) {
+        return false;
+      }
+    
       $files = array(
         array(
           'base'    => $this->upload_dir,
@@ -83,24 +90,34 @@ class LogsFolderManager {
         )
       );
       
-      $this->create_files($files);
+      $this->create_files( $files );
       
-      if ( $this->all_files_exist($files) ) {
-          $this->ready = true;
-      }
+      $ready = $this->files_are_ready( $files );
+      $this->ready = $ready;
+      
+      return $ready;
   }
   
   /**
-	 * Creates directories and files if they don't exist 
+  * Public method to determine whether file manager is ready
+  */
+  public function ready() {
+    return $this->ready;
+  }
+  
+  /**
+	 * Creates files if they don't exist 
 	 *
    * @access protected
 	 * @param string $files List of files
 	 */
   protected function create_files( $files ) {
       foreach ( $files as $file ) {
-    			if ( wp_mkdir_p( $file['base'] ) && ! file_exists( trailingslashit( $file['base'] ) . $file['file'] ) ) {
-      				$file_handle = @fopen( trailingslashit( $file['base'] ) . $file['file'], 'wb' );
-      				
+          $file_path = trailingslashit( $file['base'] ) . $file['file'];
+          
+    			if ( wp_mkdir_p( $file['base'] ) && ! file_exists( $file_path ) ) {
+      				$file_handle = @fopen( $file_path, 'wb' );
+              
               if ( $file_handle ) {
         					fwrite( $file_handle, $file['content'] );
         					fclose( $file_handle );
@@ -110,17 +127,21 @@ class LogsFolderManager {
   }
   
   /**
-	 * Checks if all directories and files exist
+	 * Checks if all files exist and are writable
 	 *
    * @access protected
 	 * @param string $files List of files
 	 */
-  protected function all_files_exist( $files ) {
+  protected function files_are_ready( $files ) {
       foreach ( $files as $file ) {
-          if ( ! file_exists( trailingslashit( $file['base'] ) . $file['file'] ) ) {
-              return false;
-          }
+        $directory_path = trailingslashit( $file['base'] );
+        $file_path = $directory_path . $file['file'];
+        
+        if ( ! is_writable( $directory_path ) || !file_exists( $file_path ) ) {
+            return false;
+        }
       }
+      
       return true;
   }
 }

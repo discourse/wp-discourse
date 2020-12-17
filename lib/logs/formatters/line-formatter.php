@@ -4,17 +4,15 @@
  * @package WPDiscourse
  */
 
-namespace WPDiscourse\Admin;
-
-use \Monolog\Formatter\LineFormatter;
+namespace WPDiscourse\Logs;
 
 /**
- * Class WPDCLogFileFormatter
+ * Class LineFormatter
  */
-class WPDCLogFileFormatter extends LineFormatter {
+class LineFormatter extends \Monolog\Formatter\LineFormatter {
   
   /**
-  * WPDCLogFileFormatter constructor
+  * LineFormatter constructor
   */
   public function __construct() {
     $format = null;
