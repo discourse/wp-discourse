@@ -14,18 +14,16 @@ class FileManager {
   /**
 	 * Name of uploads folder.
 	 *
-   * @access protected
 	 * @var null|FileManager
 	 */
-  protected $uploads_folder = "wp-discourse";
+  public $upload_folder = "wp-discourse";
   
   /**
 	 * Name of logs folder.
 	 *
-   * @access protected
 	 * @var null|FileManager
 	 */
-  protected $logs_folder = "logs";
+  public $logs_folder = "logs";
   
   /**
 	 * Absolute path to uploads directory.
@@ -54,7 +52,7 @@ class FileManager {
 	 */
   public function __construct() {
       $this->ready = false;
-      $this->upload_dir = wp_upload_dir()['basedir'] . "/" . $this->uploads_folder;
+      $this->upload_dir = wp_upload_dir()['basedir'] . "/" . $this->upload_folder;
       $this->logs_dir = $this->upload_dir . "/" . $this->logs_folder;
   }
   
@@ -76,7 +74,7 @@ class FileManager {
         array(
           'base'    => $this->upload_dir,
           'file'    => '.htaccess',
-          'content' => 'deny from all',
+          'content' => $this->htaccess_content(),
         ),
         array(
           'base'    => $this->logs_dir,
@@ -86,7 +84,7 @@ class FileManager {
         array(
           'base'    => $this->logs_dir,
           'file'    => '.htaccess',
-          'content' => 'deny from all',
+          'content' => $this->htaccess_content(),
         )
       );
       
@@ -143,5 +141,14 @@ class FileManager {
       }
       
       return true;
+  }
+  
+  /**
+   * Returns content of htaccess files
+   *
+   * @access protected
+   */
+  protected function htaccess_content() {
+    return 'deny from all';
   }
 }

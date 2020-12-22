@@ -19,10 +19,16 @@ class FileHandler extends StreamHandler {
     /**
      * Flag to determine whether file handler can be used.
      *  
-     * @access protected
      * @var null|FileHandler
      */
-    protected $enabled;
+    public $enabled;
+    
+    /**
+     * FileHandler's instance of FileManager
+     *
+     * @var null|FileHandler
+     */
+    public $file_manager;
     
     /**
      * Maximum number of log files
@@ -39,14 +45,6 @@ class FileHandler extends StreamHandler {
      * @var null|FileHandler
      */
     protected $must_rotate;
-    
-    /**
-     * FileHandler's instance of FileManager
-     *
-     * @access protected
-     * @var null|FileHandler
-     */
-    protected $file_manager; 
     
     /**
      * Allows for custom datetime to be set for testing purposes
@@ -260,7 +258,6 @@ class FileHandler extends StreamHandler {
         $name = $this->fileName();
         $hash = wp_hash( $name , "nonce");
         $extension = 'log';
-
         return "$dir_path/$name-$hash.$extension";
     }
     
@@ -268,7 +265,7 @@ class FileHandler extends StreamHandler {
      * Returns date used by file handler
      */
     protected function getDate() {
-        if ( isset($this->datetime) ) {
+        if ( isset( $this->datetime ) ) {
             return $this->datetime->format( static::DATE_FORMAT );
         } else {
             return date( static::DATE_FORMAT );
@@ -289,10 +286,17 @@ class FileHandler extends StreamHandler {
      * Builds current log file name
      */
     protected function fileName() {
-        $namespace = static::FILE_NAMESPACE;
         $date = $this->getDate();
         $number = $this->file_number;
-        return "$namespace-$date-$number";
+        return $this->buildFilename( $date, $number );
+    }
+    
+    /**
+     * Build file name
+     */
+    protected function buildFilename( $date, $number ) {
+      $namespace = static::FILE_NAMESPACE;
+      return "$namespace-$date-$number";
     }
     
     /**
@@ -300,7 +304,7 @@ class FileHandler extends StreamHandler {
      */
     public function getNumberFromUrl( $file_url ) {
       $parts = explode( '-', $file_url );
-      end($parts);
+      end( $parts );
       return (int)prev( $parts );
     }
     
@@ -311,5 +315,14 @@ class FileHandler extends StreamHandler {
       $parts = explode( '-', $file_url );
       $date_parts = array_slice( array_slice($parts, -5) , 0, 3);
       return implode( '-', $date_parts);
+    }
+    
+    /**
+     * Retrieves file name from file url
+     */
+    public function getFilename( $file_url ) {
+      $date = $this->getDateFromUrl( $file_url );
+      $number = $this->getNumberFromUrl( $file_url );
+      return $this->buildFilename( $date, $number );
     }
 }

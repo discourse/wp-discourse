@@ -85,14 +85,19 @@ class FileManagerTest extends WP_UnitTestCase {
 		$this->assertFalse( $file_manager->validate() );
 		$this->assertFalse( $file_manager->ready() );
 	}
-	
-	// Helpers
-	
+		
 	public static function reset_permissions() {
 		$file_manager = new FileManager();
-		chmod(wp_upload_dir()['basedir'], 0744);
-		chmod($file_manager->upload_dir, 0744);
-		chmod($file_manager->logs_dir, 0744);
+		
+		chmod( wp_upload_dir()['basedir'], 0744) ;
+		
+		if ( is_dir( $file_manager->upload_dir ) ) {
+			chmod( $file_manager->upload_dir, 0744 );
+		}
+		
+		if ( is_dir( $file_manager->logs_dir ) ) {
+			chmod( $file_manager->logs_dir, 0744 );
+		}
 	}
 	
 	public static function setUpBeforeClass() {

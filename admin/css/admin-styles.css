@@ -205,3 +205,40 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 .discourse-comment-type {
 	padding-left: 23px;
 }
+
+#wpdc-log-viewer-controls {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+#wpdc-log-viewer {
+	height: 700px;
+	background: white;
+	display: inline-block;
+	width: 100%;
+	position: relative;
+	overflow: scroll;
+}
+
+#wpdc-log-viewer .spinner {
+	visibility: hidden;
+	float: none;
+  position: absolute;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#wpdc-log-viewer.loading .spinner {
+	visibility: visible;
+}
+
+#wpdc-log-viewer pre {
+	visibility: visible;
+}
+
+#wpdc-log-viewer.loading pre {
+	visibility: hidden;
+}

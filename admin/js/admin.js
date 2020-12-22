@@ -125,4 +125,73 @@
 				$( '.discourse-comment-type' ).toggleClass( 'hidden' );
 		}
 	);
+	
+	var $logControls = $('#wpdc-log-viewer-controls');
+	var $logViewer = $('#wpdc-log-viewer');
+	
+	$logControls.find('select').on('change', function() {
+		var key = $logControls.find('select').val();
+		
+		if (key) {
+			$logViewer.addClass('loading');
+			
+			$.ajax({
+				url: wpdc.ajax,
+				type: 'post',
+				data: {
+					action: "wpdc_view_log",
+					key: key
+				},
+				success: function(response) {
+					if (response.success) {
+						$logControls.find('h3').html(response.data.name);
+						$logViewer.find('pre').html(response.data.contents);
+						$logViewer.removeClass('loading');
+					}
+				}
+			});
+		}
+	});
+	
+	$logControls.find('.button.view-meta').on('click', function() {		
+		$logViewer.addClass('loading');	
+		$.ajax({
+			url: wpdc.ajax,
+			type: 'post',
+			data: {
+				action: "wpdc_view_logs_metafile"
+			},
+			success: function(response) {
+				if (response.success) {
+					$logControls.find('h3').html(response.data.name);
+					$logViewer.find('pre').html(response.data.contents);
+					$logViewer.removeClass('loading');
+				}
+			}
+		});
+	});
+	
+	$logControls.find('.button.download-logs').on('click', function() {		
+		var xhr = new XMLHttpRequest();
+		xhr.open("POST", wpdc.ajax + "?action=wpdc_download_logs", true);
+		xhr.onload = function() {
+			if (xhr.readyState == 4 && xhr.status == 200) {
+				var blob = new Blob([ xhr.response ], { type: "application/zip" });
+				var url = window.URL.createObjectURL(blob);
+				var a = document.createElement("a");
+        
+				document.body.appendChild(a);
+        a.style = "display:none";
+        a.href = url;
+        a.download = xhr.getResponseHeader("Content-Disposition").split("filename=")[1];
+        a.click();
+        a.remove();
+				setTimeout(function() {
+					window.URL.revokeObjectURL(url);
+				});
+			}
+		};
+		xhr.responseType = "arraybuffer";
+		xhr.send();
+	});
 })( jQuery );
