@@ -686,12 +686,15 @@ class DiscourseSidebar extends Component {
       if (!post || !post.meta) return {};
       
       const meta = post.meta;
+      const topicTags = typeof meta.wpdc_topic_tags === 'string' ?
+        meta.wpdc_topic_tags.split(',') :
+        [];
       
       let postState = {
         publishToDiscourse: this.determinePublishToDiscourse(meta),
         published: meta.discourse_post_id > 0,
         postStatus: post.status,
-        topicTags: meta.wpdc_topic_tags.split(','),
+        topicTags,
         pinTopic: meta.wpdc_pin_topic > 0
       };
 

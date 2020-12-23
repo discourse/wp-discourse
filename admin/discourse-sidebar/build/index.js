@@ -1208,11 +1208,12 @@ var DiscourseSidebar = /*#__PURE__*/function (_Component14) {
     value: function buildPostState(post) {
       if (!post || !post.meta) return {};
       var meta = post.meta;
+      var topicTags = typeof meta.wpdc_topic_tags === 'string' ? meta.wpdc_topic_tags.split(',') : [];
       var postState = {
         publishToDiscourse: this.determinePublishToDiscourse(meta),
         published: meta.discourse_post_id > 0,
         postStatus: post.status,
-        topicTags: meta.wpdc_topic_tags.split(','),
+        topicTags: topicTags,
         pinTopic: meta.wpdc_pin_topic > 0
       };
 
