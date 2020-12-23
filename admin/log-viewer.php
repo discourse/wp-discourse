@@ -9,11 +9,13 @@ namespace WPDiscourse\Admin;
 
 use WPDiscourse\Logs\FileManager;
 use WPDiscourse\Logs\FileHandler;
+use WPDiscourse\Shared\PluginUtilities;
 
 /**
  * Class LogViewer
  */
 class LogViewer {
+	use PluginUtilities;
 	
 	protected $file_handler;
 	protected $logs;
@@ -257,6 +259,37 @@ class LogViewer {
 		foreach( $all_plugins as $plugin_folder => $plugin_data ) {
 				if ( in_array( $plugin_folder, $active_plugins ) ) {
 						$contents .= "{$plugin_data["Name"]} - {$plugin_data["Version"]}\n";
+				}
+		}
+		
+		$contents .= "\n### WP Discourse Settings (Secrets Excluded) ###\n\n";
+		$excluded_keys = array(
+			"url",
+			"key",
+			"secret",
+			"text",
+			"publish-username",
+			"publish-category",
+			"publish-failure-email",
+			"login-path",
+			"existing-comments-heading",
+			"sso-client-login-form-redirect"
+		);
+		
+		foreach( $this->get_options() as $key => $value ) {
+				$exclude = false;
+				
+				foreach( $excluded_keys as $excluded_key ) {
+						if ( strpos( $key, $excluded_key ) !== false ) {
+								$exclude = true;
+						}
+				}
+				
+				if ( !$exclude ) {
+						if ( is_array( $value ) ) {
+								$value = implode(",", $value);
+						}
+						$contents .= "$key - $value\n";
 				}
 		}
 		
