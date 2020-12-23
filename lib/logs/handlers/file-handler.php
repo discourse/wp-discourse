@@ -264,7 +264,7 @@ class FileHandler extends StreamHandler {
     /**
      * Returns date used by file handler
      */
-    protected function getDate() {
+    public function getDate() {
         if ( isset( $this->datetime ) ) {
             return $this->datetime->format( static::DATE_FORMAT );
         } else {

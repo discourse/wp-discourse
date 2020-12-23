@@ -17,30 +17,63 @@ use WPDiscourse\Shared\PluginUtilities;
 class LogViewer {
 	use PluginUtilities;
 	
+	/**
+	 * Flag to determine whether LogViewer is enabled.
+	 *  
+	 * @var null|LogViewer
+	 */
+	protected $enabled;
+	
+	/**
+	 * LogViewer's instance of FileHandler
+	 *  
+	 * @var null|LogViewer
+	 */
 	protected $file_handler;
+	
+	/**
+	 * LogViewer's log list
+	 *  
+	 * @var null|LogViewer
+	 */
 	protected $logs;
+	
+	/**
+	 * Current log in LogViewer
+	 *  
+	 * @var null|LogViewer
+	 */
 	protected $selected_log;
+	
+	/**
+	 * Metafile name
+	 *  
+	 * @var null|LogViewer
+	 */
 	protected $metafile_name;
-	protected $file_namespace;
-
+	
 	/**
 	 * LogViewer constructor.
 	 *
 	 */
 	public function __construct() {
-		$this->file_namespace = "wp-discourse";
-		$this->metafile_name = "logs-metafile";
-		
-		add_action( 'admin_init', array( $this, 'setup_log_viewer' ));
+			$this->metafile_name = "logs-metafile";
+			add_action( 'admin_init', array( $this, 'setup_log_viewer' ));
 	}
 	
 	/**
 	 * Run LogViewer setup tasks
 	 */
-	public function setup_log_viewer() {
-			$this->file_handler = new FileHandler( new FileManager() );
+	public function setup_log_viewer( $file_handler = null ) {
+			if ( $file_handler ) {
+					$this->file_handler = $file_handler;
+			} else {
+					$this->file_handler = new FileHandler( new FileManager() );
+			}
+						
+			$this->enabled = $this->file_handler->enabled();
 			
-			if ( $this->file_handler->enabled ) {
+			if ( $this->enabled ) {
 					$this->setup_logs();
 					$this->update_meta_file();
 
@@ -84,7 +117,7 @@ class LogViewer {
 	 */
 	public function log_viewer_markup() {
 		?>
-		<?php if ( !empty( $this->file_handler->enabled ) ) : ?>
+		<?php if ( $this->enabled ) : ?>
 			<?php if ( !empty( $this->logs ) ) : ?>
 				<div id="wpdc-log-viewer-controls">
 					<div class="name">
@@ -173,25 +206,27 @@ class LogViewer {
 	 * Download bundled log files
 	 */
 	public function download_logs() {
-			$file_handler = $this->file_handler;
-			$log_files = $file_handler->listFiles();
-			$date_end = $file_handler->getDateFromUrl( reset( $log_files ) );
-			$date_start = $file_handler->getDateFromUrl( end( array_values( $log_files ) ) );
-			$date_range = "$date_start-$date_end";
-			$filename = "{$this->file_namespace}-logs-$date_range.zip";
+			$log_files = $this->file_handler->listFiles();
+			$date_range = $this->build_date_range( $log_files );
 			
-			$file = tempnam("tmp", $filename);
+			$plugin_data = get_plugin_data( WPDISCOURSE_PATH . "wp-discourse.php" );
+			$namespace = $plugin_data[ "TextDomain" ];
+						
+			$filename = "{$namespace}-logs-$date_range.zip";
+			$file = tempnam( "tmp", $filename );
 			$zip = new \ZipArchive();
 			$zip->open( $file, \ZipArchive::OVERWRITE );
 			
 			foreach ( $log_files as $log_file ) {
-					$name = $file_handler->getFilename( $log_file );
+					$name = $this->file_handler->getFilename( $log_file );
 	        $zip->addFile( $log_file, "$name.log" );
 			}
 			
+			$metafile_name = $this->metafile_name;
 			$metafile_path = $this->get_metafile_path();
-			$metafile_name = "{$this->file_namespace}-{$this->metafile_name}-{$date_range}.txt";
-			$zip->addFile( $metafile_path, $metafile_name );
+			$metafile_filename = "{$namespace}-{$metafile_name}-{$date_range}.txt";
+			
+			$zip->addFile( $metafile_path, $metafile_filename );
 			$zip->close();
 						
 			header( "Content-type:  application/zip" );
@@ -213,6 +248,20 @@ class LogViewer {
 	}
 	
 	/**
+	 * Retrieve logs
+	 */
+	public function get_logs() {
+			return $this->logs;
+	}
+	
+	/**
+	 * Retrieve enabled state
+	 */
+	public function is_enabled() {
+			return $this->enabled;
+	}
+	
+	/**
 	 * Generate file name 
 	 */
 	protected function file_name( $log_info ) {
@@ -220,7 +269,7 @@ class LogViewer {
 			$number = $log_info['number'];
 			$name = esc_html( $date );
 			if ($number > 1) {
-				$name .= " (" . esc_html( $number ) . ")";
+					$name .= " (" . esc_html( $number ) . ")";
 			}
 			return $name;
 	}
@@ -229,69 +278,69 @@ class LogViewer {
 	 * Generate server statistics file
 	 */
 	protected function build_metafile_contents() {
-		$contents = "### This file is included in log downloads ###\n\n";
-		
-		global $wpdb;
-		global $wp_version;
-		
-		if ( method_exists( $wpdb, 'db_version' ) ) {
-        $mysql = preg_replace( '/[^0-9.].*/', '', $wpdb->db_version() );
-    } else {
-        $mysql = 'N/A';
-    }
-		$wp = $wp_version;
-		$php = phpversion();
-		$multisite = is_multisite();
-		
-		$contents .= "### Server ###\n";
-		$contents .= "Wordpress - $wp\n";
-		$contents .= "PHP - $php\n";
-		$contents .= "MySQL - $mysql\n\n";
-		
-		$active_plugins = get_option('active_plugins');
-		$all_plugins = get_plugins();
-		$plugins = array();
-		
-		$contents .= "### Active Plugins ###\n";
-		
-		foreach( $all_plugins as $plugin_folder => $plugin_data ) {
-				if ( in_array( $plugin_folder, $active_plugins ) ) {
-						$contents .= "{$plugin_data["Name"]} - {$plugin_data["Version"]}\n";
-				}
-		}
-		
-		$contents .= "\n### WP Discourse Settings (Secrets Excluded) ###\n\n";
-		$excluded_keys = array(
-			"url",
-			"key",
-			"secret",
-			"text",
-			"publish-username",
-			"publish-category",
-			"publish-failure-email",
-			"login-path",
-			"existing-comments-heading",
-			"sso-client-login-form-redirect"
-		);
-		
-		foreach( $this->get_options() as $key => $value ) {
-				$exclude = false;
-				
-				foreach( $excluded_keys as $excluded_key ) {
-						if ( strpos( $key, $excluded_key ) !== false ) {
-								$exclude = true;
-						}
-				}
-				
-				if ( !$exclude ) {
-						if ( is_array( $value ) ) {
-								$value = implode(",", $value);
-						}
-						$contents .= "$key - $value\n";
-				}
-		}
-		
-		return $contents;
+			$contents = "### This file is included in log downloads ###\n\n";
+			
+			global $wpdb;
+			global $wp_version;
+			
+			if ( method_exists( $wpdb, 'db_version' ) ) {
+	        $mysql = preg_replace( '/[^0-9.].*/', '', $wpdb->db_version() );
+	    } else {
+	        $mysql = 'N/A';
+	    }
+			$wp = $wp_version;
+			$php = phpversion();
+			$multisite = is_multisite();
+			
+			$contents .= "### Server ###\n";
+			$contents .= "Wordpress - $wp\n";
+			$contents .= "PHP - $php\n";
+			$contents .= "MySQL - $mysql\n\n";
+			
+			$active_plugins = get_option('active_plugins');
+			$all_plugins = get_plugins();
+			$plugins = array();
+			
+			$contents .= "### Active Plugins ###\n";
+			
+			foreach( $all_plugins as $plugin_folder => $plugin_data ) {
+					if ( in_array( $plugin_folder, $active_plugins ) ) {
+							$contents .= "{$plugin_data["Name"]} - {$plugin_data["Version"]}\n";
+					}
+			}
+			
+			$contents .= "\n### WP Discourse Settings (Secrets Excluded) ###\n\n";
+			$excluded_keys = array(
+				"url",
+				"key",
+				"secret",
+				"text",
+				"publish-username",
+				"publish-category",
+				"publish-failure-email",
+				"login-path",
+				"existing-comments-heading",
+				"sso-client-login-form-redirect"
+			);
+			
+			foreach( $this->get_options() as $key => $value ) {
+					$exclude = false;
+					
+					foreach( $excluded_keys as $excluded_key ) {
+							if ( strpos( $key, $excluded_key ) !== false ) {
+									$exclude = true;
+							}
+					}
+					
+					if ( !$exclude ) {
+							if ( is_array( $value ) ) {
+									$value = implode(",", $value);
+							}
+							$contents .= "$key - $value\n";
+					}
+			}
+			
+			return $contents;
 	}
 	
 	/**
@@ -300,5 +349,17 @@ class LogViewer {
 	protected function get_metafile_path() {
 			$metafile_dir = $this->file_handler->file_manager->upload_dir;
 			return "$metafile_dir/{$this->metafile_name}.txt";
+	}
+	
+	/**
+	 * Build date range
+	 */
+	protected function build_date_range( $log_files ) {
+			$log_values = array_values( $log_files );
+			$newest_file = reset( $log_files );
+			$oldest_file = end( $log_values );
+			$date_end = $this->file_handler->getDateFromUrl( $newest_file );
+			$date_start = $this->file_handler->getDateFromUrl( $oldest_file );
+			return "$date_start-$date_end";
 	}
 }
