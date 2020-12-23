@@ -207,7 +207,7 @@ class FileHandler extends StreamHandler {
         $files = $this->listFiles( "*$date*" );
         
         if ( count( $files ) > 0 ) {
-            return $files[0];
+            return reset( $files );
         } else {
             return false;
         }
@@ -256,7 +256,7 @@ class FileHandler extends StreamHandler {
     protected function buildNewFileUrl() {
         $dir_path = $this->file_manager->logs_dir;
         $name = $this->fileName();
-        $hash = wp_hash( $name , "nonce");
+        $hash = wp_hash( $name , "nonce" );
         $extension = 'log';
         return "$dir_path/$name-$hash.$extension";
     }

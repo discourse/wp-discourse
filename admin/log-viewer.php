@@ -26,20 +26,28 @@ class LogViewer {
 	 *
 	 */
 	public function __construct() {
-		$this->file_handler = new FileHandler( new FileManager() );
 		$this->file_namespace = "wp-discourse";
 		$this->metafile_name = "logs-metafile";
-				
-		if ( $this->file_handler->enabled ) {
-				add_action( 'admin_init', array( $this, 'setup_logs' ));
-				add_action( 'admin_init', array( $this, 'update_meta_file' ));
-				
-				add_action( "wp_ajax_wpdc_view_log", array( $this, 'log_file_contents' ));
-				add_action( "wp_ajax_wpdc_view_logs_metafile", array( $this, 'meta_file_contents' ));
-				add_action( "wp_ajax_wpdc_download_logs", array( $this, 'download_logs' ));
-		}
 		
-		add_action( 'admin_init', array( $this, 'register_log_viewer' ));
+		add_action( 'admin_init', array( $this, 'setup_log_viewer' ));
+	}
+	
+	/**
+	 * Run LogViewer setup tasks
+	 */
+	public function setup_log_viewer() {
+			$this->file_handler = new FileHandler( new FileManager() );
+			
+			if ( $this->file_handler->enabled ) {
+					$this->setup_logs();
+					$this->update_meta_file();
+
+					add_action( "wp_ajax_wpdc_view_log", array( $this, 'log_file_contents' ));
+					add_action( "wp_ajax_wpdc_view_logs_metafile", array( $this, 'meta_file_contents' ));
+					add_action( "wp_ajax_wpdc_download_logs", array( $this, 'download_logs' ));
+			}
+			
+			$this->register_log_viewer();
 	}
 
 	/**
