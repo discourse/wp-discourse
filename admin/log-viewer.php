@@ -231,7 +231,6 @@ class LogViewer {
 	protected function build_metafile_contents() {
 		$contents = "### This file is included in log downloads ###\n\n";
 		
-		// Server //
 		global $wpdb;
 		global $wp_version;
 		
@@ -249,7 +248,6 @@ class LogViewer {
 		$contents .= "PHP - $php\n";
 		$contents .= "MySQL - $mysql\n\n";
 		
-		// Plugins //
 		$active_plugins = get_option('active_plugins');
 		$all_plugins = get_plugins();
 		$plugins = array();
