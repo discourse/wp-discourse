@@ -31,9 +31,11 @@ Make sure that command completes successfully, with no errors, before continuing
 
 #### Environment and Dependencies
 
-If you haven't already, run ``composer install`` in the root plugin directory to pull in the main tests dependencies. One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct.
+If you haven't already, run ``composer install`` in the root plugin directory to pull in the main tests dependencies. 
 
-For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have two lines in your ``php.ini`` that look like this
+##### Xdebug
+
+One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct. For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have two lines in your ``php.ini`` that look like this
 
 ```
 zend_extension = /path/to/xdebug.so
