@@ -10,6 +10,7 @@ namespace WPDiscourse\DiscoursePublish;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Shared\PluginUtilities;
 use WPDiscourse\Shared\TemplateFunctions;
+use WPDiscourse\Logs\Logger;
 
 /**
  * Class DiscoursePublish
@@ -33,6 +34,33 @@ class DiscoursePublish {
 	 * @var \WPDiscourse\EmailNotification\EmailNotification
 	 */
 	protected $email_notifier;
+	
+	/**
+	 * Instance of Logger
+	 */
+	protected $logger;
+	
+	/**
+	 * Instance store for log args
+	 */
+	protected $log_args;
+	
+	/**
+	 * Instance store for current post
+	 */
+	public $post;
+	
+	/**
+	 * Messages for errors or notices, organised by type
+	 */
+	public const ERROR_MESSAGES = array(
+		"create_post"           => "An invalid request was sent to Discourse when attempting to publish a post.",
+		"create_post_response"  => "An invalid response was returned from Discourse when attempting to publish a post.",
+		"featured_link"         => "An error was returned when attempting to update the Discourse featured link.",
+		"queued_topic"          => "The published post has been added to the Discourse approval queue.",
+		"deleted_topic"         => "The Discourse topic associated with this post has been deleted.",
+		"pin_topic"             => "The topic could not be pinned on Discourse."
+	);
 
 	/**
 	 * DiscoursePublish constructor.
@@ -43,6 +71,7 @@ class DiscoursePublish {
 		$this->email_notifier = $email_notifier;
 
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
 		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
@@ -53,6 +82,13 @@ class DiscoursePublish {
 	 */
 	public function setup_options() {
 		$this->options = $this->get_options();
+	}
+	
+	/**
+	 * Setup logger.
+	 */
+	public function setup_logger() {
+		$this->logger = Logger::create(	'publish' );
 	}
 
 	/**
@@ -177,12 +213,19 @@ class DiscoursePublish {
 	protected function sync_to_discourse_work( $post_id, $title, $raw ) {
 		$options                     = $this->options;
 		$discourse_id                = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
-		$current_post                = get_post( $post_id );
-		$author_id                   = $current_post->post_author;
+		$this->post                  = get_post( $post_id );
+		$author_id                   = $this->post->post_author;
 		$use_full_post               = ! empty( $options['full-post-content'] );
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration-enabled'] );
 		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
+		
+		$this->log_args = array(
+			'wp_title'            => $title,
+			'wp_author_id'        => $author_id,
+			'wp_post_id'          => $post_id,
+			'discourse_topic_id'  => $discourse_id
+		);
 
 		if ( $use_full_post ) {
 			$blocks = parse_blocks( $raw );
@@ -203,7 +246,7 @@ class DiscoursePublish {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $parsed, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
-				$wp_excerpt = apply_filters( 'get_the_excerpt', $current_post->post_excerpt );
+				$wp_excerpt = apply_filters( 'get_the_excerpt', $this->post->post_excerpt );
 				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt, $options['custom-excerpt-length'], $use_full_post );
 			}
 
@@ -228,7 +271,7 @@ class DiscoursePublish {
 		if ( ! empty( $featured ) ) {
 			$baked = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 		}
-		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $current_post->post_author ), $author_id );
+		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $this->post->post_author ), $author_id );
 		if ( ! $username || strlen( $username ) < 2 ) {
 			$username = $options['publish-username'];
 		}
@@ -255,7 +298,7 @@ class DiscoursePublish {
 			// Unlisted has been moved from post metadata to a site option. This is awkward for now.
 			$unlisted_post   = get_post_meta( $post_id, 'wpdc_unlisted_topic', true );
 			$unlisted_option = $this->options['publish-as-unlisted'];
-			$unlisted        = apply_filters( 'wpdc_publish_unlisted', ! empty( $unlisted_post ) || ! empty( $unlisted_option ), $current_post, $post_id );
+			$unlisted        = apply_filters( 'wpdc_publish_unlisted', ! empty( $unlisted_post ) || ! empty( $unlisted_option ), $this->post, $post_id );
 			if ( $unlisted ) {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
@@ -300,45 +343,16 @@ class DiscoursePublish {
 			);
 		}// End if().
 
-		$result = wp_remote_post( esc_url_raw( $url ), $post_options );
-
-		if ( ! $this->validate( $result ) ) {
-			if ( is_wp_error( $result ) ) {
-				$error_message = $result->get_error_message();
-				$error_code    = null;
-				update_post_meta( $post_id, 'wpdc_publishing_error', $error_message );
-			} else {
-				$result_body = json_decode( wp_remote_retrieve_body( $result ) );
-				if ( ! empty( $result_body ) && ! empty( $result_body->errors ) && ! empty( $result_body->errors[0] ) ) {
-					$error_message = $result_body->errors[0];
-					$error_code    = null;
-				} else {
-					$error_message = wp_remote_retrieve_response_message( $result );
-					$error_code    = intval( wp_remote_retrieve_response_code( $result ) );
-				}
-				// This is a fix for a bug that was introduced by not setting the wpdc_auto_publish_overridden post_metadata
-				// when posts are unlined from Discourse. That metadata is now being set. This fix is for dealing with
-				// previously unlinked posts.
-				if ( 'Embed url has already been taken' === $error_message ) {
-					update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
-				}
-				update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $error_message ) );
-			}
-
-			// Delete to avoid attempts to republish posts that are returning errors.
-			delete_post_meta( $post_id, 'publish_to_discourse' );
-
-			$this->create_bad_response_notifications( $current_post, $post_id, $error_message, $error_code );
-
-			return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+		$response = $this->remote_post( $url, $post_options, 'create_post' );
+		
+		if ( is_wp_error($response) ) {
+			return $response;
 		}
-
-		$body = json_decode( wp_remote_retrieve_body( $result ) );
+		
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
 		// Check for queued posts. We have already determined that a status code of `200` was returned. A post queued by Discourse will have an empty body.
 		if ( empty( $body ) ) {
-			update_post_meta( $post_id, 'wpdc_publishing_error', 'queued_topic' );
-
-			return new \WP_Error( 'discourse_publishing_response_error', 'The published post has been added to the Discourse approval queue.' );
+			return $this->handle_notice( 'queued_topic', $response );
 		}
 
 		// The response when a topic is first created.
@@ -370,16 +384,13 @@ class DiscoursePublish {
 			return null;
 
 		} elseif ( ! empty( $body->post ) ) {
-
 			$discourse_post = $body->post;
 			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? sanitize_text_field( $discourse_post->topic_slug ) : null;
 			$topic_id       = ! empty( $discourse_post->topic_id ) ? intval( $discourse_post->topic_id ) : null;
 
 			// Handles deleted topics for recent versions of Discourse.
 			if ( ! empty( $discourse_post->deleted_at ) ) {
-				update_post_meta( $post_id, 'wpdc_publishing_error', 'deleted_topic' );
-
-				return new \WP_Error( 'discourse_publishing_response_error', 'The Discourse topic associated with this post has been deleted.' );
+				return $this->handle_notice( 'deleted_topic', $response );
 			}
 
 			if ( $topic_slug && $topic_id ) {
@@ -413,26 +424,19 @@ class DiscoursePublish {
 						'body'    => http_build_query( $data ),
 					);
 
-					$result = wp_remote_post( esc_url_raw( $discourse_topic_url ), $post_options );
-					if ( ! $this->validate( $result ) ) {
-
-						return new \WP_Error( 'discourse_publishing_response_error', 'An error was returned when attempting to update the Discourse featured link.' );
+					$response = $this->remote_post( $discourse_topic_url, $post_options, 'featured_link' );
+					
+					if ( is_wp_error( $response ) ) {
+						return $response;
 					}
 				}
 
 				// The topic has been updated, and its associated post's metadata has been updated.
 				return null;
-			} else {
-				$this->create_bad_response_notifications( $current_post, $post_id );
-
-				return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
 			}// End if().
 		}// End if().
-
-		// Neither the 'id' or the 'post' property existed on the response body.
-		$this->create_bad_response_notifications( $current_post, $post_id );
-
-		return new \WP_Error( 'discourse_publishing_response_error', 'An invalid response was returned from Discourse after attempting to publish a post.' );
+		
+		return $this->handle_error( 'create_post_response', $response );
 	}
 
 	/**
@@ -468,7 +472,7 @@ class DiscoursePublish {
 	 * @return null|\WP_Error
 	 */
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
-		$status_url   = esc_url_raw( $this->options['url'] . "/t/$topic_id/status" );
+		$status_url   = $this->options['url'] . "/t/$topic_id/status";
 		$data         = array(
 			'status'  => 'pinned',
 			'enabled' => 'true',
@@ -484,11 +488,10 @@ class DiscoursePublish {
 			'body'    => http_build_query( $data ),
 		);
 
-		$response = wp_remote_post( $status_url, $post_options );
-
-		if ( ! $this->validate( $response ) ) {
-
-			return new \WP_Error( 'discourse_publishing_response_error', 'The topic could not be pinned on Discourse.' );
+		$response = $this->remote_post( $status_url, $post_options, 'pin_topic' );
+		
+		if ( is_wp_error( $response ) ) {
+			return $response;
 		}
 
 		delete_post_meta( $post_id, 'wpdc_pin_until' );
@@ -499,21 +502,105 @@ class DiscoursePublish {
 	/**
 	 * Creates an admin_notice and calls the publish_failure_notification method after a bad response is returned from Discourse.
 	 *
-	 * @param \WP_Post $current_post The post for which the notifications are being created.
-	 * @param int      $post_id The current post id.
-	 * @param string   $error_message The error message returned from the request.
-	 * @param int      $error_code The error code returned from the request.
+	 * @param \WP_Post $post The post for which the notifications are being created.
+	 * @param object   $error The error returned from the request.
 	 */
-	protected function create_bad_response_notifications( $current_post, $post_id, $error_message = '', $error_code = null ) {
-		update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+	protected function create_bad_response_notifications( $error ) {
 		$this->email_notifier->publish_failure_notification(
-			$current_post,
+			$this->post,
 			array(
 				'location'      => 'after_bad_response',
-				'error_message' => $error_message,
-				'error_code'    => $error_code,
+				'error_message' => $error->message,
+				'error_code'    => $error->code,
 			)
 		);
+	}
+	
+	public function remote_post( $url, $options, $type ) {
+		$response = wp_remote_post( esc_url_raw( $url ), $options );
+		
+		if ( ! $this->validate( $response ) ) {
+			$response = $this->handle_error( $type, $response );	
+		}
+				
+		return $response;
+	}
+	
+	/**
+	 * Handle publication errors 
+	 */
+	protected function handle_error( $type, $response ) {
+		$post_id = $this->post->ID;
+		$atts = $this->get_response_attributes( $response );
+		
+		if ( $type == "create_post" ) {
+			// This is a fix for a bug that was introduced by not setting the wpdc_auto_publish_overridden post_metadata
+			// when posts are unlined from Discourse. That metadata is now being set. This fix is for dealing with
+			// previously unlinked posts.
+			if ( 'Embed url has already been taken' === $atts->message ) {
+				update_post_meta( $post_id, 'wpdc_auto_publish_overridden', 1 );
+			}
+			
+			update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $atts->message ) );
+			delete_post_meta( $post_id, 'publish_to_discourse' );
+		}
+		
+		if ( $type == "create_post_response" ) {
+			update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+		}
+		
+		$this->create_bad_response_notifications( $atts );
+		
+		return $this->log_and_raise( $type, $atts );
+	}
+	
+	/**
+	 * Handle publication notices
+	 */
+	protected function handle_notice( $type, $response ) {
+		$atts = $this->get_response_attributes( $response );
+		update_post_meta( $post_id, 'wpdc_publishing_error', $type );
+		return $this->log_and_raise( $type, $atts, 'notice' );
+	}
+	
+	/**
+	 * Log errors and notices and raise a WP_Error to client
+	 */
+	protected function log_and_raise( $type, $atts, $level = 'error' ) {
+		$args = $this->log_args;
+		$args["http_code"] = $atts->code;
+		$message = $atts->message;
+		error_log(print_r("MESSAGE: ", true));
+		error_log(print_r($message, true));
+		$this->logger->log( $level, "$type {$message}", $args );
+		
+		return new \WP_Error( 'discourse_publishing_response_error', self::ERROR_MESSAGES[ $type ] );
+	}
+	
+	/**
+	 * Retrieve the message and code from a response
+	 */
+	protected function get_response_attributes( $response ) {
+		$atts = (object) array( 'message' => null, 'code' => null );
+		
+		if ( is_wp_error( $response ) ) {
+			$atts->message = $response->get_error_message();
+		} else {
+			$body = json_decode( wp_remote_retrieve_body( $response ) );
+			
+			if ( ! empty( $body ) && ! empty( $body->errors ) && ! empty( $body->errors[0] ) ) {
+				$atts->message = $body->errors[0];
+			} else {
+				$atts->message = wp_remote_retrieve_response_message( $response );
+			}
+		}
+		
+		$raw_code = wp_remote_retrieve_response_code( $response );
+		if ( !empty( $raw_code) ) {
+			$atts->code = intval( $raw_code );
+		}
+		
+		return $atts;
 	}
 
 	/**
