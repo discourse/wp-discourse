@@ -17,49 +17,75 @@ use \WPDiscourse\Logs\FileHandler;
  */
 class DiscoursePublishTest extends WP_UnitTestCase {
   
-  protected $success_response;
+  /*
+   * Remote post variables
+   */
+  public static $success_response;
+  public static $forbidden_response;
+  public static $unprocessable_response;
+  public static $failed_to_connect_response;
+  public static $remote_post_options;
+  public static $remote_post_params;
   
-  protected $forbidden_response;
+  /*
+   * WP_Post atts
+   */
+  public static $post_atts;
   
-  protected $unprocessable_response;
+  /*
+   * Plugin options
+   */
+  public static $plugin_options;
   
-  protected $failed_to_connect_response;
-  
-  protected $post_options;
-  
+  /*
+   * Instance of DiscoursePublish
+   */
   protected $publish;
   
+  /*
+   * Setup test class
+   */
+  public static function setUpBeforeClass() {
+    self::initialize_static_variables();
+  }
+  
+  /*
+   * Setup test
+   */
   public function setUp() {
     $this->publish = new DiscoursePublish( new EmailNotification() );
     $this->publish->setup_logger();
-    $this->publish->post = new \WP_Post( (object) array( 'ID' => 1 ) );
-    $this->build_responses();
+    $this->publish->setup_options( self::$plugin_options );
 	}
+  
+  /*
+   * Insertion of post triggers successful post to Discourse
+   */
+  public function test_publish_post_after_save() {
+    $this->mock_remote_post_return( self::$success_response );
+    $post_id = wp_insert_post( self::$post_atts, false, false );
+    
+    // The topic_id of the mock json response in create_post_response is 20
+    $discourse_topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
+    $this->assertEquals( $discourse_topic_id, 20 );
+  }
   
   /* 
    * Successful request returns original response
    */
   public function test_remote_post_success() {
-    $this->mock_remote_post_return( $this->success_response );
-    $response = $this->publish->remote_post(
-      'https://meta.discourse.org',
-      $this->post_options,
-      "create_post"
-    );
-    $this->assertEquals( $response, $this->success_response );
+    $this->mock_remote_post_return( self::$success_response );
+    $response = $this->publish->remote_post( ...self::$remote_post_params );
+    $this->assertEquals( $response, self::$success_response );
   }
   
   /* 
    * Forbidden request returns standardised WP_Error and creates correct log
    */
   public function test_remote_post_forbidden() {
-    $this->mock_remote_post_return( $this->forbidden_response );
+    $this->mock_remote_post_return( self::$forbidden_response );
     
-    $response = $this->publish->remote_post(
-      'https://meta.discourse.org',
-      $this->post_options,
-      "create_post"
-    );
+    $response = $this->publish->remote_post( ...self::$remote_post_params );
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
@@ -71,13 +97,9 @@ class DiscoursePublishTest extends WP_UnitTestCase {
    * Unprocessable request returns standardised WP_Error and creates correct log
    */
   public function test_remote_post_unprocessable() {
-    $this->mock_remote_post_return( $this->unprocessable_response );
+    $this->mock_remote_post_return( self::$unprocessable_response );
     
-    $response = $this->publish->remote_post(
-      'https://meta.discourse.org',
-      $this->post_options,
-      "create_post"
-    );
+    $response = $this->publish->remote_post( ...self::$remote_post_params );
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
@@ -88,14 +110,10 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   /* 
    * Forbidden request returns standardised WP_Error and creates correct log
    */
-  public function test_remote_failed_to_connect() {
-    $this->mock_remote_post_return( $this->failed_to_connect_response );
+  public function test_remote_post_failed_to_connect() {
+    $this->mock_remote_post_return( self::$failed_to_connect_response );
     
-    $response = $this->publish->remote_post(
-      'https://meta.discourse.org',
-      $this->post_options,
-      "create_post"
-    );
+    $response = $this->publish->remote_post( ...self::$remote_post_params );
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
@@ -124,19 +142,30 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     return `tail -n 1 $log_file`;
   }
   
-  protected function build_responses() {
-    $this->success_response = array(
+  private function clear_logs() {
+		$manager = new FileManager();
+		$log_files = glob( $manager->logs_dir . "/*.log" );
+		
+		foreach( $log_files as $file ){
+		  if ( is_file( $file ) ) {
+		    unlink( $file );
+		  }
+		}
+	}
+  
+  public static function initialize_static_variables() {
+    self::$success_response = array(
       'headers'   => array(),
-      'body'      => json_decode(
-        file_get_contents( __DIR__ . "/fixtures/create_post_response.json" ), true
-      ),
+      'body'      => json_encode(json_decode(
+        file_get_contents( __DIR__ . "/fixtures/create_post_response.json" )
+      )),
       'response'  => array(
         'code'      => 200,
         'message'   => 'OK',
       )
     );
 
-    $this->forbidden_response = array(
+    self::$forbidden_response = array(
       'headers'   => array(),
       'body'      => 'You are not permitted to view the requested resource. The API username or key is invalid.',
       'response'  => array(
@@ -145,7 +174,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
       )
     );
 
-    $this->unprocessable_response = array(
+    self::$unprocessable_response = array(
       'headers'   => array(),
       'body'      => json_encode(array( "action" => "create_post", "errors" => ["Title seems unclear, most of the words contain the same letters over and over?"])),
       'response'  => array(
@@ -154,12 +183,12 @@ class DiscoursePublishTest extends WP_UnitTestCase {
       )
     );
 
-    $this->failed_to_connect_response = new WP_Error(
+    self::$failed_to_connect_response = new WP_Error(
       'http_request_failed',
       'cURL error 7: Failed to connect to localhost port 3000: Connection refused'
     );
 
-    $this->post_options = array(
+    self::$remote_post_options = array(
       'timeout' => 30,
       'method'  => 'POST',
       'headers' => array(
@@ -177,17 +206,33 @@ class DiscoursePublishTest extends WP_UnitTestCase {
         'visible'          => 'true',
       ) )
     );
+    
+    self::$remote_post_params = array(
+      'https://meta.discourse.org',
+      self::$remote_post_options,
+      "create_post",
+      1 // dummy post_id
+    );
+        
+    self::$post_atts = array(
+      'post_author'   => 0,
+      'post_content'  => 'This is a new post',
+      'post_title'    => 'This is the post title',
+      'meta_input'    => array(
+        "wpdc_auto_publish_overridden"  => 0,
+        "publish_to_discourse"          => 1,
+        "discourse_post_id"             => null,
+        "publish_post_category"         => 1
+      ),
+      'post_status'   => 'publish'
+    );
+    
+    self::$plugin_options = array(
+      'url' => 'http://meta.discourse.org',
+      'api-key' => '1235567',
+      'publish-username' => 'angus',
+      'allowed_post_types' => array( 'post' )
+    );
   }
-  
-  private function clear_logs() {
-		$manager = new FileManager();
-		$log_files = glob( $manager->logs_dir . "/*.log" );
-		
-		foreach( $log_files as $file ){
-		  if ( is_file( $file ) ) {
-		    unlink( $file );
-		  }
-		}
-	}
 }
 		
