@@ -67,14 +67,16 @@ class DiscoursePublish {
 	 *
 	 * @param object $email_notifier An object for sending an email verification notice.
 	 */
-	public function __construct( $email_notifier ) {
+	public function __construct( $email_notifier, $register_actions = true ) {
 		$this->email_notifier = $email_notifier;
 
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
-		add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
-		add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
+		if ( $register_actions ) {
+			add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
+			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
+		}
 	}
 
 	/**
@@ -84,7 +86,7 @@ class DiscoursePublish {
 		$this->options = $this->get_options();
 		
 		// Used to set plugin options in unit tests
-		if ( isset( $extra_options ) ) {
+		if ( !empty( $extra_options ) ) {
 			foreach( $extra_options as $key => $value) {
 				$this->options[$key] = $value;
 			}
@@ -231,7 +233,7 @@ class DiscoursePublish {
 			'wp_title'            => $title,
 			'wp_author_id'        => $author_id,
 			'wp_post_id'          => $post_id,
-			'discourse_topic_id'  => $discourse_id
+			'discourse_post_id'  	=> $discourse_id
 		);
 
 		if ( $use_full_post ) {
@@ -357,6 +359,7 @@ class DiscoursePublish {
 		}
 		
 		$body = json_decode( wp_remote_retrieve_body( $response ) );
+						
 		// Check for queued posts. We have already determined that a status code of `200` was returned. A post queued by Discourse will have an empty body.
 		if ( empty( $body ) ) {
 			return $this->handle_notice( 'queued_topic', $response, $post_id );

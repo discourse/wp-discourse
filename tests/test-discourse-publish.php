@@ -20,6 +20,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   /*
    * Remote post variables
    */
+  public static $discourse_url;
   public static $success_response;
   public static $forbidden_response;
   public static $unprocessable_response;
@@ -28,7 +29,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   public static $remote_post_params;
   
   /*
-   * WP_Post atts
+   * WP_Post attributes
    */
   public static $post_atts;
   
@@ -53,25 +54,65 @@ class DiscoursePublishTest extends WP_UnitTestCase {
    * Setup test
    */
   public function setUp() {
-    $this->publish = new DiscoursePublish( new EmailNotification() );
+    $setup_actions = false;
+    $this->publish = new DiscoursePublish( new EmailNotification(), $setup_actions );
     $this->publish->setup_logger();
     $this->publish->setup_options( self::$plugin_options );
 	}
   
   /*
-   * Insertion of post triggers successful post to Discourse
+   * publish_post_after_save handles new posts correctly
    */
-  public function test_publish_post_after_save() {
-    $this->mock_remote_post_return( self::$success_response );
+  public function test_publish_post_after_save_when_creating() {
+    // Set up a response body for creating a new post
+    $body = $this->mock_remote_post_success_body( "create_post_response_body" );
+    $discourse_post_id = $body->id;
+    $discourse_topic_id = $body->topic_id;
+    $discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
+    $discourse_category = self::$post_atts['meta_input']['publish_post_category'];
+    
+    // Add the post
     $post_id = wp_insert_post( self::$post_atts, false, false );
     
-    // The topic_id of the mock json response in create_post_response is 20
-    $discourse_topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
-    $this->assertEquals( $discourse_topic_id, 20 );
+    // Run the publish action
+    $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
+    
+    // Ensure the right post meta is created
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+    $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+    $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+    
+    // cleanup
+    wp_delete_post( $post_id );
+  }
+  
+  /*
+   * publish_post_after_save handles post updates correctly
+   */
+  public function test_publish_post_after_save_when_updating() {
+    // Set up a response body for updating an existing post
+    $body = $this->mock_remote_post_success_body( "update_post_response_body" );
+    $discourse_post_id = $body->post->id;
+    
+    // Add a post that's already been published to Discourse
+    $post_atts = self::$post_atts;
+    $post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
+    $post_id = wp_insert_post( $post_atts, false, false );
+    
+    // Run the publish action
+    $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
+    
+    // Ensure the right post meta is created
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+    
+    // Cleanup
+    wp_delete_post( $post_id );
   }
   
   /* 
-   * Successful request returns original response
+   * Successful remote post request returns original response
    */
   public function test_remote_post_success() {
     $this->mock_remote_post_return( self::$success_response );
@@ -80,7 +121,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   }
   
   /* 
-   * Forbidden request returns standardised WP_Error and creates correct log
+   * Forbidden remote post request returns standardised WP_Error and creates correct log
    */
   public function test_remote_post_forbidden() {
     $this->mock_remote_post_return( self::$forbidden_response );
@@ -94,7 +135,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   }
   
   /* 
-   * Unprocessable request returns standardised WP_Error and creates correct log
+   * Unprocessable remote post request returns standardised WP_Error and creates correct log
    */
   public function test_remote_post_unprocessable() {
     $this->mock_remote_post_return( self::$unprocessable_response );
@@ -108,7 +149,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   }
   
   /* 
-   * Forbidden request returns standardised WP_Error and creates correct log
+   * Forbidden remote post request returns standardised WP_Error and creates correct log
    */
   public function test_remote_post_failed_to_connect() {
     $this->mock_remote_post_return( self::$failed_to_connect_response );
@@ -129,6 +170,14 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     add_filter( 'pre_http_request', function() use( $response ) {
       return $response;
     } );
+  }
+  
+  protected function mock_remote_post_success_body( $body_json_file ) {
+    $response = self::$success_response;
+    $body = json_decode(file_get_contents( __DIR__ . "/fixtures/$body_json_file.json" ));
+    $response['body'] = json_encode( $body );
+    $this->mock_remote_post_return( $response );
+    return $body;
   }
   
   protected function standardised_error( $type ) {
@@ -154,11 +203,11 @@ class DiscoursePublishTest extends WP_UnitTestCase {
 	}
   
   public static function initialize_static_variables() {
+    self::$discourse_url = "http://meta.discourse.org";
+    
     self::$success_response = array(
       'headers'   => array(),
-      'body'      => json_encode(json_decode(
-        file_get_contents( __DIR__ . "/fixtures/create_post_response.json" )
-      )),
+      'body'      => "{}",
       'response'  => array(
         'code'      => 200,
         'message'   => 'OK',
@@ -208,7 +257,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     );
     
     self::$remote_post_params = array(
-      'https://meta.discourse.org',
+      self::$discourse_url,
       self::$remote_post_options,
       "create_post",
       1 // dummy post_id
@@ -221,14 +270,13 @@ class DiscoursePublishTest extends WP_UnitTestCase {
       'meta_input'    => array(
         "wpdc_auto_publish_overridden"  => 0,
         "publish_to_discourse"          => 1,
-        "discourse_post_id"             => null,
         "publish_post_category"         => 1
       ),
       'post_status'   => 'publish'
     );
     
     self::$plugin_options = array(
-      'url' => 'http://meta.discourse.org',
+      'url' => self::$discourse_url,
       'api-key' => '1235567',
       'publish-username' => 'angus',
       'allowed_post_types' => array( 'post' )
