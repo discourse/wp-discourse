@@ -54,8 +54,8 @@ class DiscoursePublishTest extends WP_UnitTestCase {
    * Setup test
    */
   public function setUp() {
-    $setup_actions = false;
-    $this->publish = new DiscoursePublish( new EmailNotification(), $setup_actions );
+    $register_actions = false;
+    $this->publish = new DiscoursePublish( new EmailNotification(), $register_actions );
     $this->publish->setup_logger();
     $this->publish->setup_options( self::$plugin_options );
 	}
@@ -74,7 +74,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     // Add the post
     $post_id = wp_insert_post( self::$post_atts, false, false );
     
-    // Run the publish action
+    // Run the publication
     $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
     
     // Ensure the right post meta is created
@@ -94,18 +94,28 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   public function test_publish_post_after_save_when_updating() {
     // Set up a response body for updating an existing post
     $body = $this->mock_remote_post_success_body( "update_post_response_body" );
-    $discourse_post_id = $body->post->id;
+    $post = $body->post;
     
+    $discourse_post_id = $post->id;
+    $discourse_topic_id = $post->topic_id;
+    $discourse_permalink = self::$discourse_url . '/t/' . $post->topic_slug . '/' . $post->topic_id;
+    $discourse_category = self::$post_atts['meta_input']['publish_post_category'];
+        
     // Add a post that's already been published to Discourse
     $post_atts = self::$post_atts;
     $post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
     $post_id = wp_insert_post( $post_atts, false, false );
     
-    // Run the publish action
+    // Run the update
+    update_post_meta( $post_id, 'update_discourse_topic', 1 );
     $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
     
-    // Ensure the right post meta is created
+    // Ensure the right post meta still exists
     $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+    $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+    $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+    $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
     
     // Cleanup
     wp_delete_post( $post_id );
@@ -164,6 +174,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   
   public function tearDown() {
     $this->clear_logs();
+    remove_all_filters( 'pre_http_request' );
   }
   
   protected function mock_remote_post_return( $response ) {

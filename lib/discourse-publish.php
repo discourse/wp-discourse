@@ -37,18 +37,19 @@ class DiscoursePublish {
 	
 	/**
 	 * Instance of Logger
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Logs\Logger
 	 */
 	protected $logger;
 	
 	/**
 	 * Instance store for log args
+	 *
+	 * @access protected
+	 * @var mixed|void
 	 */
 	protected $log_args;
-	
-	/**
-	 * Instance store for current post
-	 */
-	public $post;
 	
 	/**
 	 * Messages for errors or notices, organised by type
@@ -72,8 +73,10 @@ class DiscoursePublish {
 
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
-		// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
+		
+		// Registration is conditional to make testing easier
 		if ( $register_actions ) {
+			// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
 			add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
 			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		}
@@ -152,7 +155,7 @@ class DiscoursePublish {
 		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
 		$title                  = $this->sanitize_title( $post->post_title );
 		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
+		
 		if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		}
@@ -353,13 +356,13 @@ class DiscoursePublish {
 		}// End if().
 				
 		$response = $this->remote_post( $url, $post_options, 'create_post', $post_id );
-		
+
 		if ( is_wp_error($response) ) {
 			return $response;
 		}
 		
 		$body = json_decode( wp_remote_retrieve_body( $response ) );
-						
+
 		// Check for queued posts. We have already determined that a status code of `200` was returned. A post queued by Discourse will have an empty body.
 		if ( empty( $body ) ) {
 			return $this->handle_notice( 'queued_topic', $response, $post_id );
