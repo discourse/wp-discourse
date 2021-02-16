@@ -17,6 +17,9 @@ TMPDIR=$(echo $TMPDIR | sed -e "s/\/$//")
 WP_TESTS_DIR=${WP_TESTS_DIR-$TMPDIR/wordpress-tests-lib}
 WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress/}
 
+rm -rf $WP_TESTS_DIR
+rm -rf $WP_CORE_DIR
+
 download() {
     if [ `which curl` ]; then
         curl -s "$1" > "$2";
@@ -146,7 +149,7 @@ install_db() {
 		fi
 	fi
 
-	# create database
+	yes | mysqladmin drop $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA 
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
 
