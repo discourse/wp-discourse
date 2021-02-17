@@ -50,18 +50,6 @@ class DiscoursePublish {
 	 * @var mixed|void
 	 */
 	protected $log_args;
-	
-	/**
-	 * Messages for errors or notices, organised by type
-	 */
-	public const ERROR_MESSAGES = array(
-		"create_post"           => "An invalid request was sent to Discourse when attempting to publish a post.",
-		"create_post_response"  => "An invalid response was returned from Discourse when attempting to publish a post.",
-		"featured_link"         => "An error was returned when attempting to update the Discourse featured link.",
-		"queued_topic"          => "The published post has been added to the Discourse approval queue.",
-		"deleted_topic"         => "The Discourse topic associated with this post has been deleted.",
-		"pin_topic"             => "The topic could not be pinned on Discourse."
-	);
 
 	/**
 	 * DiscoursePublish constructor.
@@ -304,6 +292,8 @@ class DiscoursePublish {
 		} else {
 			$tags_param = '';
 		}
+		
+		$remote_post_type = '';
 
 		// The post hasn't been published to Discourse yet.
 		if ( ! $discourse_id > 0 ) {
@@ -326,7 +316,7 @@ class DiscoursePublish {
 				'visible'          => $unlisted ? 'false' : 'true',
 			);
 			$url          = $options['url'] . '/posts';
-			$post_options = array(
+			$remote_post_options = array(
 				'timeout' => 30,
 				'method'  => 'POST',
 				'headers' => array(
@@ -335,7 +325,7 @@ class DiscoursePublish {
 				),
 				'body'    => http_build_query( $data ) . $tags_param,
 			);
-
+			$remote_post_type = 'create_post';
 		} else {
 			// The post has already been published.
 			$data         = array(
@@ -344,7 +334,7 @@ class DiscoursePublish {
 				'skip_validations' => 'true',
 			);
 			$url          = $options['url'] . '/posts/' . $discourse_id;
-			$post_options = array(
+			$remote_post_options = array(
 				'timeout' => 30,
 				'method'  => 'PUT',
 				'headers' => array(
@@ -353,23 +343,22 @@ class DiscoursePublish {
 				),
 				'body'    => http_build_query( $data ),
 			);
+			$remote_post_type = 'update_post';
 		}// End if().
 				
-		$response = $this->remote_post( $url, $post_options, 'create_post', $post_id );
+		$response = $this->remote_post( $url, $remote_post_options, $remote_post_type, $post_id );
 
-		if ( is_wp_error($response) ) {
+		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
+				
+		$body = $this->validate_response_body( $response, $remote_post_type, $post_id );
 		
-		$body = json_decode( wp_remote_retrieve_body( $response ) );
-
-		// Check for queued posts. We have already determined that a status code of `200` was returned. A post queued by Discourse will have an empty body.
-		if ( empty( $body ) ) {
-			return $this->handle_notice( 'queued_topic', $response, $post_id );
+		if ( is_wp_error( $body ) ) {
+			return $body;
 		}
 
-		// The response when a topic is first created.
-		if ( ! empty( $body->id ) && ! empty( $body->topic_slug ) && ! empty( $body->topic_id ) ) {
+		if ( $remote_post_type == 'create_post' ) {
 			$discourse_id = intval( $body->id );
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
@@ -378,6 +367,8 @@ class DiscoursePublish {
 			$this->dc_add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
 			$this->dc_add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
 			update_post_meta( $post_id, 'publish_post_category', $category );
+			
+			$this->log_args['discourse_post_id'] = $discourse_id;
 
 			// Used for resetting the error notification, if one was being displayed.
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
@@ -395,61 +386,55 @@ class DiscoursePublish {
 
 			// The topic has been created and its associated post's metadata has been updated.
 			return null;
-
-		} elseif ( ! empty( $body->post ) ) {
+		} 
+		
+		if ( $remote_post_type == 'update_post' ) {
 			$discourse_post = $body->post;
-			$topic_slug     = ! empty( $discourse_post->topic_slug ) ? sanitize_text_field( $discourse_post->topic_slug ) : null;
-			$topic_id       = ! empty( $discourse_post->topic_id ) ? intval( $discourse_post->topic_id ) : null;
+			$topic_slug     = sanitize_text_field( $discourse_post->topic_slug );
+			$topic_id       = intval( $discourse_post->topic_id );
+			$discourse_topic_url = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+			
+			update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
+			update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
+			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
+			// Allows the publish_post_category to be set by clicking the "Update Discourse Topic" button.
+			update_post_meta( $post_id, 'publish_post_category', $category );
 
-			// Handles deleted topics for recent versions of Discourse.
-			if ( ! empty( $discourse_post->deleted_at ) ) {
-				return $this->handle_notice( 'deleted_topic', $response, $post_id );
+			if ( $use_multisite_configuration ) {
+				// Used when use_multisite_configuration is enabled, if an existing post is not yet associated with a topic_id/blog_id.
+				if ( ! $this->topic_blog_id_exists( $topic_id ) ) {
+					$blog_id = get_current_blog_id();
+					$this->save_topic_blog_id( $topic_id, $blog_id );
+				}
+			}
+			
+			// Update the topic's featured_link property.
+			if ( ! empty( $options['add-featured-link'] ) ) {
+				$data         = array(
+					'featured_link' => $permalink,
+				);
+				$remote_post_options = array(
+					'timeout' => 30,
+					'method'  => 'PUT',
+					'headers' => array(
+						'Api-Key'      => sanitize_key( $options['api-key'] ),
+						'Api-Username' => sanitize_text_field( $username ),
+					),
+					'body'    => http_build_query( $data ),
+				);
+
+				$response = $this->remote_post( $discourse_topic_url, $remote_post_options, 'featured_link', $post_id );
+				
+				if ( is_wp_error( $response ) ) {
+					return $response;
+				}
 			}
 
-			if ( $topic_slug && $topic_id ) {
-				$discourse_topic_url = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
-				update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
-				update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
-				update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
-				// Allows the publish_post_category to be set by clicking the "Update Discourse Topic" button.
-				update_post_meta( $post_id, 'publish_post_category', $category );
-
-				if ( $use_multisite_configuration ) {
-					// Used when use_multisite_configuration is enabled, if an existing post is not yet associated with a topic_id/blog_id.
-					if ( ! $this->topic_blog_id_exists( $topic_id ) ) {
-						$blog_id = get_current_blog_id();
-						$this->save_topic_blog_id( $topic_id, $blog_id );
-					}
-				}
-
-				// Update the topic's featured_link property.
-				if ( ! empty( $options['add-featured-link'] ) ) {
-					$data         = array(
-						'featured_link' => $permalink,
-					);
-					$post_options = array(
-						'timeout' => 30,
-						'method'  => 'PUT',
-						'headers' => array(
-							'Api-Key'      => sanitize_key( $options['api-key'] ),
-							'Api-Username' => sanitize_text_field( $username ),
-						),
-						'body'    => http_build_query( $data ),
-					);
-
-					$response = $this->remote_post( $discourse_topic_url, $post_options, 'featured_link', $post_id );
-					
-					if ( is_wp_error( $response ) ) {
-						return $response;
-					}
-				}
-
-				// The topic has been updated, and its associated post's metadata has been updated.
-				return null;
-			}// End if().
-		}// End if().
+			// The topic has been updated, and its associated post's metadata has been updated.
+			return null;
+		}
 		
-		return $this->handle_error( 'create_post_response', $response, $post_id );
+		return $this->handle_error( "unknown", $response, $post_id );
 	}
 
 	/**
@@ -506,7 +491,7 @@ class DiscoursePublish {
 		if ( is_wp_error( $response ) ) {
 			return $response;
 		}
-
+		
 		delete_post_meta( $post_id, 'wpdc_pin_until' );
 
 		return null;
@@ -535,23 +520,87 @@ class DiscoursePublish {
 		);
 	}
 	
-	public function remote_post( $url, $options, $type, $post_id ) {
-		$response = wp_remote_post( esc_url_raw( $url ), $options );
-		
+	/**
+	 * wp_remote_post wrapper to handle validation, logging and error handling
+	 */
+	public function remote_post( $url, $remote_options, $remote_type, $post_id ) {
+		$response = wp_remote_post( esc_url_raw( $url ), $remote_options );
+
 		if ( ! $this->validate( $response ) ) {
-			$response = $this->handle_error( $type, $response, $post_id );	
+			$response = $this->handle_error( $remote_type, $response, $post_id );	
+		} else if ( !empty( $this->options['verbose-publication-logs'] ) ) {
+			$this->logger->info( "$remote_type.post_success", $this->log_args );
 		}
 				
 		return $response;
 	}
 	
 	/**
+	 * Validation for post response body
+	 */
+	protected function validate_response_body( $response, $remote_type ) {
+		$body = json_decode( wp_remote_retrieve_body( $response ) );
+
+		if ( $this->post_is_enqueued( $body ) ) {
+			return $this->handle_notice( 'queued_topic', $response, $post_id );
+		}
+		
+		if ( $remote_type == 'create_post' && !$this->validate_create_post_body( $body ) ) {
+			return $this->handle_error( $remote_type, $response, $post_id, true );
+		}
+		
+		if ( $remote_type == 'update_post') {
+			if ( !$this->validate_update_post_body( $body ) ) {
+				return $this->handle_error( $remote_type, $response, $post_id, true );
+			}
+			
+			if ( $this->post_is_deleted( $body ) ) {
+				return $this->handle_notice( 'deleted_topic', $response, $post_id );
+			}
+		}
+		
+		if ( !empty( $this->options['verbose-publication-logs'] ) ) {
+			$this->logger->info( "$remote_type.body_valid", $this->log_args );
+		}
+		
+		return $body;
+	}
+	
+	/**
+	 * Validate the body of a response when creating a post
+	 */
+	protected function validate_create_post_body( $body ) {
+		return !empty( $body->id ) && !empty( $body->topic_slug ) && !empty( $body->topic_id );
+	}
+	
+	/**
+	 * Validate the body of a response when updating a post
+	 */
+	protected function validate_update_post_body( $body ) {
+		return !empty( $body->post ) && !empty( $body->post->topic_slug ) && !empty( $body->post->topic_id );
+	}
+	
+	/**
+	 * Test for whether post was enqueued
+	 */
+	protected function post_is_enqueued( $body ) {
+		return empty( $body );
+	}
+	
+	/**
+	 * Test for whether topic has been deleted
+	 */
+	protected function post_is_deleted( $body ) {
+		return !empty( $body->post->deleted_at );
+	}
+	
+	/**
 	 * Handle publication errors 
 	 */
-	protected function handle_error( $type, $response, $post_id ) {
+	protected function handle_error( $remote_type, $response, $post_id, $body_validation = false ) {
 		$atts = $this->get_response_attributes( $response );
 		
-		if ( $type == "create_post" ) {
+		if ( $remote_type == "create_post" ) {
 			// This is a fix for a bug that was introduced by not setting the wpdc_auto_publish_overridden post_metadata
 			// when posts are unlinked from Discourse. That metadata is now being set. This fix is for dealing with
 			// previously unlinked posts.
@@ -561,39 +610,45 @@ class DiscoursePublish {
 			
 			update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $atts->message ) );
 			delete_post_meta( $post_id, 'publish_to_discourse' );
-		}
-		
-		if ( $type == "create_post_response" ) {
-			update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+			
+			if ( $body_validation ) {
+				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
+			}
 		}
 		
 		$this->create_bad_response_notifications( $atts, $post_id );
 		
-		return $this->log_and_raise( $type, $atts );
+		if ( $body_validation ) {
+			$log_message = "body_validation_error";
+			$error_message = __( "An invalid response was returned from Discourse", 'wp-discourse');
+		} else {
+			$log_message = "post_error";
+			$error_message = __( "An error occurred when communicating with Discourse", 'wp-discourse' );
+		}	
+				
+		$this->logger->error( "$remote_type.$log_message", $this->log_args );
+		
+		return new \WP_Error( 'discourse_publishing_response_error', $error_message );
 	}
 	
 	/**
 	 * Handle publication notices
 	 */
-	protected function handle_notice( $type, $response, $post_id ) {
-		$atts = $this->get_response_attributes( $response );
-		update_post_meta( $post_id, 'wpdc_publishing_error', $type );
-		return $this->log_and_raise( $type, $atts, 'notice' );
-	}
-	
-	/**
-	 * Log errors and notices, and return a WP_Error to client. Both errors and
-	 * notices return a WP_Error.
-	 */
-	protected function log_and_raise( $type, $atts, $level = 'error' ) {
-		$args = $this->log_args;
-		$args["http_code"] = $atts->code;
-		$message = $atts->message;
-		$this->logger->log( $level, "$type {$message}", $args );
+	protected function handle_notice( $remote_type, $response, $post_id ) {
+		update_post_meta( $post_id, 'wpdc_publishing_error', $remote_type );
 		
-		return new \WP_Error( 'discourse_publishing_response_error', self::ERROR_MESSAGES[ $type ] );
+		$this->get_response_attributes( $response );
+		$this->logger->warn( $remote_type, $this->log_args );
+		
+		$notice_messages = array(
+			"queued_topic"	=> __( "The published post has been added to the Discourse approval queue" ),
+			"deleted_topic"	=> __( "The Discourse topic associated with this post has been deleted" )
+		);
+		$error_message = $notice_messages[ $remote_type ];
+		
+		return new \WP_Error( 'discourse_publishing_response_notice', $error_message );
 	}
-	
+
 	/**
 	 * Retrieve the message and code from a response
 	 */
@@ -612,9 +667,15 @@ class DiscoursePublish {
 			}
 		}
 		
+		if ( !empty( $atts->message ) ) {
+			$this->log_args['response_message'] = $atts->message;
+		}
+		
 		$raw_code = wp_remote_retrieve_response_code( $response );
+		
 		if ( !empty( $raw_code) ) {
 			$atts->code = intval( $raw_code );
+			$this->log_args['http_code'] = $atts->code;
 		}
 		
 		return $atts;

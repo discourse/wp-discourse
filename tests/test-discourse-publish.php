@@ -44,6 +44,12 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   protected $publish;
   
   /*
+   *
+   * setup functions
+   *
+  */
+  
+  /*
    * Setup test class
    */
   public static function setUpBeforeClass() {
@@ -51,7 +57,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
   }
   
   /*
-   * Setup test
+   * Setup each test
    */
   public function setUp() {
     $register_actions = false;
@@ -59,6 +65,20 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     $this->publish->setup_logger();
     $this->publish->setup_options( self::$plugin_options );
 	}
+  
+  /*
+   * Teardown each test
+   */
+  public function tearDown() {
+    $this->clear_logs();
+    remove_all_filters( 'pre_http_request' );
+  }
+  
+  /*
+   *
+   * publish_post_after_save tests
+   *
+   */
   
   /*
    * publish_post_after_save handles new posts correctly
@@ -121,6 +141,83 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     wp_delete_post( $post_id );
   }
   
+  /*
+   * publish_post_after_save handles pinning topics after post creation
+   */
+  public function test_publish_post_after_save_pin_topic() {
+    // Set up a response body for creating a new post, with subsequent pin request
+    $pin_until = '2021-02-17';
+    $pin_until_body = http_build_query(array(
+			'status'  => 'pinned',
+			'enabled' => 'true',
+			'until'   => $pin_until,
+		));
+    $second_request = array(
+      "body"      => $pin_until_body,
+      "response"  => self::$success_response
+    );
+    $body = $this->mock_remote_post_success_body( "create_post_response_body", $second_request );
+    
+    // Add a post that will be pinned
+    $post_atts = self::$post_atts;
+    $post_atts['meta_input']['wpdc_pin_until'] = $pin_until;
+    $post_id = wp_insert_post( $post_atts, false, false );
+    
+    // Run the publication
+    $response = $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
+    
+    // Ensure the right result
+    $this->assertFalse( is_wp_error( $response ) );
+    $this->assertTrue( empty( get_post_meta( $post_id, 'wpdc_pin_until', true ) ) );
+    
+    // cleanup
+    wp_delete_post( $post_id );
+  }
+  
+  /*
+   * publish_post_after_save handles adding feature links after post updates
+   */
+  public function test_publish_post_after_save_add_featured_link() {
+    // Enable featured link option
+    self::$plugin_options['add-featured-link'] = 1;
+    $this->publish->setup_options( self::$plugin_options );
+    
+    // Add a post that's already been published to Discourse
+    $body_json_file = "update_post_response_body";
+    $body = json_decode(file_get_contents( __DIR__ . "/fixtures/$body_json_file.json" ));
+    $discourse_post = $body->post;
+    $post_atts = self::$post_atts;
+    $post_atts['meta_input']['discourse_post_id'] = $discourse_post->id;
+    $post_id = wp_insert_post( $post_atts, false, false );
+    
+    // Set up a response body for updating an existing post, and the featured link in the second request
+    $featured_link_body = http_build_query(array(
+      'featured_link' => get_permalink( $post_id )
+    ));
+    $second_request = array(
+      "body"      => $featured_link_body,
+      "response"  => self::$success_response
+    );
+    $body = $this->mock_remote_post_success_body( $body_json_file, $second_request );
+    $post = $body->post;
+    
+    // Run the update
+    update_post_meta( $post_id, 'update_discourse_topic', 1 );
+    $response = $this->publish->publish_post_after_save( $post_id, get_post( $post_id ) );
+    
+    // Ensure the right result
+    $this->assertFalse( is_wp_error( $response ) );
+    
+    // cleanup
+    wp_delete_post( $post_id );
+  }
+  
+  /*
+   *
+   * remote_post tests
+   *
+   */
+  
   /* 
    * Successful remote post request returns original response
    */
@@ -140,7 +237,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
-    $this->assertRegExp('/publish.ERROR: create_post Forbidden/', $log );
+    $this->assertRegExp('/publish.ERROR: create_post.post_error/', $log );
     $this->assertRegExp('/http_code":403/', $log);
   }
   
@@ -154,7 +251,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
-    $this->assertRegExp('/publish.ERROR: create_post Title seems unclear, most of the words contain the same letters over and over?/', $log);
+    $this->assertRegExp('/publish.ERROR: create_post.post_error/', $log);
     $this->assertRegExp('/http_code":422/', $log);
   }
   
@@ -168,31 +265,37 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     $this->assertEquals( $response, $this->standardised_error( "create_post" ) );
     
     $log = $this->get_last_log();
-    $this->assertRegExp('/publish.ERROR: create_post cURL error 7: Failed to connect to localhost port 3000: Connection refused/', $log );
-    $this->assertRegExp('/http_code":null/', $log);
+    $this->assertRegExp('/publish.ERROR: create_post.post_error/', $log );
   }
   
-  public function tearDown() {
-    $this->clear_logs();
-    remove_all_filters( 'pre_http_request' );
+  /*
+   *
+   * Utility functions
+   *
+   */
+  
+  protected function mock_remote_post_return( $response, $second_request = null ) {    
+    add_filter( 'pre_http_request', function( $prempt, $args, $url ) use( $response, $second_request ) {
+      
+      if ( !empty( $second_request ) && ( $second_request['body'] == $args['body'] ) ) {
+        return $second_request['response'];
+      } else {
+        return $response;
+      }
+    }, 10, 3 );
   }
   
-  protected function mock_remote_post_return( $response ) {
-    add_filter( 'pre_http_request', function() use( $response ) {
-      return $response;
-    } );
-  }
-  
-  protected function mock_remote_post_success_body( $body_json_file ) {
+  protected function mock_remote_post_success_body( $body_json_file, $second_request = null ) {
     $response = self::$success_response;
     $body = json_decode(file_get_contents( __DIR__ . "/fixtures/$body_json_file.json" ));
     $response['body'] = json_encode( $body );
-    $this->mock_remote_post_return( $response );
+    $this->mock_remote_post_return( $response, $second_request );
     return $body;
   }
   
-  protected function standardised_error( $type ) {
-    return new WP_Error( 'discourse_publishing_response_error', $this->publish::ERROR_MESSAGES[ $type ] );
+  protected function standardised_error( $body_validation = false ) {
+    $message = __( "An error occurred when communicating with Discourse", 'wp-discourse' );
+    return new WP_Error( 'discourse_publishing_response_error', $message );
   }
   
   protected function get_last_log() {
@@ -202,7 +305,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     return `tail -n 1 $log_file`;
   }
   
-  private function clear_logs() {
+  protected function clear_logs() {
 		$manager = new FileManager();
 		$log_files = glob( $manager->logs_dir . "/*.log" );
 		

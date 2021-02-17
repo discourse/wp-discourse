@@ -116,15 +116,22 @@ class LogViewer {
 	 * Outputs the markup for the log viewer
 	 */
 	public function log_viewer_markup() {
+		$selected_log_key = null;
+		
+		if ( !empty( $this->selected_log ) ) {
+			$selected_log_key = $this->build_log_key( $this->selected_log );
+		}
+		
 		?>
 		<?php if ( $this->enabled ) : ?>
 			<?php if ( !empty( $this->logs ) ) : ?>
 				<div id="wpdc-log-viewer-controls">
 					<div class="name">
-						<h3>
+						<h4>
 							<?php esc_html_e( 'Log for ', 'wp-discourse' ); ?>
 							<?php echo esc_html( $this->file_name( $this->selected_log ) ); ?>
-						</h3>
+						</h4>
+						<div class="refresh button"><?php esc_html_e( 'Refresh', 'wp-discourse' ); ?></div>
 					</div>
 					<div class="select">
 						<select>
@@ -138,7 +145,7 @@ class LogViewer {
 						<div class="download-logs button"><?php esc_html_e( 'Download All', 'wp-discourse' ); ?></div>
 					</div>
 				</div>
-				<div id="wpdc-log-viewer">
+				<div id="wpdc-log-viewer" data-log-key="<?php echo esc_attr( $selected_log_key ); ?>">
 					<span class="spinner"></span>
 					<pre><?php echo esc_html( file_get_contents( $this->selected_log['file'] ) ); ?></pre>
 				</div>
@@ -161,11 +168,12 @@ class LogViewer {
 			$this->logs = array_reduce( $log_files, function ( $result, $log_file ) use ( $file_handler ) {
 					$date = $file_handler->getDateFromUrl( $log_file );
 					$number = $file_handler->getNumberFromUrl( $log_file );
-					$result["$date-$number"] = array(
+					$log = array(
 							"date" => $date,
 							"number" => $number,
 							"file" => $log_file
 					);
+					$result[ $this->build_log_key( $log ) ] = $log;
 			    return $result;
 			}, array());
 	}
@@ -272,6 +280,15 @@ class LogViewer {
 					$name .= " (" . esc_html( $number ) . ")";
 			}
 			return $name;
+	}
+	
+	/**
+	 * Build log key from log in logs list
+	 */
+	protected function build_log_key( $item ) {
+		$date = $item["date"];
+		$number = $item["number"];
+		return "$date-$number";
 	}
 	
 	/**

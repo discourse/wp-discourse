@@ -145,6 +145,30 @@
 				success: function(response) {
 					if (response.success) {
 						$logControls.find('h3').html(response.data.name);
+						$logViewer.data('log-key', key);
+						$logViewer.find('pre').html(response.data.contents);
+						$logViewer.removeClass('loading');
+					}
+				}
+			});
+		}
+	});
+	
+	$logControls.find('.button.refresh').on('click', function() {		
+		var key = $logViewer.data('log-key');
+		
+		if (key) {
+			$logViewer.addClass('loading');
+			
+			$.ajax({
+				url: wpdc.ajax,
+				type: 'post',
+				data: {
+					action: "wpdc_view_log",
+					key: key
+				},
+				success: function(response) {
+					if (response.success) {
 						$logViewer.find('pre').html(response.data.contents);
 						$logViewer.removeClass('loading');
 					}
@@ -165,6 +189,7 @@
 				if (response.success) {
 					$logControls.find('h3').html(response.data.name);
 					$logViewer.find('pre').html(response.data.contents);
+					$logViewer.data('log-key', null);
 					$logViewer.removeClass('loading');
 				}
 			}

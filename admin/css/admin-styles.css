@@ -212,6 +212,15 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 	justify-content: space-between;
 }
 
+#wpdc-log-viewer-controls .name {
+	display: flex;
+	align-items: center;
+}
+
+#wpdc-log-viewer-controls .name h4 {
+	margin-right: 1em;
+}
+
 #wpdc-log-viewer {
 	height: 700px;
 	background: white;
