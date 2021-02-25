@@ -31,5 +31,7 @@
     "10up/wp_mock": "dev-master",
     "phpunit/phpunit": "7.1",
     "phpunit/php-code-coverage": "^6.1.4"
+    "phpcompatibility/php-compatibility": "^9.3.5",
+    "wp-coding-standards/wpcs": "^2.3.0"
   }
 }

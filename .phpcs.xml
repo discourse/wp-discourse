@@ -5,6 +5,8 @@
 
     <!-- Set a description for this ruleset. -->
     <description>A custom set of code standard rules for the WP Discourse plugin.</description>
+    
+    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility" />
 
     <!-- Include the WordPress ruleset, with exclusions. -->
     <rule ref="WordPress">
@@ -12,10 +14,9 @@
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
-        <exclude name="WordPress.VIP.RestrictedFunctions" />
-        <exclude name="WordPress.VIP.SlowDBQuery" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
+        <exclude name="WordPress.DB.SlowDBQuery" />
+        <exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching" />
+        <exclude name="WordPress.DB.DirectDatabaseQuery.SchemaChange" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
         <!-- Have to add this so that $table_name can be included in a prepare statment. -->
