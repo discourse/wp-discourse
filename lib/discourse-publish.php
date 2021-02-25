@@ -200,6 +200,18 @@ class DiscoursePublish {
 			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
 		}
 	}
+	
+	/**
+	 * Calls `sync_to_discourse_work` without a lock. Only used for testing.
+	 * Should not be used elsewhere in plugin.
+	 *
+	 * @param int    $post_id The post id.
+	 * @param string $title The title.
+	 * @param string $raw The raw content of the post.
+	 */
+	public function sync_to_discourse_without_lock( $post_id, $title, $raw ) {
+		return $this->sync_to_discourse_work( $post_id, $title, $raw );
+	}
 
 	/**
 	 * Syncs a post to Discourse.

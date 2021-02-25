@@ -14,7 +14,10 @@
       "homepage": "https://github.com/eviltrout"
     }
   ],
-  "keywords": ["wordpress", "discourse"],
+  "keywords": [
+    "wordpress",
+    "discourse"
+  ],
   "support": {
     "issues": "https://github.com/discourse/wp-discourse/issues"
   },
@@ -26,7 +29,7 @@
   "require-dev": {
     "squizlabs/php_codesniffer": "3.*",
     "10up/wp_mock": "dev-master",
-    "phpunit/phpunit": "7.*",
+    "phpunit/phpunit": "7.1",
     "phpunit/php-code-coverage": "^6.1.4"
   }
 }

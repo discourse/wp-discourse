@@ -15,6 +15,7 @@
 	<filter>
 	  <whitelist processUncoveredFilesFromWhitelist="true">
 	    <directory suffix=".php">lib/logs</directory>
+			<file>lib/discourse-publish.php</file>
 	  </whitelist>
 	</filter>
 </phpunit>

@@ -58,6 +58,18 @@ Once you've completed the ``Setup`` section, run the tests suite using
 vendor/bin/phpunit
 ```
 
+To run a specific suite add the path to the file as an argument
+
+```
+vendor/bin/phpunit tests/test-discourse-publish.php
+```
+
+To run a specific test in a suite use the ``--filter`` option
+
+```
+vendor/bin/phpunit tests/test-discourse-publish.php --filter=test_sync_to_discourse_when_creating_with_embed_error 
+```
+
 To add a coverage report to the output add ``--coverage-text``, which will send the report to stdout. 
 
 ```
