@@ -144,9 +144,8 @@ class DiscourseSSO {
 
 			// Not logged in to WordPress, redirect to WordPress login page with redirect back to here.
 			if ( ! is_user_logged_in() ) {
-				$redirect = add_query_arg( $payload, $sig );
 				// Build login URL.
-				$login = wp_login_url( esc_url_raw( $redirect ) );
+				$login = wp_login_url( esc_url_raw( $_SERVER['REQUEST_URI'] ) );
 				do_action( 'wpdc_sso_before_login_redirect', $redirect, $login );
 				// Redirect to login.
 				wp_safe_redirect( esc_url_raw( $login ) );
