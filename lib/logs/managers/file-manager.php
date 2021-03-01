@@ -113,9 +113,9 @@ class FileManager {
     protected function create_files( $files ) {
         foreach ( $files as $file ) {
     		    $file_path = trailingslashit( $file['base'] ) . $file['file'];
-            $dir_exists = wp_mkdir_p( $file['base'] );
-            $dir_writable = is_writable( $file['base'] );
-            
+            $dir_exists    = wp_mkdir_p( $file['base'] );
+            $dir_writable  = is_writable( $file['base'] );
+
         		if ( $dir_exists && $dir_writable && ! file_exists( $file_path ) ) {
                 $file_handle = fopen( $file_path, 'wb' );
 

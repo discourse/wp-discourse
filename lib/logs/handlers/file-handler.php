@@ -14,8 +14,8 @@ use \Monolog\Handler\StreamHandler;
  */
 class FileHandler extends StreamHandler {
 
-    public const DATE_FORMAT    = 'Y-m-d';
-    public const FILE_NAMESPACE = 'wp-discourse';
+    const DATE_FORMAT    = 'Y-m-d';
+    const FILE_NAMESPACE = 'wp-discourse';
 
     /**
      * Flag to determine whether file handler can be used.
