@@ -92,7 +92,7 @@ class LogViewer {
 		public function register_log_viewer() {
 				add_settings_section(
 					'discourse_log_viewer',
-					__( 'Log Viewer', 'wp-discourse' ),
+					__( 'Logs', 'wp-discourse' ),
 					array(
 						$this,
 						'log_viewer_markup',

@@ -126,8 +126,8 @@ class AdminMenu {
 		
 		$log_viewer = add_submenu_page(
 			'wp_discourse_options',
-			__( 'Log Viewer', 'wp-discourse' ),
-			__( 'Log Viewer', 'wp-discourse' ),
+			__( 'Logs', 'wp-discourse' ),
+			__( 'Logs', 'wp-discourse' ),
 			'manage_options',
 			'log_viewer',
 			array( $this, 'log_viewer_tab' )
