@@ -1,21 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <phpunit
-	bootstrap="tests/phpunit/bootstrap.php"
+	bootstrap="bootstrap.php"
 	backupGlobals="false"
 	colors="true"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
 	>
+	<php>
+     <const name="WP_TESTS_MULTISITE" value="1" />
+  </php>
 	<testsuites>
-		<testsuite name="unit">
-			<directory prefix="test-" suffix=".php">tests/phpunit/</directory>
-			<exclude>tests/phpunit/multisite/</exclude>
+		<testsuite name="multisite">
+			<directory prefix="test-" suffix=".php">multisite/</directory>
 		</testsuite>
 	</testsuites>
 	<filter>
 	  <whitelist processUncoveredFilesFromWhitelist="true">
-	    <directory suffix=".php">lib/logs</directory>
 			<file>lib/discourse-publish.php</file>
 	  </whitelist>
 	</filter>

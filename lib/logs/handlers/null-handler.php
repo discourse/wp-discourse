@@ -1,5 +1,6 @@
 <?php
 /**
+ * Log handler that discards logs.
  *
  * @package WPDiscourse
  */

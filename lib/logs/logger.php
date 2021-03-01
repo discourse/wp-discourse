@@ -1,5 +1,6 @@
 <?php
 /**
+ * Creates logs for a context
  *
  * @package WPDiscourse
  */
@@ -20,39 +21,39 @@ use \WPDiscourse\Logs\LineFormatter;
  * Class Logger.
  */
 class Logger extends \Monolog\Logger {
-  
-  /**
-	 * Creates an instance of Logger for a particular context with the 
-   * default file handler. If the file handler cannot be used, a null handler
-   * will be used, which throws records away.
-	 *
-	 * @param string $context The context for the logs, e.g. 'publish'.
-   * @param object $handler optional. The handler for the logs
-   * @param object $formatter optional. The formatter for the handler
-	 * 
-   * @return Logger
-	 */
-  public static function create( $context, $handler = null, $formatter = null ) {
-    $logger = new Logger( $context );
-    
-    if ( !$handler ) {
-      $handler = new FileHandler( new FileManager() );
+
+    /**
+     * Creates an instance of Logger for a particular context with the
+     * default file handler. If the file handler cannot be used, a null handler
+     * will be used, which throws records away.
+     *
+     * @param string $context The context for the logs, e.g. 'publish'.
+     * @param object $handler optional. The handler for the logs.
+     * @param object $formatter optional. The formatter for the handler.
+     *
+     * @return Logger
+     */
+    public static function create( $context, $handler = null, $formatter = null ) {
+    		$logger = new Logger( $context );
+
+    		if ( ! $handler ) {
+    		    $handler = new FileHandler( new FileManager() );
+    		}
+
+    		if ( ! $formatter ) {
+    		    $formatter = new LineFormatter();
+    		}
+
+    		if ( $handler && $handler->enabled() ) {
+            if ( $formatter ) {
+                $handler->setFormatter( $formatter );
+            }
+        } else {
+            $handler = new NullHandler();
+        }
+
+    		$logger->pushHandler( $handler );
+
+    		return $logger;
     }
-    
-    if ( !$formatter ) {
-      $formatter = new LineFormatter();
-    }
-    
-    if ( $handler && $handler->enabled() ) {
-      if ( $formatter ) {
-        $handler->setFormatter( $formatter );
-      }  
-    } else {
-      $handler = new NullHandler();
-    }
-    
-    $logger->pushHandler( $handler );
-    
-    return $logger;
-  }
 };
