@@ -139,7 +139,7 @@
 				url: wpdc.ajax,
 				type: 'post',
 				data: {
-					action: "wpdc_view_log",
+					action: 'wpdc_view_log',
 					key: key
 				},
 				success: function(response) {
@@ -164,7 +164,7 @@
 				url: wpdc.ajax,
 				type: 'post',
 				data: {
-					action: "wpdc_view_log",
+					action: 'wpdc_view_log',
 					nonce: wpdc.nonce,
 					key: key
 				},
@@ -184,7 +184,7 @@
 			url: wpdc.ajax,
 			type: 'post',
 			data: {
-				action: "wpdc_view_logs_metafile"
+				action: 'wpdc_view_logs_metafile'
 			},
 			success: function(response) {
 				if (response.success) {
@@ -199,17 +199,17 @@
 	
 	$logControls.find('.button.download-logs').on('click', function() {		
 		var xhr = new XMLHttpRequest();
-		xhr.open("POST", wpdc.ajax + "?action=wpdc_download_logs", true);
+		xhr.open('POST', wpdc.ajax + '?action=wpdc_download_logs', true);
 		xhr.onload = function() {
-			if (xhr.readyState == 4 && xhr.status == 200) {
-				var blob = new Blob([ xhr.response ], { type: "application/zip" });
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var blob = new Blob([ xhr.response ], { type: 'application/zip' });
 				var url = window.URL.createObjectURL(blob);
-				var a = document.createElement("a");
+				var a = document.createElement('a');
         
 				document.body.appendChild(a);
-        a.style = "display:none";
+        a.style = 'display:none';
         a.href = url;
-        a.download = xhr.getResponseHeader("Content-Disposition").split("filename=")[1];
+        a.download = xhr.getResponseHeader('Content-Disposition').split('filename=')[1];
         a.click();
         a.remove();
 				setTimeout(function() {
@@ -217,7 +217,7 @@
 				});
 			}
 		};
-		xhr.responseType = "arraybuffer";
+		xhr.responseType = 'arraybuffer';
 		xhr.send();
 	});
 })( jQuery );
