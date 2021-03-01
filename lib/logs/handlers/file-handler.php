@@ -114,7 +114,7 @@ class FileHandler extends StreamHandler {
     /**
      * {@inheritdoc}
      */
-    public function close() {
+    public function close(): void {
         parent::close();
 
         if ( true === $this->must_rotate ) {
@@ -138,7 +138,7 @@ class FileHandler extends StreamHandler {
      *
      * @param array $record Log record being written.
      */
-    protected function write( $record ) {
+    protected function write( array $record ): void {
         if ( null === $this->must_rotate ) {
             $this->must_rotate = ! file_exists( $this->url );
         }
