@@ -16,4 +16,4 @@ You can attempt to fix the issues automatically using ``phpcbf``, adhering to fo
 
 1. Make sure your working tree is clean as you may wish to revert the results (in some cases it can create more issues than it solves)
 
-2. Only use ``phpcbf`` on a file by file basis.s
+2. Only use ``phpcbf`` on a file by file basis.
