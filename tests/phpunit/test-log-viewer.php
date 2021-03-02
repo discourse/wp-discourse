@@ -47,9 +47,9 @@ class LogViewerTest extends WP_UnitTestCase {
         $viewer = new LogViewer();
         $viewer->setup_log_viewer();
 
-        $date   = $handler->getDate();
-        $number = $handler->currentFileNumber();
-        $file   = $handler->currentFileUrl();
+        $date   = $handler->get_date();
+        $number = $handler->current_file_number();
+        $file   = $handler->current_file_url();
 
         $this->assertArraySubset(
             array(

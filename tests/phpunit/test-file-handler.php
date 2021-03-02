@@ -133,7 +133,7 @@ class FileHandlerTest extends WP_UnitTestCase {
 				$tomorrows_date = $tomorrows_datetime->format( FileHandler::DATE_FORMAT );
 				$todays_date    = $todays_datetime->format( FileHandler::DATE_FORMAT );
 
-				$files = $file_handler->listFiles();
+				$files = $file_handler->list_files();
 				$this->assertRegExp( '/' . $tomorrows_date . '/', $files[0] );
 				$this->assertRegExp( '/' . $todays_date . '/', $files[1] );
 		}
@@ -153,7 +153,7 @@ class FileHandlerTest extends WP_UnitTestCase {
 				// then taking it over the limit with normal logs.
 
 				$handle = fopen( $file_handler->getUrl(), 'wb' );
-				$limit  = $file_handler->getFileSizeLimit();
+				$limit  = $file_handler->get_file_size_limit();
 
 				while ( fstat( $handle )['size'] < ( $limit - ( 1024 * 30 * 1 ) ) ) {
 				fwrite( $handle, str_repeat( "filler line taking up 30 bts\n", 1024 ) );
@@ -164,7 +164,7 @@ class FileHandlerTest extends WP_UnitTestCase {
 				}
 
 				$this->assertLessThanOrEqual( $limit, fstat( $handle )['size'] );
-				$this->assertCount( 2, $file_handler->listFiles() );
+				$this->assertCount( 2, $file_handler->list_files() );
 		}
 
 		/**
@@ -182,8 +182,8 @@ class FileHandlerTest extends WP_UnitTestCase {
 				$logger->warning( 'A line long enough to take it over 100 bytes with log metadata' );
 				}
 
-				$this->assertCount( 7, $low_limit_file_handler->listFiles() );
-				$this->assertEquals( 7, $low_limit_file_handler->currentFileNumber() );
+				$this->assertCount( 7, $low_limit_file_handler->list_files() );
+				$this->assertEquals( 7, $low_limit_file_handler->current_file_number() );
 		}
 
 		/**
@@ -200,13 +200,13 @@ class FileHandlerTest extends WP_UnitTestCase {
 				$logger->warning( 'A line long enough to take it over 100 bytes with log metadata' );
 				}
 
-				$files = $handler->listFiles();
+				$files = $handler->list_files();
 
 				$this->assertCount( 10, $files );
 
 				// Ensure the right files have been removed.
-				$this->assertEquals( 15, $handler->getNumberFromUrl( $files[0] ) );
-				$this->assertEquals( 6, $handler->getNumberFromUrl( end( $files ) ) );
+				$this->assertEquals( 15, $handler->get_number_from_url( $files[0] ) );
+				$this->assertEquals( 6, $handler->get_number_from_url( end( $files ) ) );
 		}
 
 		/**

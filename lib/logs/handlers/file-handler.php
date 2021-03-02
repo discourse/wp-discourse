@@ -90,15 +90,15 @@ class FileHandler extends StreamHandler {
         $this->file_manager    = $file_manager;
         $this->max_files       = $max_files;
         $this->file_size_limit = $file_size_limit;
-        $this->file_number     = $this->currentFileNumber();
+        $this->file_number     = $this->current_file_number();
         $this->datetime        = $datetime;
 
         // Arguments for StreamHandler.
-        $current_url     = $this->currentFileUrl();
-        $url             = $current_url ? $current_url : $this->buildNewFileUrl();
-        $level           = Logger::DEBUG; // we want this handlers for all levels.
+        $current_url     = $this->current_file_url();
+        $url             = $current_url ? $current_url : $this->build_new_file_url();
+        $level           = Logger::DEBUG; // we want this handler for all levels.
         $bubble          = false; // we currently have only one handler, so no bubbling.
-        $file_permission = null; // we handle permissions in file manager.
+        $file_permission = null; // we handle permissions in the file manager.
         $use_locking     = true; // we want a log file lock if possible.
 
         StreamHandler::__construct( $url, $level, $bubble, $file_permission, $use_locking );
@@ -114,7 +114,7 @@ class FileHandler extends StreamHandler {
     /**
      * {@inheritdoc}
      */
-    public function close(): void {
+    public function close() {
         parent::close();
 
         if ( true === $this->must_rotate ) {
@@ -138,15 +138,15 @@ class FileHandler extends StreamHandler {
      *
      * @param array $record Log record being written.
      */
-    protected function write( array $record ): void {
+    protected function write( array $record ) {
         if ( null === $this->must_rotate ) {
             $this->must_rotate = ! file_exists( $this->url );
         }
 
+        // Ensure we're writing to today's log file.
         $date = $record['datetime']->format( static::DATE_FORMAT );
-
         if ( ! preg_match( '/' . $date . '/', $this->url ) ) {
-            $files_for_date = $this->listFiles( "*$date*" );
+            $files_for_date = $this->list_files( "*$date*" );
 
             if ( count( $files_for_date ) > 0 ) {
                 $this->url = $files_for_date[0];
@@ -156,7 +156,8 @@ class FileHandler extends StreamHandler {
             }
         }
 
-        if ( file_exists( $this->url ) && ! $this->validateSize() ) {
+        // Ensure the log file is not too large.
+        if ( file_exists( $this->url ) && ! $this->validate_size() ) {
             $this->file_number++;
             $this->must_rotate = true;
             $this->close();
@@ -168,7 +169,7 @@ class FileHandler extends StreamHandler {
     /**
      * Returns the log file size limit
      */
-    public function getFileSizeLimit() {
+    public function get_file_size_limit() {
         return $this->file_size_limit;
     }
 
@@ -177,14 +178,14 @@ class FileHandler extends StreamHandler {
      *
      * @param string $filter optional. Regex pattern for filename.
      */
-    public function listFiles( $filter = '*' ) {
+    public function list_files( $filter = '*' ) {
         $files = glob( $this->file_manager->logs_dir . "/$filter.log" );
 
         usort(
             $files,
             function ( $a, $b ) {
-        				$a_date = $this->getDateFromUrl( $a );
-        				$b_date = $this->getDateFromUrl( $b );
+        				$a_date = $this->get_date_from_url( $a );
+        				$b_date = $this->get_date_from_url( $b );
 
         				if ( $a_date > $b_date ) {
         				    return -1;
@@ -194,8 +195,8 @@ class FileHandler extends StreamHandler {
                     return 1;
         				}
 
-        				$a_number = $this->getNumberFromUrl( $a );
-        				$b_number = $this->getNumberFromUrl( $b );
+        				$a_number = $this->get_number_from_url( $a );
+        				$b_number = $this->get_number_from_url( $b );
 
         				if ( $a_number > $b_number ) {
         				    return -1;
@@ -215,9 +216,9 @@ class FileHandler extends StreamHandler {
     /**
      * Returns the url of the current log file
      */
-    public function currentFileUrl() {
-        $date  = $this->getDate();
-        $files = $this->listFiles( "*$date*" );
+    public function current_file_url() {
+        $date  = $this->get_date();
+        $files = $this->list_files( "*$date*" );
 
         if ( count( $files ) > 0 ) {
             return reset( $files );
@@ -229,11 +230,11 @@ class FileHandler extends StreamHandler {
     /**
      * Returns the current log file number
      */
-    public function currentFileNumber() {
-        $file_url = $this->currentFileUrl();
+    public function current_file_number() {
+        $file_url = $this->current_file_url();
 
         if ( $file_url ) {
-            return $this->getNumberFromUrl( $file_url );
+            return $this->get_number_from_url( $file_url );
         } else {
             return 1;
         }
@@ -243,8 +244,8 @@ class FileHandler extends StreamHandler {
      * Handles log rotation
      */
     protected function rotate() {
-        $this->url = $this->buildNewFileUrl();
-        $files     = $this->listFiles();
+        $this->url = $this->build_new_file_url();
+        $files     = $this->list_files();
 
         if ( count( $files ) >= ( $this->max_files - 1 ) ) {
             foreach ( array_slice( $files, ( $this->max_files - 1 ) ) as $file ) {
@@ -268,9 +269,9 @@ class FileHandler extends StreamHandler {
     /**
      * Builds a new log file url
      */
-    protected function buildNewFileUrl() {
+    protected function build_new_file_url() {
         $dir_path  = $this->file_manager->logs_dir;
-        $name      = $this->fileName();
+        $name      = $this->file_name();
         $hash      = wp_hash( $name, 'nonce' );
         $extension = 'log';
         return "$dir_path/$name-$hash.$extension";
@@ -279,7 +280,7 @@ class FileHandler extends StreamHandler {
     /**
      * Returns date used by file handler
      */
-    public function getDate() {
+    public function get_date() {
         if ( isset( $this->datetime ) ) {
             return $this->datetime->format( static::DATE_FORMAT );
         } else {
@@ -290,7 +291,7 @@ class FileHandler extends StreamHandler {
     /**
      * Validates size of current log file against size limit
      */
-    protected function validateSize() {
+    protected function validate_size() {
         $handle                = fopen( $this->url, 'r+' );
         $stat                  = fstat( $handle );
         $last_line_byte_buffer = 100;
@@ -300,10 +301,10 @@ class FileHandler extends StreamHandler {
     /**
      * Builds current log file name
      */
-    protected function fileName() {
-        $date   = $this->getDate();
+    protected function file_name() {
+        $date   = $this->get_date();
         $number = $this->file_number;
-        return $this->buildFilename( $date, $number );
+        return $this->build_filename( $date, $number );
     }
 
     /**
@@ -312,7 +313,7 @@ class FileHandler extends StreamHandler {
      * @param string $date Log date.
      * @param string $number Log number.
      */
-    protected function buildFilename( $date, $number ) {
+    protected function build_filename( $date, $number ) {
         $namespace = static::FILE_NAMESPACE;
         return "$namespace-$date-$number";
     }
@@ -322,7 +323,7 @@ class FileHandler extends StreamHandler {
      *
      * @param string $file_url URL of log file.
      */
-    public function getNumberFromUrl( $file_url ) {
+    public function get_number_from_url( $file_url ) {
         $parts = explode( '-', $file_url );
         end( $parts );
         return (int) prev( $parts );
@@ -333,7 +334,7 @@ class FileHandler extends StreamHandler {
      *
      * @param string $file_url URL of log file.
      */
-    public function getDateFromUrl( $file_url ) {
+    public function get_date_from_url( $file_url ) {
         $parts      = explode( '-', $file_url );
         $date_parts = array_slice( array_slice( $parts, -5 ), 0, 3 );
         return implode( '-', $date_parts );
@@ -344,9 +345,9 @@ class FileHandler extends StreamHandler {
      *
      * @param string $file_url URL of log file.
      */
-    public function getFilename( $file_url ) {
-        $date   = $this->getDateFromUrl( $file_url );
-        $number = $this->getNumberFromUrl( $file_url );
-        return $this->buildFilename( $date, $number );
+    public function get_filename( $file_url ) {
+        $date   = $this->get_date_from_url( $file_url );
+        $number = $this->get_number_from_url( $file_url );
+        return $this->build_filename( $date, $number );
     }
 }

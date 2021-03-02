@@ -165,13 +165,13 @@ class LogViewer {
 		 */
 		public function retrieve_logs() {
 				$file_handler = $this->file_handler;
-				$log_files    = $file_handler->listFiles();
+				$log_files    = $file_handler->list_files();
 
 				$this->logs = array_reduce(
 						$log_files,
 						function ( $result, $log_file ) use ( $file_handler ) {
-								$date                                   = $file_handler->getDateFromUrl( $log_file );
-								$number                                 = $file_handler->getNumberFromUrl( $log_file );
+								$date                                   = $file_handler->get_date_from_url( $log_file );
+								$number                                 = $file_handler->get_number_from_url( $log_file );
 								$log                                    = array(
 									'date'   => $date,
 									'number' => $number,
@@ -225,7 +225,7 @@ class LogViewer {
 		 * Download bundled log files.
 		 */
 		public function download_logs() {
-				$log_files  = $this->file_handler->listFiles();
+				$log_files  = $this->file_handler->list_files();
 				$date_range = $this->build_date_range( $log_files );
 
 				$plugin_data = get_plugin_data( WPDISCOURSE_PATH . 'wp-discourse.php' );
@@ -237,7 +237,7 @@ class LogViewer {
 				$zip->open( $file, \ZipArchive::OVERWRITE );
 
 				foreach ( $log_files as $log_file ) {
-						$name = $this->file_handler->getFilename( $log_file );
+						$name = $this->file_handler->get_filename( $log_file );
 						$zip->addFile( $log_file, "$name.log" );
 				}
 
@@ -392,8 +392,8 @@ class LogViewer {
 				$log_values  = array_values( $log_files );
 				$newest_file = reset( $log_files );
 				$oldest_file = end( $log_values );
-				$date_end    = $this->file_handler->getDateFromUrl( $newest_file );
-				$date_start  = $this->file_handler->getDateFromUrl( $oldest_file );
+				$date_end    = $this->file_handler->get_date_from_url( $newest_file );
+				$date_start  = $this->file_handler->get_date_from_url( $oldest_file );
 				return "$date_start-$date_end";
 		}
 }
