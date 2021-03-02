@@ -10,7 +10,7 @@ namespace WPDiscourse\Logs;
 /**
  * Class LineFormatter
  */
-class LineFormatter extends \Monolog\Formatter\LineFormatter {
+class LineFormatter extends \WPDiscourse\Monolog\Formatter\LineFormatter {
 
     /**
      * LineFormatter constructor

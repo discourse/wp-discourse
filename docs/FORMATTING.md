@@ -10,5 +10,10 @@ To format your code, run ``phpcs`` to see what issues the file has.
 vendor/bin/phpcs lib/discourse-publish.php
 ```
 
-All issues at "warning" level and above should be addressed. It is recommended that you fix issues manually, as use of ``phpcbf`` can lead to unexpected results.
+Ideally, all issues at "warning" level and above should be addressed.
 
+You can attempt to fix the issues automatically using ``phpcbf``, adhering to following:
+
+1. Make sure your working tree is clean as you may wish to revert the results (in some cases it can create more issues than it solves)
+
+2. Only use ``phpcbf`` on a file by file basis.s

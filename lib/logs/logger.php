@@ -20,7 +20,7 @@ use \WPDiscourse\Logs\LineFormatter;
 /**
  * Class Logger.
  */
-class Logger extends \Monolog\Logger {
+class Logger extends \WPDiscourse\Monolog\Logger {
 
     /**
      * Creates an instance of Logger for a particular context with the

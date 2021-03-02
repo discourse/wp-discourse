@@ -7,7 +7,7 @@
 
 namespace WPDiscourse\Logs;
 
-use \Monolog\Handler\StreamHandler;
+use \WPDiscourse\Monolog\Handler\StreamHandler;
 
 /**
  * Class FileHandler

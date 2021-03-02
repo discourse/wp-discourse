@@ -23,8 +23,7 @@
   },
   "require": {
     "php": ">=5.4",
-    "composer/installers": "^1.0",
-    "monolog/monolog": "^1.25"
+    "composer/installers": "^1.0"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "3.*",
@@ -32,13 +31,20 @@
     "phpunit/phpunit": "7.5.20",
     "phpunit/php-code-coverage": "^6.1.4",
     "phpcompatibility/php-compatibility": "^9.3.5",
-    "wp-coding-standards/wpcs": "^2.3.0"
+    "wp-coding-standards/wpcs": "^2.3.0",
+    "monolog/monolog": "^1.25"
+  },
+  "autoload": {
+    "classmap": [
+      "vendor_namespaced/"
+    ]
   },
   "autoload-dev": {
     "classmap": [
       "lib/",
       "admin/",
-      "tests/"
+      "tests/",
+      "vendor_namespaced/"
     ]
   }
 }
