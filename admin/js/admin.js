@@ -140,6 +140,7 @@
 				type: 'post',
 				data: {
 					action: 'wpdc_view_log',
+					nonce: wpdc.nonce,
 					key: key
 				},
 				success: function(response) {
