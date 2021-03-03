@@ -89,7 +89,7 @@ When building for production, use composer as you normally would when preparing 
 composer install --prefer-dist --optimize-autoloader --no-dev
 ```
 
-This will also add the namespaced packages in ``vendor_namespaced`` to the autoloaded due to the autoload classmap:
+This will also add the namespaced packages in ``vendor_namespaced`` to the autoload due to the autoload classmap:
 
 ```
 "autoload": {
