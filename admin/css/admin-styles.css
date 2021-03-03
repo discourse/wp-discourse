@@ -217,8 +217,25 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 	align-items: center;
 }
 
-#wpdc-log-viewer-controls .name h4 {
+#wpdc-log-viewer-controls .name h3 {
+	font-size: 1.2em;
 	margin-right: 1em;
+}
+
+#wpdc-log-viewer-controls .load-log {
+	cursor: pointer;
+}
+
+#wpdc-log-viewer-controls .load-log .return-to {
+	display: none;
+}
+
+#wpdc-log-viewer-controls.meta .load-log .return-to {
+	display: block;
+}
+
+#wpdc-log-viewer-controls.meta .load-log .refresh {
+	display: none;
 }
 
 #wpdc-log-viewer {

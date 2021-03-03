@@ -129,11 +129,14 @@ class LogViewer {
 					<?php if ( ! empty( $this->logs ) ) : ?>
 						<div id="wpdc-log-viewer-controls">
 							<div class="name">
-								<h4>
+								<h3>
 									<?php esc_html_e( 'Log for ', 'wp-discourse' ); ?>
 									<?php echo esc_html( $this->file_name( $this->selected_log ) ); ?>
-								</h4>
-								<div class="refresh button"><?php esc_html_e( 'Refresh', 'wp-discourse' ); ?></div>
+								</h3>
+								<a class="load-log">
+									<span class="refresh"><?php esc_html_e( 'Refresh', 'wp-discourse' ); ?></span>
+									<span class="return-to"><?php esc_html_e( 'Return to log', 'wp-discourse' ); ?></span>
+								</a>
 							</div>
 							<div class="select">
 								<select>
@@ -144,7 +147,7 @@ class LogViewer {
 									<?php endforeach; ?>
 								</select>
 								<div class="view-meta button"><?php esc_html_e( 'View Meta', 'wp-discourse' ); ?></div>
-								<div class="download-logs button"><?php esc_html_e( 'Download All', 'wp-discourse' ); ?></div>
+								<div class="download-logs button"><?php esc_html_e( 'Download', 'wp-discourse' ); ?></div>
 							</div>
 						</div>
 						<div id="wpdc-log-viewer" data-log-key="<?php echo esc_attr( $selected_log_key ); ?>">
@@ -229,9 +232,10 @@ class LogViewer {
 				$date_range = $this->build_date_range( $log_files );
 
 				$plugin_data = get_plugin_data( WPDISCOURSE_PATH . 'wp-discourse.php' );
-				$namespace   = $plugin_data['TextDomain'];
+				$plugin_name = $plugin_data['TextDomain'];
+				$site_title  = str_replace( ' ', '-', strtolower( get_bloginfo( 'name' ) ));
 
-				$filename = "{$namespace}-logs-$date_range.zip";
+				$filename = "{$site_title}-{$plugin_name}-logs-$date_range.zip";
 				$file     = tempnam( 'tmp', $filename );
 				$zip      = new \ZipArchive();
 				$zip->open( $file, \ZipArchive::OVERWRITE );
@@ -243,7 +247,7 @@ class LogViewer {
 
 				$metafile_name     = $this->metafile_name;
 				$metafile_path     = $this->get_metafile_path();
-				$metafile_filename = "{$namespace}-{$metafile_name}-{$date_range}.txt";
+				$metafile_filename = "{$plugin_name}-{$metafile_name}-{$date_range}.txt";
 
 				$zip->addFile( $metafile_path, $metafile_filename );
 				$zip->close();

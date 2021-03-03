@@ -129,10 +129,25 @@
 	var $logControls = $('#wpdc-log-viewer-controls');
 	var $logViewer = $('#wpdc-log-viewer');
 	
+	function handleLogResponse(response, logKey = null, meta = false) {		
+		if (response && response.data) {
+			var title = (meta ? '' : 'Log for ') + response.data.name;
+			$logControls.find('h3').html(title);
+			$logViewer.find('pre').html(response.data.contents);
+		}
+
+		if (logKey) {
+			$logViewer.data('log-key', logKey);
+		}
+
+		$logControls.toggleClass('meta', meta);
+		$logViewer.removeClass('loading');
+	}
+	
 	$logControls.find('select').on('change', function() {
-		var key = $logControls.find('select').val();
+		var logKey = $logControls.find('select').val();
 		
-		if (key) {
+		if (logKey) {
 			$logViewer.addClass('loading');
 			
 			$.ajax({
@@ -141,24 +156,21 @@
 				data: {
 					action: 'wpdc_view_log',
 					nonce: wpdc.nonce,
-					key: key
+					key: logKey
 				},
 				success: function(response) {
 					if (response.success) {
-						$logControls.find('h3').html(response.data.name);
-						$logViewer.data('log-key', key);
-						$logViewer.find('pre').html(response.data.contents);
-						$logViewer.removeClass('loading');
+						handleLogResponse(response, logKey);
 					}
 				}
 			});
 		}
 	});
 	
-	$logControls.find('.button.refresh').on('click', function() {		
-		var key = $logViewer.data('log-key');
+	$logControls.find('.load-log').on('click', function() {		
+		var logKey = $logViewer.data('log-key');
 		
-		if (key) {
+		if (logKey) {
 			$logViewer.addClass('loading');
 			
 			$.ajax({
@@ -167,12 +179,11 @@
 				data: {
 					action: 'wpdc_view_log',
 					nonce: wpdc.nonce,
-					key: key
+					key: logKey
 				},
 				success: function(response) {
 					if (response.success) {
-						$logViewer.find('pre').html(response.data.contents);
-						$logViewer.removeClass('loading');
+						handleLogResponse(response, logKey);
 					}
 				}
 			});
@@ -189,10 +200,7 @@
 			},
 			success: function(response) {
 				if (response.success) {
-					$logControls.find('h3').html(response.data.name);
-					$logViewer.find('pre').html(response.data.contents);
-					$logViewer.data('log-key', null);
-					$logViewer.removeClass('loading');
+					handleLogResponse(response, null, true);
 				}
 			}
 		});
