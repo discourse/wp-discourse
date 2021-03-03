@@ -30,7 +30,7 @@ trait FormattableHandlerTrait
      * {@inheritdoc}
      * @suppress PhanTypeMismatchReturn
      */
-    public function setFormatter(\WPDiscourse\Monolog\Formatter\FormatterInterface $formatter) : \WPDiscourse\Monolog\Handler\HandlerInterface
+    public function setFormatter(\WPDiscourse\Monolog\Formatter\FormatterInterface $formatter)
     {
         $this->formatter = $formatter;
         return $this;
@@ -38,7 +38,7 @@ trait FormattableHandlerTrait
     /**
      * {@inheritdoc}
      */
-    public function getFormatter() : \WPDiscourse\Monolog\Formatter\FormatterInterface
+    public function getFormatter()
     {
         if (!$this->formatter) {
             $this->formatter = $this->getDefaultFormatter();
@@ -50,7 +50,7 @@ trait FormattableHandlerTrait
      *
      * Overwrite this if the LineFormatter is not a good default for your handler.
      */
-    protected function getDefaultFormatter() : \WPDiscourse\Monolog\Formatter\FormatterInterface
+    protected function getDefaultFormatter()
     {
         return new \WPDiscourse\Monolog\Formatter\LineFormatter();
     }

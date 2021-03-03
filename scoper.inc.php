@@ -33,9 +33,7 @@ return [
     // Whitelists a list of files. Unlike the other whitelist related features, this one is about completely leaving
     // a file untouched.
     // Paths are relative to the configuration file unless if they are already absolute
-    'files-whitelist' => [
-        'src/a-whitelisted-file.php',
-    ],
+    'files-whitelist' => [],
 
     // When scoping PHP files, there will be scenarios where some of the code being scoped indirectly references the
     // original namespace. These will include, for example, strings or string manipulations. PHP-Scoper has limited
@@ -45,9 +43,35 @@ return [
     // For more see: https://github.com/humbug/php-scoper#patchers
     'patchers' => [
         function (string $filePath, string $prefix, string $contents): string {
-            // Change the contents here.
+            $lines = explode( "\n", $contents );
 
-            return $contents;
+            foreach ( $lines as $index => $line ) {
+              
+              // Ensure functions do not have return type declarations, which are not supported in PHP 5.*.
+              if ( preg_match( '/\h(function)\h/', $line ) && ltrim($line)[0] !== '*' ) {
+                $last_bracket_index = strripos( $line, ')' );
+
+                if ( $last_bracket_index ) {
+                  $new_line = substr( $line, 0, $last_bracket_index );
+                  $new_line .= ")";
+
+                  $line_without_args = preg_replace( '/\(([^()]*+|(?R))*\)/', '', $line );
+
+                  if ( strpos( $line_without_args, "{" ) !== false ) {
+                    $new_line .= " {";
+                  }
+                  
+                  if ( substr( $line, -1 ) == ";" ) {
+                    $new_line .= ";";
+                  }
+
+                  $lines[ $index ] = $new_line;
+                }
+              }
+
+            }
+
+            return implode( "\n", $lines );
         },
     ],
 

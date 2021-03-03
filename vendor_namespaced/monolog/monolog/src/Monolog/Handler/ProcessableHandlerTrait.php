@@ -29,7 +29,7 @@ trait ProcessableHandlerTrait
      * {@inheritdoc}
      * @suppress PhanTypeMismatchReturn
      */
-    public function pushProcessor($callback) : \WPDiscourse\Monolog\Handler\HandlerInterface
+    public function pushProcessor($callback)
     {
         \array_unshift($this->processors, $callback);
         return $this;
@@ -37,7 +37,7 @@ trait ProcessableHandlerTrait
     /**
      * {@inheritdoc}
      */
-    public function popProcessor() : callable
+    public function popProcessor()
     {
         if (!$this->processors) {
             throw new \LogicException('You tried to pop from an empty processor stack.');
@@ -47,14 +47,14 @@ trait ProcessableHandlerTrait
     /**
      * Processes a record.
      */
-    protected function processRecord(array $record) : array
+    protected function processRecord(array $record)
     {
         foreach ($this->processors as $processor) {
             $record = $processor($record);
         }
         return $record;
     }
-    protected function resetProcessors() : void
+    protected function resetProcessors()
     {
         foreach ($this->processors as $processor) {
             if ($processor instanceof \WPDiscourse\Monolog\ResettableInterface) {

@@ -27,11 +27,11 @@ interface FormattableHandlerInterface
      * @param  FormatterInterface $formatter
      * @return HandlerInterface   self
      */
-    public function setFormatter(\WPDiscourse\Monolog\Formatter\FormatterInterface $formatter) : \WPDiscourse\Monolog\Handler\HandlerInterface;
+    public function setFormatter(\WPDiscourse\Monolog\Formatter\FormatterInterface $formatter);
     /**
      * Gets the formatter.
      *
      * @return FormatterInterface
      */
-    public function getFormatter() : \WPDiscourse\Monolog\Formatter\FormatterInterface;
+    public function getFormatter();
 }

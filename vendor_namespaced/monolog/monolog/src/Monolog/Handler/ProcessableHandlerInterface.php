@@ -27,12 +27,12 @@ interface ProcessableHandlerInterface
      * @param  ProcessorInterface|callable $callback
      * @return HandlerInterface            self
      */
-    public function pushProcessor($callback) : \WPDiscourse\Monolog\Handler\HandlerInterface;
+    public function pushProcessor($callback);
     /**
      * Removes the processor on top of the stack and returns it.
      *
      * @throws \LogicException In case the processor stack is empty
      * @return callable
      */
-    public function popProcessor() : callable;
+    public function popProcessor();
 }
