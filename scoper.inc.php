@@ -48,6 +48,7 @@ return [
             foreach ( $lines as $index => $line ) {
               
               // Ensure functions do not have return type declarations, which are not supported in PHP 5.*.
+              // See further https://github.com/Seldaek/monolog/issues/1537.
               if ( preg_match( '/\h(function)\h/', $line ) && ltrim($line)[0] !== '*' ) {
                 $last_bracket_index = strripos( $line, ')' );
 
