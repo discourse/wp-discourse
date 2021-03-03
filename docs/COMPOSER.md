@@ -40,7 +40,9 @@ Add whatever package you want to use in production as a development dependency, 
 
 Then run ``composer install`` to install your package in ``vendor``.
 
-#### Step 2. Build a namespaced distribution version of the package
+#### Step 2. Build a distribution version of the package
+
+##### 2.1 Setup
 
 First, install [``humbug/php-scoper``](https://github.com/humbug/php-scoper) globally on your machine. A local global install for development is cleaner than a project install via ``bamarni/composer-bin-plugin`` for our purposes.
 
@@ -52,13 +54,17 @@ Then, update the finders ``path`` array in ``scoper.inc.php`` to include your pa
 
 will include both the ``monolog`` and ``psr`` packages. ``psr`` is a production dependency of ``monolog``.
 
-Finally, run ``add-prefix`` as follows
+You may also need to perform modifications on the package files in order to achieve compatibility. For example, monolog
+
+##### 2.2 Running
+
+Now run ``add-prefix`` as follows
 
 ```
 php-scoper add-prefix --output-dir=./vendor_namespaced/ --force
 ```
 
-This will populate ``vendor_namespaced`` with namespaced versions of the packages matching the listed paths.
+This will populate ``vendor_namespaced`` with namespaced versions of the packages matching the listed paths, with any patchers applied.
 
 #### Step 3. Use the namespaced package in your code
 
