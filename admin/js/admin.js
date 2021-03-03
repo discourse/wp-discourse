@@ -129,7 +129,7 @@
 	var $logControls = $('#wpdc-log-viewer-controls');
 	var $logViewer = $('#wpdc-log-viewer');
 	
-	function handleLogResponse(response, logKey = null, meta = false) {		
+	function handleLogResponse(response, logKey, meta) {
 		if (response && response.data) {
 			var title = (meta ? '' : 'Log for ') + response.data.name;
 			$logControls.find('h3').html(title);
@@ -160,7 +160,7 @@
 				},
 				success: function(response) {
 					if (response.success) {
-						handleLogResponse(response, logKey);
+						handleLogResponse(response, logKey, false);
 					}
 				}
 			});
@@ -183,7 +183,7 @@
 				},
 				success: function(response) {
 					if (response.success) {
-						handleLogResponse(response, logKey);
+						handleLogResponse(response, logKey, false);
 					}
 				}
 			});
