@@ -50,4 +50,4 @@ jobs:
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
-          $PHPCS_DIR/scripts/phpcs -p -s -v -n . --standard=./.phpcs.xml --ignore=*/tests/*,*/tests/lib/*,*/lib/wp-new-user-notification.php*,*/vendor/*,*/admin/discourse-sidebar/build/index.asset.php* --extensions=php
+          $PHPCS_DIR/scripts/phpcs -p -s -v -n . --report-checkstyle=./.phpcs.xml --ignore=*/tests/*,*/tests/lib/*,*/lib/wp-new-user-notification.php*,*/vendor/*,*/admin/discourse-sidebar/build/index.asset.php* --extensions=php
