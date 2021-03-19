@@ -1,0 +1,112 @@
+.wpdc-published-post {
+	margin-bottom: -15px;
+}
+
+.wpdc-permalink {
+	margin-bottom: 16px;
+}
+a.wpdc-permalink-link {
+	text-decoration: none;
+}
+
+button.components-button.is-button.is-default.is-primary.is-large.active {
+	color: #fff;
+	background-size: 100px 100%;
+	background-image: linear-gradient(-45deg,#0085ba 28%,#005d82 28%,#005d82 72%,#0085ba 72%);
+	border-color: #00435d;
+	animation: components-button__busy-animation 2.5s infinite linear;
+	animation-name: components-button__busy-animation;
+	animation-duration: 2.5s;
+	animation-timing-function: linear;
+	animation-delay: 0s;
+	animation-iteration-count: infinite;
+	animation-direction: normal;
+	animation-fill-mode: none;
+	animation-play-state: running;
+	opacity: 1;
+}
+
+.wpdc-button {
+  margin-bottom: 16px;
+}
+
+input.wpdc-topic-url-input {
+  margin-bottom: 16px;
+}
+
+.wpdc-publishing-options {
+	margin-bottom: 16px;
+}
+
+.wpdc-category-select {
+	margin: 8px 0;
+}
+
+.edit-post-sidebar h2.wpdc-sidebar-title {
+	margin-top: 0;
+	margin-bottom: 8px;
+}
+
+.wpdc-publishing-response {
+	color: #555d66;
+	border-left: 4px solid;
+}
+
+.wpdc-publishing-response.success {
+	margin: -16px -16px 16px -16px;
+	padding: 16px;
+	border-left-color: #4ab866;
+	background-color: #eff9f1;
+}
+
+.wpdc-publishing-response.error {
+	margin: -16px -16px 16px -16px;
+	padding: 16px;
+	border-left-color: #d94f4f;
+	background-color: #f9e2e2;
+}
+
+.wpdc-publishing-method {
+	display: block;
+	font-style: italic;
+}
+
+.wpdc-info {
+	display: block;
+	margin-top: 8px;
+	color: #ababab;
+	font-style: italic;
+}
+
+h2.wpdc-panel-section-title {
+  color: #555d66;
+  display: block;
+  padding: 0;
+  font-size: inherit;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: -15px;
+  margin-right: -15px;
+  transition: .1s background ease-in-out;
+  border-top: 1px solid #e2e4e7;
+}
+
+h2.wpdc-panel-section-title:hover {
+  background: #f8f9f9;
+}
+
+hr.wpdc-sidebar-hr {
+	display: block;
+	margin-left: -16px;
+	margin-right: -16px;
+}
+
+/* tags */
+.wpdc-sidebar .components-form-token-field__input-container input[type=text].components-form-token-field__input {
+	width: auto;
+}
+
+.wpdc-pin-until-input {
+	display: block;
+	margin-top: 8px;
+}
