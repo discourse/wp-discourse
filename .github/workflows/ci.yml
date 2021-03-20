@@ -28,7 +28,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          args: "WordPress,WordPress-Core,WordPress-Docs"
       - name: Install Tools
         if: "matrix.sniff"
         run: |
