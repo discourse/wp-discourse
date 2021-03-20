@@ -15,6 +15,9 @@
         <!-- DOMDocument uses camelCase. -->
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_add_user_meta" />
+        <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
     </rule>
 
     <rule ref="PHPCompatibility"/>
