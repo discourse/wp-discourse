@@ -1,22 +1,11 @@
 <?xml version="1.0"?>
-<ruleset name="WP Discourse Coding Standards">
-    <!-- See https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml -->
-    <!-- See https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards/blob/develop/WordPress-Core/ruleset.xml -->
-
-    <!-- Set a description for this ruleset. -->
+<ruleset name="">
     <description>A custom set of code standard rules for the WP Discourse plugin.</description>
-    
-    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility" />
-
-    <!-- Include the WordPress ruleset, with exclusions. -->
     <rule ref="WordPress">
         <exclude name="Generic.Files.LowercasedFilename" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
-        <exclude name="WordPress.DB.SlowDBQuery" />
-        <exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching" />
-        <exclude name="WordPress.DB.DirectDatabaseQuery.SchemaChange" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
         <!-- Have to add this so that $table_name can be included in a prepare statment. -->
@@ -24,8 +13,15 @@
         <!-- DOMDocument uses camelCase. -->
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_add_user_meta" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_delete_user_meta" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta" />
+        <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
+        <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.switch_to_blog_switch_to_blog" />
+        <exclude name="WordPress.VIP.RestrictedFunctions.get_page_by_title_get_page_by_title" />
     </rule>
 
-    <!-- Include sniffs for PHP cross-version compatibility. -->
     <rule ref="PHPCompatibility"/>
 </ruleset>

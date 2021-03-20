@@ -86,7 +86,7 @@ class DiscourseSidebar {
 			return null;
 		}
 		$block_path = '/build/index.js';
-		$style_path = '/build/styles.css';
+		$style_path = '/styles.css';
 
 		wp_register_script(
 			'discourse-sidebar-js',
