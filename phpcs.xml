@@ -1,10 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="WP Discourse Coding Standards">
+<ruleset name="">
     <description>A custom set of code standard rules for the WP Discourse plugin.</description>
-
-    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility" />
-
-    <!-- Include the WordPress ruleset, with exclusions. -->
     <rule ref="WordPress">
         <exclude name="Generic.Files.LowercasedFilename" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
