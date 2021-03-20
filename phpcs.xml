@@ -1,20 +1,26 @@
 <?xml version="1.0"?>
-<ruleset name="">
-    <description>Generally-applicable sniffs for WordPress plugins</description>
+<ruleset name="WP Discourse Coding Standards">
+    <description>A custom set of code standard rules for the WP Discourse plugin.</description>
 
+    <config name="installed_paths" value="vendor/wp-coding-standards/wpcs,vendor/phpcompatibility/php-compatibility" />
+
+    <!-- Include the WordPress ruleset, with exclusions. -->
     <rule ref="WordPress">
-        <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase" />
+        <exclude name="Generic.Files.LowercasedFilename" />
+        <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
+        <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
+        <exclude name="WordPress.DB.SlowDBQuery" />
+        <exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching" />
+        <exclude name="WordPress.DB.DirectDatabaseQuery.SchemaChange" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
+        <!-- Have to add this so that $table_name can be included in a prepare statment. -->
+        <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
+        <!-- DOMDocument uses camelCase. -->
+        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
     </rule>
 
     <rule ref="PHPCompatibility"/>
-    <config name="testVersion" value="7.4-"/>
-
-    <arg name="extensions" value="php"/>
-    <arg value="s"/>
-
-    <exclude-pattern>*/dev-lib/*</exclude-pattern>
-    <exclude-pattern>*/node_modules/*</exclude-pattern>
-    <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>.github/</exclude-pattern>
 </ruleset>
