@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.6
+Tested up to: 5.7
 Requires PHP: 5.6.0
-Stable tag: 2.2.1
+Stable tag: 2.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the SSO Client settings tab.
 
 == Changelog ==
+
+#### 2.2.2 03/19/2021
+
+- Update wp-scripts dev-dependency
+- Move Discourse Sidebar styles.css to the root of the `/discourse-sidebar` directory
 
 #### 2.2.1 12/23/2020
 
