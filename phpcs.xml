@@ -24,4 +24,10 @@
     </rule>
 
     <rule ref="PHPCompatibility"/>
+
+    <extensions>php</extensions>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/lib/wp-new-user-notification.php*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/build/index.asset.php**</exclude-pattern>
 </ruleset>

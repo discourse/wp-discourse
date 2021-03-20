@@ -42,7 +42,7 @@ return [
     //
     // For more see: https://github.com/humbug/php-scoper#patchers
     'patchers' => [
-        function (string $filePath, string $prefix, string $contents): string {
+        function (string $filePath, string $prefix, string $contents) {
             $lines = explode( "\n", $contents );
 
             foreach ( $lines as $index => $line ) {
@@ -68,6 +68,11 @@ return [
 
                   $lines[ $index ] = $new_line;
                 }
+              }
+              
+              // Remove strict_type declarations
+              if ( preg_match( '/strict_types/', $line ) && ltrim($line)[0] !== '*' ) {
+                unset( $lines[ $index ] );
               }
 
             }
