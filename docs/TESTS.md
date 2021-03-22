@@ -1,15 +1,17 @@
 ### WP Discourse Tests Guide
 
-WP Discourse uses PHPUnit tests. For general guides on PHPUnit tests, and their application in Wordpress, please see
+For general guides on PHPUnit tests, and their application in Wordpress, see
+
 - The [WP Handbook on Plugin Unit Tests](https://make.wordpress.org/cli/handbook/misc/plugin-unit-tests/)
 - The [PHPUnit Documentation](https://phpunit.readthedocs.io)
+
 Please make sure you check the version of the PHPUnit Documentation you're viewing against the version this plugin is using in ``./composer.json``. You can change to any version of the documentation by updating the docs url.
 
 ### Setup
 
 #### Files and Database
 
-Before running the tests suite, you need to setup your tests database. You can do this using the following command in the root plugin directory. Make sure you substitute your local root mysql password.
+First, set up your tests database by running the following command in the root plugin directory. Make sure you substitute your local root mysql password.
 
 ```
 cd wp-discourse
@@ -38,16 +40,17 @@ If you haven't already, run ``composer install`` in the root plugin directory to
 
 ##### Xdebug
 
-One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct. For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have two lines in your ``php.ini`` that look like this
+One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct. 
+
+For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have a lines in your ``php.ini`` that look like this
 
 ```
-zend_extension = /path/to/xdebug.so
 xdebug.mode = coverage
 ```
 
 ### Configuration
 
-The tests suite is configured by the ``phpunit.xml`` file. Read more about the elements in the file, and their usage in the [PHPUnit Documentation](https://phpunit.readthedocs.io). Make sure you're viewing the version of the docs that matches the version of PHPUnit being used here, as the elements in that file change significantly between versions.
+The tests suite is configured by the ``phpunit.xml`` file. Read more about the elements in the file, and their usage in the [PHPUnit Documentation](https://phpunit.readthedocs.io).
 
 #### Coverage
 
