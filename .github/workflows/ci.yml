@@ -12,6 +12,8 @@ jobs:
     name: PHP ${{ matrix.php }}
     strategy:
       matrix:
+        dependencies:
+          - "lowest"
         include:
           - php: "5.6"
             sniff: true
