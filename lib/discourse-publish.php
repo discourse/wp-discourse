@@ -3,6 +3,7 @@
  * Publishes a post to Discourse.
  *
  * @package WPDiscourse
+ * @todo Periodically review phpcs exclusions.
  */
 
 namespace WPDiscourse\DiscoursePublish;
