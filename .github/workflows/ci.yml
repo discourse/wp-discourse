@@ -10,9 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: PHP ${{ matrix.php }}
-    env:
-      PHPCS_DIR: "/tmp/phpcs"
-      SNIFFS_DIR: "/tmp/sniffs"
     strategy:
       matrix:
         include:
@@ -28,15 +25,12 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+      - uses: php-actions/composer@v5
       - name: Install Tools
         if: "matrix.sniff"
         run: |
           git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
           export PATH="$HOME/.phpenv/bin:$PATH"
-          git clone -b 3.5.8 --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git $PHPCS_DIR
-          git clone -b 2.3.0 --depth 1 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git $SNIFFS_DIR
-          git clone -b 9.3.5 --depth 1 https://github.com/PHPCompatibility/PHPCompatibility.git $SNIFFS_DIR/PHPCompatibility
-          $PHPCS_DIR/scripts/phpcs --config-set installed_paths $SNIFFS_DIR
           phpenv rehash
           sudo npm install -g jshint
           wget https://develop.svn.wordpress.org/trunk/.jshintrc
@@ -50,4 +44,4 @@ jobs:
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
-          $PHPCS_DIR/scripts/phpcs -p -s -v -n . --ignore=*/tests/*,*/tests/lib/*,*/lib/wp-new-user-notification.php*,*/vendor/*,*/admin/discourse-sidebar/build/index.asset.php* --extensions=php
+          vendor/bin/phpcs -p -s -v -n .
