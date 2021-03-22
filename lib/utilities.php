@@ -661,6 +661,7 @@ class Utilities {
                             break;
 						case 'html':
 												$result->{$key} = $value;
+                            break;
 						default:
 												;
                             break;

@@ -8,19 +8,9 @@
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
-        <!-- Have to add this so that $table_name can be included in a prepare statment. -->
-        <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
         <!-- DOMDocument uses camelCase. -->
-        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_add_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_delete_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.switch_to_blog_switch_to_blog" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.get_page_by_title_get_page_by_title" />
     </rule>
 
     <rule ref="PHPCompatibility"/>

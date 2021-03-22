@@ -4,6 +4,7 @@
  *
  * @link https://github.com/discourse/wp-discourse/blob/master/lib/admin.php
  * @package WPDiscourse
+ * @todo Review phpcs exclusions
  */
 
 namespace WPDiscourse\Admin;
@@ -81,6 +82,6 @@ function enqueue_network_styles() {
 		return;
 	}
 
-	wp_register_style( 'wp_discourse_network_admin', WPDISCOURSE_URL . '/admin/css/network-admin-styles.css' );
+	wp_register_style( 'wp_discourse_network_admin', WPDISCOURSE_URL . '/admin/css/network-admin-styles.css' ); // phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion
 	wp_enqueue_style( 'wp_discourse_network_admin' );
 }

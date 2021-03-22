@@ -3,7 +3,10 @@
  * Uses a Discourse webhook to sync topics with their associated WordPress posts.
  *
  * @package WPDiscourse\DiscourseWebhookRefresh
+ * @todo Review phpcs disablement.
  */
+
+// phpcs:disable WordPress.DB.PreparedSQL
 
 namespace WPDiscourse\SyncDiscourseTopic;
 
