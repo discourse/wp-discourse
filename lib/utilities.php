@@ -663,7 +663,6 @@ class Utilities {
 												$result->{$key} = $value;
                             break;
 						default:
-												;
                             break;
 					}
 				} else {
