@@ -278,7 +278,7 @@ class PublishSettings {
 				'discourse_publish',
 				'discourse_publishing_settings_section'
 			);
-			
+
 			add_settings_field(
 				'discourse_verbose_publication_logs',
 				__( 'Verbose Publication Logging', 'wp-discourse' ),
@@ -566,7 +566,7 @@ class PublishSettings {
 			)
 		);
 	}
-	
+
 	/**
 	 * Outputs markup for the discourse_verbose_publication_logs checkbox.
 	 */

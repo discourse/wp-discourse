@@ -151,7 +151,7 @@ class OptionsPage {
 						settings_fields( 'discourse_webhook' );
 						do_settings_sections( 'discourse_webhook' );
 					}
-					
+
 					if ( 'log_viewer' === $tab ) {
 						settings_fields( 'discourse_logs' );
 						do_settings_sections( 'discourse_logs' );
@@ -160,9 +160,9 @@ class OptionsPage {
 					do_action( 'wpdc_options_page_after_tab_switch', $tab );
 
 					$multisite_configuration = get_site_option( 'wpdc_multisite_configuration' );
-					$hide_submit_button      = (is_multisite() &&
+					$hide_submit_button      = ( is_multisite() &&
 										  ( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
-										  ! empty( $multisite_configuration )) || 
+										  ! empty( $multisite_configuration ) ) ||
 											'log_viewer' === $tab;
 
 					if ( ! $hide_submit_button ) {

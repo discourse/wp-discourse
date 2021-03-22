@@ -123,7 +123,7 @@ class AdminMenu {
 			array( $this, 'sso_options_tab' )
 		);
 		add_action( 'load-' . $sso_settings, array( $this->form_helper, 'connection_status_notice' ) );
-		
+
 		$log_viewer = add_submenu_page(
 			'wp_discourse_options',
 			__( 'Logs', 'wp-discourse' ),
@@ -188,7 +188,7 @@ class AdminMenu {
 			$this->options_page->display( 'sso_options' );
 		}
 	}
-	
+
 	/**
 	 * Called to display the 'log_viewer' tab.
 	 */
