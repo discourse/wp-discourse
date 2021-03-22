@@ -3,6 +3,7 @@
  * Manages log folders and files.
  *
  * @package WPDiscourse
+ * @todo Review phpcs exclusions.
  */
 
 namespace WPDiscourse\Logs;
@@ -116,6 +117,9 @@ class FileManager {
             $dir_exists    = wp_mkdir_p( $file['base'] );
             $dir_writable  = is_writable( $file['base'] );
 
+            // Note https://github.com/WordPress/WordPress-Coding-Standards/pull/1265#issuecomment-405143028.
+            // Note https://github.com/woocommerce/woocommerce/issues/6091.
+            // phpcs:disable WordPress.WP.AlternativeFunctions
         		if ( $dir_exists && $dir_writable && ! file_exists( $file_path ) ) {
                 $file_handle = fopen( $file_path, 'wb' );
 
@@ -124,6 +128,7 @@ class FileManager {
           					fclose( $file_handle );
         				}
         		}
+            // phpcs:enable Wordpress.WP.AlternativeFunctions
     		}
     }
 

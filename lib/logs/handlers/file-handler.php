@@ -3,6 +3,7 @@
  * Log handler that writes logs to a .log file
  *
  * @package WPDiscourse
+ * @todo Review phpcs exclusions.
  */
 
 namespace WPDiscourse\Logs;
@@ -250,8 +251,10 @@ class FileHandler extends StreamHandler {
         if ( count( $files ) >= ( $this->max_files - 1 ) ) {
             foreach ( array_slice( $files, ( $this->max_files - 1 ) ) as $file ) {
         				if ( is_writable( $file ) ) {
-          					// suppress errors here as unlink() might fail if two processes
-          					// are cleaning up/rotating at the same time.
+                    // Note from monolog/monolog:
+          					// "suppress errors here as unlink() might fail if two processes
+          					// are cleaning up/rotating at the same time.".
+                    // phpcs:disable WordPress.PHP.DevelopmentFunctions
           					set_error_handler(
                         function () {
               							return false;
@@ -259,6 +262,7 @@ class FileHandler extends StreamHandler {
                     );
           					unlink( $file );
           					restore_error_handler();
+                    // phpcs:enabled WordPress.PHP.DevelopmentFunctions
         				}
             }
         }
@@ -292,7 +296,9 @@ class FileHandler extends StreamHandler {
      * Validates size of current log file against size limit
      */
     protected function validate_size() {
-        $handle                = fopen( $this->url, 'r+' );
+        // Note https://github.com/WordPress/WordPress-Coding-Standards/pull/1265#issuecomment-405143028.
+        // Note https://github.com/woocommerce/woocommerce/issues/6091.
+        $handle                = fopen( $this->url, 'r+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
         $stat                  = fstat( $handle );
         $last_line_byte_buffer = 100;
         return $stat['size'] <= ( $this->file_size_limit - $last_line_byte_buffer );
