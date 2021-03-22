@@ -54,7 +54,7 @@ class DiscoursePublishMultisiteTest extends DiscoursePublishTest {
     }
 
     /**
-     * Create topic_blog_table is it doesn't exist.
+     * Create topic_blog_table if it doesn't exist.
      */
     protected function create_topic_blog_table() {
         global $wpdb;

@@ -196,10 +196,10 @@ class DiscoursePublish {
 		global $wpdb;
 
 		// this avoids a double sync, just 1 is allowed to go through at a time.
-		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" );
+		$got_lock = $wpdb->get_row( "SELECT GET_LOCK('discourse_sync_lock', 0) got_it" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		if ( 1 === intval( $got_lock->got_it ) ) {
 			$this->sync_to_discourse_work( $post_id, $title, $raw );
-			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" );
+			$wpdb->get_results( "SELECT RELEASE_LOCK('discourse_sync_lock')" ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		}
 	}
 
@@ -557,25 +557,27 @@ class DiscoursePublish {
 	 *
 	 * @param object $response Response to be validated.
 	 * @param string $remote_type Remote post type.
+	 * @param int    $post_id ID of post being sent.
 	 */
-	protected function validate_response_body( $response, $remote_type ) {
-		$body = json_decode( wp_remote_retrieve_body( $response ) );
+	protected function validate_response_body( $response, $remote_type, $post_id ) {
+		$body       = json_decode( wp_remote_retrieve_body( $response ) );
+		$error_type = 'body_validation';
 
 		if ( $this->post_is_enqueued( $body ) ) {
-			return $this->handle_notice( 'queued_topic', $response, $post_id );
+			return $this->handle_notice( $remote_type, $response, $post_id, 'queued_topic' );
 		}
 
 		if ( 'create_post' === $remote_type && ! $this->validate_create_post_body( $body ) ) {
-			return $this->handle_error( $remote_type, $response, $post_id, true );
+			return $this->handle_error( $remote_type, $response, $post_id, $error_type );
 		}
 
 		if ( 'update_post' === $remote_type ) {
 			if ( ! $this->validate_update_post_body( $body ) ) {
-				return $this->handle_error( $remote_type, $response, $post_id, true );
+				return $this->handle_error( $remote_type, $response, $post_id, $error_type );
 			}
 
 			if ( $this->post_is_deleted( $body ) ) {
-				return $this->handle_notice( 'deleted_topic', $response, $post_id );
+				return $this->handle_notice( $remote_type, $response, $post_id, 'deleted_topic' );
 			}
 		}
 
@@ -628,9 +630,9 @@ class DiscoursePublish {
 	 * @param string $remote_type Remote post type.
 	 * @param object $response Remote post response.
 	 * @param string $post_id ID of post sent.
-	 * @param bool   $body_validation Whether body is being validated.
+	 * @param bool   $error_type Error type.
 	 */
-	protected function handle_error( $remote_type, $response, $post_id, $body_validation = false ) {
+	protected function handle_error( $remote_type, $response, $post_id, $error_type = 'post' ) {
 		$atts = $this->get_response_attributes( $response );
 
 		if ( 'create_post' === $remote_type ) {
@@ -644,24 +646,22 @@ class DiscoursePublish {
 			update_post_meta( $post_id, 'wpdc_publishing_error', sanitize_text_field( $atts->message ) );
 			delete_post_meta( $post_id, 'publish_to_discourse' );
 
-			if ( $body_validation ) {
+			if ( 'body_validation' === $error_type ) {
 				update_post_meta( $post_id, 'wpdc_publishing_response', 'error' );
 			}
 		}
 
 		$this->create_bad_response_notifications( $atts, $post_id );
 
-		if ( $body_validation ) {
-			$log_message   = 'body_validation_error';
-			$error_message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
+		if ( 'body_validation' === $error_type ) {
+			$message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
 		} else {
-			$log_message   = 'post_error';
-			$error_message = __( 'An error occurred when communicating with Discourse', 'wp-discourse' );
+			$message = __( 'An error occurred when communicating with Discourse', 'wp-discourse' );
 		}
 
-		$this->logger->error( "$remote_type.$log_message", $this->log_args );
+		$this->logger->error( "{$remote_type}.{$error_type}_error", $this->log_args );
 
-		return new \WP_Error( 'discourse_publishing_response_error', $error_message );
+		return new \WP_Error( 'discourse_publishing_response_error', $message );
 	}
 
 	/**
@@ -670,20 +670,24 @@ class DiscoursePublish {
 	 * @param string $remote_type Type of remote post.
 	 * @param object $response Remote post response.
 	 * @param string $post_id ID of post sent.
+	 * @param string $notice_type Type of notice.
 	 */
-	protected function handle_notice( $remote_type, $response, $post_id ) {
-		update_post_meta( $post_id, 'wpdc_publishing_error', $remote_type );
+	protected function handle_notice( $remote_type, $response, $post_id, $notice_type ) {
+		// The presence of notice types 'queued_topic' and 'deleted_topic' in
+		// wpdc_publising_error are currently used for determining whether a
+		// post can be published in discourse-sidebar/src/index.js.
+		update_post_meta( $post_id, 'wpdc_publishing_error', $notice_type );
 
 		$this->get_response_attributes( $response );
-		$this->logger->warn( $remote_type, $this->log_args );
+		$this->logger->warn( "{$remote_type}.{$notice_type}_notice", $this->log_args );
 
 		$notice_messages = array(
-			'queued_topic'  => __( 'The published post has been added to the Discourse approval queue' ),
-			'deleted_topic' => __( 'The Discourse topic associated with this post has been deleted' ),
+			'queued_topic'  => __( 'The published post has been added to the Discourse approval queue', 'wp-discourse' ),
+			'deleted_topic' => __( 'The Discourse topic associated with this post has been deleted', 'wp-discourse' ),
 		);
-		$error_message   = $notice_messages[ $remote_type ];
+		$message         = $notice_messages[ $notice_type ];
 
-		return new \WP_Error( 'discourse_publishing_response_notice', $error_message );
+		return new \WP_Error( 'discourse_publishing_response_notice', $message );
 	}
 
 	/**
@@ -786,7 +790,7 @@ class DiscoursePublish {
 				'%d',
 				'%d',
 			)
-		);
+		); // db call whitelist.
 	}
 
 	/**
@@ -800,9 +804,14 @@ class DiscoursePublish {
 	 */
 	public function topic_blog_id_exists( $topic_id ) {
 		global $wpdb;
-		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$query      = "SELECT * FROM $table_name WHERE topic_id = %d";
-		$row        = $wpdb->get_row( $wpdb->prepare( $query, $topic_id ) );
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT * FROM {$wpdb->base_prefix}wpdc_topic_blog WHERE topic_id = %d",
+				$topic_id
+			)
+		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
 		return $row ? true : false;
 	}
@@ -822,14 +831,17 @@ class DiscoursePublish {
 		}
 
 		global $wpdb;
-
+		$limit = $single ? 'LIMIT 1' : '';
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 		$value = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key= %s" . ( $single ? ' LIMIT 1' : '' ) . ';',
+				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s %1s;", // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnquotedComplexPlaceholder
 				$post_id,
-				$key
+				$key,
+				$limit
 			)
 		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery
 
 		return $value;
 	}
@@ -855,12 +867,13 @@ class DiscoursePublish {
 			return false;
 		}
 
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 		$result = $wpdb->insert(
 			$wpdb->postmeta,
 			array(
 				'post_id'    => $post_id,
-				'meta_key'   => $key,
-				'meta_value' => $value,
+				'meta_key'   => $key, // phpcs:ignore WordPress.DB.SlowDBQuery
+				'meta_value' => $value, // phpcs:ignore WordPress.DB.SlowDBQuery
 			),
 			array(
 				'%d',
@@ -868,6 +881,7 @@ class DiscoursePublish {
 				'%s',
 			)
 		);
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 
 		return $result ? true : false;
 	}
