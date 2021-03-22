@@ -238,6 +238,17 @@ class SSOSettings {
 			);
 
 			add_settings_field(
+				'discourse_auto_create_wp_user',
+				__( 'Create Wordpress Users', 'wp-discourse' ),
+				array(
+					$this,
+					'sso_client_auto_create_wp_user_checkbox',
+				),
+				'discourse_sso_client',
+				'discourse_sso_client_settings_section'
+			);
+
+			add_settings_field(
 				'discourse_enable_sso_sync',
 				__( 'Sync Existing Users by Email', 'wp-discourse' ),
 				array(
@@ -557,6 +568,17 @@ class SSOSettings {
 	}
 
 	/**
+	 * Outputs markup for sso-client-auto-create-wp-user checkbox.
+	 */
+	public function sso_client_auto_create_wp_user_checkbox() {
+		$this->form_helper->checkbox_input(
+			'sso-client-auto-create-wp-user',
+			'discourse_sso_client',
+			__( "If that user doesn't yet exist on your WordPress site, a new user will be created.", 'wp-discourse' )
+		);
+	}
+
+	/**
 	 * Outputs markup for sso-client-sync-by-email checkbox.
 	 */
 	public function sso_client_sync_by_email_checkbox() {
@@ -690,7 +712,7 @@ class SSOSettings {
 					"Enabling your site to function as an SSO client allows WordPress user authentication to be handled
                 through either your Discourse forum, or your WordPress site. If a Discourse user logs into WordPress through an SSO link,
                 they will be authenticated based on their Discourse credentials. If that user doesn't yet exist on your WordPress site, a new
-                user will be created.",
+                user will be optionally created.",
 					'wp-discourse'
 				);
 				?>
