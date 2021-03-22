@@ -125,7 +125,8 @@ class LogViewer {
 
 				?>
 				<?php if ( $this->enabled ) : ?>
-					<p><?php printf(__( 'Logging is not yet available for all functionality. Please see <a href="%s">WP Discourse Setup</a> for details.', 'wp-discourse' ), esc_url( "https://meta.discourse.org/t/50752" ) ); ?></p>
+					<?php /* translators: placeholder interpolates url to documentation on meta.discourse.org */ ?>
+					<p><?php printf( esc_html_e( 'Logging is not yet available for all functionality. Please see <a href="%s">WP Discourse Setup</a> for details.', 'wp-discourse' ), esc_url( 'https://meta.discourse.org/t/50752' ) ); ?></p>
 					<?php if ( ! empty( $this->logs ) ) : ?>
 						<div id="wpdc-log-viewer-controls">
 							<div class="name">
@@ -191,7 +192,8 @@ class LogViewer {
 		 * Return log file contents for selected key.
 		 */
 		public function log_file_contents() {
-				if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( $_REQUEST['nonce'], 'admin-ajax-nonce' ) || ! isset( $_POST['key'] ) ) {
+				// See further https://github.com/WordPress/WordPress-Coding-Standards/issues/869.
+				if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'admin-ajax-nonce' ) || ! isset( $_POST['key'] ) ) {
 						wp_send_json_error();
 						return;
 				}
@@ -233,7 +235,7 @@ class LogViewer {
 
 				$plugin_data = get_plugin_data( WPDISCOURSE_PATH . 'wp-discourse.php' );
 				$plugin_name = $plugin_data['TextDomain'];
-				$site_title  = str_replace( ' ', '-', strtolower( get_bloginfo( 'name' ) ));
+				$site_title  = str_replace( ' ', '-', strtolower( get_bloginfo( 'name' ) ) );
 
 				$filename = "{$site_title}-{$plugin_name}-logs-$date_range.zip";
 				$file     = tempnam( 'tmp', $filename );
