@@ -25,7 +25,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-      - uses: php-actions/composer@v5
       - name: Install Tools
         if: "matrix.sniff"
         run: |
