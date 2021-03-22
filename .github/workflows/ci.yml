@@ -33,9 +33,9 @@ jobs:
         run: |
           git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
           export PATH="$HOME/.phpenv/bin:$PATH"
-          git clone -b 2.9.1 --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git $PHPCS_DIR
-          git clone -b 0.11.0 --depth 1 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git $SNIFFS_DIR
-          git clone -b 7.1.5 --depth 1 https://github.com/wimg/PHPCompatibility.git $SNIFFS_DIR/PHPCompatibility
+          git clone -b 3.5.8 --depth 1 https://github.com/squizlabs/PHP_CodeSniffer.git $PHPCS_DIR
+          git clone -b 2.3.0 --depth 1 https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards.git $SNIFFS_DIR
+          git clone -b 9.3.5 --depth 1 https://github.com/PHPCompatibility/PHPCompatibility.git $SNIFFS_DIR/PHPCompatibility
           $PHPCS_DIR/scripts/phpcs --config-set installed_paths $SNIFFS_DIR
           phpenv rehash
           sudo npm install -g jshint
