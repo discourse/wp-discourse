@@ -44,4 +44,4 @@ jobs:
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
-          phpcs -p -s -v -n .
+          vendor/bin/phpcs -p -s -v -n .
