@@ -25,6 +25,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: phpcs
       - name: Install Tools
         if: "matrix.sniff"
         run: |
@@ -43,4 +44,4 @@ jobs:
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
-          vendor/bin/phpcs -p -s -v -n .
+          phpcs -p -s -v -n .
