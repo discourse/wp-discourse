@@ -25,7 +25,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: phpcs
+      - name: Install Composer
+        uses: ramsey/composer-install@v1
       - name: Install Tools
         if: "matrix.sniff"
         run: |
