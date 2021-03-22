@@ -12,8 +12,6 @@ jobs:
     name: PHP ${{ matrix.php }}
     strategy:
       matrix:
-        dependencies:
-          - "lowest"
         include:
           - php: "5.6"
             sniff: true
@@ -32,6 +30,8 @@ jobs:
       - name: Install Composer
         if: "matrix.sniff"
         uses: ramsey/composer-install@v1
+        with:
+          dependency-versions: "lowest"
       - name: Install Tools
         if: "matrix.sniff"
         run: |
