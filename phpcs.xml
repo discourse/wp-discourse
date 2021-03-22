@@ -30,4 +30,5 @@
     <exclude-pattern>*/lib/wp-new-user-notification.php*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/admin/discourse-sidebar/build/index.asset.php**</exclude-pattern>
+    <exclude-pattern>*/vendor_namespaced/*</exclude-pattern>
 </ruleset>

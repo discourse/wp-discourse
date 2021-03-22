@@ -17,17 +17,36 @@ return [
         Finder::create()
             ->files()
             ->ignoreVCS(true)
+            ->in('vendor')
+            ->path([
+                'Monolog/Formatter/FormatterInterface.php',
+                'Monolog/Formatter/NormalizerFormatter.php',
+                'Monolog/Formatter/LineFormatter.php',
+                'Monolog/Handler/AbstractHandler.php',
+                'Monolog/Handler/AbstractProcessingHandler.php',
+                'Monolog/Handler/HandlerInterface.php',
+                'Monolog/Handler/NullHandler.php',
+                'Monolog/Handler/StreamHandler.php',
+                'Monolog/ResettableInterface.php',
+                'Monolog/Logger.php',
+                'Monolog/Utils.php',
+                'monolog/LICENSE'
+              ]),
+        Finder::create()
+            ->files()
+            ->ignoreVCS(true)
             ->notName('/.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/')
             ->exclude([
                 'doc',
                 'test',
                 'test_old',
+                'Test',
                 'tests',
                 'Tests',
                 'vendor-bin',
             ])
             ->in('vendor')
-            ->path(['monolog', '/^psr/'])
+            ->path('/^psr/')
     ],
 
     // Whitelists a list of files. Unlike the other whitelist related features, this one is about completely leaving

@@ -46,15 +46,9 @@ Then run ``composer install`` to install your package in ``vendor``.
 
 First, install [``humbug/php-scoper``](https://github.com/humbug/php-scoper) globally on your machine. A local global install for development is cleaner than a project install via ``bamarni/composer-bin-plugin`` for our purposes.
 
-Then, update the finders ``path`` array in ``scoper.inc.php`` to include your package(s) in the scoping. Make sure you include each package required in production, for example
+Then, create a finder in the 'finders' array in ``scoper.inc.php`` to include your package(s) in the scoping. See the [documentation on Symfony Finders](https://symfony.com/doc/current/components/finder.html) for details on usage.
 
-```
-['monolog', '/^psr/']
-```
-
-will include both the ``monolog`` and ``psr`` packages. ``psr`` is a production dependency of ``monolog``.
-
-You may also need to perform modifications on the package files in order to achieve compatibility. For example, monolog
+You may also need to perform modifications on the package files in order to achieve compatibility. For example, monolog requires various function signature parsing and type declaration removals. This can be performed in the 'patchers' callback.
 
 ##### 2.2 Running
 
