@@ -126,7 +126,7 @@ class LogViewer {
 				?>
 				<?php if ( $this->enabled ) : ?>
 					<?php /* translators: placeholder interpolates url to documentation on meta.discourse.org */ ?>
-					<p><?php printf( esc_html_e( 'Logging is not yet available for all functionality. Please see <a href="%s">WP Discourse Setup</a> for details.', 'wp-discourse' ), esc_url( 'https://meta.discourse.org/t/50752' ) ); ?></p>
+					<p><?php printf( esc_html__( 'Logging is not yet available for all functionality. Please see %s for details.', 'wp-discourse' ), sprintf( '<a href="%s">%s</a>', esc_url( 'https://meta.discourse.org/t/50752' ), esc_html__( 'WP Discourse Setup', 'text-domain' ) ) ); ?></p>
 					<?php if ( ! empty( $this->logs ) ) : ?>
 						<div id="wpdc-log-viewer-controls">
 							<div class="name">
