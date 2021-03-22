@@ -1,2 +1,3 @@
 admin/discourse-sidebar/src/*
 admin/discourse-sidebar/build/*
+vendor/*
