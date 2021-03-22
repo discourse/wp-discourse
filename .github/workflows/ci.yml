@@ -15,10 +15,8 @@ jobs:
         include:
           - php: "5.6"
             sniff: true
-            composer-options: "--ignore-platform-reqs"
           - php: "7.0"
             sniff: true
-            composer-options: "--ignore-platform-reqs"
           - php: "7.1"
             sniff: false
     steps:
@@ -32,6 +30,7 @@ jobs:
         uses: ramsey/composer-install@v1
         with:
           dependency-versions: "lowest"
+          composer-options: "--ignore-platform-reqs"
       - name: Install Tools
         if: "matrix.sniff"
         run: |
