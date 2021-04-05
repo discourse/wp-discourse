@@ -394,6 +394,6 @@ class DiscourseComment {
 			}
 		}
 
-		return $count;
+		return apply_filters( 'wpdc_comments_count', $count, $post_id, $discourse_post_id );
 	}
 }
