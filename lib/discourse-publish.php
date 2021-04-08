@@ -300,6 +300,10 @@ class DiscoursePublish {
 			);
 		}// End if().
 
+		if ( function_exists( 'wp_get_environment_type' ) && 'production' !== wp_get_environment_type() ) {
+			return null;
+		}
+
 		$result = wp_remote_post( esc_url_raw( $url ), $post_options );
 
 		if ( ! $this->validate( $result ) ) {
@@ -483,6 +487,10 @@ class DiscoursePublish {
 			),
 			'body'    => http_build_query( $data ),
 		);
+
+		if ( function_exists( 'wp_get_environment_type' ) && 'production' !== wp_get_environment_type() ) {
+			return null;
+		}
 
 		$response = wp_remote_post( $status_url, $post_options );
 
