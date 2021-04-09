@@ -116,8 +116,8 @@ class AdminMenu {
 
 		$sso_settings = add_submenu_page(
 			'wp_discourse_options',
-			__( 'SSO', 'wp-discourse' ),
-			__( 'SSO', 'wp-discourse' ),
+			__( 'DiscourseConnect', 'wp-discourse' ),
+			__( 'DiscourseConnect', 'wp-discourse' ),
 			'manage_options',
 			'sso_options',
 			array( $this, 'sso_options_tab' )
