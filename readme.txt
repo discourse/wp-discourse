@@ -18,7 +18,7 @@ The WP Discourse plugin acts as an interface between your WordPress site and you
 ### Use Discourse for comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
-- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Associates WP author accounts with their respective Discourse accounts. Does not require DiscourseConnect.
 - Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
 based on post score and commenter "trust level" -- see docs.
 
@@ -29,7 +29,7 @@ based on post score and commenter "trust level" -- see docs.
 
 ### Single Sign On from WordPress to Discourse
 
-The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
+The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the
 Single Sign On provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
@@ -71,7 +71,7 @@ will fail.
 
 = Does it work with a WordPress multisite configuration? =
 
-All of the plugin's functionality except for using Discourse as the SSO provider for WordPress works with multisite configurations.
+All of the plugin's functionality except for using Discourse as the DiscourseConnect provider for WordPress works with multisite configurations.
 
 = Does this plugin install Discourse for me? =
 
@@ -117,9 +117,9 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 6. Configuring the plugin: the Text Content settings tab.
 
-7. Configuring the plugin: the SSO settings tab.
+7. Configuring the plugin: the DiscourseConnect settings tab.
 
-8. Configuring the plugin: the SSO Client settings tab.
+8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
 

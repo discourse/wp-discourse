@@ -17,6 +17,7 @@ class SSOClientShortcode extends SSOClientBase {
 	 */
 	public function __construct() {
 		add_shortcode( 'discourse_sso_client', array( $this, 'discourse_sso_client_shortcode' ) );
+		add_shortcode( 'discourse_connect_client', array( $this, 'discourse_sso_client_shortcode' ) );
 	}
 
 	/**
