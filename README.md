@@ -23,8 +23,7 @@ based on post score and commenter "trust level" -- see docs.
 
 ### DiscourseConnect
 
-The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the
-DiscourseConnect provider for your Discourse forum.
+The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the DiscourseConnect provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
