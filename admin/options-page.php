@@ -94,7 +94,7 @@ class OptionsPage {
 				<?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
 
 				<a href="?page=wp_discourse_options&tab=sso_options"
-				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'SSO', 'wp-discourse' ); ?>
+				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?>
 				</a>
 				
 				<a href="?page=wp_discourse_options&tab=log_viewer"
