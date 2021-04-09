@@ -96,7 +96,7 @@ class OptionsPage {
 				<a href="?page=wp_discourse_options&tab=sso_options"
 				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?>
 				</a>
-				
+
 				<a href="?page=wp_discourse_options&tab=log_viewer"
 				   class="nav-tab <?php echo 'log_viewer' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Logs', 'wp-discourse' ); ?>
 				</a>
