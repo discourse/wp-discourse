@@ -21,10 +21,10 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 
-### Single Sign On
+### DiscourseConnect
 
 The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the
-Single Sign On provider for your Discourse forum.
+DiscourseConnect provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
