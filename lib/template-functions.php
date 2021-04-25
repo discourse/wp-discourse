@@ -303,6 +303,48 @@ trait TemplateFunctions {
 	}
 
 	/**
+	 * Adds alt attributes to avatars in comment bodies.
+	 *
+	 * @param string $content The comment's content.
+	 *
+	 * @return string
+	 */
+	protected function add_avatar_alt( $content ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+			return $content;
+		}
+
+		$use_internal_errors = libxml_use_internal_errors( true );
+		$doc                 = new \DOMDocument( '1.0', 'utf-8' );
+		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
+
+		$finder = new \DOMXPath( $doc );
+		$quote_avatars_without_alt = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ') and @alt='']" );
+		if ( $quote_avatars_without_alt->length ) {
+			foreach ( $quote_avatars_without_alt as $avatar ) {
+				$alt = 'Avatar for Discourse user';
+				$src = $avatar->getAttribute( 'src' );
+				if ( preg_match(
+					'#^https?://[^/]+/user_avatar/[^/]+/([^/]+)/#',
+					$src,
+					$matches
+				) ) {
+					$alt = 'Avatar for ' . esc_attr( $matches[1] );
+				}
+				$avatar->setAttribute( 'alt', $alt );
+			}
+
+			$content = $doc->saveHTML( $doc->documentElement );
+			$content = $this->remove_outer_html_elements( $content );
+		}
+
+		libxml_clear_errors();
+		libxml_use_internal_errors( $use_internal_errors );
+
+		return $content;
+	}
+
+	/**
 	 * Format the Discourse created_at date based on the WordPress site's timezone.
 	 *
 	 * @param string $string The datetime string returned from Discourse.

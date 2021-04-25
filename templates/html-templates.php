@@ -193,8 +193,7 @@ class HTMLTemplates {
 	public static function participant_html() {
 		ob_start();
 		?>
-		<img alt="" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25"
-			 width="25">
+		<img alt="Avatar for {username}" src="{avatar_url}" class="avatar avatar-25 photo avatar-default" height="25" width="25">
 		<?php
 		$output = ob_get_clean();
 
