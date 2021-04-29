@@ -66,8 +66,14 @@ class DiscoursePublish {
 
 		// Registration is conditional to make testing easier.
 		if ( $register_actions ) {
-			// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
-			add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
+			if ( version_compare( get_bloginfo( 'version' ), '5.6', '>=' ) ) {
+				// On the difference between wp_after_insert_post and save_post see https://make.wordpress.org/core/2020/11/20/new-action-wp_after_insert_post-in-wordpress-5-6/.
+				add_action( 'wp_after_insert_post', array( $this, 'publish_post_after_save' ), 10, 2 );
+			} else {
+				// Priority is set to 13 so that 'publish_post_after_save' is called after the meta-box is saved.
+				add_action( 'save_post', array( $this, 'publish_post_after_save' ), 13, 2 );
+			}
+
 			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		}
 	}
@@ -107,10 +113,11 @@ class DiscoursePublish {
 		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
 		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 		if ( wp_is_post_revision( $post_id )
-				|| ( $publish_status_not_set && ! $publish_private )
-				|| $plugin_unconfigured
-				|| empty( $post->post_title )
-				|| ! $this->is_valid_sync_post_type( $post_id )
+			 || ( $publish_status_not_set && ! $publish_private )
+			 || $plugin_unconfigured
+			 || empty( $post->post_title )
+			 || ! $this->is_valid_sync_post_type( $post_id )
+			 || $this->has_excluded_tag( $post_id, $post )
 		) {
 
 			return null;
@@ -173,7 +180,7 @@ class DiscoursePublish {
 		$title                = $this->sanitize_title( $post->post_title );
 		$title                = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) ) {
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) && ! $this->has_excluded_tag( $post_id ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
@@ -743,6 +750,28 @@ class DiscoursePublish {
 	}
 
 	/**
+	 * Checks if a post has an excluded tag.
+	 *
+	 * @param null| $post_id The ID of the post in question.
+	 *
+	 * @return bool
+	 */
+	protected function has_excluded_tag( $post_id = null, $post ) {
+		if ( version_compare( get_bloginfo('version'), '5.6', '<') ) {
+			return false;
+		}
+
+		$post_tag_ids     = wp_get_post_tags( $post_id, array( 'fields' => 'ids' ) );
+		$excluded_tag_ids = $this->get_excluded_tag_ids();
+
+		if ( empty( $excluded_tag_ids ) || !$post_tag_ids || is_wp_error( $post_tag_ids ) ) {
+			return false;
+		} else {
+			return count( array_intersect( $post_tag_ids, $excluded_tag_ids ) ) > 0;
+		}
+	}
+
+	/**
 	 * Returns the array of allowed post types.
 	 *
 	 * @return mixed
@@ -755,6 +784,21 @@ class DiscoursePublish {
 		} else {
 			// Return an empty array, otherwise if all post types have been deselectd on the options page
 			// functions using this function will be trying to access the key of `null`.
+			return array();
+		}
+	}
+
+	/**
+	 * Returns the array of excluded tags.
+	 *
+	 * @return mixed
+	 */
+	protected function get_excluded_tag_ids() {
+		if ( isset( $this->options['exclude_tags'] ) && is_array( $this->options['exclude_tags'] ) ) {
+			$exclude_tags = $this->options['exclude_tags'];
+
+			return $exclude_tags;
+		} else {
 			return array();
 		}
 	}
