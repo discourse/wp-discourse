@@ -752,23 +752,28 @@ class DiscoursePublish {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param null| $post_id The ID of the post in question.
+	 * @param null|int  $post_id The ID of the post in question.
+	 * @param \WP_Post  $post The Post object.
 	 *
 	 * @return bool
 	 */
 	protected function has_excluded_tag( $post_id = null, $post ) {
-		if ( version_compare( get_bloginfo('version'), '5.6', '<') ) {
+		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
 			return false;
 		}
 
-		$post_tag_ids     = wp_get_post_tags( $post_id, array( 'fields' => 'ids' ) );
+		$post_tags = get_the_terms( $post->ID, 'post_tag' );
+		if ( empty( $post_tags ) || is_wp_error( $post_tags ) ) {
+			return false;
+		}
+		$post_tag_ids = wp_list_pluck( $post_tags, 'term_id' );
+
 		$excluded_tag_ids = $this->get_excluded_tag_ids();
-
-		if ( empty( $excluded_tag_ids ) || !$post_tag_ids || is_wp_error( $post_tag_ids ) ) {
+		if ( empty( $excluded_tag_ids ) ) {
 			return false;
-		} else {
-			return count( array_intersect( $post_tag_ids, $excluded_tag_ids ) ) > 0;
 		}
+
+		return count( array_intersect( $post_tag_ids, $excluded_tag_ids ) ) > 0;
 	}
 
 	/**
