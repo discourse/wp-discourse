@@ -57,6 +57,8 @@ require_once WPDISCOURSE_PATH . 'lib/sso-client/query-redirect.php';
 require_once WPDISCOURSE_PATH . 'lib/shortcodes/sso-client.php';
 require_once WPDISCOURSE_PATH . 'templates/html-templates.php';
 require_once WPDISCOURSE_PATH . 'admin/discourse-sidebar/discourse-sidebar.php';
+require_once WPDISCOURSE_PATH . 'vendor/autoload.php';
+require_once WPDISCOURSE_PATH . 'lib/logs/logger.php';
 require_once WPDISCOURSE_PATH . 'admin/admin.php';
 
 new WPDiscourse\Discourse\Discourse();

@@ -6,22 +6,23 @@
         <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
         <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
         <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
         <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
-        <!-- Have to add this so that $table_name can be included in a prepare statment. -->
-        <exclude name="WordPress.WP.PreparedSQL.NotPrepared" />
         <!-- DOMDocument uses camelCase. -->
-        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCaseMemberVar" />
+        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
         <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_update_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_add_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_delete_user_meta" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.user_meta_get_user_meta" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.NoCaching" />
-        <exclude name="WordPress.VIP.DirectDatabaseQuery.SchemaChange" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.switch_to_blog_switch_to_blog" />
-        <exclude name="WordPress.VIP.RestrictedFunctions.get_page_by_title_get_page_by_title" />
     </rule>
 
     <rule ref="PHPCompatibility"/>
+
+    <extensions>php</extensions>
+    <exclude-pattern>*/tests/*</exclude-pattern>
+    <exclude-pattern>*/lib/wp-new-user-notification.php*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/build/index.asset.php**</exclude-pattern>
+    <exclude-pattern>*/vendor_namespaced/*</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
+    <exclude-pattern>*.css</exclude-pattern>
+    <exclude-pattern>scoper.inc.php</exclude-pattern>
 </ruleset>

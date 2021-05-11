@@ -278,6 +278,17 @@ class PublishSettings {
 				'discourse_publish',
 				'discourse_publishing_settings_section'
 			);
+
+			add_settings_field(
+				'discourse_verbose_publication_logs',
+				__( 'Verbose Publication Logging', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_publication_logs',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
 		}
 
 		register_setting(
@@ -551,6 +562,24 @@ class PublishSettings {
 			),
 			__(
 				'Potentially prevents concurrency issues arising from object cache usage.',
+				'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_publication_logs checkbox.
+	 */
+	public function verbose_publication_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-publication-logs',
+			'discourse_publish',
+			__(
+				'Enable verbose logs for publication.',
+				'wp-discourse'
+			),
+			__(
+				'Will log successful publications as well as errors.',
 				'wp-discourse'
 			)
 		);

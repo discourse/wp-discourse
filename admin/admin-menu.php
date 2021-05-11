@@ -123,6 +123,16 @@ class AdminMenu {
 			array( $this, 'sso_options_tab' )
 		);
 		add_action( 'load-' . $sso_settings, array( $this->form_helper, 'connection_status_notice' ) );
+
+		$log_viewer = add_submenu_page(
+			'wp_discourse_options',
+			__( 'Logs', 'wp-discourse' ),
+			__( 'Logs', 'wp-discourse' ),
+			'manage_options',
+			'log_viewer',
+			array( $this, 'log_viewer_tab' )
+		);
+		add_action( 'load-' . $log_viewer, array( $this->form_helper, 'connection_status_notice' ) );
 	}
 
 	/**
@@ -176,6 +186,15 @@ class AdminMenu {
 	public function sso_options_tab() {
 		if ( current_user_can( 'manage_options' ) ) {
 			$this->options_page->display( 'sso_options' );
+		}
+	}
+
+	/**
+	 * Called to display the 'log_viewer' tab.
+	 */
+	public function log_viewer_tab() {
+		if ( current_user_can( 'manage_options' ) ) {
+			$this->options_page->display( 'log_viewer' );
 		}
 	}
 }
