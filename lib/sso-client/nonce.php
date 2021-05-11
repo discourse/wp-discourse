@@ -3,7 +3,10 @@
  * Nonce generator & validator.
  *
  * @package WPDiscourse
+ * @todo Review phpcs disablement.
  */
+
+// phpcs:disable WordPress.DB.PreparedSQL
 
 namespace WPDiscourse\SSOClient;
 

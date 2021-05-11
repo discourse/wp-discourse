@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+	bootstrap="tests/phpunit/bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	>
+	<testsuites>
+		<testsuite name="unit">
+			<directory prefix="test-" suffix=".php">tests/phpunit/</directory>
+			<exclude>tests/phpunit/multisite/</exclude>
+		</testsuite>
+	</testsuites>
+	<filter>
+	  <whitelist processUncoveredFilesFromWhitelist="true">
+	    <directory suffix=".php">lib/logs</directory>
+			<file>lib/discourse-publish.php</file>
+	  </whitelist>
+	</filter>
+</phpunit>

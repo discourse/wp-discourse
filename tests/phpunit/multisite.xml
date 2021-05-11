@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="bootstrap.php"
+	backupGlobals="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	>
+	<php>
+     <const name="WP_TESTS_MULTISITE" value="1" />
+  </php>
+	<testsuites>
+		<testsuite name="multisite">
+			<directory prefix="test-" suffix=".php">multisite/</directory>
+		</testsuite>
+	</testsuites>
+	<filter>
+	  <whitelist processUncoveredFilesFromWhitelist="true">
+			<file>lib/discourse-publish.php</file>
+	  </whitelist>
+	</filter>
+</phpunit>
