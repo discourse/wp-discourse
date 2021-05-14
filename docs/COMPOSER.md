@@ -1,13 +1,15 @@
 ### WP Discourse Composer Development Usage
 
-WP Discourse uses [Composer](https://getcomposer.org) in the standard fashion, but there are a few things that are worth pointing out about using composer packaages in production.
+WP Discourse uses [Composer](https://getcomposer.org) in the standard fashion, but there are a few things that are worth pointing out when developing this plugin and using composer packages in production.
 
-### Using Composer Packages in Production
+> Please note, this guide is intended for developers of this plugin. If you're using this plugin via composer, this does not apply to you. Use it as you normally would.
 
-This approach is inspired by approaches used by [Yoast](https://developer.yoast.com/blog/safely-using-php-dependencies-in-the-wordpress-ecosystem/) and [Delicious Brains](https://deliciousbrains.com/php-scoper-namespace-composer-depencies/), both of which use namespacing with a custom build process. We use a simplified version of that approach, which we are scripting over time. In short, we:
+### Adding Composer Packages For Production Use
+
+This approach is inspired by approaches used by [Yoast](https://developer.yoast.com/blog/safely-using-php-dependencies-in-the-wordpress-ecosystem/) and [Delicious Brains](https://deliciousbrains.com/php-scoper-namespace-composer-depencies/), both of which use namespacing with a custom build process. We use a simplified version of that approach, which we are scripting into an automated build process over time. In short, we:
 
 1. isolate and namespace (``WPDiscourse``) vendor packages used in production; and
-2. define a build and autoload process to ensure ``1`` works with both wordpress.org and composer installation.
+2. define a build and autoload process to ensure ``1`` works with both wordpress.org and composer installations.
 
 The goal here is simplicity and selectivity. We do not want to auto-namespace the entire plugin, or every development dependency.
 
@@ -78,7 +80,7 @@ This will also add the namespaced packages in ``vendor_namespaced`` to the autol
 ```
 You can see a full list of autoloaded classes in ``vendor/composer/autoload_classmap.php``.
 
-Once the production dependencies are installed, the plugin should then be bundled for submission.
+Once the production dependencies are installed, the plugin should then be bundled for submission to Wordpress.
 
 
 
