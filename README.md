@@ -98,6 +98,10 @@ For more details on template customization, see: [WP Discourse template customiz
 
 #### Contributing
 
+Before you start contributing or developing this plugin please read the documentation in ``docs/`` explaining how the plugin handles code formatting, linting, tests and using composer packages. If you have any questions about those process, please raise an issue on the repository.
+
+When you've read the docs, you're ready to start coding! Here's how to get started
+
 1. Fork this repo
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
