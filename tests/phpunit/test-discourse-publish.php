@@ -18,14 +18,6 @@ use \WPDiscourse\Test\UnitTest;
 class DiscoursePublishTest extends UnitTest {
 
     /**
-     * WP_Post attributes.
-     *
-     * @access public
-     * @var object
-     */
-    public static $post_atts;
-
-    /**
      * Instance of DiscoursePublish.
      *
      * @access protected
@@ -573,19 +565,6 @@ class DiscoursePublishTest extends UnitTest {
 			'create_post',
 			1,
         );
-
-        self::$post_atts = array(
-            'post_author'  => 0,
-            'post_content' => 'This is a new post',
-            'post_title'   => 'This is the post title',
-            'meta_input'   => array(
-				'wpdc_auto_publish_overridden' => 0,
-				'publish_to_discourse'         => 1,
-				'publish_post_category'        => 1,
-            ),
-            'post_status'  => 'publish',
-        );
-        self::$plugin_options[ 'allowed_post_types' ] = array( 'post' );
     }
 }
 

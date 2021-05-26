@@ -8,6 +8,7 @@
 namespace WPDiscourse\DiscourseComment;
 
 use WPDiscourse\Shared\PluginUtilities;
+use WPDiscourse\Logs\Logger;
 
 /**
  * Class DiscourseComment
@@ -22,6 +23,14 @@ class DiscourseComment {
 	 * @var mixed|void
 	 */
 	protected $options;
+
+	/**
+	 * Instance of Logger
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\Logs\Logger
+	 */
+	protected $logger;
 
 	/**
 	 * An instance of the DiscourseCommentFormatter class.
@@ -40,6 +49,7 @@ class DiscourseComment {
 		$this->comment_formatter = $comment_formatter;
 
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
@@ -50,9 +60,24 @@ class DiscourseComment {
 
 	/**
 	 * Setup options.
+	 *
+	 * @param object $extra_options Extra options used for testing.
 	 */
-	public function setup_options() {
+	public function setup_options( $extra_options = null ) {
 		$this->options = $this->get_options();
+
+		if ( ! empty( $extra_options ) ) {
+			foreach ( $extra_options as $key => $value ) {
+				$this->options[ $key ] = $value;
+			}
+		}
+	}
+
+	/**
+	 * Setup Logger.
+	 */
+	public function setup_logger() {
+		$this->logger = Logger::create( 'comment' );
 	}
 
 	/**
@@ -157,10 +182,11 @@ class DiscourseComment {
 	 * to Discourse, or if the 'enable-discourse-comments' option is not enabled.
 	 *
 	 * @param int $post_id The post ID to check.
+	 * @param string $context The caller context.
 	 *
 	 * @return int|mixed|string
 	 */
-	protected function get_comment_type_for_post( $post_id ) {
+	public function get_comment_type_for_post( $post_id, $context ) {
 		$discourse_post_id = get_post_meta( $post_id, 'discourse_post_id', true );
 		if ( empty( $this->options['enable-discourse-comments'] ) || empty( $discourse_post_id ) ) {
 
@@ -177,9 +203,17 @@ class DiscourseComment {
 			return $comment_type;
 		} else {
 			$discourse_category = $this->get_discourse_category_by_id( $publish_category_id );
+
+			if ( is_wp_error( $discourse_category ) ) {
+				$log_args = array(
+					"message" => $discourse_category->get_error_message()
+				);
+				$this->logger->error( "{$context}.get_discourse_category", $log_args );
+			}
+
 			// If the Display Subcategories option is not enabled and a linked Discourse topic is moved to a subcategory, comments will not be displayed on WordPress.
 			// If the Display Subcategories option is enabled, the subcategory security settings will be respected.
-			if ( empty( $discourse_category ) || 1 === intval( $discourse_category['read_restricted'] ) ) {
+			if ( is_wp_error( $discourse_category ) || empty( $discourse_category ) || 1 === intval( $discourse_category['read_restricted'] ) ) {
 
 				return 'display-comments-link';
 			} else {
@@ -222,7 +256,7 @@ class DiscourseComment {
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
-					$comment_type             = $this->get_comment_type_for_post( $post_id );
+					$comment_type             = $this->get_comment_type_for_post( $post_id, 'sync_comments' );
 					$comment_count            = 'display-comments' === $comment_type ? intval( $discourse_options['max-comments'] ) : 0;
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
@@ -308,7 +342,7 @@ class DiscourseComment {
 		$current_user = wp_get_current_user();
 
 		// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
-		$comment_type = $this->get_comment_type_for_post( $post_id );
+		$comment_type = $this->get_comment_type_for_post( $post_id, 'comments_template' );
 		// Discourse comments are not being used for the post and the hide-wordpress-comments option has been selected.
 		$load_blank = empty( $comment_type ) && ! empty( $this->options['hide-wordpress-comments'] );
 		// A switch that can be used to prevent loading the comments template for a user.
