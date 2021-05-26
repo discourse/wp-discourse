@@ -181,7 +181,7 @@ class DiscourseComment {
 	 * Returns the comment type for posts that have been published to Discourse, 0 if the post has not been published
 	 * to Discourse, or if the 'enable-discourse-comments' option is not enabled.
 	 *
-	 * @param int $post_id The post ID to check.
+	 * @param int    $post_id The post ID to check.
 	 * @param string $context The caller context.
 	 *
 	 * @return int|mixed|string
@@ -193,7 +193,7 @@ class DiscourseComment {
 			return 0;
 		}
 
-		$comment_type        = $this->options['comment-type'];
+		$comment_type = $this->options['comment-type'];
 		// For posts published to Discourse prior to WP Discourse version 2.0.7 the "Update Discourse Topic" button will need to be
 		// clicked for the 'publish_post_category' metadata to get set as post_metadata.
 		$publish_category_id = get_post_meta( $post_id, 'publish_post_category', true );
@@ -206,7 +206,7 @@ class DiscourseComment {
 
 			if ( is_wp_error( $discourse_category ) ) {
 				$log_args = array(
-					"message" => $discourse_category->get_error_message()
+					'message' => $discourse_category->get_error_message(),
 				);
 				$this->logger->error( "{$context}.get_discourse_category", $log_args );
 			}
