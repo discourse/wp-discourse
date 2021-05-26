@@ -5,31 +5,17 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\Test;
+
 use \WPDiscourse\EmailNotification\EmailNotification;
 use \WPDiscourse\DiscoursePublish\DiscoursePublish;
-use \WPDiscourse\Logs\FileManager;
 use \WPDiscourse\Logs\FileHandler;
+use \WPDiscourse\Test\UnitTest;
 
 /**
  * DiscoursePublish test case.
  */
-class DiscoursePublishTest extends WP_UnitTestCase {
-
-    /**
-     * URL of mock discourse instance.
-     *
-     * @access public
-     * @var string
-     */
-    public static $discourse_url;
-
-    /**
-     * Params used in remote posts.
-     *
-     * @access public
-     * @var object
-     */
-    public static $remote_post_params;
+class DiscoursePublishTest extends UnitTest {
 
     /**
      * WP_Post attributes.
@@ -38,14 +24,6 @@ class DiscoursePublishTest extends WP_UnitTestCase {
      * @var object
      */
     public static $post_atts;
-
-    /**
-     * Plugin options.
-     *
-     * @access public
-     * @var object
-     */
-    public static $plugin_options;
 
     /**
      * Instance of DiscoursePublish.
@@ -59,26 +37,21 @@ class DiscoursePublishTest extends WP_UnitTestCase {
      * Setup test class
      */
     public static function setUpBeforeClass() {
-        self::initialize_static_variables();
+        parent::setUpBeforeClass();
+        self::initialize_variables();
     }
 
     /**
      * Setup each test.
      */
     public function setUp() {
+        parent::setUp();
+
         $register_actions = false;
         $this->publish    = new DiscoursePublish( new EmailNotification(), $register_actions );
         $this->publish->setup_logger();
         $this->publish->setup_options( self::$plugin_options );
   	}
-
-    /**
-     * Teardown each test.
-     */
-    public function tearDown() {
-        $this->clear_logs();
-        remove_all_filters( 'pre_http_request' );
-    }
 
     /**
      * Sync_to_discourse handles new posts correctly.
@@ -535,7 +508,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
      */
     public function test_remote_post_failed_to_connect() {
         $this->mock_remote_post(
-            new WP_Error(
+            new \WP_Error(
                 'http_request_failed',
                 'cURL error 7: Failed to connect to localhost port 3000: Connection refused'
             )
@@ -549,46 +522,11 @@ class DiscoursePublishTest extends WP_UnitTestCase {
     }
 
     /**
-     * Mock remote post response.
-     *
-     * @param object $response Remote post response object.
-     * @param object $second_request Second request response of second request in tested method.
-     */
-    protected function mock_remote_post( $response, $second_request = null ) {
-        add_filter(
-            'pre_http_request',
-            function( $prempt, $args, $url ) use ( $response, $second_request ) {
-                if ( ! empty( $second_request ) && ( $second_request['body'] === $args['body'] ) ) {
-                    return $second_request['response'];
-                } else {
-                    return $response;
-                }
-            },
-            10,
-            3
-        );
-    }
-
-    /**
-     * Mock remote post success.
-     *
-     * @param string $type Type of response.
-     * @param object $second_request Second request response of second request in tested method.
-     */
-    protected function mock_remote_post_success( $type, $second_request = null ) {
-        $raw_body         = $this->response_body_json( $type );
-        $response         = $this->build_response( 'success' );
-        $response['body'] = $raw_body;
-        $this->mock_remote_post( $response, $second_request );
-        return json_decode( $raw_body );
-    }
-
-    /**
      * Build error returned by discourse-publish when post request fails.
      */
     protected function build_post_error() {
         $message = __( 'An error occurred when communicating with Discourse', 'wp-discourse' );
-        return new WP_Error( 'discourse_publishing_response_error', $message );
+        return new \WP_Error( 'discourse_publishing_response_error', $message );
     }
 
     /**
@@ -596,125 +534,20 @@ class DiscoursePublishTest extends WP_UnitTestCase {
      */
     protected function build_body_error() {
         $message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
-        return new WP_Error( 'discourse_publishing_response_error', $message );
+        return new \WP_Error( 'discourse_publishing_response_error', $message );
     }
     
     /**
      * Build an error notice returned by discourse-publish when post queued or topic deleted.
      */
     protected function build_notice( $message ) {
-        return new WP_Error( 'discourse_publishing_response_notice', $message );
-    }
-
-    /**
-     * Get last line in latest log file.
-     */
-    protected function get_last_log() {
-    		$manager   = new FileManager();
-    		$log_files = glob( $manager->logs_dir . '/*.log' );
-    		$log_file  = $log_files[0];
-        return shell_exec( "tail -n 1 $log_file" );
-    }
-
-    /**
-     * Clear all logs.
-     */
-    protected function clear_logs() {
-    		$manager   = new FileManager();
-    		$log_files = glob( $manager->logs_dir . '/*.log' );
-
-    		foreach ( $log_files as $file ) {
-            if ( is_file( $file ) ) {
-                unlink( $file );
-      	    }
-    		}
-  	}
-
-    /**
-     * Get fixture with response body.
-     *
-     * @param string $file Name of response body file.
-     */
-    protected function response_body_file( $file ) {
-        return file_get_contents( __DIR__ . "/../fixtures/response_body/$file.json" );
-    }
-
-    /**
-     * Build JSON of response body.
-     *
-     * @param string $type Type of response.
-     * @param string $sub_type Sub-type of response.
-     * @param string $action_type Action type of test.
-     */
-    protected function response_body_json( $type, $sub_type = null, $action_type = 'create_post' ) {
-        if ( in_array( $type, array( 'post_create', 'post_update' ), true ) ) {
-            return $this->response_body_file( $type );
-        }
-        if ( 'unprocessable' === $type ) {
-            $messages     = array(
-                'title' => 'Title seems unclear, most of the words contain the same letters over and over?',
-                'embed' => 'Embed url has already been taken',
-            );
-            $message_type = $sub_type;
-        } else {
-            $messages     = array(
-                'invalid_parameters' => "You supplied invalid parameters to the request: $sub_type",
-                'forbidden'          => 'You are not permitted to view the requested resource. The API username or key is invalid.',
-            );
-            $message_type = $type;
-        }
-        return wp_json_encode(
-            array(
-                'action'     => $action_type,
-                'errors'     => array( $messages[ $message_type ] ),
-                'error_type' => $type,
-            )
-        );
-    }
-
-    /**
-     * Build remote post response.
-     *
-     * @param string $type Type of response.
-     * @param string $sub_type Sub-type of response.
-     */
-    protected function build_response( $type, $sub_type = null ) {
-        $codes    = array(
-            'success'            => 200,
-            'invalid_parameters' => 400,
-            'forbidden'          => 403,
-            'unprocessable'      => 422,
-        );
-        $messages = array(
-            'success'            => 'OK',
-            'invalid_parameters' => 'Bad Request',
-            'forbidden'          => 'Forbidden',
-            'unprocessable'      => 'Unprocessable Entity',
-        );
-        if ( in_array( $type, array( 'invalid_parameters', 'unprocessable' ), true ) ) {
-            $body = $this->response_body_json( $type, $sub_type );
-        } else {
-            $body = array(
-                'success'   => '{}',
-                'forbidden' => 'You are not permitted to view the requested resource. The API username or key is invalid.',
-            )[ $type ];
-        }
-        return array(
-            'headers'  => array(),
-            'body'     => $body,
-            'response' => array(
-                'code'    => $codes[ $type ],
-                'message' => $messages[ $type ],
-            ),
-        );
+        return new \WP_Error( 'discourse_publishing_response_notice', $message );
     }
 
     /**
      * Initialize static variables used by test class.
      */
-    public static function initialize_static_variables() {
-        self::$discourse_url = 'http://meta.discourse.org';
-
+    public static function initialize_variables() {
         self::$remote_post_params = array(
             self::$discourse_url,
 			array(
@@ -752,13 +585,7 @@ class DiscoursePublishTest extends WP_UnitTestCase {
             ),
             'post_status'  => 'publish',
         );
-
-        self::$plugin_options = array(
-            'url'                => self::$discourse_url,
-            'api-key'            => '1235567',
-            'publish-username'   => 'angus',
-            'allowed_post_types' => array( 'post' ),
-        );
+        self::$plugin_options[ 'allowed_post_types' ] = array( 'post' );
     }
 }
 

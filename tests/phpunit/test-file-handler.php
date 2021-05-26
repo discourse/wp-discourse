@@ -5,16 +5,18 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\Test;
+
 use \WPDiscourse\Logs\Logger;
 use \WPDiscourse\Logs\FileManager;
 use \WPDiscourse\Logs\FileHandler;
 use \WPDiscourse\Logs\LineFormatter;
+use \WPDiscourse\Test\UnitTest;
 
 /**
  * FileHandler test case.
  */
-class FileHandlerTest extends WP_UnitTestCase {
-
+class FileHandlerTest extends UnitTest {
 		/**
 		 * It creates an instance of FileHandler
 		 */
@@ -207,27 +209,5 @@ class FileHandlerTest extends WP_UnitTestCase {
 				// Ensure the right files have been removed.
 				$this->assertEquals( 15, $handler->get_number_from_url( $files[0] ) );
 				$this->assertEquals( 6, $handler->get_number_from_url( end( $files ) ) );
-		}
-
-		/**
-		 * Teardown class.
-		 */
-		public function tearDown() {
-				$this->clear_logs();
-				\Mockery::close();
-		}
-
-		/**
-		 * Clear logs.
-		 */
-		private function clear_logs() {
-				$manager   = new FileManager();
-				$log_files = glob( $manager->logs_dir . '/*.log' );
-
-				foreach ( $log_files as $file ) {
-			  		if ( is_file( $file ) ) {
-								unlink( $file );
-				  	}
-				}
 		}
 }
