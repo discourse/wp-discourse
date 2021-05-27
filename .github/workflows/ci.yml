@@ -15,10 +15,16 @@ jobs:
         include:
           - php: "5.6"
             sniff: true
+            test: true
           - php: "7.0"
             sniff: true
+            test: true
           - php: "7.1"
             sniff: false
+            test: true
+          - php: "8.0"
+            sniff: true
+            test: false
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
@@ -50,3 +56,7 @@ jobs:
         if: "matrix.sniff"
         run: |
           vendor/bin/phpcs -p -s -v -n .
+      - name: PHPUnit
+        if: "matrix.test"
+        run: |
+          vendor/bin/phpunit
