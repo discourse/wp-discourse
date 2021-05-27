@@ -22,9 +22,6 @@ jobs:
           - php: "7.1"
             sniff: true
             test: true
-          - php: "8.0"
-            sniff: true
-            test: false
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
