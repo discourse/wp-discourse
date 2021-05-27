@@ -60,5 +60,6 @@ jobs:
         if: "matrix.test"
         run: |
           sudo /etc/init.d/mysql start
-          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
+          mysql -e "CREATE USER 'wordpress_test'@'localhost' IDENTIFIED WITH mysql_native_password BY 'password'";
+          bash bin/install-wp-tests.sh wordpress_test wordpress_test 'password' localhost latest
           vendor/bin/phpunit
