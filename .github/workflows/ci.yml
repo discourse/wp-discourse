@@ -59,5 +59,6 @@ jobs:
       - name: PHPUnit
         if: "matrix.test"
         run: |
+          sudo /etc/init.d/mysql start
           bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
           vendor/bin/phpunit
