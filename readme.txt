@@ -123,6 +123,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
+#### 2.2.6 05/28/2021
+
+- Error handling, logging and unit tests for comment type detection in comment publishing.
+
 #### 2.2.4 05/11/2021
 
 - Add a logging system. This update adds a Logs tab to the plugin's options menu.
