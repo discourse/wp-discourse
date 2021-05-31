@@ -5,17 +5,20 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\Test;
+
 use \WPDiscourse\Logs\FileManager;
+use \WPDiscourse\Test\UnitTest;
 
 /**
  * Logger test case.
  */
-class FileManagerTest extends WP_UnitTestCase {
-
+class FileManagerTest extends UnitTest {
 		/**
 		 * Setup test class.
 		 */
 		public function setUp() {
+				parent::setUp();
 				static::reset_permissions();
 		}
 
@@ -23,8 +26,8 @@ class FileManagerTest extends WP_UnitTestCase {
 		 * Teardown test class.
 		 */
 		public function tearDown() {
+				parent::setUp();
 				static::reset_permissions();
-				\Mockery::close();
 		}
 
 		/**

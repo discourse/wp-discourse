@@ -102,7 +102,7 @@ trait PluginUtilities {
 	 * @return array|\WP_Error
 	 */
 	protected function get_discourse_categories() {
-		$options    = $this->get_options();
+		$options    = isset( $this->options ) ? $this->options : $this->get_options();
 		$categories = get_transient( 'wpdc_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
@@ -180,9 +180,9 @@ trait PluginUtilities {
 	 * @return mixed|\WP_Error|null
 	 */
 	protected function get_discourse_category_by_id( $category_id ) {
-		$categories = $this->get_discourse_categories();
-		if ( ! is_wp_error( $categories ) ) {
-			foreach ( $categories as $category ) {
+		$category_result = $this->get_discourse_categories();
+		if ( ! is_wp_error( $category_result ) ) {
+			foreach ( $category_result as $category ) {
 				if ( intval( $category_id ) === $category['id'] ) {
 
 					return $category;
@@ -190,9 +190,9 @@ trait PluginUtilities {
 			}
 
 			return null;
+		} else {
+			return $category_result;
 		}
-
-		return new \WP_Error( 'wpdc_categories_error', 'The Discourse category list could not be returned. Check your Connection settings.' );
 	}
 
 	/**
@@ -335,7 +335,7 @@ trait PluginUtilities {
 	 * @return array|\WP_Error
 	 */
 	protected function get_api_credentials() {
-		$options      = $this->get_options();
+		$options      = isset( $this->options ) ? $this->options : $this->get_options();
 		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
 		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
 		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;

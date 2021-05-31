@@ -5,15 +5,18 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\Test;
+
 use \WPDiscourse\Logs\Logger;
 use \WPDiscourse\Logs\NullHandler;
 use \WPDiscourse\Logs\FileHandler;
 use \WPDiscourse\Logs\LineFormatter;
+use \WPDiscourse\Test\UnitTest;
 
 /**
  * Logger test case.
  */
-class LoggerTest extends WP_UnitTestCase {
+class LoggerTest extends UnitTest {
 
 		/**
 		 * It creates an instance of Logger
