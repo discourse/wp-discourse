@@ -5,15 +5,18 @@
  * @package WPDiscourse
  */
 
+namespace WPDiscourse\Test;
+
 use \WPDiscourse\Logs\FileManager;
 use \WPDiscourse\Logs\FileHandler;
 use \WPDiscourse\Logs\Logger;
 use \WPDiscourse\Admin\LogViewer;
+use \WPDiscourse\Test\UnitTest;
 
 /**
  * Logger test case.
  */
-class LogViewerTest extends WP_UnitTestCase {
+class LogViewerTest extends UnitTest {
 
     /**
      * It should be disabled if file handler is disabled
