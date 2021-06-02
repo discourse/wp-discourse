@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4d221414dbd6eb314ee1c83b37e87f27",
+    "content-hash": "8c105aa1ca2f0112b0fba2ed9a536d60",
     "packages": [
         {
             "name": "composer/installers",
-            "version": "v1.10.0",
+            "version": "v1.11.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d"
+                "reference": "ae03311f45dfe194412081526be2e003960df74b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
-                "reference": "1a0357fccad9d1cc1ea0c9a05b8847fbccccb78d",
+                "url": "https://api.github.com/repos/composer/installers/zipball/ae03311f45dfe194412081526be2e003960df74b",
+                "reference": "ae03311f45dfe194412081526be2e003960df74b",
                 "shasum": ""
             },
             "require": {
@@ -111,6 +111,7 @@
                 "majima",
                 "mako",
                 "mediawiki",
+                "miaoxing",
                 "modulework",
                 "modx",
                 "moodle",
@@ -128,6 +129,7 @@
                 "sydes",
                 "sylius",
                 "symfony",
+                "tastyigniter",
                 "typo3",
                 "wordpress",
                 "yawik",
@@ -136,7 +138,7 @@
             ],
             "support": {
                 "issues": "https://github.com/composer/installers/issues",
-                "source": "https://github.com/composer/installers/tree/v1.10.0"
+                "source": "https://github.com/composer/installers/tree/v1.11.0"
             },
             "funding": [
                 {
@@ -152,7 +154,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-01-14T11:07:16+00:00"
+            "time": "2021-04-28T06:42:17+00:00"
         }
     ],
     "packages-dev": [
@@ -826,6 +828,130 @@
             "time": "2019-12-27T09:44:58+00:00"
         },
         {
+            "name": "phpcsstandards/phpcsextra",
+            "version": "1.0.0-alpha3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPCSStandards/PHPCSExtra.git",
+                "reference": "a8415f9c2b7360e7184aad803a2c7e2b0544b4f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSExtra/zipball/a8415f9c2b7360e7184aad803a2c7e2b0544b4f1",
+                "reference": "a8415f9c2b7360e7184aad803a2c7e2b0544b4f1",
+                "shasum": ""
+            },
+            "require": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7",
+                "php": ">=5.4",
+                "phpcsstandards/phpcsutils": "^1.0 || dev-develop",
+                "squizlabs/php_codesniffer": "^3.3.1"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-console-highlighter": "^0.5",
+                "php-parallel-lint/php-parallel-lint": "^1.0",
+                "phpcsstandards/phpcsdevtools": "^1.0",
+                "phpunit/phpunit": "^4.5 || ^5.0 || ^6.0 || ^7.0"
+            },
+            "type": "phpcodesniffer-standard",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "homepage": "https://github.com/jrfnl",
+                    "role": "lead"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/PHPCSStandards/PHPCSExtra/graphs/contributors"
+                }
+            ],
+            "description": "A collection of sniffs and standards for use with PHP_CodeSniffer.",
+            "keywords": [
+                "PHP_CodeSniffer",
+                "phpcbf",
+                "phpcodesniffer-standard",
+                "phpcs",
+                "standards"
+            ],
+            "support": {
+                "issues": "https://github.com/PHPCSStandards/PHPCSExtra/issues",
+                "source": "https://github.com/PHPCSStandards/PHPCSExtra"
+            },
+            "time": "2020-06-29T03:39:34+00:00"
+        },
+        {
+            "name": "phpcsstandards/phpcsutils",
+            "version": "1.0.0-alpha3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/PHPCSStandards/PHPCSUtils.git",
+                "reference": "a16c989b8421e29c336ece5c4099b48585994673"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHPCSUtils/zipball/a16c989b8421e29c336ece5c4099b48585994673",
+                "reference": "a16c989b8421e29c336ece5c4099b48585994673",
+                "shasum": ""
+            },
+            "require": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^0.4.1 || ^0.5 || ^0.6.2 || ^0.7",
+                "php": ">=5.4",
+                "squizlabs/php_codesniffer": "^2.6.0 || ^3.1.0 || 4.0.x-dev@dev"
+            },
+            "conflict": {
+                "squizlabs/php_codesniffer": "3.5.3"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-console-highlighter": "^0.5",
+                "php-parallel-lint/php-parallel-lint": "^1.2.0",
+                "phpunit/phpunit": "^4.5 || ^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
+            },
+            "type": "phpcodesniffer-standard",
+            "autoload": {
+                "classmap": [
+                    "PHPCSUtils/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "authors": [
+                {
+                    "name": "Juliette Reinders Folmer",
+                    "homepage": "https://github.com/jrfnl",
+                    "role": "lead"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/PHPCSStandards/PHPCSUtils/graphs/contributors"
+                }
+            ],
+            "description": "A suite of utility functions for use with PHP_CodeSniffer",
+            "homepage": "https://phpcsutils.com/",
+            "keywords": [
+                "PHP_CodeSniffer",
+                "phpcbf",
+                "phpcodesniffer-standard",
+                "phpcs",
+                "phpcs2",
+                "phpcs3",
+                "standards",
+                "tokens",
+                "utility"
+            ],
+            "support": {
+                "docs": "https://phpcsutils.com/",
+                "issues": "https://github.com/PHPCSStandards/PHPCSUtils/issues",
+                "source": "https://github.com/PHPCSStandards/PHPCSUtils"
+            },
+            "time": "2020-06-28T21:57:33+00:00"
+        },
+        {
             "name": "phpdocumentor/reflection-common",
             "version": "2.2.0",
             "source": {
@@ -1431,16 +1557,16 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.3",
+            "version": "1.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc"
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/0f73288fd15629204f9d42b7055f72dacbe811fc",
-                "reference": "0f73288fd15629204f9d42b7055f72dacbe811fc",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
+                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
                 "shasum": ""
             },
             "require": {
@@ -1464,7 +1590,7 @@
             "authors": [
                 {
                     "name": "PHP-FIG",
-                    "homepage": "http://www.php-fig.org/"
+                    "homepage": "https://www.php-fig.org/"
                 }
             ],
             "description": "Common interface for logging libraries",
@@ -1475,9 +1601,9 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/1.1.3"
+                "source": "https://github.com/php-fig/log/tree/1.1.4"
             },
-            "time": "2020-03-23T09:12:05+00:00"
+            "time": "2021-05-03T11:20:27+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -2145,16 +2271,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.5.8",
+            "version": "3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/squizlabs/PHP_CodeSniffer.git",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4"
+                "reference": "ffced0d2c8fa8e6cdc4d695a743271fab6c38625"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/9d583721a7157ee997f235f327de038e7ea6dac4",
-                "reference": "9d583721a7157ee997f235f327de038e7ea6dac4",
+                "url": "https://api.github.com/repos/squizlabs/PHP_CodeSniffer/zipball/ffced0d2c8fa8e6cdc4d695a743271fab6c38625",
+                "reference": "ffced0d2c8fa8e6cdc4d695a743271fab6c38625",
                 "shasum": ""
             },
             "require": {
@@ -2197,7 +2323,7 @@
                 "source": "https://github.com/squizlabs/PHP_CodeSniffer",
                 "wiki": "https://github.com/squizlabs/PHP_CodeSniffer/wiki"
             },
-            "time": "2020-10-23T02:01:07+00:00"
+            "time": "2021-04-09T00:54:41+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2388,31 +2514,32 @@
         },
         {
             "name": "wp-coding-standards/wpcs",
-            "version": "2.3.0",
+            "version": "dev-develop",
             "source": {
                 "type": "git",
                 "url": "https://github.com/WordPress/WordPress-Coding-Standards.git",
-                "reference": "7da1894633f168fe244afc6de00d141f27517b62"
+                "reference": "7cd46bed1e6a7a2af3fe24c7f4a044da3076d8f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/7da1894633f168fe244afc6de00d141f27517b62",
-                "reference": "7da1894633f168fe244afc6de00d141f27517b62",
+                "url": "https://api.github.com/repos/WordPress/WordPress-Coding-Standards/zipball/7cd46bed1e6a7a2af3fe24c7f4a044da3076d8f4",
+                "reference": "7cd46bed1e6a7a2af3fe24c7f4a044da3076d8f4",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
-                "squizlabs/php_codesniffer": "^3.3.1"
+                "phpcsstandards/phpcsextra": "^1.0",
+                "phpcsstandards/phpcsutils": "^1.0",
+                "squizlabs/php_codesniffer": "^3.5.0"
             },
             "require-dev": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.5 || ^0.6",
+                "php-parallel-lint/php-console-highlighter": "^0.5",
+                "php-parallel-lint/php-parallel-lint": "^1.0",
                 "phpcompatibility/php-compatibility": "^9.0",
                 "phpcsstandards/phpcsdevtools": "^1.0",
                 "phpunit/phpunit": "^4.0 || ^5.0 || ^6.0 || ^7.0"
             },
-            "suggest": {
-                "dealerdirect/phpcodesniffer-composer-installer": "^0.6 || This Composer plugin will sort out the PHPCS 'installed_paths' automatically."
-            },
+            "default-branch": true,
             "type": "phpcodesniffer-standard",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -2435,15 +2562,16 @@
                 "source": "https://github.com/WordPress/WordPress-Coding-Standards",
                 "wiki": "https://github.com/WordPress/WordPress-Coding-Standards/wiki"
             },
-            "time": "2020-05-13T23:57:56+00:00"
+            "time": "2021-04-12T06:28:36+00:00"
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "stability-flags": {
-        "10up/wp_mock": 20
+        "10up/wp_mock": 20,
+        "wp-coding-standards/wpcs": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=5.4"

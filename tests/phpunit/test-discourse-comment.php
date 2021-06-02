@@ -102,6 +102,7 @@ class DiscourseCommentTest extends UnitTest {
         $this->comment->setup_options( self::$plugin_options );
 
         // Setup the categories response
+        delete_transient( "wpdc_discourse_categories" );
         $response = $this->build_response( $response_error );
         $this->mock_remote_post( $response );
 

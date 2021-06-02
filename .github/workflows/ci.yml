@@ -15,10 +15,16 @@ jobs:
         include:
           - php: "5.6"
             sniff: true
+            test: false
           - php: "7.0"
             sniff: true
-          - php: "7.1"
+            test: false
+          - php: "7.4"
+            sniff: true
+            test: true
+          - php: "8.0"
             sniff: false
+            test: false
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
@@ -26,27 +32,33 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
       - name: Install Composer
-        if: "matrix.sniff"
+        if: "${{ matrix.sniff || matrix.test }}"
         uses: ramsey/composer-install@v1
         with:
           dependency-versions: "lowest"
           composer-options: "--ignore-platform-reqs"
-      - name: Install Tools
-        if: "matrix.sniff"
+      - name: Install PHPEnv
+        if: "${{ matrix.sniff || matrix.test }}"
         run: |
           git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
           export PATH="$HOME/.phpenv/bin:$PATH"
           phpenv rehash
-          sudo npm install -g jshint
-          wget https://develop.svn.wordpress.org/trunk/.jshintrc
       - name: Syntax Check
         run: |
           find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
       - name: JSHint
         if: "matrix.sniff"
         run: |
+          sudo npm install -g jshint
+          wget https://develop.svn.wordpress.org/trunk/.jshintrc
           jshint .
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
           vendor/bin/phpcs -p -s -v -n .
+      - name: PHPUnit
+        if: "matrix.test"
+        run: |
+          sudo /etc/init.d/mysql start
+          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
+          vendor/bin/phpunit

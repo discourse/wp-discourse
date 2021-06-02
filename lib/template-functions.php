@@ -76,7 +76,7 @@ trait TemplateFunctions {
 
 		// Allows parsing misformed html. Save the previous value of libxml_use_internal_errors so that it can be restored.
 		$use_internal_errors   = libxml_use_internal_errors( true );
-		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = $this->create_dom_document( $content );
 
 		// Mentions and hashtags.
@@ -122,7 +122,7 @@ trait TemplateFunctions {
 		}
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
-		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = $this->create_dom_document( $cooked );
 
 		$finder = new \DOMXPath( $doc );
@@ -168,7 +168,7 @@ trait TemplateFunctions {
 		}
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
-		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = $this->create_dom_document( $cooked );
 		$finder                = new \DOMXPath( $doc );
 		$youtube_links         = $finder->query( '//div[@data-youtube-id]' );
@@ -211,7 +211,7 @@ trait TemplateFunctions {
 		}
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
-		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = $this->create_dom_document( $html );
 		$finder                = new \DOMXPath( $doc );
 		$images                = $finder->query( '//img' );
@@ -243,7 +243,7 @@ trait TemplateFunctions {
 		}
 
 		$use_internal_errors   = libxml_use_internal_errors( true );
-		$disable_entity_loader = libxml_disable_entity_loader( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = $this->create_dom_document( $html );
 		$finder                = new \DOMXPath( $doc );
 		$comments              = $finder->query( '//comment()' );
@@ -299,7 +299,20 @@ trait TemplateFunctions {
 	protected function clear_libxml_errors( $use_internal_errors, $disable_entity_loader ) {
 		libxml_clear_errors();
 		libxml_use_internal_errors( $use_internal_errors );
-		libxml_disable_entity_loader( $disable_entity_loader );
+		$this->libxml_disable_entity_loader( $disable_entity_loader );
+	}
+
+	/**
+	 * Using libxml_disable_entity_loader is unecessary and deprecated in PHP 8.0.0. See alos https://core.trac.wordpress.org/ticket/50898.
+	 *
+	 * @param bool $state State value for libxml_disable_entity_loader.
+	 */
+	protected function libxml_disable_entity_loader( $state ) {
+		if ( version_compare( PHP_VERSION, '8.0', '<' ) ) {
+			return libxml_disable_entity_loader( $state ); // phpcs:disable
+		} else {
+			return null;
+		}
 	}
 
 	/**

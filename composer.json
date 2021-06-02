@@ -32,9 +32,11 @@
     "phpunit/phpunit": "7.5.20",
     "phpunit/php-code-coverage": "^6.1.4",
     "phpcompatibility/php-compatibility": "^9.3.5",
-    "wp-coding-standards/wpcs": "^2.3.0",
+    "wp-coding-standards/wpcs": "dev-develop#7cd46bed1e6a7a2af3fe24c7f4a044da3076d8f4",
     "monolog/monolog": "^1.25"
   },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
   "autoload": {
     "classmap": [
       "vendor_namespaced/"
