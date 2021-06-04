@@ -160,21 +160,33 @@ class FormHelper {
 			'strong' => array(),
 		);
 
-		echo "<select multiple id='discourse-allowed-post-types' class='discourse-allowed-types' name='discourse_publish[allowed_post_types][]'>";
-
-		foreach ( $post_types as $post_type ) {
-
-			if ( array_key_exists( $option, $options ) && in_array( $post_type, $options[ $option ], true ) ) {
-				$value = 'selected';
-			} else {
-				$value = '';
-			}
-
-			echo '<option ' . esc_attr( $value ) . ' value="' . esc_attr( $post_type ) . '">' . esc_html( $post_type ) . '</option>';
-		}
-
+		echo "<select multiple id='discourse-allowed-post-types' class='discourse-select-input' name='discourse_publish[allowed_post_types][]'>";
+		$this->select_options( $option, $post_types );
 		echo '</select>';
 		echo '<p class="description">' . wp_kses( $description, $allowed ) . '</p>';
+	}
+
+	/**
+	 * Outputs the tag select input.
+	 *
+	 * @param string $option Used to set the selected option.
+	 * @param array  $tags An array of available tags.
+	 * @param string $description The description of the settings field.
+	 */
+	public function tags_select_input( $option, $tags, $description = '' ) {
+		$options = $this->options;
+		$allowed = array(
+			'strong' => array(),
+		);
+
+		if ( empty( $tags ) ) {
+			echo '<p class="no-tags">' . esc_html_e( 'No tags to select.', 'wp-discourse' ) . '</p>';
+		} else {
+			echo "<select multiple id='discourse-exclude-tags' class='discourse-select-input' name='discourse_publish[exclude_tags][]'>";
+			$this->select_options( $option, $tags );
+			echo '</select>';
+			echo '<p class="description">' . wp_kses( $description, $allowed ) . '</p>';
+		}
 	}
 
 	/**
@@ -267,6 +279,22 @@ class FormHelper {
 		}
 
 		return apply_filters( 'discourse_post_types_to_publish', $post_types );
+	}
+
+	/**
+	 * Returns post tags ordered by name
+	 *
+	 * @return array
+	 */
+	public function post_tags() {
+		$tags = get_tags(
+			array(
+			    'taxonomy' => 'post_tag',
+			    'orderby'  => 'name',
+			)
+		);
+
+		return apply_filters( 'discourse_tags_to_publish', $tags );
 	}
 
 	/**
@@ -400,5 +428,35 @@ class FormHelper {
 	 */
 	protected function option_name( $option, $option_group ) {
 		return $option_group . '[' . esc_attr( $option ) . ']';
+	}
+
+	/**
+	 * Outputs markup for select options
+	 *
+	 * @param string $option The name of the option.
+	 * @param array  $items An array of items to display as options.
+	 *
+	 * @return void
+	 */
+	protected function select_options( $option, $items ) {
+		$options = $this->options;
+
+		foreach ( $items as $item ) {
+			if ( is_a( $item, 'WP_Term' ) ) {
+				$item_id   = strval( $item->term_id );
+				$item_name = $item->name;
+			} else {
+				$item_id   = $item;
+				$item_name = $item;
+			}
+
+			if ( array_key_exists( $option, $options ) && in_array( $item_id, $options[ $option ], true ) ) {
+				$value = 'selected';
+			} else {
+				$value = '';
+			}
+
+			echo '<option ' . esc_attr( $value ) . ' value="' . esc_attr( $item_id ) . '">' . esc_html( $item_name ) . '</option>';
+		}
 	}
 }

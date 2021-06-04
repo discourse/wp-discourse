@@ -38,7 +38,7 @@
 	margin-bottom: 6px;
 }
 
-#discourse-allowed-post-types {
+.discourse-select-input {
 	min-width: 160px;
 }
 

@@ -243,6 +243,19 @@ class PublishSettings {
 			'discourse_publishing_settings_section'
 		);
 
+		if ( version_compare( get_bloginfo( 'version' ), '5.6', '>=' ) ) {
+			add_settings_field(
+				'discourse_exclude_tags',
+				__( 'Exclude Posts By Tag', 'wp-discourse' ),
+				array(
+					$this,
+					'tags_select',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+		}
+
 		// These options should be set for the whole network when multi-site support is enabled.
 		if ( ! $this->use_network_publish_settings ) {
 			add_settings_field(
@@ -546,6 +559,17 @@ class PublishSettings {
 			'allowed_post_types',
 			$this->form_helper->post_types_to_publish( array( 'attachment' ) ),
 			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple post-types.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the tags select input.
+	 */
+	public function tags_select() {
+		$this->form_helper->tags_select_input(
+			'exclude_tags',
+			$this->form_helper->post_tags(),
+			__( 'Do not auto-publish posts to Discourse if they have one of these tags. Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple tags.', 'wp-discourse' )
 		);
 	}
 

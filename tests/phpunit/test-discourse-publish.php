@@ -456,6 +456,86 @@ class DiscoursePublishTest extends UnitTest {
     }
 
     /**
+     * Exclude_tags prevents publication if excluded tag is present
+     */
+    public function test_exclude_tags_with_exclusionary_tag() {
+        // Create the exclusionary tag
+        $excluded_term = term_exists( 'dont_publish', 'post_tag' );
+        if ( ! $excluded_term ) {
+          $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
+        }
+        $excluded_term_id = $excluded_term['term_id'];
+
+        // Enable direct db pubilcation flags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        $this->publish->setup_options( self::$plugin_options );
+
+        // Set up a response body for creating a new post.
+        $body                = $this->mock_remote_post_success( 'post_create' );
+        $discourse_post_id   = $body->id;
+        $discourse_category  = self::$post_atts['tags_input'] = array( $excluded_term_id );
+
+        // Add the post.
+        $post_id = wp_insert_post( self::$post_atts, false, false );
+
+        // Run the publication.
+        $post = get_post( $post_id );
+        $this->publish->publish_post_after_save( $post_id, $post );
+
+        // Ensure no publication occurs.
+        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), null );
+        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), null );
+
+        // Cleanup.
+        wp_delete_post( $post_id );
+        wp_delete_term( $excluded_term_id, 'post_tags' );
+    }
+
+    /**
+     * Exclude_tags does not prevent publication if excluded tag is not present
+     */
+    public function test_exclude_tags_with_non_exclusionary_tag() {
+        // Create a non exclusionary tag
+        $term = term_exists( 'publish', 'post_tag' );
+        if ( ! $term ) {
+          $term = wp_insert_term( 'publish', 'post_tag' );
+        }
+        $term_id = $term['term_id'];
+
+        // Create the exclusionary tag
+        $excluded_term = term_exists( 'dont_publish', 'post_tag' );
+        if ( ! $excluded_term ) {
+          $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
+        }
+        $excluded_term_id = $excluded_term['term_id'];
+
+        // Enable direct db pubilcation flags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        $this->publish->setup_options( self::$plugin_options );
+
+        // Set up a response body for creating a new post.
+        $body                = $this->mock_remote_post_success( 'post_create' );
+        $discourse_post_id   = $body->id;
+        $discourse_category  = self::$post_atts['tags_input'] = array( $term_id );
+
+        // Add the post.
+        $post_id = wp_insert_post( self::$post_atts, false, false );
+
+        // Run the publication.
+        $post = get_post( $post_id );
+        $this->publish->publish_post_after_save( $post_id, $post );
+
+        // Ensure publication occurs.
+        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+        // Cleanup.
+        wp_delete_post( $post_id );
+        wp_delete_term( $term_id, 'post_tags' );
+        wp_delete_term( $excluded_term_id, 'post_tags' );
+    }
+
+    /**
      * Successful remote_post request returns original response.
      */
     public function test_remote_post_success() {
