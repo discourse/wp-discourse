@@ -170,23 +170,25 @@ class FormHelper {
 	 * Outputs the tag select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $tags An array of available tags.
+	 * @param string $option_group The option group of the settings field.
 	 * @param string $description The description of the settings field.
 	 */
-	public function tags_select_input( $option, $tags, $description = '' ) {
-		$options = $this->options;
-		$allowed = array(
-			'strong' => array(),
-		);
+	public function tags_select_input( $option, $option_group, $description = '' ) {
+		$options 	= $this->options;
+		$tax_name	= 'post_tag';
+		$comma		= _x( ',', 'tag delimiter' );
+		$selected = isset( $options[ $option ] ) ? $options[ $option ] : array();
+		$value		= join( "$comma ", $selected );
+		$name			= $this->option_name( $option, $option_group );
 
-		if ( empty( $tags ) ) {
-			echo '<p class="no-tags">' . esc_html_e( 'No tags to select.', 'wp-discourse' ) . '</p>';
-		} else {
-			echo "<select multiple id='discourse-exclude-tags' class='discourse-select-input' name='discourse_publish[exclude_tags][]'>";
-			$this->select_options( $option, $tags );
-			echo '</select>';
-			echo '<p class="description">' . wp_kses( $description, $allowed ) . '</p>';
-		}
+		?>
+			<div class="tagsdiv" id="wpdc-tags-select">
+				<div class="ajaxtag">
+					<input data-wp-taxonomy="<?php echo $tax_name; ?>" type="text" id="discourse-<?php echo $option; ?>" name="<?php echo $name; ?>" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php echo esc_attr( $value ); ?>" />
+				</div>
+			</div>
+			<p class="description"><?php echo $description; ?></p>
+		<?php
 	}
 
 	/**
@@ -279,22 +281,6 @@ class FormHelper {
 		}
 
 		return apply_filters( 'discourse_post_types_to_publish', $post_types );
-	}
-
-	/**
-	 * Returns post tags ordered by name
-	 *
-	 * @return array
-	 */
-	public function post_tags() {
-		$tags = get_tags(
-			array(
-			    'taxonomy' => 'post_tag',
-			    'orderby'  => 'name',
-			)
-		);
-
-		return apply_filters( 'discourse_tags_to_publish', $tags );
 	}
 
 	/**

@@ -60,7 +60,7 @@ function enqueue_admin_scripts() {
 	wp_enqueue_style( 'admin_styles' );
 
 	$script_path = '/js/admin.js';
-	wp_register_script( 'admin_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
+	wp_register_script( 'admin_js', plugins_url( $script_path, __FILE__ ), array( 'jquery', 'tags-box' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 	wp_enqueue_script( 'admin_js' );
 	$commenting_options = get_option( 'discourse-comment' );
 	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];

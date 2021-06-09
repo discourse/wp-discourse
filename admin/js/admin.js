@@ -229,4 +229,8 @@
 		xhr.responseType = 'arraybuffer';
 		xhr.send();
 	});
+	
+	if ( $('.tagsdiv').length ) {
+		window.tagBox && window.tagBox.init();
+	}
 })( jQuery );

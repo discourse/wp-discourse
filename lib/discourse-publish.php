@@ -766,14 +766,15 @@ class DiscoursePublish {
 		if ( empty( $post_tags ) || is_wp_error( $post_tags ) ) {
 			return false;
 		}
-		$post_tag_ids = wp_list_pluck( $post_tags, 'term_id' );
 
-		$excluded_tag_ids = $this->get_excluded_tag_ids();
-		if ( empty( $excluded_tag_ids ) ) {
+		$excluded_tag_slugs = $this->get_excluded_tag_slugs();
+		if ( empty( $excluded_tag_slugs ) ) {
 			return false;
 		}
 
-		return count( array_intersect( $post_tag_ids, $excluded_tag_ids ) ) > 0;
+		$post_tag_slugs = wp_list_pluck( $post_tags, 'slug' );
+
+		return count( array_intersect( $post_tag_slugs, $excluded_tag_slugs ) ) > 0;
 	}
 
 	/**
@@ -798,11 +799,11 @@ class DiscoursePublish {
 	 *
 	 * @return mixed
 	 */
-	protected function get_excluded_tag_ids() {
+	protected function get_excluded_tag_slugs() {
 		if ( isset( $this->options['exclude_tags'] ) && is_array( $this->options['exclude_tags'] ) ) {
-			$exclude_tags = $this->options['exclude_tags'];
+			$excluded_tag_slugs = $this->options['exclude_tags'];
 
-			return $exclude_tags;
+			return $excluded_tag_slugs;
 		} else {
 			return array();
 		}

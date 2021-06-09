@@ -568,8 +568,8 @@ class PublishSettings {
 	public function tags_select() {
 		$this->form_helper->tags_select_input(
 			'exclude_tags',
-			$this->form_helper->post_tags(),
-			__( 'Do not auto-publish posts to Discourse if they have one of these tags. Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple tags.', 'wp-discourse' )
+			'discourse_publish',
+			__( 'Do not auto-publish posts to Discourse if they have one of these tags.', 'wp-discourse' )
 		);
 	}
 
