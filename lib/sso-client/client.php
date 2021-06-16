@@ -189,7 +189,7 @@ class Client extends SSOClientBase {
 	 *
 	 * For non-logged-in users, the function checks if there's an existing user with the payload's 'discourse_sso_user_id',
 	 * if there isn't, there is an optional check for a user with a matching email address. If both checks fail, a new user
-	 * is created.
+	 * is optionally created.
 	 *
 	 * @return int|\WP_Error
 	 */
@@ -236,7 +236,7 @@ class Client extends SSOClientBase {
 				}
 			}
 
-			if ( empty( $user_query_results ) ) {
+			if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-auto-create-wp-user'] ) ) {
 				$user_password = wp_generate_password( 12, true );
 
 				$user_id = wp_create_user(
@@ -248,6 +248,10 @@ class Client extends SSOClientBase {
 				do_action( 'wpdc_sso_client_after_create_user', $user_id );
 
 				return $user_id;
+			}
+
+			if ( empty( $user_query_results ) ) {
+				return new \WP_Error( 'no_such_user' );
 			}
 
 			return $user_query_results[0]->ID;
