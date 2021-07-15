@@ -174,20 +174,20 @@ class FormHelper {
 	 * @param string $description The description of the settings field.
 	 */
 	public function tags_select_input( $option, $option_group, $description = '' ) {
-		$options 	= $this->options;
-		$tax_name	= 'post_tag';
-		$comma		= _x( ',', 'tag delimiter' );
+		$options  = $this->options;
+		$tax_name = 'post_tag';
+		$comma    = _x( ',', 'tag delimiter' );
 		$selected = isset( $options[ $option ] ) ? $options[ $option ] : array();
-		$value		= join( "$comma ", $selected );
-		$name			= $this->option_name( $option, $option_group );
+		$value    = join( "$comma ", $selected );
+		$name     = $this->option_name( $option, $option_group );
 
 		?>
 			<div class="tagsdiv" id="wpdc-tags-select">
 				<div class="ajaxtag">
-					<input data-wp-taxonomy="<?php echo $tax_name; ?>" type="text" id="discourse-<?php echo $option; ?>" name="<?php echo $name; ?>" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php echo esc_attr( $value ); ?>" />
+					<input data-wp-taxonomy="<?php echo esc_attr( $tax_name ); ?>" type="text" id="discourse-<?php echo esc_attr( $option ); ?>" name="<?php echo esc_attr( $name ); ?>" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php echo esc_attr( $value ); ?>" />
 				</div>
 			</div>
-			<p class="description"><?php echo $description; ?></p>
+			<p class="description"><?php echo esc_attr( $description ); ?></p>
 		<?php
 	}
 

@@ -310,7 +310,7 @@ class SettingsValidator {
 		foreach ( $input as $tag_slug ) {
 			$tag_slug = trim( $tag_slug );
 
-			if ( $tag_slug == '' ) {
+			if ( '' == $tag_slug ) {
 				continue;
 			}
 
