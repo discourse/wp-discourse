@@ -464,16 +464,16 @@ class DiscoursePublishTest extends UnitTest {
         if ( ! $excluded_term ) {
           $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
         }
-        $excluded_term_id = $excluded_term['term_id'];
+        $excluded_term = get_tag( $excluded_term['term_id'] );
+        $excluded_term_slug = $excluded_term->slug;
 
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        // Enable exclude_tags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for creating a new post.
         $body                = $this->mock_remote_post_success( 'post_create' );
-        $discourse_post_id   = $body->id;
-        $discourse_category  = self::$post_atts['tags_input'] = array( $excluded_term_id );
+        self::$post_atts['tags_input'] = array( $excluded_term_slug );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -488,7 +488,7 @@ class DiscoursePublishTest extends UnitTest {
 
         // Cleanup.
         wp_delete_post( $post_id );
-        wp_delete_term( $excluded_term_id, 'post_tags' );
+        wp_delete_term( $excluded_term->ID, 'post_tags' );
     }
 
     /**
@@ -500,23 +500,25 @@ class DiscoursePublishTest extends UnitTest {
         if ( ! $term ) {
           $term = wp_insert_term( 'publish', 'post_tag' );
         }
-        $term_id = $term['term_id'];
+        $term = get_tag( $term['term_id'] );
+        $term_slug = $term->slug;
 
         // Create the exclusionary tag
         $excluded_term = term_exists( 'dont_publish', 'post_tag' );
         if ( ! $excluded_term ) {
           $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
         }
-        $excluded_term_id = $excluded_term['term_id'];
+        $excluded_term = get_tag( $excluded_term['term_id'] );
+        $excluded_term_slug = $excluded_term->slug;
 
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        // Enable excluded tags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for creating a new post.
         $body                = $this->mock_remote_post_success( 'post_create' );
         $discourse_post_id   = $body->id;
-        $discourse_category  = self::$post_atts['tags_input'] = array( $term_id );
+        self::$post_atts['tags_input'] = array( $term_slug );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -531,8 +533,8 @@ class DiscoursePublishTest extends UnitTest {
 
         // Cleanup.
         wp_delete_post( $post_id );
-        wp_delete_term( $term_id, 'post_tags' );
-        wp_delete_term( $excluded_term_id, 'post_tags' );
+        wp_delete_term( $term->ID, 'post_tags' );
+        wp_delete_term( $excluded_term->ID, 'post_tags' );
     }
 
     /**
