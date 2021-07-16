@@ -366,7 +366,7 @@ class Utilities {
 		$plugin_options = self::get_options();
 		if ( empty( $plugin_options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when DiscourseConnect is enabled.' );
 		}
 		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
@@ -422,7 +422,7 @@ class Utilities {
 		$options = self::get_options();
 		if ( empty( $options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when DiscourseConnect is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
@@ -447,7 +447,7 @@ class Utilities {
 		$options = self::get_options();
 		if ( empty( $options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when DiscourseConnect is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
