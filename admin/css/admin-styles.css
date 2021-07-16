@@ -268,3 +268,11 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 #wpdc-log-viewer.loading pre {
 	visibility: hidden;
 }
+
+#wpdc-tags-select {
+	display: inline-block;
+}
+
+#wpdc-tags-select .newtag {
+	width: 350px;
+}

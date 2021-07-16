@@ -100,6 +100,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_add_featured_link', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_auto_track', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_allowed_post_types', array( $this, 'validate_allowed_post_types' ) );
+		add_filter( 'wpdc_validate_exclude_tags', array( $this, 'validate_exclude_tags' ) );
 		add_filter( 'wpdc_validate_publish_failure_notice', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_publish_failure_email', array( $this, 'validate_email' ) );
 		add_filter( 'wpdc_validate_hide_discourse_name_field', array( $this, 'validate_checkbox' ) );
@@ -290,6 +291,42 @@ class SettingsValidator {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Validates the 'exclude_tags' input.
+	 *
+	 * @param mixed $input The excluded tags.
+	 *
+	 * @return array
+	 */
+	public function validate_exclude_tags( $input ) {
+		$output = array();
+
+		if ( is_string( $input ) ) {
+			$input  = explode( ',', $input );
+		}
+
+		foreach ( $input as $tag_slug ) {
+			$tag_slug = trim( $tag_slug );
+
+			if ( '' == $tag_slug ) {
+				continue;
+			}
+
+			if ( term_exists( $tag_slug, 'post_tag' ) ) {
+				$output[] = sanitize_text_field( $tag_slug );
+			} else {
+				add_settings_error(
+					'discourse_exclude_tags',
+					'tag-does-not-exist',
+					"Exclude Posts By Tag: '$tag_slug' is not a valid tag.",
+					'warning'
+				);
+			}
+		}
+
+		return array_unique( $output );
 	}
 
 	/**
