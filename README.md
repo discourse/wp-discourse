@@ -12,7 +12,7 @@ The plugin is not a substitute for Disqus-like commenting systems.
 ### Use Discourse for Comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
-- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Associates WP author accounts with their respective Discourse accounts. Does not require DiscourseConnect.
 - Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
 based on post score and commenter "trust level" -- see docs.
 
@@ -21,10 +21,9 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 
-### Single Sign On
+### DiscourseConnect
 
-The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
-Single Sign On provider for your Discourse forum.
+The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the DiscourseConnect provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.

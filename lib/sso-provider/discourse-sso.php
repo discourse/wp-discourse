@@ -314,7 +314,7 @@ class DiscourseSSO {
 		$plugin_options = $this->options;
 		if ( empty( $plugin_options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when DiscourseConnect is enabled.' );
 		}
 		$api_credentials = $this->get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {

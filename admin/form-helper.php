@@ -351,8 +351,8 @@ class FormHelper {
 						// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
 						__(
 							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
-                                             an existing Discourse admin account, before enabling SSO please ensure that your email
-                                             addresses on Discourse and WordPress match. This is required for SSO login to an
+                                             an existing Discourse admin account, before enabling DiscourseConnect please ensure that your email
+                                             addresses on Discourse and WordPress match. This is required for DiscourseConnect login to an
                                              existing Discourse account.',
 							'wp-discourse'
 						),

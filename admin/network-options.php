@@ -155,7 +155,7 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_network_enable_sso',
-			__( 'Enable SSO Provider', 'wp-discourse' ),
+			__( 'Enable DiscourseConnect Provider', 'wp-discourse' ),
 			array(
 				$this,
 				'enable_sso_provider_checkbox',
@@ -166,7 +166,7 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_network_enable_discourse_sso',
-			__( 'Enable SSO Client', 'wp-discourse' ),
+			__( 'Enable DiscourseConnect Client', 'wp-discourse' ),
 			array(
 				$this,
 				'enable_sso_client_checkbox',
@@ -177,7 +177,7 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_network_sso_secret',
-			__( 'SSO Secret Key', 'wp-discourse' ),
+			__( 'DiscourseConnect Secret Key', 'wp-discourse' ),
 			array(
 				$this,
 				'sso_secret_input',
@@ -360,7 +360,7 @@ class NetworkOptions {
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
-				'This webhook is only active when WordPress is enabled as the SSO Provider for Discourse (this can be overridden by
+				'This webhook is only active when WordPress is enabled as the DiscourseConnect Provider for Discourse (this can be overridden by
 hooking into the \'wpdc_use_discourse_user_webhook\' filter.) It supplies the Discourse username to WordPress when a user is created or updated on your forum.
 Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
 URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
@@ -445,13 +445,13 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				'wp-discourse'
 			)
 		);
-		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
+		$this->next_setting_heading( __( 'DiscourseConnect Settings', 'wp-discourse' ) );
 	}
 
 	/**
 	 * *******************
 	 *
-	 * SSO Settings Fields.
+	 * DiscourseConnect Settings Fields.
 	 **********************/
 
 
@@ -460,11 +460,11 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_provider_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
-		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'DiscourseConnect Provider tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Use this WordPress instance as the DiscourseConnect provider for your Discourse forum.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_provider input. Placeholder: sso_documentation_link.
-			__( 'For details about using WordPress as the SSO Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ),
+			__( 'For details about using WordPress as the DiscourseConnect Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ),
 			$sso_documentation_link
 		);
 		$this->checkbox_input( 'enable-sso', $description, $details );
@@ -475,11 +475,11 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_client_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
-		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'DiscourseConnect Client tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Allow your WordPress site to function as a DiscourseConnect client to Discourse.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
-			__( 'For details about using WordPress as an SSO Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ),
+			__( 'For details about using WordPress as a DiscourseConnect Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ),
 			$sso_documentation_link
 		);
 		$this->checkbox_input( 'sso-client-enabled', $description, $details );
@@ -500,7 +500,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$description = sprintf(
 			// translators: SSO secret input. Placeholder: discourse_sso_url.
 			__(
-				'The secret key used to verify Discourse SSO requests. Set it to a string of text, at least 10
+				'The secret key used to verify Discourse DiscourseConnect requests. Set it to a string of text, at least 10
 		        characters long. It needs to match the key set at %1$s.',
 				'wp-discourse'
 			),
@@ -646,14 +646,14 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				?>
 			</em>
 		</p>
-		<h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
+		<h2><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?></h2>
 		<p>
 			<em>
 				<?php
 				esc_html_e(
-					'When Multisite Configuration is enabled, SSO functionality to either use WordPress as the
-                SSO provider for Discourse, or WordPress as an SSO client to Discourse is enabled on this page. The SSO Secret
-                Key is also set here. In a multisite setup, the SSO Client functionality is only available when Multisite Configuration
+					'When Multisite Configuration is enabled, DiscourseConnect functionality to either use WordPress as the
+                DiscourseConnect provider for Discourse, or WordPress as a DiscourseConnect client to Discourse is enabled on this page. The DiscourseConnect Secret
+                Key is also set here. In a multisite setup, the DiscourseConnect Client functionality is only available when Multisite Configuration
                 is enabled.',
 					'wp-discourse'
 				);
@@ -739,26 +739,26 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			if ( ! empty( $enable_sso ) && empty( $sso_secret )
 			) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'To use WordPress as the SSO Provider, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+							__( 'To use WordPress as the DiscourseConnect Provider, you need to supply a DiscourseConnect Secret Key.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $sso_client_enabled ) && empty( $sso_secret )
 			) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'To use WordPress as the SSO Client, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+							__( 'To use WordPress as the DiscourseConnect Client, you need to supply a DiscourseConnect Secret Key.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
+							__( "You can't enable both the DiscourseConnect Client and DiscourseConnect Provider functionality.", 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $sso_secret ) && strlen( $sso_secret ) < 10 ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'The SSO Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
+							__( 'The DiscourseConnect Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 		}// End if().
