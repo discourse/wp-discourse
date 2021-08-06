@@ -5,7 +5,8 @@ on:
     - "*"
 jobs:
   tag:
-    name: New tag
+    name: Deploy when tag is pushed
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
     - name: Setup
