@@ -448,7 +448,7 @@ class TagTopic extends Component {
     handleKeyPress( e ) {
         const keyVal = e.key,
             val = e.target.value,
-            allowedChars = new RegExp("^[a-zA-Z0-9\-\_ ]+$");
+            allowedChars = new RegExp("^[a-zA-Z0-9À-ž\-\_ ]+$");
 
         if ( 'Enter' === keyVal || ',' === keyVal ) {
             let currentChoices = this.state.chosenTags;
