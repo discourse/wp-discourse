@@ -59,6 +59,8 @@ const upArrow = ( <svg
     </g>
 </svg> );
 
+const tagsFilterRegExp = /[\/\?#\[\]@!\$&'\(\)\*\+,;=\.%\\`^\s|\{\}"<>]+/;
+
 class Notification extends Component {
     constructor( props ) {
         super( props );
@@ -446,9 +448,8 @@ class TagTopic extends Component {
     }
 
     handleKeyPress( e ) {
-        const keyVal = e.key,
-            val = e.target.value,
-            allowedChars = new RegExp("^[a-zA-Z0-9À-ž\-\_ ]+$");
+        let keyVal = e.key,
+            val = e.target.value;
 
         if ( 'Enter' === keyVal || ',' === keyVal ) {
             let currentChoices = this.state.chosenTags;
@@ -459,8 +460,11 @@ class TagTopic extends Component {
                 } );
                 return null;
             }
-            if ( allowedChars.test( val ) ) {
-                currentChoices.push( val.trim().replace( / /g, '-' ) );
+
+            val = this.cleanTag(val);
+
+            if ( val.length ) {
+                currentChoices.push( val );
                 currentChoices = TagTopic.sanitizeArray( currentChoices );
                 this.setState( {
                     chosenTags: currentChoices,
@@ -474,6 +478,15 @@ class TagTopic extends Component {
                 });
             }
         }
+    }
+
+    // see discourse/lib/discourse_tagging.rb#clean_tag
+    cleanTag( val ) {
+      val = val.trim(); // remove surrounding whitespace
+      val = val.replace( / /g, '-' ); // replace whitespace with hyphen
+      val = val.replace( /(-)\1+/g, '-'); // remove duplicate hyphens
+      val = val.replace( new RegExp(tagsFilterRegExp, 'g'), '' ); // remove special characters
+      return val;
     }
 
     handleClick( key ) {
