@@ -33,10 +33,10 @@ class SSOClientBase {
 
 				return null;
 			}
-			$link_account_text = ! empty( $discourse_options['link-to-discourse-text'] ) ? $discourse_options['link-to-discourse-text'] : '';
+			$link_account_text = ! empty( self::get_text_options( 'link-to-discourse-text' ) ) ? self::get_text_options( 'link-to-discourse-text' ) : '';
 			$anchor            = ! empty( $options['link'] ) ? $options['link'] : $link_account_text;
 		} else {
-			$login_text = ! empty( $discourse_options['external-login-text'] ) ? $discourse_options['external-login-text'] : '';
+			$login_text = ! empty( self::get_text_options( 'external-login-text' ) ) ? self::get_text_options( 'external-login-text' ) : '';
 			$anchor     = ! empty( $options['login'] ) ? $options['login'] : $login_text;
 		}
 
