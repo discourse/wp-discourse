@@ -51,24 +51,12 @@ trait PluginUtilities {
 	public function check_connection_status() {
 		$api_credentials = $this->get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+			return $api_credentials;
 		}
 
-		$api_username = sanitize_text_field( $api_credentials['api_username'] );
-
-		$url      = esc_url_raw( "{$api_credentials['url']}/users/{$api_username}.json" );
-		$response = wp_remote_get(
-			$url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => $api_username,
-				),
-			)
-		);
-
-		return $this->validate( $response );
+		$path = "/users/{$api_credentials['api_username']}.json";
+		$body = $this->discourse_request( $path );
+		return !is_wp_error( $body );
 	}
 
 	/**
@@ -106,53 +94,31 @@ trait PluginUtilities {
 		$categories = get_transient( 'wpdc_discourse_categories' );
 
 		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
-			$api_credentials = $this->get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
 
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+			$body = $this->discourse_request( "/site.json" );
+			if ( is_wp_error( $body ) ) {
+				return $body;
 			}
 
-			$base_url     = $api_credentials['url'];
-			$api_username = $api_credentials['api_username'];
-			$api_key      = $api_credentials['api_key'];
-
-			$site_url = esc_url_raw( "{$base_url}/site.json" );
-
-			$remote = wp_remote_get(
-				$site_url,
-				array(
-					'headers' => array(
-						'Api-Key'      => sanitize_key( $api_key ),
-						'Api-Username' => sanitize_text_field( $api_username ),
-					),
-				)
-			);
-
-			if ( ! $this->validate( $remote ) ) {
-
-				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
-			}
-
-			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
-			if ( array_key_exists( 'categories', $remote ) ) {
-				$categories           = $remote['categories'];
+			if ( $body->categories ) {
+				$categories           = $body->categories;
 				$discourse_categories = array();
 				foreach ( $categories as $category ) {
-					if ( ( empty( $options['display-subcategories'] ) ) && array_key_exists( 'parent_category_id', $category ) ) {
+					if ( ( empty( $options['display-subcategories'] ) ) && property_exists( $category, 'parent_category_id' ) ) {
 
 						continue;
 					}
 					$current_category                     = array();
-					$current_category['id']               = intval( $category['id'] );
-					$current_category['name']             = sanitize_text_field( $category['name'] );
-					$current_category['name']             = sanitize_text_field( $category['name'] );
-					$current_category['color']            = sanitize_key( $category['color'] );
-					$current_category['text_color']       = sanitize_key( $category['text_color'] );
-					$current_category['slug']             = sanitize_text_field( $category['slug'] );
-					$current_category['topic_count']      = intval( $category['topic_count'] );
-					$current_category['post_count']       = intval( $category['post_count'] );
-					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
-					$current_category['read_restricted']  = intval( $category['read_restricted'] );
+					$current_category['id']               = intval( $category->id );
+					$current_category['name']             = sanitize_text_field( $category->name );
+					$current_category['name']             = sanitize_text_field( $category->name );
+					$current_category['color']            = sanitize_key( $category->color );
+					$current_category['text_color']       = sanitize_key( $category->text_color );
+					$current_category['slug']             = sanitize_text_field( $category->slug );
+					$current_category['topic_count']      = intval( $category->topic_count );
+					$current_category['post_count']       = intval( $category->post_count );
+					$current_category['description_text'] = sanitize_text_field( $category->description_text );
+					$current_category['read_restricted']  = intval( $category->read_restricted );
 
 					$discourse_categories[] = $current_category;
 				}
@@ -204,31 +170,14 @@ trait PluginUtilities {
 	 * @return array|mixed|object|\WP_Error
 	 */
 	protected function get_discourse_user( $user_id, $match_by_email = false ) {
-		$api_credentials = $this->get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
+		$body = $this->discourse_request( "/users/by-external/{$user_id}.json" );
+		if ( is_wp_error( $body ) ) {
+			return $body;
 		}
+		
+		if ( isset( $body->user ) ) {
 
-		$external_user_url = esc_url_raw( "{$api_credentials['url']}/users/by-external/{$user_id}.json" );
-
-		$response = wp_remote_get(
-			$external_user_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
-
-		if ( $this->validate( $response ) ) {
-
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( isset( $body->user ) ) {
-
-				return $body->user;
-			}
+			return $body->user;
 		}
 
 		if ( $match_by_email ) {
@@ -254,44 +203,21 @@ trait PluginUtilities {
 	 * @return object \WP_Error
 	 */
 	protected function get_discourse_user_by_email( $email ) {
-		$api_credentials = $this->get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$users_url = esc_url_raw( "{$api_credentials['url']}/admin/users/list/all.json" );
-		$users_url = add_query_arg(
+		$path = "/admin/users/list/all.json";
+		$path = add_query_arg(
 			array(
 				'email'  => rawurlencode_deep( $email ),
 				'filter' => rawurlencode_deep( $email ),
 			),
-			$users_url
+			$path
 		);
 
-		$response = wp_remote_get(
-			$users_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
-		if ( $this->validate( $response ) ) {
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			// The reqest returns a valid response even if the user isn't found, so check for empty.
-			if ( ! empty( $body ) && ! empty( $body[0] ) ) {
+		$body = $this->discourse_request( $path );
 
-				return $body[0];
-			} else {
-
-				// A valid response was returned, but the user wasn't found.
-				return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
-			}
+		if ( ! empty( $body ) && ! empty( $body[0] ) ) {
+			return $body[0];
 		} else {
-
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
+			return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
 		}
 	}
 
@@ -303,27 +229,102 @@ trait PluginUtilities {
 	 * @return array|mixed|object|\WP_Error
 	 */
 	protected function get_discourse_topic( $topic_url ) {
-		$api_credentials = $this->get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
+		return $this->discourse_request( "{$topic_url}.json" );
+	}
 
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+	/**
+	 * Syncs a user with Discourse through SSO.
+	 *
+	 * @param array $sso_params The sso params to sync.
+	 * @param int   $user_id The WordPress user's ID.
+	 *
+	 * @return int|string|\WP_Error
+	 */
+	protected function sync_sso( $sso_params, $user_id = null ) {
+		$plugin_options = $this->options;
+		if ( empty( $plugin_options['enable-sso'] ) ) {
+			return handle_error( 'sso_error', 'The sync_sso_record function can only be used when DiscourseConnect is enabled.' );
 		}
 
-		$topic_url = esc_url_raw( "{$topic_url}.json" );
-
-		$response = wp_remote_get(
-			$topic_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
+		$path        = '/admin/users/sync_sso';
+		$sso_secret  = $plugin_options['sso-secret'];
+		$sso_payload = base64_encode( http_build_query( $sso_params ) );
+		$sig         = hash_hmac( 'sha256', $sso_payload, $sso_secret );
+		$body        = array(
+			'sso' => $sso_payload,
+			'sig' => $sig,
 		);
+		$response_body = $this->discourse_request( $path, array( 'body' => $body ) );
+
+		if ( is_wp_error( $response_body ) ) {
+			return $response_body;
+		}
+
+		$discourse_user = $response_body;
+
+		if ( ! empty( $discourse_user->id ) ) {
+			$wordpress_user_id = intval( $sso_params['external_id'] );
+			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', intval( $discourse_user->id ) );
+			update_user_meta( $wordpress_user_id, 'discourse_username', sanitize_text_field( $discourse_user->username ) );
+
+			do_action( 'wpdc_after_sync_sso', $discourse_user, $user_id );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Perform a Discourse request
+	 *
+	 * @param string $url Discourse request url.
+	 * @param array $body Request body.
+	 * @param string $type Request type.
+	 *
+	 * @return array|\WP_Error|void
+	 */
+	protected function discourse_request( $url, $args = array() ) {
+		if ( ! $url ) {
+			return;
+		}
+
+		$api_credentials = $this->get_api_credentials();
+		if ( is_wp_error( $api_credentials ) ) {
+			return $api_credentials;
+		}
+
+		$headers = array(
+			'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
+			'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
+			'Accept'       => 'application/json',
+		);
+		$opts = array(
+			'headers' => $headers
+		);
+		if ( !empty( $args["body"] ) ) {
+			$opts['body'] = $args["body"];
+		}
+
+		// support relative paths
+		if ( strpos( $url, '://' ) == false ) {
+			$url = esc_url_raw( $api_credentials['url'] . $url );
+		}
+
+		$type = isset( $args["type"] ) ? $args["type"] : "get";
+		$request = "wp_remote_$type";
+		$response = $request( $url, $opts );
 
 		if ( ! $this->validate( $response ) ) {
+			return new \WP_Error(
+				'wpdc_response_error',
+				'An invalid response was returned from Discourse',
+				array(
+					'http_code' => wp_remote_retrieve_response_code( $response )
+				)
+			);
+		}
 
-			return new \WP_Error( 'wpdc_response_error', 'The topic could not be retrieved from Discourse.' );
+		if ( isset( $args["raw"] ) && $args["raw"] ) {
+			return $response;
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );
@@ -341,8 +342,7 @@ trait PluginUtilities {
 		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
 
 		if ( ! ( $url && $api_key && $api_username ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse configuration options have not been set.' );
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		return array(
@@ -382,5 +382,94 @@ trait PluginUtilities {
 		}
 
 		add_option( $group_name, $transferred_options );
+	}
+
+	/**
+	 * Gets the SSO parameters for a user.
+	 *
+	 * @param object $user The WordPress user.
+	 * @param array  $sso_options An optional array of extra SSO parameters.
+	 *
+	 * @return array
+	 */
+	protected function get_sso_params( $user, $sso_options = array() ) {
+		$plugin_options      = $this->options;
+		$user_id             = $user->ID;
+		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
+		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
+		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
+		$avatar_url          = get_avatar_url(
+			$user_id,
+			array(
+				'default' => '404',
+			)
+		);
+		$avatar_url          = esc_url_raw( apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id ) );
+
+		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
+			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
+			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
+
+			if ( $first_name || $last_name ) {
+				$name = trim( $first_name . ' ' . $last_name );
+			}
+		}
+
+		if ( empty( $name ) ) {
+			$name = $user->display_name;
+		}
+
+		$params = array(
+			'external_id'         => $user_id,
+			'username'            => $user->user_login,
+			'email'               => $user->user_email,
+			'require_activation'  => $require_activation ? 'true' : 'false',
+			'name'                => $name,
+			'bio'                 => $user->description,
+			'avatar_url'          => $avatar_url,
+			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
+		);
+
+		if ( ! empty( $sso_options ) ) {
+			foreach ( $sso_options as $option_key => $option_value ) {
+				$params[ $option_key ] = $option_value;
+			}
+		}
+
+		return apply_filters( 'wpdc_sso_params', $params, $user );
+	}
+
+	/**
+	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
+	 *
+	 * @param \WP_REST_Request $data The WP_REST_Request object.
+	 *
+	 * @return \WP_Error|\WP_REST_Request
+	 */
+	public function verify_discourse_webhook_request( $data ) {
+		$options = $this->get_options();
+		// The X-Discourse-Event-Signature consists of 'sha256=' . hamc of raw payload.
+		// It is generated by computing `hash_hmac( 'sha256', $payload, $secret )`.
+		$sig = substr( $data->get_header( 'X-Discourse-Event-Signature' ), 7 );
+		if ( $sig ) {
+			$payload = $data->get_body();
+			// Key used for verifying the request - a matching key needs to be set on the Discourse webhook.
+			$secret = ! empty( $options['webhook-secret'] ) ? $options['webhook-secret'] : '';
+
+			if ( ! $secret ) {
+
+				return new \WP_Error( 'discourse_webhook_configuration_error', 'The webhook secret key has not been set.' );
+			}
+
+			if ( hash_hmac( 'sha256', $payload, $secret ) === $sig ) {
+
+				return $data;
+			} else {
+
+				return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: signatures did not match.' );
+			}
+		}
+
+		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
 	}
 }

@@ -7,34 +7,21 @@
 
 namespace WPDiscourse\SyncDiscourseUser;
 
-use WPDiscourse\Webhook\Webhook;
+use WPDiscourse\DiscourseBase;
 
 /**
- * Class DiscourseUser
+ * Class SyncDiscourseUser
  */
-class SyncDiscourseUser extends Webhook {
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
+class SyncDiscourseUser extends DiscourseBase {
 
 	/**
 	 * DiscourseUser constructor.
 	 */
 	public function __construct() {
+		$this->logger_context = "sync_user";
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_user_route' ) );
-	}
-
-	/**
-	 * Setup the plugin options.
-	 */
-	public function setup_options() {
-		$this->options = $this->get_options();
 	}
 
 	/**

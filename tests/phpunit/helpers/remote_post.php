@@ -22,15 +22,17 @@ trait RemotePost {
           'success'            => 200,
           'invalid_parameters' => 400,
           'forbidden'          => 403,
+          'not_found'          => 404,
           'unprocessable'      => 422,
       );
       $messages = array(
           'success'            => 'OK',
           'invalid_parameters' => 'Bad Request',
           'forbidden'          => 'Forbidden',
+          'not_found'          => 'Not found',
           'unprocessable'      => 'Unprocessable Entity',
       );
-      if ( in_array( $type, array( 'invalid_parameters', 'unprocessable' ), true ) ) {
+      if ( in_array( $type, array( 'invalid_parameters', 'unprocessable', 'not_found' ), true ) ) {
           $body = $this->response_body_json( $type, $sub_type );
       } else {
           $body = array(
@@ -56,7 +58,7 @@ trait RemotePost {
    * @param string $action_type Action type of test.
    */
   protected function response_body_json( $type, $sub_type = null, $action_type = 'create_post' ) {
-      if ( in_array( $type, array( 'post_create', 'post_update' ), true ) ) {
+      if ( in_array( $type, array( 'post_create', 'post_update', 'user', 'comments' ), true ) ) {
           return $this->response_body_file( $type );
       }
       if ( 'unprocessable' === $type ) {
@@ -68,6 +70,7 @@ trait RemotePost {
       } else {
           $messages     = array(
               'invalid_parameters' => "You supplied invalid parameters to the request: $sub_type",
+              'not_found'          => "Sorry, that resource doesn't exist in our system.",
               'forbidden'          => 'You are not permitted to view the requested resource. The API username or key is invalid.',
           );
           $message_type = $type;
@@ -100,7 +103,7 @@ trait RemotePost {
       add_filter(
           'pre_http_request',
           function( $prempt, $args, $url ) use ( $response, $second_request ) {
-              if ( ! empty( $second_request ) && ( $second_request['body'] === $args['body'] ) ) {
+              if ( ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false ) ) {
                   return $second_request['response'];
               } else {
                   return $response;
