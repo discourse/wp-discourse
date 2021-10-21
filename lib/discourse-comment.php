@@ -7,30 +7,12 @@
 
 namespace WPDiscourse\DiscourseComment;
 
-use WPDiscourse\Shared\PluginUtilities;
-use WPDiscourse\Logs\Logger;
+use WPDiscourse\DiscourseBase;
 
 /**
  * Class DiscourseComment
  */
-class DiscourseComment {
-	use PluginUtilities;
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
-
-	/**
-	 * Instance of Logger
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\Logs\Logger
-	 */
-	protected $logger;
+class DiscourseComment extends DiscourseBase {
 
 	/**
 	 * An instance of the DiscourseCommentFormatter class.
@@ -47,7 +29,7 @@ class DiscourseComment {
 	 */
 	public function __construct( $comment_formatter ) {
 		$this->comment_formatter = $comment_formatter;
-
+		$this->logger_context = "comment";
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
@@ -202,7 +184,7 @@ class DiscourseComment {
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $post_id ) {
+	public function sync_comments( $post_id, $force = false ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -220,7 +202,7 @@ class DiscourseComment {
 			$sync_post = $sync_post || 1 === intval( get_post_meta( $post_id, 'wpdc_sync_post_comments', true ) );
 		}
 
-		if ( $sync_post ) {
+		if ( $sync_post || $force ) {
 			// Avoids a double sync.
 			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
 			if ( 1 === intval( $got_lock->got_it ) ) {
@@ -249,20 +231,22 @@ class DiscourseComment {
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
+					$result = $this->discourse_request( $permalink, array( "raw" => true ) );
 
-					$result = wp_remote_get(
-						$permalink,
-						array(
-							'headers' => array(
-								'Api-Key'      => sanitize_key( $discourse_options['api-key'] ),
-								'Api-Username' => sanitize_text_field( $discourse_options['publish-username'] ),
-							),
-						)
-					);
+					if ( is_wp_error( $result ) ) {
+						$message = $result->get_error_message();
+						$error_data = $result->get_error_data();
 
-					if ( $this->validate( $result ) ) {
-
-						$json = json_decode( $result['body'] );
+						$log_args = array(
+							'message'            => $message,
+							'discourse_topic_id' => $topic_id,
+							'wp_post_id'				 => $post_id,
+							'http_code'          => $error_data["http_code"]
+						);
+						$this->logger->error( 'sync_comments.response_error', $log_args );
+					} else {
+						$raw_body = $result['body'];
+						$json = json_decode( $raw_body );
 
 						if ( isset( $json->filtered_posts_count ) ) {
 							$posts_count = $json->filtered_posts_count - 1;
@@ -279,7 +263,7 @@ class DiscourseComment {
 								update_post_meta( $post_id, 'publish_post_category', intval( $category_id ) );
 							}
 
-							update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $raw_body ) );
 
 							if ( isset( $topic_id ) ) {
 								// Delete the cached html.

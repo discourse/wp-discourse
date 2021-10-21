@@ -2,7 +2,7 @@
 /**
  * Uses a Discourse webhook to sync topics with their associated WordPress posts.
  *
- * @package WPDiscourse\DiscourseWebhookRefresh
+ * @package WPDiscourse\SyncDiscourseTopic
  * @todo Review phpcs disablement.
  */
 
@@ -10,20 +10,12 @@
 
 namespace WPDiscourse\SyncDiscourseTopic;
 
-use WPDiscourse\Webhook\Webhook;
+use WPDiscourse\DiscourseBase;
 
 /**
- * Class DiscourseWebhookRefresh
+ * Class SyncDiscourseTopic
  */
-class SyncDiscourseTopic extends Webhook {
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var array|void
-	 */
-	protected $options;
+class SyncDiscourseTopic extends DiscourseBase {
 
 	/**
 	 * The current version of the wpdc_topic_blog database table.
@@ -34,19 +26,14 @@ class SyncDiscourseTopic extends Webhook {
 	protected $db_version = '1.0';
 
 	/**
-	 * DiscourseWebhookRefresh constructor.
+	 * SyncDiscourseTopic constructor.
 	 */
 	public function __construct() {
+		$this->logger_context = "sync_topic";
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
 		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
-	}
-
-	/**
-	 * Setup options.
-	 */
-	public function setup_options() {
-		$this->options = $this->get_options();
 	}
 
 	/**

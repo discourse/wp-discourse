@@ -8,25 +8,15 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
+use WPDiscourse\DiscourseBase;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Shared\PluginUtilities;
 use WPDiscourse\Shared\TemplateFunctions;
-use WPDiscourse\Logs\Logger;
 
 /**
  * Class DiscoursePublish
  */
-class DiscoursePublish {
-	use PluginUtilities;
+class DiscoursePublish extends DiscourseBase {
 	use TemplateFunctions;
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
 
 	/**
 	 * An email_notification object that has a publish_failure_notification method.
@@ -35,14 +25,6 @@ class DiscoursePublish {
 	 * @var \WPDiscourse\EmailNotification\EmailNotification
 	 */
 	protected $email_notifier;
-
-	/**
-	 * Instance of Logger
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\Logs\Logger
-	 */
-	protected $logger;
 
 	/**
 	 * Instance store for log args
@@ -60,6 +42,7 @@ class DiscoursePublish {
 	 */
 	public function __construct( $email_notifier, $register_actions = true ) {
 		$this->email_notifier = $email_notifier;
+		$this->logger_context = "publish";
 
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
@@ -76,28 +59,6 @@ class DiscoursePublish {
 
 			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		}
-	}
-
-	/**
-	 * Setup options.
-	 *
-	 * @param object $extra_options Extra options used for testing.
-	 */
-	public function setup_options( $extra_options = null ) {
-		$this->options = $this->get_options();
-
-		if ( ! empty( $extra_options ) ) {
-			foreach ( $extra_options as $key => $value ) {
-				$this->options[ $key ] = $value;
-			}
-		}
-	}
-
-	/**
-	 * Setup Logger for the pubish context.
-	 */
-	public function setup_logger() {
-		$this->logger = Logger::create( 'publish' );
 	}
 
 	/**
