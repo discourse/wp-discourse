@@ -53,7 +53,6 @@ class DiscourseComment {
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
 		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
-		add_filter( 'wp_kses_allowed_html', array( $this, 'extend_allowed_html' ), 10, 2 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
 	}
@@ -78,33 +77,6 @@ class DiscourseComment {
 	 */
 	public function setup_logger() {
 		$this->logger = Logger::create( 'comment' );
-	}
-
-	/**
-	 * Adds data-youtube-id to the allowable div attributes.
-	 *
-	 * Discourse returns the youtube video id as the value of the 'data-youtube-attribute',
-	 * this function makes it possible to filter the comments with `wp_kses_post` without
-	 * stripping out that attribute.
-	 *
-	 * @param array  $allowedposttags The array of allowed post tags.
-	 * @param string $context The current context ('post', 'data', etc.).
-	 *
-	 * @return mixed
-	 */
-	public function extend_allowed_html( $allowedposttags, $context ) {
-		if ( 'post' === $context ) {
-			$allowedposttags['div'] = array(
-				'class'           => true,
-				'id'              => true,
-				'style'           => true,
-				'title'           => true,
-				'role'            => true,
-				'data-youtube-id' => array(),
-			);
-		}
-
-		return $allowedposttags;
 	}
 
 	/**
