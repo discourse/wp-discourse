@@ -112,7 +112,7 @@ class Discourse {
 		'more-replies-more-text'      => 'more',
 		'external-login-text'         => 'Log in with Discourse',
 		'link-to-discourse-text'      => 'Link your account to Discourse',
-		'linked-to-discourse-text'    => "You're account is linked with Discourse!",
+		'linked-to-discourse-text'    => 'Your account is linked with Discourse!',
 	);
 
 	/**
@@ -203,7 +203,6 @@ class Discourse {
 		$discourse_url = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
 		$domain_name   = wp_parse_url( $discourse_url, PHP_URL_HOST );
 		update_option( 'wpdc_discourse_domain', $domain_name );
-
 		update_option( 'discourse_option_groups', $this->discourse_option_groups );
 
 		foreach ( $this->discourse_option_groups as $group_name ) {
@@ -211,6 +210,7 @@ class Discourse {
 				$saved_values   = get_option( 'discourse_configurable_text' );
 				$default_values = $this->discourse_configurable_text;
 				$merged_values  = array_merge( $default_values, $saved_values );
+				array_walk( $merged_values, 'self::register_text_translations' );
 				update_option( $group_name, $merged_values );
 			} else {
 				add_option( $group_name, $this->$group_name );

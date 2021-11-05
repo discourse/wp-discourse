@@ -58,7 +58,7 @@ class DiscourseCommentFormatter {
 		}
 
 		if ( ! empty( $options['discourse-link-text'] ) ) {
-			$discourse_url_name = esc_html( $options['discourse-link-text'] );
+			$discourse_url_name = esc_html( self::get_text_options( 'discourse-link-text' ) );
 		} else {
 			$discourse_url_name = preg_replace( '(https?://)', '', esc_url( $options['url'] ) );
 		}
@@ -67,13 +67,13 @@ class DiscourseCommentFormatter {
 		$datetime_format = empty( $options['custom-datetime-format'] ) ? get_option( 'date_format' ) : $options['custom-datetime-format'];
 
 		$more_replies_number = intval( ( $topic_data->filtered_posts_count - count( $topic_data->posts ) - 1 ) );
-		$more_text           = esc_html( strtolower( $options['more-replies-more-text'] ) ) . ' ';
+		$more_text           = esc_html( strtolower( self::get_text_options( 'more-replies-more-text' ) ) ) . ' ';
 		if ( 0 >= $more_replies_number ) {
 			$more_replies = '';
 		} elseif ( 1 === $more_replies_number ) {
-			$more_replies = '1 ' . $more_text . esc_html( strtolower( $options['single-reply-text'] ) );
+			$more_replies = '1 ' . $more_text . esc_html( strtolower( self::get_text_options( 'single-reply-text' ) ) );
 		} else {
-			$more_replies = $more_replies_number . ' ' . $more_text . esc_html( strtolower( $options['many-replies-text'] ) );
+			$more_replies = $more_replies_number . ' ' . $more_text . esc_html( strtolower( self::get_text_options( 'many-replies-text' ) ) );
 		}
 
 		$discourse_url     = esc_url( $options['url'] );
@@ -173,13 +173,13 @@ class DiscourseCommentFormatter {
 
 		switch ( $comments_count ) {
 			case 0:
-				$link_text = $options['no-comments-text'];
+				$link_text = self::get_text_options( 'no-comments-text' );
 				break;
 			case 1:
-				$link_text = '1 ' . $options['comments-singular-text'];
+				$link_text = '1 ' . self::get_text_options( 'comments-singular-text' );
 				break;
 			default:
-				$link_text = $comments_count . ' ' . $options['comments-plural-text'];
+				$link_text = $comments_count . ' ' . self::get_text_options( 'comments-plural-text' );
 		}
 
 		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );

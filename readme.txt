@@ -4,7 +4,7 @@ Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.8
 Requires PHP: 5.6.0
-Stable tag: 2.3.1
+Stable tag: 2.3.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.3.2 10/07/2021
+
+- Add translation pipeline for configurable text
+- Support WPML in translation pipeline for configurable text
 
 #### 2.3.1 08/31/2021
 
