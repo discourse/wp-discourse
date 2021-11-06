@@ -107,8 +107,8 @@ class Client extends SSOClientBase {
 	 */
 	public function discourse_sso_alter_user_profile() {
 		$auto_inject_button = $this->discourse_sso_auto_inject_button();
-		$link_text          = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
-		$linked_text        = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
+		$link_text          = ! empty( self::get_text_options( 'link-to-discourse-text' ) ) ? self::get_text_options( 'link-to-discourse-text' ) : '';
+		$linked_text        = ! empty( self::get_text_options( 'linked-to-discourse-text' ) ) ? self::get_text_options( 'linked-to-discourse-text' ) : '';
 		$user               = wp_get_current_user();
 
 		if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {

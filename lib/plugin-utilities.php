@@ -13,6 +13,47 @@ namespace WPDiscourse\Shared;
 trait PluginUtilities {
 
 	/**
+	 * Gets the 'discourse_configurable_text' options.
+	 *
+	 * @param string $option The option key.
+	 *
+	 * @return string
+	 */
+	protected static function get_text_options( $option ) {
+		$text_options = get_option( 'discourse_configurable_text' );
+		$text         = ! empty( $text_options[ $option ] ) ? $text_options[ $option ] : '';
+		return self::apply_text_translations( $text, $option );
+	}
+
+	/**
+	 * Applies translations of configurable text.
+	 *
+	 * @param string $text The text to be translated.
+	 * @param string $option The text option to be translated.
+	 *
+	 * @return string
+	 */
+	protected static function apply_text_translations( $text, $option ) {
+		// See https://wpml.org/wpml-hook/wpml_translate_single_string/.
+		$text = apply_filters( 'wpml_translate_single_string', $text, 'wp-discourse', $option );
+
+		return $text;
+	}
+
+	/**
+	 * Registers translations of configurable text.
+	 *
+	 * @param string $text The text to be translated.
+	 * @param string $option The text option to be translated.
+	 *
+	 * @return void
+	 */
+	 protected static function register_text_translations( $text, $option ) {
+		 // See https://wpml.org/wpml-hook/wpml_register_single_string/.
+		 do_action( 'wpml_register_single_string', 'wp-discourse', $option, $text );
+	 }
+
+	/**
 	 * Returns a single array of options from a given array of arrays.
 	 *
 	 * @return array
