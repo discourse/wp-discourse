@@ -48,28 +48,6 @@ class DiscourseComment extends DiscourseBase {
 	}
 
 	/**
-	 * Setup options.
-	 *
-	 * @param object $extra_options Extra options used for testing.
-	 */
-	public function setup_options( $extra_options = null ) {
-		$this->options = $this->get_options();
-
-		if ( ! empty( $extra_options ) ) {
-			foreach ( $extra_options as $key => $value ) {
-				$this->options[ $key ] = $value;
-			}
-		}
-	}
-
-	/**
-	 * Setup Logger.
-	 */
-	public function setup_logger() {
-		$this->logger = Logger::create( 'comment' );
-	}
-
-	/**
 	 * Enqueues the comment scripts and styles.
 	 *
 	 * Hooks into 'wp_enqueue_scripts'.
