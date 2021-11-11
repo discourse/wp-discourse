@@ -720,7 +720,7 @@ class DiscoursePublish extends DiscourseBase {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param int $post_id The ID of the post in question.
+	 * @param int      $post_id The ID of the post in question.
 	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return bool

@@ -348,7 +348,7 @@ trait PluginUtilities {
 			$opts['body'] = $args['body'];
 		}
 
-		// support relative paths
+		// support relative paths.
 		if ( strpos( $url, '://' ) == false ) {
 			$url = esc_url_raw( $api_credentials['url'] . $url );
 		}
