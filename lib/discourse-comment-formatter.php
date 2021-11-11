@@ -18,11 +18,17 @@ class DiscourseCommentFormatter extends DiscourseBase {
 	use TemplateFunctions;
 
 	/**
-	 * DiscourseCommentFormatter constructor.
+	 * Logger context
 	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'comment_formatter';
+
+	/**
+	 * DiscourseCommentFormatter constructor.
 	 */
 	public function __construct() {
-		$this->logger_context = "comment_formatter";
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 	}
@@ -30,7 +36,8 @@ class DiscourseCommentFormatter extends DiscourseBase {
 	/**
 	 * Formats the Discourse comments for a given post.
 	 *
-	 * @param int $post_id The post_id to retrieve comments for.
+	 * @param int  $post_id The post_id to retrieve comments for.
+	 * @param bool $perform_sync Determines whether sync is performed.
 	 *
 	 * @return string
 	 */
@@ -41,17 +48,17 @@ class DiscourseCommentFormatter extends DiscourseBase {
 		}
 		$options = $this->options;
 
-		$custom = get_post_custom( $post_id );
+		$custom               = get_post_custom( $post_id );
 		$required_post_custom = array( 'discourse_permalink', 'discourse_comments_raw' );
-		$missing_post_custom = array();
+		$missing_post_custom  = array();
 
-		foreach( $required_post_custom as $key ) {
-			if ( empty( $custom[$key] ) ) {
+		foreach ( $required_post_custom as $key ) {
+			if ( empty( $custom[ $key ] ) ) {
 				$missing_post_custom[] = $key;
 			}
 		}
 
-		if ( !empty( $missing_post_custom ) ) {
+		if ( ! empty( $missing_post_custom ) ) {
 			$this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );
 			return wp_kses_post( Templates::bad_response_html() );
 		}

@@ -99,6 +99,17 @@ class SSOSettings {
 			'discourse_sso_common_settings_section'
 		);
 
+		add_settings_field(
+			'discourse_verbose_sso_logs',
+			__( 'Verbose DiscourseConnect Logging', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_sso_logs',
+			),
+			'discourse_sso_common',
+			'discourse_sso_common_settings_section'
+		);
+
 		register_setting(
 			'discourse_sso_common',
 			'discourse_sso_common',
@@ -363,6 +374,24 @@ class SSOSettings {
 				)
 			);
 		}
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_sso_logs checkbox.
+	 */
+	public function verbose_sso_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-sso-logs',
+			'discourse_sso_common',
+			__(
+				'Enable verbose logs for DiscourseConnect.',
+				'wp-discourse'
+			),
+			__(
+				'Will log successful operations as well as errors.',
+				'wp-discourse'
+			)
+		);
 	}
 
 	/**

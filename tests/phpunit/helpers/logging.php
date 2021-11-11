@@ -19,6 +19,9 @@ trait Logging {
   protected function get_last_log() {
       $manager   = new FileManager();
       $log_files = glob( $manager->logs_dir . '/*.log' );
+      if ( empty( $log_files ) ) {
+        return '';
+      }
       $log_file  = $log_files[0];
       return shell_exec( "tail -n 1 $log_file" );
   }

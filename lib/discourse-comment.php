@@ -23,13 +23,21 @@ class DiscourseComment extends DiscourseBase {
 	protected $comment_formatter;
 
 	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'comment';
+
+	/**
 	 * DiscourseComment constructor.
 	 *
 	 * @param \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter $comment_formatter An instance of DiscourseCommentFormatter.
 	 */
 	public function __construct( $comment_formatter ) {
 		$this->comment_formatter = $comment_formatter;
-		$this->logger_context = "comment";
+
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
@@ -180,7 +188,8 @@ class DiscourseComment extends DiscourseBase {
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int $post_id The WordPress post id.
+	 * @param int  $post_id The WordPress post id.
+	 * @param bool $force Force comment sync.
 	 *
 	 * @return null
 	 */
@@ -231,22 +240,22 @@ class DiscourseComment extends DiscourseBase {
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
-					$result = $this->discourse_request( $permalink, array( "raw" => true ) );
+					$result    = $this->discourse_request( $permalink, array( 'raw' => true ) );
 
 					if ( is_wp_error( $result ) ) {
-						$message = $result->get_error_message();
+						$message    = $result->get_error_message();
 						$error_data = $result->get_error_data();
 
 						$log_args = array(
 							'message'            => $message,
 							'discourse_topic_id' => $topic_id,
-							'wp_post_id'				 => $post_id,
-							'http_code'          => $error_data["http_code"]
+							'wp_post_id'         => $post_id,
+							'http_code'          => $error_data['http_code'],
 						);
 						$this->logger->error( 'sync_comments.response_error', $log_args );
 					} else {
 						$raw_body = $result['body'];
-						$json = json_decode( $raw_body );
+						$json     = json_decode( $raw_body );
 
 						if ( isset( $json->filtered_posts_count ) ) {
 							$posts_count = $json->filtered_posts_count - 1;
@@ -268,6 +277,10 @@ class DiscourseComment extends DiscourseBase {
 							if ( isset( $topic_id ) ) {
 								// Delete the cached html.
 								delete_transient( "wpdc_comment_html_{$topic_id}" );
+							}
+
+							if ( ! empty( $this->options['verbose-comment-logs'] ) ) {
+								$this->logger->info( 'sync_comments.success', array( 'post_id' => $post_id ) );
 							}
 						}
 					}

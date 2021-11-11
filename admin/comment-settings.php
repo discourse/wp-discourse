@@ -233,6 +233,17 @@ class CommentSettings {
 			'discourse_commenting_settings_section'
 		);
 
+		add_settings_field(
+			'discourse_verbose_comment_logs',
+			__( 'Verbose Comment Logging', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_comment_logs',
+			),
+			'discourse_comment',
+			'discourse_commenting_settings_section'
+		);
+
 		register_setting(
 			'discourse_comment',
 			'discourse_comment',
@@ -301,6 +312,24 @@ class CommentSettings {
 				'wp-discourse'
 			),
 			__( 'Only enabled for a single request.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_comment_logs checkbox.
+	 */
+	public function verbose_comment_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-comment-logs',
+			'discourse_comment',
+			__(
+				'Enable verbose logs for comments.',
+				'wp-discourse'
+			),
+			__(
+				'Will log successful operations as well as errors.',
+				'wp-discourse'
+			)
 		);
 	}
 

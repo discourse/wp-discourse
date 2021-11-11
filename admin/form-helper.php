@@ -329,9 +329,9 @@ class FormHelper {
 		// Only check the connection status on the main settings tab.
 		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 			$connection_status = $this->check_connection_status();
-			if ( 0 === $connection_status || is_wp_error( $connection_status ) ) {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 
+			if ( is_wp_error( $connection_status ) || empty( $connection_status ) || 0 === $connection_status ) {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'connected' ) );
 			}

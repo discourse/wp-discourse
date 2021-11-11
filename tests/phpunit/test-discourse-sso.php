@@ -9,7 +9,6 @@ namespace WPDiscourse\Test;
 
 use \WPDiscourse\DiscourseSSO\DiscourseSSO;
 use \WPDiscourse\Test\UnitTest;
-use \WPDiscourse\Shared\Utilities;
 
 /**
  * DiscourseSSO test case.
@@ -23,6 +22,7 @@ class DiscourseSSOTest extends UnitTest {
     $this->signature = hash_hmac( 'sha256', $this->payload, $this->secret );
 
     self::$plugin_options['sso-secret'] = $this->secret;
+    
     $this->discourse_sso = \Mockery::mock(DiscourseSSO::class)->makePartial();
     $this->discourse_sso->shouldReceive('redirect_to')->andReturnArg(0);
     $this->discourse_sso->setup_options( array_merge( self::$plugin_options, array( 'enable-sso' => true ) ) );
