@@ -712,7 +712,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
 							__( 'To connect with Discourse, you need to supply the Discourse URL, API Key, and Publishing Username.', 'wp-discourse' ) .
 							'</p></div>';
-			} elseif ( ! $this->check_connection_status() ) {
+			} elseif ( empty( $this->check_connection_status() ) ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 							__( 'You are not connected to Discourse. Check that your connection settings are correct.', 'wp-discourse' ) .
 							'</p></div>';

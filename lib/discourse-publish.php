@@ -27,6 +27,14 @@ class DiscoursePublish extends DiscourseBase {
 	protected $email_notifier;
 
 	/**
+     * Logger context
+     *
+     * @access protected
+     * @var string
+     */
+  protected $logger_context = 'publish';
+
+	/**
 	 * Instance store for log args
 	 *
 	 * @access protected
@@ -42,7 +50,6 @@ class DiscoursePublish extends DiscourseBase {
 	 */
 	public function __construct( $email_notifier, $register_actions = true ) {
 		$this->email_notifier = $email_notifier;
-		$this->logger_context = "publish";
 
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );

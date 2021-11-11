@@ -127,6 +127,7 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_custom_datetime_format', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_only_show_moderator_liked', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_display_subcategories', array( $this, 'validate_checkbox' ) );
+		add_filter( 'wpdc_validate_discourse_verbose_comment_logs', array( $this, 'validate_checkbox' ) );
 
 		add_filter( 'wpdc_validate_discourse_link_text', array( $this, 'validate_text_input' ) );
 		add_filter( 'wpdc_validate_start_discussion_text', array( $this, 'validate_text_input' ) );
@@ -151,7 +152,9 @@ class SettingsValidator {
 		add_filter( 'wpdc_validate_use_discourse_user_webhook', array( $this, 'validate_use_discourse_user_webhook' ) );
 		add_filter( 'wpdc_validate_webhook_match_user_email', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_webhook_secret', array( $this, 'validate_webhook_secret' ) );
+		add_filter( 'wpdc_validate_discourse_verbose_webhook_logs', array( $this, 'validate_checkbox' ) );
 
+		add_filter( 'wpdc_validate_discourse_verbose_sso_logs', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_sso_client_enabled', array( $this, 'validate_sso_client_enabled' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_change', array( $this, 'validate_checkbox' ) );
 		add_filter( 'wpdc_validate_sso_client_login_form_redirect', array( $this, 'validate_sso_client_login_form_redirect' ) );

@@ -14,12 +14,18 @@ use \WPDiscourse\SSO\SSO;
  * Class DiscourseSSO
  */
 class DiscourseSSO extends DiscourseBase {
+	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'sso_provider';
 
 	/**
 	 * DiscourseSSO constructor.
 	 */
 	public function __construct() {
-		$this->logger_context = "sso_provider";
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'query_vars', array( $this, 'sso_add_query_vars' ) );
@@ -131,7 +137,7 @@ class DiscourseSSO extends DiscourseBase {
 			// Not logged in to WordPress, redirect to WordPress login page with redirect back to here.
 			if ( ! is_user_logged_in() ) {
 				$redirect = add_query_arg( $payload, $sig );
-				$login = wp_login_url( esc_url_raw( $redirect ) );
+				$login    = wp_login_url( esc_url_raw( $redirect ) );
 
 				do_action( 'wpdc_sso_before_login_redirect', $redirect, $login );
 
@@ -154,6 +160,10 @@ class DiscourseSSO extends DiscourseBase {
 				}
 
 				do_action( 'wpdc_sso_provider_before_sso_redirect', $current_user->ID, $current_user );
+
+				if ( ! empty( $this->options['verbose-sso-logs'] ) ) {
+					$this->logger->info( 'parse_request.success', array( 'user_id' => $current_user->ID ) );
+				}
 
 				return $this->redirect_to( $this->options['url'] . '/session/sso_login?' . $q );
 			}
@@ -189,8 +199,8 @@ class DiscourseSSO extends DiscourseBase {
 				return $this->handle_error(
 					'logout.discourse_user',
 					array(
-						"message" => 'The Discourse user_id could not be returned when trying to logout the user.',
-						"user_id" => $user_id
+						'message' => 'The Discourse user_id could not be returned when trying to logout the user.',
+						'user_id' => $user_id,
 					)
 				);
 			}
@@ -199,16 +209,16 @@ class DiscourseSSO extends DiscourseBase {
 			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
 		}
 
-		$path   = "/admin/users/$discourse_user_id/log_out";
+		$path     = "/admin/users/$discourse_user_id/log_out";
 		$response = $this->discourse_request( $path, array( 'type' => 'post' ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $this->handle_error(
 				'logout.response_error',
 				array(
-					"message" => 'There was an error in logging out the user from Discourse.',
-					"user_id" => $user_id,
-					"discourse_user_id" => $discourse_user_id
+					'message'           => 'There was an error in logging out the user from Discourse.',
+					'user_id'           => $user_id,
+					'discourse_user_id' => $discourse_user_id,
 				)
 			);
 		} else {
@@ -221,7 +231,13 @@ class DiscourseSSO extends DiscourseBase {
 	 */
 	protected function handle_logout_request() {
 		if ( isset( $_GET['request'] ) && 'logout' === $_GET['request'] ) { // Input var okay.
+			$user_id = get_current_user_id();
 			wp_logout();
+
+			if ( $user_id && ! empty( $this->options['verbose-sso-logs'] ) ) {
+				$this->logger->info( 'handle_logout_request.success', array( 'user_id' => $user_id ) );
+			}
+
 			$this->redirect_to( $this->options['url'] );
 		}
 	}
@@ -230,18 +246,18 @@ class DiscourseSSO extends DiscourseBase {
 	 * Handle sso_provider errors
 	 *
 	 * @param string $type Error type.
-	 * @param string $messge Error message.
+	 * @param array  $args Error args.
 	 */
 	protected function handle_error( $type, $args = array() ) {
 		$this->logger->error( $type, $args );
-		return new \WP_Error( $type, isset( $args['message'] ) ? $args['message'] : "SSO error" );
+		return new \WP_Error( $type, isset( $args['message'] ) ? $args['message'] : 'SSO error' );
 	}
 
   /**
-	 * Handle redirects
-	 *
-	 * @param string $url Url to redirect to.
-	 */
+   * Handle redirects
+   *
+   * @param string $url Url to redirect to.
+   */
 	public function redirect_to( $url ) {
 		wp_safe_redirect( esc_url_raw( $url ) );
 		exit;

@@ -9,6 +9,11 @@ namespace WPDiscourse\Utilities;
 
 use WPDiscourse\Shared\PluginUtilities;
 
+/**
+ * Class PublicPluginUtilities
+ *
+ * @package WPDiscourse
+ */
 class PublicPluginUtilities {
 	use PluginUtilities {
 		get_options as public;
@@ -22,7 +27,7 @@ class PublicPluginUtilities {
 		get_sso_params as public;
 		verify_discourse_webhook_request as public;
 	}
-};
+}
 
 /**
  * Class Utilities
@@ -112,9 +117,8 @@ class Utilities {
 	/**
 	 * Public static alias for discourse_request.
 	 *
-	 * @param string $path Discourse request path.
-	 * @param array $body Request body.
-	 * @param string $type Request type.
+	 * @param string $path Request path.
+	 * @param array  $args Request args.
 	 *
 	 * @return array|\WP_Error|void
 	 */
@@ -178,7 +182,12 @@ class Utilities {
 			'approved' => 'true',
 		);
 
-		$user_data = static::discourse_request( $create_user_url, array( 'body' => $body, 'type' => 'post' ) );
+		$user_data = static::discourse_request(
+             $create_user_url, array(
+				 'body' => $body,
+				 'type' => 'post',
+			 )
+            );
 
 		if ( is_wp_error( $user_data ) ) {
 			return $user_data;
@@ -345,7 +354,7 @@ class Utilities {
 						 $raw_groups,
 						function( $result, $group ) {
 			if ( empty( $group->automatic ) ) {
-					$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
+									$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
 			}
 			return $result;
 		},
@@ -370,21 +379,21 @@ class Utilities {
 					switch ( $schema[ $key ] ) {
 						case 'int':
 												$result->{$key} = intval( $value );
-														break;
+                            break;
 						case 'bool':
 												$result->{$key} = true == $value;
-														break;
+                            break;
 						case 'text':
 												$result->{$key} = sanitize_text_field( $value );
-														break;
+                            break;
 						case 'textarea':
 												$result->{$key} = sanitize_textarea_field( $value );
-														break;
+                            break;
 						case 'html':
 												$result->{$key} = $value;
-														break;
+                            break;
 						default:
-														break;
+                            break;
 					}
 				} else {
 					$result->{$key} = null;

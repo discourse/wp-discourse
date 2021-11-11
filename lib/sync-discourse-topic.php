@@ -26,10 +26,17 @@ class SyncDiscourseTopic extends DiscourseBase {
 	protected $db_version = '1.0';
 
 	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'webhook_topic';
+
+	/**
 	 * SyncDiscourseTopic constructor.
 	 */
 	public function __construct() {
-		$this->logger_context = "sync_topic";
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
@@ -46,11 +53,11 @@ class SyncDiscourseTopic extends DiscourseBase {
 				'update-topic-content',
 				array(
 					array(
-						'methods'  => \WP_REST_Server::CREATABLE,
+						'methods'             => \WP_REST_Server::CREATABLE,
 						'permission_callback' => function() {
 							return true;
 						},
-						'callback' => array( $this, 'update_topic_content' ),
+						'callback'            => array( $this, 'update_topic_content' ),
 					),
 				)
 			);
@@ -69,8 +76,8 @@ class SyncDiscourseTopic extends DiscourseBase {
 		$data = $this->verify_discourse_webhook_request( $data );
 
 		if ( is_wp_error( $data ) ) {
-
-			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse webhook.', 'wp-discourse' ) );
+			$this->logger->error( 'update_topic_content.webhook_verification_error', array( 'message', $data->get_error_message() ) );
+			return $data;
 		}
 
 		$json = $data->get_json_params();
@@ -95,6 +102,8 @@ class SyncDiscourseTopic extends DiscourseBase {
 			} else {
 				$this->update_post_metadata( $post_data );
 			}
+		} else {
+			$this->logger->error( 'update_topic_content.response_body_error' );
 		}
 
 		return null;
@@ -184,6 +193,10 @@ class SyncDiscourseTopic extends DiscourseBase {
 					if ( ! empty( $unlisted ) && $comments_count > 0 && 1 === $post_type ) {
 						$this->list_topic( $post_id, $topic_id );
 					}
+				}
+
+				if ( ! empty( $this->options['verbose-webhook-logs'] ) ) {
+					$this->logger->info( 'update_topic_content.update_post_metadata_success', array( 'post_ids' => implode( ',', $post_ids ) ) );
 				}
 			}
 		}

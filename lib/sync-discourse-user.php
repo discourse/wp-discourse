@@ -13,12 +13,18 @@ use WPDiscourse\DiscourseBase;
  * Class SyncDiscourseUser
  */
 class SyncDiscourseUser extends DiscourseBase {
+	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'webhook_user';
 
 	/**
-	 * DiscourseUser constructor.
+	 * SyncDiscourseUser constructor.
 	 */
 	public function __construct() {
-		$this->logger_context = "sync_user";
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_user_route' ) );
@@ -66,8 +72,8 @@ class SyncDiscourseUser extends DiscourseBase {
 		// This function call is used to verify the request. For clarity, the permission callback should be updated to call this function.
 		$data = $this->verify_discourse_webhook_request( $data );
 		if ( is_wp_error( $data ) ) {
-
-			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse User webhook.', 'wp-discourse' ) );
+			$this->logger->error( 'update_user.webhook_verification_error', array( 'message', $data->get_error_message() ) );
+			return $data;
 		}
 
 		$event_type   = $data->get_header( 'x_discourse_event_type' );
@@ -120,8 +126,18 @@ class SyncDiscourseUser extends DiscourseBase {
 
 				$user_id = $wordpress_user->ID;
 				$this->update_user_data( $user_id, $discourse_user );
+			} else {
+				$log_args = array(
+					'event_type'   => $event_type,
+					'event_action' => $event_action,
+					'discourse_id' => $discourse_id,
+					'external_id'  => $external_id,
+				);
+				$this->logger->warn( 'update_user.user_not_found', $log_args );
 			}
-		}// End if().
+		} else {
+			$this->logger->error( 'update_user.response_body_error' );
+		}
 
 		return null;
 	}
@@ -139,5 +155,13 @@ class SyncDiscourseUser extends DiscourseBase {
 		update_user_meta( $user_id, 'discourse_username', $discourse_username );
 		// The unique flag is important here.
 		add_user_meta( $user_id, 'discourse_sso_user_id', $discourse_id, true );
+
+		if ( ! empty( $this->options['verbose-webhook-logs'] ) ) {
+			$log_args = array(
+				'user_id'           => $user_id,
+				'discourse_user_id' => $discourse_id,
+			);
+			$this->logger->info( 'update_user.update_user_data_success', $log_args );
+		}
 	}
 }

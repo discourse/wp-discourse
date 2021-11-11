@@ -7,36 +7,28 @@
 
 namespace WPDiscourse\SSOClient;
 
-use \WPDiscourse\Shared\PluginUtilities;
+use WPDiscourse\DiscourseBase;
 
 /**
  * Class QueryRedirect
  */
-class QueryRedirect {
-	use PluginUtilities;
-
+class QueryRedirect extends DiscourseBase {
 	/**
-	 * Gives access to the plugin options.
+	 * Logger context
 	 *
 	 * @access protected
-	 * @var mixed|void
+	 * @var string
 	 */
-	protected $options;
+	protected $logger_context = 'query_redirect';
 
 	/**
-	 * QueryRedirect constructor.
+	 * Constructor
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'query_vars', array( $this, 'discourse_sso_custom_query_vars' ) );
 		add_action( 'parse_query', array( $this, 'discourse_sso_url_redirect' ) );
-	}
-
-	/**
-	 * Setup options.
-	 */
-	public function setup_options() {
-		$this->options = $this->get_options();
 	}
 
 	/**
