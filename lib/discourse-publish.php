@@ -789,30 +789,6 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
-	 *
-	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
-	 *
-	 * @param int $topic_id The topic_id to save to the database.
-	 * @param int $blog_id The blog_id to save to the database.
-	 */
-	protected function save_topic_blog_id( $topic_id, $blog_id ) {
-		global $wpdb;
-		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$wpdb->insert(
-			$table_name,
-			array(
-				'topic_id' => $topic_id,
-				'blog_id'  => $blog_id,
-			),
-			array(
-				'%d',
-				'%d',
-			)
-		); // db call whitelist.
-	}
-
-	/**
 	 * Checks if a given topic_id already exists in the wpdc_topic_blog table.
 	 *
 	 * Only used for multisite installations.

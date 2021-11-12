@@ -4,28 +4,15 @@
  *
  * @package WPDiscourse
  */
+ 
+use WPDiscourse\Test\Multisite;
+use WPDiscourse\Test\DiscoursePublishTest;
 
 /**
  * DiscoursePublishMultisite test case.
  */
 class DiscoursePublishMultisiteTest extends DiscoursePublishTest {
-
-    /**
-     * Setup multisite tests
-     */
-    public function setUp() {
-        parent::setUp();
-        $this->create_topic_blog_table();
-    }
-
-
-    /**
-     * Teardown multisite tests
-     */
-    public function tearDown() {
-        parent::tearDown();
-        $this->clear_topic_blog_table();
-    }
+  use Multisite;
 
     /**
      * Sync_to_discourse handles new posts correctly in multisite
@@ -51,35 +38,5 @@ class DiscoursePublishMultisiteTest extends DiscoursePublishTest {
 
         // cleanup.
         wp_delete_post( $post_id );
-    }
-
-    /**
-     * Create topic_blog_table if it doesn't exist.
-     */
-    protected function create_topic_blog_table() {
-        global $wpdb;
-
-        $table = $wpdb->base_prefix . 'wpdc_topic_blog';
-        $sql   = sprintf(
-            'CREATE TABLE %s (
-              topic_id mediumint(9) NOT NULL,
-              blog_id mediumint(9) NOT NULL,
-              PRIMARY KEY  (topic_id)
-            ) %s;',
-            $table,
-            $wpdb->get_charset_collate()
-        );
-
-        require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-        maybe_create_table( $table, $sql );
-    }
-
-    /**
-     * Clear topic_blog_table
-     */
-    protected function clear_topic_blog_table() {
-        global $wpdb;
-        $table  = $wpdb->base_prefix . 'wpdc_topic_blog';
-        $result = $wpdb->query( "TRUNCATE TABLE $table" );
     }
 }

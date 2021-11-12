@@ -516,4 +516,28 @@ trait PluginUtilities {
 
 		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
 	}
+
+	/**
+	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
+	 *
+	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
+	 *
+	 * @param int $topic_id The topic_id to save to the database.
+	 * @param int $blog_id The blog_id to save to the database.
+	 */
+	public function save_topic_blog_id( $topic_id, $blog_id ) {
+		global $wpdb;
+		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
+		$wpdb->insert(
+			$table_name,
+			array(
+				'topic_id' => $topic_id,
+				'blog_id'  => $blog_id,
+			),
+			array(
+				'%d',
+				'%d',
+			)
+		); // db call whitelist.
+	}
 }

@@ -18,6 +18,7 @@
 	<filter>
 	  <whitelist processUncoveredFilesFromWhitelist="true">
 			<file>lib/discourse-publish.php</file>
+			<file>lib/sync-discourse-topic.php</file>
 	  </whitelist>
 	</filter>
 </phpunit>

@@ -33,4 +33,5 @@ require $_tests_dir . '/includes/bootstrap.php';
 require __DIR__ . '/../../vendor/autoload.php';
 require __DIR__ . '/helpers/logging.php';
 require __DIR__ . '/helpers/remote_post.php';
+require __DIR__ . '/helpers/multisite.php';
 require __DIR__ . '/unit-test.php';
