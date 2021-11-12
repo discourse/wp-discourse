@@ -35,7 +35,7 @@ jobs:
         if: "${{ matrix.sniff || matrix.test }}"
         uses: ramsey/composer-install@v1
         with:
-          dependency-versions: "lowest"
+          dependency-versions: "highest"
           composer-options: "--ignore-platform-reqs"
       - name: Install PHPEnv
         if: "${{ matrix.sniff || matrix.test }}"
