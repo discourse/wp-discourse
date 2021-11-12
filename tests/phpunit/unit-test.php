@@ -57,7 +57,7 @@ class UnitTest extends \WP_UnitTestCase {
   }
 
   /**
-   * Teardown each test.
+   * Setup each test.
    */
   public function setUp() {
 	}

@@ -26,7 +26,7 @@ class FileManagerTest extends UnitTest {
 		 * Teardown test class.
 		 */
 		public function tearDown() {
-				parent::setUp();
+				parent::tearDown();
 				static::reset_permissions();
 		}
 

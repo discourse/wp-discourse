@@ -33,6 +33,8 @@ class DiscourseSSOTest extends UnitTest {
   }
 
   public function tearDown() {
+    parent::tearDown();
+
     $_GET['request'] = null;
     delete_user_meta( $this->user_id, 'discourse_sso_user_id', true );
   }
