@@ -7,6 +7,8 @@
 
 namespace WPDiscourse\Shared;
 
+use WPDiscourse\Logs\Logger;
+
 /**
  * Trait PluginUtilities
  */
@@ -49,8 +51,8 @@ trait PluginUtilities {
 	 * @return void
 	 */
 	 protected static function register_text_translations( $text, $option ) {
-		 // See https://wpml.org/wpml-hook/wpml_register_single_string/.
-		 do_action( 'wpml_register_single_string', 'wp-discourse', $option, $text );
+		// See https://wpml.org/wpml-hook/wpml_register_single_string/.
+		do_action( 'wpml_register_single_string', 'wp-discourse', $option, $text );
 	 }
 
 	/**
@@ -90,13 +92,42 @@ trait PluginUtilities {
 	 * @return int|\WP_Error
 	 */
 	public function check_connection_status() {
+		$logger          = Logger::create( 'connection' );
+		$options         = isset( $this->options ) ? $this->options : $this->get_options();
 		$api_credentials = $this->get_api_credentials();
+
 		if ( is_wp_error( $api_credentials ) ) {
-			return $api_credentials;
+			if ( $options['verbose-connection-logs'] ) {
+				$logger->info( 'check_connection_status.invalid_api_credentials' );
+			}
+			return false;
 		}
 
 		$path = "/users/{$api_credentials['api_username']}.json";
 		$body = $this->discourse_request( $path );
+
+		if ( $options['verbose-connection-logs'] ) {
+			$log_args = array();
+
+			if ( is_wp_error( $body ) ) {
+				$error_code = $body->get_error_code();
+				$error_data = $body->get_error_data();
+				$log_type   = 'failed_to_connect';
+
+				if ( isset( $error_data['http_code'] ) ) {
+					$log_args['http_code'] = $error_data['http_code'];
+				}
+				if ( isset( $error_data['http_body'] ) ) {
+					$log_args['http_body'] = $error_data['http_body'];
+				}
+			} else {
+				$log_type = 'successful_connection';
+
+			}
+
+			$logger->info( "check_connection_status.$log_type", $log_args );
+		}
+
 		return ! is_wp_error( $body );
 	}
 
@@ -363,6 +394,7 @@ trait PluginUtilities {
 				'An invalid response was returned from Discourse',
 				array(
 					'http_code' => wp_remote_retrieve_response_code( $response ),
+					'http_body' => wp_remote_retrieve_body( $response ),
 				)
 			);
 		}
