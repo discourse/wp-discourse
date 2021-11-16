@@ -125,7 +125,7 @@ class WebhookSettings {
 
 			add_settings_field(
 				'discourse_verbose_webhook_logs',
-				__( 'Verbose Webhook Logging', 'wp-discourse' ),
+				__( 'Verbose Webhook Logs', 'wp-discourse' ),
 				array(
 					$this,
 					'verbose_webhook_logs',
@@ -300,10 +300,7 @@ This setting will only be activated if your site is functioning as the Discourse
 				'Enable verbose logs for webhooks.',
 				'wp-discourse'
 			),
-			__(
-				'Will log successful syncs as well as errors.',
-				'wp-discourse'
-			)
+			__( 'Will log successful syncs as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 

@@ -235,7 +235,7 @@ class CommentSettings {
 
 		add_settings_field(
 			'discourse_verbose_comment_logs',
-			__( 'Verbose Comment Logging', 'wp-discourse' ),
+			__( 'Verbose Comment Logs', 'wp-discourse' ),
 			array(
 				$this,
 				'verbose_comment_logs',
@@ -326,10 +326,7 @@ class CommentSettings {
 				'Enable verbose logs for comments.',
 				'wp-discourse'
 			),
-			__(
-				'Will log successful operations as well as errors.',
-				'wp-discourse'
-			)
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 

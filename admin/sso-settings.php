@@ -101,7 +101,7 @@ class SSOSettings {
 
 		add_settings_field(
 			'discourse_verbose_sso_logs',
-			__( 'Verbose DiscourseConnect Logging', 'wp-discourse' ),
+			__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
 			array(
 				$this,
 				'verbose_sso_logs',
@@ -387,10 +387,7 @@ class SSOSettings {
 				'Enable verbose logs for DiscourseConnect.',
 				'wp-discourse'
 			),
-			__(
-				'Will log successful operations as well as errors.',
-				'wp-discourse'
-			)
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 

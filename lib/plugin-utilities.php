@@ -97,7 +97,7 @@ trait PluginUtilities {
 		$api_credentials = $this->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {
-			if ( $options['verbose-connection-logs'] ) {
+			if ( ! empty( $options['connection-logs'] ) ) {
 				$logger->info( 'check_connection_status.invalid_api_credentials' );
 			}
 			return false;
@@ -106,7 +106,7 @@ trait PluginUtilities {
 		$path = "/users/{$api_credentials['api_username']}.json";
 		$body = $this->discourse_request( $path );
 
-		if ( $options['verbose-connection-logs'] ) {
+		if ( ! empty( $options['connection-logs'] ) ) {
 			$log_args = array();
 
 			if ( is_wp_error( $body ) ) {
@@ -380,7 +380,7 @@ trait PluginUtilities {
 		}
 
 		// support relative paths.
-		if ( strpos( $url, '://' ) == false ) {
+		if ( strpos( $url, '://' ) === false ) {
 			$url = esc_url_raw( $api_credentials['url'] . $url );
 		}
 

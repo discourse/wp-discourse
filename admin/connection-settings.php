@@ -102,11 +102,11 @@ class ConnectionSettings {
 			);
 
 			add_settings_field(
-				'discourse_verbose_connection_logs',
-				__( 'Verbose Connection Logging', 'wp-discourse' ),
+				'discourse_connection_logs',
+				__( 'Connection Logs', 'wp-discourse' ),
 				array(
 					$this,
-					'verbose_connection_logs',
+					'connection_logs',
 				),
 				'discourse_connect',
 				'discourse_connection_settings_section'
@@ -175,18 +175,15 @@ class ConnectionSettings {
 	/**
 	 * Outputs markup for the discourse_verbose_connection_logs checkbox.
 	 */
-	public function verbose_connection_logs() {
+	public function connection_logs() {
 		$this->form_helper->checkbox_input(
-			'verbose-connection-logs',
+			'connection-logs',
 			'discourse_connect',
 			__(
-				'Enable verbose connection logs.',
+				'Enable connection logs.',
 				'wp-discourse'
 			),
-			__(
-				'Will log successful connections as well as errors.',
-				'wp-discourse'
-			)
+			__( 'Log attempts to check the connection with Discourse.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 
