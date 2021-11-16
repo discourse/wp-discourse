@@ -88,6 +88,17 @@ class NetworkOptions {
 		);
 
 		add_settings_field(
+			'discourse_network_connection_logs',
+			__( 'Connection Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'connection_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_network_use_discourse_webhook',
 			__( 'Sync Comment Data', 'wp-discourse' ),
 			array(
@@ -143,11 +154,44 @@ class NetworkOptions {
 		);
 
 		add_settings_field(
+			'discourse_network_verbose_webhook_logs',
+			__( 'Verbose Webhook Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_webhook_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_network_hide_name_field',
 			__( 'Do Not Display Discourse Name Field', 'wp-discourse' ),
 			array(
 				$this,
 				'hide_discourse_name_field_checkbox',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_network_verbose_publication_logs',
+			__( 'Verbose Publication Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_publication_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_network_verbose_comment_logs',
+			__( 'Verbose Comment Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_comment_logs',
 			),
 			'discourse_network_options',
 			'discourse_network_settings_section'
@@ -181,6 +225,17 @@ class NetworkOptions {
 			array(
 				$this,
 				'sso_secret_input',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_network_verbose_sso_logs',
+			__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_sso_logs',
 			),
 			'discourse_network_options',
 			'discourse_network_settings_section'
@@ -278,6 +333,20 @@ class NetworkOptions {
 			null,
 			null,
 			'system'
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_connection_logs checkbox.
+	 */
+	public function connection_logs() {
+		$this->checkbox_input(
+			'connection-logs',
+			__(
+				'Enable connection logs.',
+				'wp-discourse'
+			),
+			__( 'Log attempts to check the connection with Discourse.', 'wp-discourse' )
 		);
 		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
@@ -418,6 +487,20 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		);
 
 		$this->input( 'webhook-secret', $description );
+	}
+
+	/**
+	 * Outputs markup for the verbose-webhook-logs checkbox.
+	 */
+	public function verbose_webhook_logs() {
+		$this->checkbox_input(
+			'verbose-webhook-logs',
+			__(
+				'Enable verbose logs for webhooks.',
+				'wp-discourse'
+			),
+			__( 'Will log successful syncs as well as errors.', 'wp-discourse' )
+		);
 		$this->next_setting_heading( __( 'Publishing Settings', 'wp-discourse' ) );
 	}
 
@@ -444,6 +527,41 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
         uneditable on WordPress.',
 				'wp-discourse'
 			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the verbose-publication-logs checkbox.
+	 */
+	public function verbose_publication_logs() {
+		$this->checkbox_input(
+			'verbose-publication-logs',
+			__(
+				'Enable verbose logs for publication.',
+				'wp-discourse'
+			),
+			__( 'Will log successful publications as well as errors.', 'wp-discourse' )
+		);
+		$this->next_setting_heading( __( 'Comment Settings', 'wp-discourse' ) );
+	}
+
+	/**
+	 * ***********************
+	 *
+	 * Comment Settings Fields.
+	 **************************/
+
+	/**
+	 * Outputs markup for the verbose-comment-logs checkbox.
+	 */
+	public function verbose_comment_logs() {
+		$this->checkbox_input(
+			'verbose-comment-logs',
+			__(
+				'Enable verbose logs for comments.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' )
 		);
 		$this->next_setting_heading( __( 'DiscourseConnect Settings', 'wp-discourse' ) );
 	}
@@ -507,6 +625,20 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			$discourse_sso_url
 		);
 		$this->input( 'sso-secret', $description );
+	}
+
+	/**
+	 * Outputs markup for the verbose-sso-logs checkbox.
+	 */
+	public function verbose_sso_logs() {
+		$this->checkbox_input(
+			'verbose-sso-logs',
+			__(
+				'Enable verbose logs for DiscourseConnect.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' )
+		);
 	}
 
 	/**

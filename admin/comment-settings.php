@@ -46,7 +46,9 @@ class CommentSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_comment_settings() {
-		$this->options = $this->get_options();
+		$this->options                = $this->get_options();
+		$use_network_comment_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+
 		add_settings_section(
 			'discourse_commenting_settings_section',
 			__( 'Comment Settings', 'wp-discourse' ),
@@ -233,16 +235,18 @@ class CommentSettings {
 			'discourse_commenting_settings_section'
 		);
 
-		add_settings_field(
-			'discourse_verbose_comment_logs',
-			__( 'Verbose Comment Logs', 'wp-discourse' ),
-			array(
-				$this,
-				'verbose_comment_logs',
-			),
-			'discourse_comment',
-			'discourse_commenting_settings_section'
-		);
+		if ( ! $use_network_comment_settings ) {
+			add_settings_field(
+				'discourse_verbose_comment_logs',
+				__( 'Verbose Comment Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_comment_logs',
+				),
+				'discourse_comment',
+				'discourse_commenting_settings_section'
+			);
+		}
 
 		register_setting(
 			'discourse_comment',

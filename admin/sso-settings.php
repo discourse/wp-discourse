@@ -99,16 +99,18 @@ class SSOSettings {
 			'discourse_sso_common_settings_section'
 		);
 
-		add_settings_field(
-			'discourse_verbose_sso_logs',
-			__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
-			array(
-				$this,
-				'verbose_sso_logs',
-			),
-			'discourse_sso_common',
-			'discourse_sso_common_settings_section'
-		);
+		if ( ! $this->use_network_sso_settings ) {
+			add_settings_field(
+				'discourse_verbose_sso_logs',
+				__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_sso_logs',
+				),
+				'discourse_sso_common',
+				'discourse_sso_common_settings_section'
+			);
+		}
 
 		register_setting(
 			'discourse_sso_common',
