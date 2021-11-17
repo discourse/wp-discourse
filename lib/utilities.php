@@ -152,7 +152,7 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
-		$utils = new PublicPluginUtilities();
+		$utils           = new PublicPluginUtilities();
 		$api_credentials = $utils->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {
