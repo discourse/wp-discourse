@@ -71,12 +71,13 @@ class Utilities {
 	 * Public static alias for sync_sso.
 	 *
 	 * @param array $sso_params The sso params to sync.
+	 * @param int   $user_id The WordPress user's ID.
 	 *
 	 * @return int|string|\WP_Error
 	 */
-	public static function sync_sso_record( $sso_params ) {
+	public static function sync_sso_record( $sso_params, $user_id = null ) {
 		$utils = new PublicPluginUtilities();
-		return $utils->sync_sso( $sso_params );
+		return $utils->sync_sso( $sso_params, $user_id );
 	}
 
 	/**
@@ -102,16 +103,6 @@ class Utilities {
 	public static function get_discourse_user_by_email( $email ) {
 		$utils = new PublicPluginUtilities();
 		return $utils->get_discourse_user_by_email( $email );
-	}
-
-	/**
-	 * Public static alias for get_api_credentials.
-	 *
-	 * @return array|\WP_Error
-	 */
-	protected static function get_api_credentials() {
-		$utils = new PublicPluginUtilities();
-		return $utils->get_api_credentials();
 	}
 
 	/**
@@ -161,9 +152,14 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
+		$utils = new PublicPluginUtilities();
+		$api_credentials = $utils->get_api_credentials();
+
+		if ( is_wp_error( $api_credentials ) ) {
+			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		}
 
 		if ( empty( $user ) || empty( $user->ID ) || is_wp_error( $user ) ) {
-
 			return new \WP_Error( 'wpdc_user_not_set_error', 'The Discourse user you are attempting to create does not exist on WordPress.' );
 		}
 

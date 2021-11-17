@@ -61,24 +61,22 @@ trait PluginUtilities {
 	 * @return array
 	 */
 	protected function get_options() {
-		static $options = array();
+		$options = array();
 
-		if ( empty( $options ) ) {
-			$discourse_option_groups = get_option( 'discourse_option_groups' );
-			if ( $discourse_option_groups ) {
-				foreach ( $discourse_option_groups as $option_name ) {
-					if ( get_option( $option_name ) ) {
-						$option  = get_option( $option_name );
-						$options = array_merge( $options, $option );
-					}
+		$discourse_option_groups = get_option( 'discourse_option_groups' );
+		if ( $discourse_option_groups ) {
+			foreach ( $discourse_option_groups as $option_name ) {
+				if ( get_option( $option_name ) ) {
+					$option  = get_option( $option_name );
+					$options = array_merge( $options, $option );
 				}
+			}
 
-				$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
-				if ( 1 === intval( $multisite_configuration_enabled ) ) {
-					$site_options = get_site_option( 'wpdc_site_options' );
-					foreach ( $site_options as $key => $value ) {
-						$options[ $key ] = $value;
-					}
+			$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
+			if ( 1 === intval( $multisite_configuration_enabled ) ) {
+				$site_options = get_site_option( 'wpdc_site_options' );
+				foreach ( $site_options as $key => $value ) {
+					$options[ $key ] = $value;
 				}
 			}
 		}
@@ -317,13 +315,13 @@ trait PluginUtilities {
 	 * @return int|string|\WP_Error
 	 */
 	protected function sync_sso( $sso_params, $user_id = null ) {
-		$plugin_options = $this->options;
-		if ( empty( $plugin_options['enable-sso'] ) ) {
-			return handle_error( 'sso_error', 'The sync_sso_record function can only be used when DiscourseConnect is enabled.' );
+		$options = isset( $this->options ) ? $this->options : $this->get_options();
+		if ( empty( $options['enable-sso'] ) ) {
+			return new \WP_Error( 'sso_error', 'The sync_sso_record function can only be used when DiscourseConnect is enabled.' );
 		}
 
 		$path          = '/admin/users/sync_sso';
-		$sso_secret    = $plugin_options['sso-secret'];
+		$sso_secret    = $options['sso-secret'];
 		$sso_payload   = base64_encode( http_build_query( $sso_params ) );
 		$sig           = hash_hmac( 'sha256', $sso_payload, $sso_secret );
 		$body          = array(
@@ -469,7 +467,7 @@ trait PluginUtilities {
 	 * @return array
 	 */
 	protected function get_sso_params( $user, $sso_options = array() ) {
-		$plugin_options      = $this->options;
+		$plugin_options      = isset( $this->options ) ? $this->options : $this->get_options();
 		$user_id             = $user->ID;
 		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
 		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
