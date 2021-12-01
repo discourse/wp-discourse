@@ -260,16 +260,10 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_sync_to_discourse_pin_topic() {
         // Set up a response body for creating a new post, with subsequent pin request.
+        $discourse_post = json_decode( $this->response_body_file( "post_create" ) );
         $pin_until      = '2021-02-17';
-        $pin_until_body = http_build_query(
-            array(
-				'status'  => 'pinned',
-				'enabled' => 'true',
-				'until'   => $pin_until,
-			)
-        );
         $second_request = array(
-            'body'     => $pin_until_body,
+            'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/status",
             'response' => $this->build_response( 'success' ),
         );
         $body           = $this->mock_remote_post_success( 'post_create', $second_request );
@@ -389,13 +383,8 @@ class DiscoursePublishTest extends UnitTest {
         $post_id                                      = wp_insert_post( $post_atts, false, false );
 
         // Set up a response body for updating an existing post, and the featured link in the second request.
-        $featured_link_body = http_build_query(
-            array(
-				'featured_link' => get_permalink( $post_id ),
-			)
-            );
         $second_request     = array(
-            'body'     => $featured_link_body,
+            'url'      => self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id,
             'response' => $this->build_response( 'success' ),
         );
         $body               = $this->mock_remote_post_success( 'post_update', $second_request );

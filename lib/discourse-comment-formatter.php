@@ -9,32 +9,58 @@ namespace WPDiscourse\DiscourseCommentFormatter;
 
 use WPDiscourse\Templates\HTMLTemplates as Templates;
 use WPDiscourse\Shared\TemplateFunctions;
-use WPDiscourse\Shared\PluginUtilities;
+use WPDiscourse\DiscourseBase;
 
 /**
  * Class DiscourseCommentFormatter
  */
-class DiscourseCommentFormatter {
-	use PluginUtilities;
+class DiscourseCommentFormatter extends DiscourseBase {
 	use TemplateFunctions;
+
+	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'comment_formatter';
+
+	/**
+	 * DiscourseCommentFormatter constructor.
+	 */
+	public function __construct() {
+		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
+	}
 
 	/**
 	 * Formats the Discourse comments for a given post.
 	 *
-	 * @param int $post_id The post_id to retrieve comments for.
+	 * @param int  $post_id The post_id to retrieve comments for.
+	 * @param bool $perform_sync Determines whether sync is performed.
 	 *
 	 * @return string
 	 */
-	public function format( $post_id ) {
+	public function format( $post_id, $perform_sync = true ) {
 		// Sync the comments.
-		do_action( 'wpdc_sync_discourse_comments', $post_id );
-		$options = $this->get_options();
+		if ( $perform_sync ) {
+			do_action( 'wpdc_sync_discourse_comments', $post_id );
+		}
+		$options = $this->options;
 
-		$custom = get_post_custom( $post_id );
-		if ( empty( $custom['discourse_permalink'] ) || empty( $custom['discourse_comments_raw'] ) ) {
+		$custom               = get_post_custom( $post_id );
+		$required_post_custom = array( 'discourse_permalink', 'discourse_comments_raw' );
+		$missing_post_custom  = array();
 
+		foreach ( $required_post_custom as $key ) {
+			if ( empty( $custom[ $key ] ) ) {
+				$missing_post_custom[] = $key;
+			}
+		}
+
+		if ( ! empty( $missing_post_custom ) ) {
+			$this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );
 			return wp_kses_post( Templates::bad_response_html() );
-
 		}
 
 		$topic_data = json_decode( $custom['discourse_comments_raw'][0] );

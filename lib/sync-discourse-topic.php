@@ -2,7 +2,7 @@
 /**
  * Uses a Discourse webhook to sync topics with their associated WordPress posts.
  *
- * @package WPDiscourse\DiscourseWebhookRefresh
+ * @package WPDiscourse\SyncDiscourseTopic
  * @todo Review phpcs disablement.
  */
 
@@ -10,20 +10,12 @@
 
 namespace WPDiscourse\SyncDiscourseTopic;
 
-use WPDiscourse\Webhook\Webhook;
+use WPDiscourse\DiscourseBase;
 
 /**
- * Class DiscourseWebhookRefresh
+ * Class SyncDiscourseTopic
  */
-class SyncDiscourseTopic extends Webhook {
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var array|void
-	 */
-	protected $options;
+class SyncDiscourseTopic extends DiscourseBase {
 
 	/**
 	 * The current version of the wpdc_topic_blog database table.
@@ -34,19 +26,21 @@ class SyncDiscourseTopic extends Webhook {
 	protected $db_version = '1.0';
 
 	/**
-	 * DiscourseWebhookRefresh constructor.
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'webhook_topic';
+
+	/**
+	 * SyncDiscourseTopic constructor.
 	 */
 	public function __construct() {
 		add_action( 'init', array( $this, 'setup_options' ) );
+		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
 		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
-	}
-
-	/**
-	 * Setup options.
-	 */
-	public function setup_options() {
-		$this->options = $this->get_options();
 	}
 
 	/**
@@ -59,11 +53,11 @@ class SyncDiscourseTopic extends Webhook {
 				'update-topic-content',
 				array(
 					array(
-						'methods'  => \WP_REST_Server::CREATABLE,
+						'methods'             => \WP_REST_Server::CREATABLE,
 						'permission_callback' => function() {
 							return true;
 						},
-						'callback' => array( $this, 'update_topic_content' ),
+						'callback'            => array( $this, 'update_topic_content' ),
 					),
 				)
 			);
@@ -82,8 +76,8 @@ class SyncDiscourseTopic extends Webhook {
 		$data = $this->verify_discourse_webhook_request( $data );
 
 		if ( is_wp_error( $data ) ) {
-
-			return new \WP_Error( 'discourse_webhook_error', __( 'Unable to process Discourse webhook.', 'wp-discourse' ) );
+			$this->logger->error( 'update_topic_content.webhook_verification_error', array( 'message', $data->get_error_message() ) );
+			return $data;
 		}
 
 		$json = $data->get_json_params();
@@ -108,6 +102,8 @@ class SyncDiscourseTopic extends Webhook {
 			} else {
 				$this->update_post_metadata( $post_data );
 			}
+		} else {
+			$this->logger->error( 'update_topic_content.response_body_error' );
 		}
 
 		return null;
@@ -197,6 +193,10 @@ class SyncDiscourseTopic extends Webhook {
 					if ( ! empty( $unlisted ) && $comments_count > 0 && 1 === $post_type ) {
 						$this->list_topic( $post_id, $topic_id );
 					}
+				}
+
+				if ( ! empty( $this->options['verbose-webhook-logs'] ) ) {
+					$this->logger->info( 'update_topic_content.update_post_metadata_success', array( 'post_ids' => implode( ',', $post_ids ) ) );
 				}
 			}
 		}

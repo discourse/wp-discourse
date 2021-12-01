@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 2.3.4
+ * Version: 2.3.5
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,17 +34,17 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.6.0' );
-define( 'WPDISCOURSE_VERSION', '2.3.4' );
+define( 'WPDISCOURSE_VERSION', '2.3.5' );
 
 require_once WPDISCOURSE_PATH . 'lib/plugin-utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/template-functions.php';
 require_once WPDISCOURSE_PATH . 'lib/utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse.php';
+require_once WPDISCOURSE_PATH . 'lib/discourse-base.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse-comment.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse-publish.php';
 require_once WPDISCOURSE_PATH . 'lib/sso-provider/sso.php';
 require_once WPDISCOURSE_PATH . 'lib/sso-provider/discourse-sso.php';
-require_once WPDISCOURSE_PATH . 'lib/webhook.php';
 require_once WPDISCOURSE_PATH . 'lib/sync-discourse-user.php';
 require_once WPDISCOURSE_PATH . 'lib/sync-discourse-topic.php';
 require_once WPDISCOURSE_PATH . 'lib/email-notification.php';

@@ -123,6 +123,17 @@ class WebhookSettings {
 				'discourse_webhook_settings_section'
 			);
 
+			add_settings_field(
+				'discourse_verbose_webhook_logs',
+				__( 'Verbose Webhook Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_webhook_logs',
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
+			);
+
 		}// End if().
 
 		register_setting(
@@ -276,6 +287,21 @@ This setting will only be activated if your site is functioning as the Discourse
 		);
 
 		$this->form_helper->input( 'webhook-secret', 'discourse_webhook', $description );
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_webhook_logs checkbox.
+	 */
+	public function verbose_webhook_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-webhook-logs',
+			'discourse_webhook',
+			__(
+				'Enable verbose logs for webhooks.',
+				'wp-discourse'
+			),
+			__( 'Will log successful syncs as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
+		);
 	}
 
 	/**

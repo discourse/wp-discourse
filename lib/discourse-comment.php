@@ -7,30 +7,12 @@
 
 namespace WPDiscourse\DiscourseComment;
 
-use WPDiscourse\Shared\PluginUtilities;
-use WPDiscourse\Logs\Logger;
+use WPDiscourse\DiscourseBase;
 
 /**
  * Class DiscourseComment
  */
-class DiscourseComment {
-	use PluginUtilities;
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
-
-	/**
-	 * Instance of Logger
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\Logs\Logger
-	 */
-	protected $logger;
+class DiscourseComment extends DiscourseBase {
 
 	/**
 	 * An instance of the DiscourseCommentFormatter class.
@@ -39,6 +21,14 @@ class DiscourseComment {
 	 * @var \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter DiscourseCommentFormatter
 	 */
 	protected $comment_formatter;
+
+	/**
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'comment';
 
 	/**
 	 * DiscourseComment constructor.
@@ -55,28 +45,6 @@ class DiscourseComment {
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
-	}
-
-	/**
-	 * Setup options.
-	 *
-	 * @param object $extra_options Extra options used for testing.
-	 */
-	public function setup_options( $extra_options = null ) {
-		$this->options = $this->get_options();
-
-		if ( ! empty( $extra_options ) ) {
-			foreach ( $extra_options as $key => $value ) {
-				$this->options[ $key ] = $value;
-			}
-		}
-	}
-
-	/**
-	 * Setup Logger.
-	 */
-	public function setup_logger() {
-		$this->logger = Logger::create( 'comment' );
 	}
 
 	/**
@@ -198,11 +166,12 @@ class DiscourseComment {
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int $post_id The WordPress post id.
+	 * @param int  $post_id The WordPress post id.
+	 * @param bool $force Force comment sync.
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $post_id ) {
+	public function sync_comments( $post_id, $force = false ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -220,7 +189,7 @@ class DiscourseComment {
 			$sync_post = $sync_post || 1 === intval( get_post_meta( $post_id, 'wpdc_sync_post_comments', true ) );
 		}
 
-		if ( $sync_post ) {
+		if ( $sync_post || $force ) {
 			// Avoids a double sync.
 			$got_lock = $wpdb->get_row( "SELECT GET_LOCK( 'discourse_lock', 0 ) got_it" );
 			if ( 1 === intval( $got_lock->got_it ) ) {
@@ -249,20 +218,22 @@ class DiscourseComment {
 						return 0;
 					}
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
+					$result    = $this->discourse_request( $permalink, array( 'raw' => true ) );
 
-					$result = wp_remote_get(
-						$permalink,
-						array(
-							'headers' => array(
-								'Api-Key'      => sanitize_key( $discourse_options['api-key'] ),
-								'Api-Username' => sanitize_text_field( $discourse_options['publish-username'] ),
-							),
-						)
-					);
+					if ( is_wp_error( $result ) ) {
+						$message    = $result->get_error_message();
+						$error_data = $result->get_error_data();
 
-					if ( $this->validate( $result ) ) {
-
-						$json = json_decode( $result['body'] );
+						$log_args = array(
+							'message'            => $message,
+							'discourse_topic_id' => $topic_id,
+							'wp_post_id'         => $post_id,
+							'http_code'          => $error_data['http_code'],
+						);
+						$this->logger->error( 'sync_comments.response_error', $log_args );
+					} else {
+						$raw_body = $result['body'];
+						$json     = json_decode( $raw_body );
 
 						if ( isset( $json->filtered_posts_count ) ) {
 							$posts_count = $json->filtered_posts_count - 1;
@@ -279,11 +250,15 @@ class DiscourseComment {
 								update_post_meta( $post_id, 'publish_post_category', intval( $category_id ) );
 							}
 
-							update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $result['body'] ) );
+							update_post_meta( $post_id, 'discourse_comments_raw', esc_sql( $raw_body ) );
 
 							if ( isset( $topic_id ) ) {
 								// Delete the cached html.
 								delete_transient( "wpdc_comment_html_{$topic_id}" );
+							}
+
+							if ( ! empty( $this->options['verbose-comment-logs'] ) ) {
+								$this->logger->info( 'sync_comments.success', array( 'post_id' => $post_id ) );
 							}
 						}
 					}

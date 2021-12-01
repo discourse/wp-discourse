@@ -15,8 +15,10 @@
 	</testsuites>
 	<filter>
 	  <whitelist processUncoveredFilesFromWhitelist="true">
-	    <directory suffix=".php">lib/logs</directory>
-			<file>lib/discourse-publish.php</file>
+	    <directory suffix=".php">lib</directory>
 	  </whitelist>
 	</filter>
+	<php>
+	  <server name="REQUEST_URI" value="https://wordpress.discourse.org"/>
+	</php>
 </phpunit>

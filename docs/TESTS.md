@@ -58,8 +58,7 @@ The tests coverage whitelist in the config file limits the coverage reports to t
 
 ```
 <whitelist processUncoveredFilesFromWhitelist="true">
-  <directory suffix=".php">lib/logs</directory>
-  <file>lib/discourse-publish.php</file>
+  <directory suffix=".php">lib</directory>
 </whitelist>
 ```
 

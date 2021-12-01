@@ -8,25 +8,15 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
+use WPDiscourse\DiscourseBase;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Shared\PluginUtilities;
 use WPDiscourse\Shared\TemplateFunctions;
-use WPDiscourse\Logs\Logger;
 
 /**
  * Class DiscoursePublish
  */
-class DiscoursePublish {
-	use PluginUtilities;
+class DiscoursePublish extends DiscourseBase {
 	use TemplateFunctions;
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
 
 	/**
 	 * An email_notification object that has a publish_failure_notification method.
@@ -37,12 +27,12 @@ class DiscoursePublish {
 	protected $email_notifier;
 
 	/**
-	 * Instance of Logger
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\Logs\Logger
-	 */
-	protected $logger;
+     * Logger context
+     *
+     * @access protected
+     * @var string
+     */
+  protected $logger_context = 'publish';
 
 	/**
 	 * Instance store for log args
@@ -76,28 +66,6 @@ class DiscoursePublish {
 
 			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		}
-	}
-
-	/**
-	 * Setup options.
-	 *
-	 * @param object $extra_options Extra options used for testing.
-	 */
-	public function setup_options( $extra_options = null ) {
-		$this->options = $this->get_options();
-
-		if ( ! empty( $extra_options ) ) {
-			foreach ( $extra_options as $key => $value ) {
-				$this->options[ $key ] = $value;
-			}
-		}
-	}
-
-	/**
-	 * Setup Logger for the pubish context.
-	 */
-	public function setup_logger() {
-		$this->logger = Logger::create( 'publish' );
 	}
 
 	/**
@@ -752,12 +720,12 @@ class DiscoursePublish {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param null|int $post_id The ID of the post in question.
+	 * @param int      $post_id The ID of the post in question.
 	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return bool
 	 */
-	protected function has_excluded_tag( $post_id = null, $post ) {
+	protected function has_excluded_tag( $post_id, $post ) {
 		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
 			return false;
 		}
@@ -818,30 +786,6 @@ class DiscoursePublish {
 	 */
 	protected function sanitize_title( $title ) {
 		return wp_strip_all_tags( $title );
-	}
-
-	/**
-	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
-	 *
-	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
-	 *
-	 * @param int $topic_id The topic_id to save to the database.
-	 * @param int $blog_id The blog_id to save to the database.
-	 */
-	protected function save_topic_blog_id( $topic_id, $blog_id ) {
-		global $wpdb;
-		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$wpdb->insert(
-			$table_name,
-			array(
-				'topic_id' => $topic_id,
-				'blog_id'  => $blog_id,
-			),
-			array(
-				'%d',
-				'%d',
-			)
-		); // db call whitelist.
 	}
 
 	/**

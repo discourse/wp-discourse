@@ -294,7 +294,7 @@ class PublishSettings {
 
 			add_settings_field(
 				'discourse_verbose_publication_logs',
-				__( 'Verbose Publication Logging', 'wp-discourse' ),
+				__( 'Verbose Publication Logs', 'wp-discourse' ),
 				array(
 					$this,
 					'verbose_publication_logs',
@@ -602,10 +602,7 @@ class PublishSettings {
 				'Enable verbose logs for publication.',
 				'wp-discourse'
 			),
-			__(
-				'Will log successful publications as well as errors.',
-				'wp-discourse'
-			)
+			__( 'Will log successful publications as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 
