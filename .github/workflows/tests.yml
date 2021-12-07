@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: PHP ${{ matrix.php }}
+    name: Tests on PHP ${{ matrix.php }}
     strategy:
       matrix:
         include:

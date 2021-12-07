@@ -1,4 +1,4 @@
-name: Metadata
+name: WP Discourse Metadata
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    name: Metadata
     steps:
       - name: Checkout head repository
         uses: actions/checkout@v2
