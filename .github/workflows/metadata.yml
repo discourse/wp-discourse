@@ -36,9 +36,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-
-      - name: Install semver
-        run: npm install --include=dev
+          cache: 'npm'
+      - run: npm install --include=dev
 
       - name: Run checks
         uses: actions/github-script@v5
