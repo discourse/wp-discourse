@@ -2,7 +2,7 @@
 
 WP Discourse uses [Composer](https://getcomposer.org) in the standard fashion, but there are a few things that are worth pointing out when developing this plugin and using composer packages in production.
 
-> Please note, this guide is intended for developers of this plugin. If you're using this plugin via composer, this does not apply to you. Use it as you normally would.
+> Please note, this guide is intended for developers of this plugin. If you're using this plugin via composer, this does not apply to you; see "Installation: With Composer" in the README.md instead.
 
 ### Adding Composer Packages For Production Use
 

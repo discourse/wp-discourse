@@ -1,4 +1,4 @@
-### WP Discourse Code Formatting
+### WP Discourse Code Formatting Guide
 
 WP Discourse uses
 - [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer) to handle code formatting (``phpcs``);
