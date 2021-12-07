@@ -59,7 +59,7 @@ jobs:
               let base_var = process.env[`base_${variable}`];
               let type = variable.split('_')[1];
 
-              if (type === 'version) {
+              if (type === 'version') {
                 if (semver.lte(head_var, base_var)) {
                   core.setFailed(`Head ${variable} is less than or equal to base ${variable}.`);
                 }
