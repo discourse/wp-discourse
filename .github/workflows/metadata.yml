@@ -22,7 +22,9 @@ jobs:
       - name: Checkout base repository
         uses: actions/checkout@v2
         with:
+          repository: "${{ github.repository }}"
           ref: "${{ github.base_ref }}"
+          token: "${{ github.token }}"
 
       - name: Store base versions
         run: |
