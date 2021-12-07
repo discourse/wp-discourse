@@ -50,10 +50,10 @@ trait PluginUtilities {
 	 *
 	 * @return void
 	 */
-	 protected static function register_text_translations( $text, $option ) {
+	protected static function register_text_translations( $text, $option ) {
 		// See https://wpml.org/wpml-hook/wpml_register_single_string/.
 		do_action( 'wpml_register_single_string', 'wp-discourse', $option, $text );
-	 }
+	}
 
 	/**
 	 * Returns a single array of options from a given array of arrays.
@@ -328,7 +328,13 @@ trait PluginUtilities {
 			'sso' => $sso_payload,
 			'sig' => $sig,
 		);
-		$response_body = $this->discourse_request( $path, array( 'body' => $body ) );
+		$response_body = $this->discourse_request(
+			$path,
+			array(
+				'type' => 'post',
+				'body' => $body,
+			)
+		);
 
 		if ( is_wp_error( $response_body ) ) {
 			return $response_body;
