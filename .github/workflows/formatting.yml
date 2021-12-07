@@ -1,4 +1,4 @@
-name: WP-Discourse Tests
+name: WP-Discourse Formatting
 
 on:
   pull_request:
@@ -9,57 +9,51 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: PHP ${{ matrix.php }}
+    name: Formatting on PHP ${{ matrix.php }}
     strategy:
       matrix:
         include:
           - php: "5.6"
             sniff: true
-            test: false
           - php: "7.0"
             sniff: true
-            test: false
           - php: "7.4"
             sniff: true
-            test: true
+            jshint: true
           - php: "8.0"
-            sniff: false
-            test: false
     steps:
       - uses: actions/checkout@v2
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+
+      - name: Syntax Check
+        run: |
+          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+
       - name: Install Composer
-        if: "${{ matrix.sniff || matrix.test }}"
+        if: "matrix.sniff"
         uses: ramsey/composer-install@v1
         with:
           dependency-versions: "highest"
           composer-options: "--ignore-platform-reqs"
+
       - name: Install PHPEnv
-        if: "${{ matrix.sniff || matrix.test }}"
+        if: "matrix.sniff"
         run: |
           git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
           export PATH="$HOME/.phpenv/bin:$PATH"
           phpenv rehash
-      - name: Syntax Check
-        run: |
-          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
-      - name: JSHint
-        if: "matrix.sniff"
-        run: |
-          sudo npm install -g jshint
-          wget https://develop.svn.wordpress.org/trunk/.jshintrc
-          jshint .
+
       - name: WordPress Coding Standards
         if: "matrix.sniff"
         run: |
           vendor/bin/phpcs -p -s -v -n .
-      - name: PHPUnit
-        if: "matrix.test"
+
+      - name: JSHint
+        if: "matrix.jshint"
         run: |
-          sudo /etc/init.d/mysql start
-          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
-          vendor/bin/phpunit
-          vendor/bin/phpunit -c tests/phpunit/multisite.xml
+          sudo npm install -g jshint
+          wget https://develop.svn.wordpress.org/trunk/.jshintrc
+          jshint .
