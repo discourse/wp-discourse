@@ -8,23 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     name: Metadata
     steps:
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 14
-      - run: npm install --include=dev
-
-      - name: Checkout head repository
-        uses: actions/checkout@v2
-
-      - name: Store head versions
-        run: |
-          echo "head_readme_version=$(grep -Pio -m 1 '(?<=Stable tag: )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
-          echo "head_change_version=$(grep -Pio -m 1 '(?<=#### )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
-          echo "head_change_date=$(grep -Pio -m 1 "(?<=#### (\d\.\d\.\d) )(\d\d\/\d\d\/\d\d\d\d)" readme.txt)" >> $GITHUB_ENV
-          echo "head_plugin_version=$(grep -Pio -m 1 "(?<=Version: )(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
-          echo "head_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
-
       - name: Checkout base repository
         uses: actions/checkout@v2
         with:
@@ -37,6 +20,23 @@ jobs:
           echo "base_change_date=$(grep -Pio -m 1 "(?<=#### (\d\.\d\.\d) )(\d\d\/\d\d\/\d\d\d\d)" readme.txt)" >> $GITHUB_ENV
           echo "base_plugin_version=$(grep -Pio -m 1 "(?<=Version: )(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
           echo "base_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+
+      - name: Checkout head repository
+        uses: actions/checkout@v2
+
+      - name: Store head versions
+        run: |
+          echo "head_readme_version=$(grep -Pio -m 1 '(?<=Stable tag: )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "head_change_version=$(grep -Pio -m 1 '(?<=#### )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "head_change_date=$(grep -Pio -m 1 "(?<=#### (\d\.\d\.\d) )(\d\d\/\d\d\/\d\d\d\d)" readme.txt)" >> $GITHUB_ENV
+          echo "head_plugin_version=$(grep -Pio -m 1 "(?<=Version: )(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+          echo "head_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install --include=dev
 
       - name: Run checks
         uses: actions/github-script@v5
