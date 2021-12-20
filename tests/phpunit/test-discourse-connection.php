@@ -64,10 +64,10 @@ class DiscourseConnectionTest extends UnitTest {
     $this->form_helper->setup_options( self::$plugin_options );
 
     $raw_body  = $this->response_body_json( 'scopes' );
-    $full_body = json_decode( $raw_body );
-    $body = array_filter( $full_body, function( $scope ) { return $scope->key !== 'commenting'; });
+    $body = json_decode( $raw_body );
+    $scopes = array_filter( $body->scopes, function( $scope ) { return $scope->key !== 'commenting'; });
     $response = $this->build_response( 'success' );
-    $response['body'] = json_encode( array_values( $body ) );
+    $response['body'] = json_encode( array( "scopes" => array_values( $scopes ) ) );
     $this->mock_remote_post( $response );
 
     $result = $this->form_helper->check_connection_status();

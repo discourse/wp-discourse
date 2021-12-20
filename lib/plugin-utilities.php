@@ -129,7 +129,7 @@ trait PluginUtilities {
 			return false;
 		}
 
-		$scope_validation = $this->validate_scopes( $body );
+		$scope_validation = $this->validate_scopes( $body->scopes );
 
 		if ( ! empty( $options['connection-logs'] ) ) {
 			$log_args = array();
