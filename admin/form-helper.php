@@ -328,7 +328,7 @@ class FormHelper {
 		$check_connection_on = array(
 			'wp_discourse_options',
 			'connection_options',
-			'sso_provider'
+			'sso_provider',
 		);
 
 		if ( $current_page && in_array( $current_page, $check_connection_on ) ) {
@@ -341,7 +341,7 @@ class FormHelper {
 			}
 		}
 
-		if ( $current_page && 'sso_provider' === $current_page && !empty( $this->options['enable-sso'] ) ) {
+		if ( $current_page && 'sso_provider' === $current_page && ! empty( $this->options['enable-sso'] ) ) {
 			// Check if the user saving the options has an email address on Discourse.
 			$current_user_email = wp_get_current_user()->user_email;
 			$discourse_user     = $this->get_discourse_user_by_email( $current_user_email );

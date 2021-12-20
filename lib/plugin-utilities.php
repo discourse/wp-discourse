@@ -101,7 +101,7 @@ trait PluginUtilities {
 			return false;
 		}
 
-		$path = "/session/scopes.json";
+		$path = '/session/scopes.json';
 		$body = $this->discourse_request( $path );
 
 		if ( ! empty( $options['connection-logs'] ) ) {
@@ -135,13 +135,13 @@ trait PluginUtilities {
 			$log_args = array();
 
 			if ( $scope_validation->success ) {
-				$log_type = "valid_scopes";
+				$log_type = 'valid_scopes';
 			} else {
-				$log_type = "invalid_scopes";
+				$log_type = 'invalid_scopes';
 			}
 
-			if ( !empty( $scope_validation->errors ) ) {
-				$log_args["message"] = implode( ', ', $scope_validation->errors );
+			if ( ! empty( $scope_validation->errors ) ) {
+				$log_args['message'] = implode( ', ', $scope_validation->errors );
 			}
 
 			$logger->info( "check_connection_status.$log_type", $log_args );
@@ -183,47 +183,57 @@ trait PluginUtilities {
 	 * @return int
 	 */
 	protected function validate_scopes( $scopes ) {
-		$result = (object) array( "success" => false, "errors" => []);
+		$result = (object) array(
+			'success' => false,
+			'errors'  => array(),
+		);
 
-		## If scopes are empty the key is global.
+		// If scopes are empty the key is global.
 		if ( empty( $scopes ) ) {
 			$result->success = true;
 			return $result;
 		}
 
-		$wordpress_scopes = array_filter( $scopes, function( $scope ) {
-			return "wordpress" == $scope->resource;
-		});
+		$wordpress_scopes = array_filter(
+             $scopes, function( $scope ) {
+			return 'wordpress' === $scope->resource; // phpcs:ignore WordPress.WP.CapitalPDangit
+		}
+            );
 
 		if ( empty( $wordpress_scopes ) ) {
-			$result->errors[] = "API Key has no wordpress scopes";
+			$result->errors[] = 'API Key has no WordPress scopes';
 			return $result;
 		}
 
-		$scoped_actions = array_column( $wordpress_scopes, 'key' );
-		$feature_groups = $this->enabled_feature_groups();
+		$scoped_actions    = array_column( $wordpress_scopes, 'key' );
+		$feature_groups    = $this->enabled_feature_groups();
 		$unscoped_features = array_diff( $feature_groups, $scoped_actions );
 
 		if ( empty( $unscoped_features ) ) {
 			$result->success = true;
 			return $result;
 		} else {
-			foreach( $unscoped_features as $usf ) {
-				$result->errors[] = "API Key is missing wordpress $usf scope";
+			foreach ( $unscoped_features as $usf ) {
+				$result->errors[] = "API Key is missing WordPress $usf scope";
 			}
 			return $result;
 		}
 	}
 
+	/**
+	 * Lists the enabled feature groups.
+	 *
+	 * @return array
+	 */
 	protected function enabled_feature_groups() {
-		## TODO: add 'enabled' setting for publishing features.
-		$groups = array( 'publishing');
+		// TODO: add 'enabled' setting for publishing features.
+		$groups = array( 'publishing' );
 
-		if ( !empty( $this->options['enable-discourse-comments'] ) ) {
+		if ( ! empty( $this->options['enable-discourse-comments'] ) ) {
 			$groups[] = 'commenting';
 		}
 
-		if ( !empty( $this->options['enable-sso'] ) || !empty( $this->options['sso-client-enabled'] ) ) {
+		if ( ! empty( $this->options['enable-sso'] ) || ! empty( $this->options['sso-client-enabled'] ) ) {
 			$groups[] = 'discourse_connect';
 		}
 
