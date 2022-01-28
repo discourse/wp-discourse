@@ -234,7 +234,7 @@ class Client extends SSOClientBase {
 			if ( empty( $user_query_results ) ) {
 				$user_password = wp_generate_password( 12, true );
 
-				$user_id       = wp_create_user(
+				$user_id = wp_create_user(
 					$this->get_sso_response( 'username' ),
 					$user_password,
 					$this->get_sso_response( 'email' )
@@ -458,9 +458,6 @@ class Client extends SSOClientBase {
 
 		$user              = wp_get_current_user();
 		$user_id           = $user->ID;
-		$base_url          = $this->options['url'];
-		$api_key           = $this->options['api-key'];
-		$api_username      = $this->options['publish-username'];
 		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
@@ -474,25 +471,14 @@ class Client extends SSOClientBase {
 			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
 		}
 
-		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
-		$logout_url      = esc_url_raw( $logout_url );
-		$logout_response = wp_remote_post(
-			$logout_url,
-			array(
-				'method'  => 'POST',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_key ),
-					'Api-Username' => sanitize_text_field( $api_username ),
-				),
-			)
-		);
+		$path     = "/admin/users/$discourse_user_id/log_out";
+		$response = $this->discourse_request( $path, array( 'method' => 'POST' ) );
 
-		if ( ! $this->validate( $logout_response ) ) {
-
+		if ( ! $this->validate( $response ) ) {
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
+		} else {
+			return null;
 		}
-
-		return null;
 	}
 
 	/**

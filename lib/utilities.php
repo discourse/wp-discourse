@@ -48,7 +48,7 @@ class Utilities {
 	/**
 	 * Public static alias for validate.
 	 *
-	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
+	 * @param array $response The response from `wp_remote_request`.
 	 *
 	 * @return int
 	 */
@@ -180,8 +180,8 @@ class Utilities {
 
 		$user_data = static::discourse_request(
              $create_user_url, array(
-				 'body' => $body,
-				 'type' => 'post',
+				 'body'   => $body,
+				 'method' => 'POST',
 			 )
             );
 

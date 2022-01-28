@@ -210,7 +210,7 @@ class DiscourseSSO extends DiscourseBase {
 		}
 
 		$path     = "/admin/users/$discourse_user_id/log_out";
-		$response = $this->discourse_request( $path, array( 'type' => 'post' ) );
+		$response = $this->discourse_request( $path, array( 'method' => 'POST' ) );
 
 		if ( is_wp_error( $response ) ) {
 			return $this->handle_error(

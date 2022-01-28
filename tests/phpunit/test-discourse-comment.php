@@ -71,7 +71,12 @@ class DiscourseCommentTest extends UnitTest {
         // Mock objects and endpoints
         $discourse_post = json_decode( $this->response_body_file( 'post_create' ) );
         $post_id        = wp_insert_post( self::$post_atts, false, false );
-        $this->mock_remote_post( $this->build_response( 'not_found' ) );
+        $response       = $this->build_response( 'not_found' );
+        $request        = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the post meta
         $discourse_topic_id  = $discourse_post->topic_id;
@@ -85,7 +90,7 @@ class DiscourseCommentTest extends UnitTest {
         // Ensure we've made the right logs
         $log = $this->get_last_log();
         $this->assertRegExp( "/comment.ERROR: sync_comments.response_error/", $log );
-        $this->assertRegExp( '/"message":"An invalid response was returned from Discourse"/', $log );
+        $this->assertRegExp( '/"message":"Not found"/', $log );
         $this->assertRegExp( '/"discourse_topic_id":"'. $discourse_topic_id . '"/', $log );
         $this->assertRegExp( '/"wp_post_id":'. $post_id . '/', $log );
         $this->assertRegExp( '/"http_code":404/', $log );
@@ -106,7 +111,11 @@ class DiscourseCommentTest extends UnitTest {
         $site_json         = $this->response_body_file( 'site' );
         $response          = $this->build_response( 'success' );
         $response['body']  = $site_json;
-        $this->mock_remote_post( $response );
+        $request = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
         $site = json_decode( $site_json );
@@ -159,7 +168,11 @@ class DiscourseCommentTest extends UnitTest {
         // Setup the categories response
         delete_transient( "wpdc_discourse_categories" );
         $response = $this->build_response( $response_error );
-        $this->mock_remote_post( $response );
+        $request = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
         $site = json_decode( $this->response_body_file( 'site' ) );
