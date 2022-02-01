@@ -363,7 +363,7 @@ trait PluginUtilities {
 	 */
 	protected function discourse_request( $url, $args = array() ) {
 		if ( ! $url ) {
-			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
+			return new \WP_Error( 'discourse_configuration_error', 'No discourse url provided to request.' );
 		}
 
 		$api_credentials = $this->get_api_credentials();
@@ -377,11 +377,21 @@ trait PluginUtilities {
 			'Accept'       => 'application/json',
 		);
 		$opts    = array(
-			'headers' => $headers,
+			'timeout' => 30,
 		);
+
 		if ( ! empty( $args['body'] ) ) {
-			$opts['body'] = $args['body'];
+			$headers['Content-Type'] = 'application/json';
+			$opts['body']            = json_encode( $args['body'] );
 		}
+
+		if ( ! empty( $args['headers'] ) ) {
+			foreach ( $args['headers'] as $key => $value ) {
+				$headers[ $key ] = $value;
+			}
+		}
+
+		$opts['headers'] = $headers;
 
 		// support relative paths.
 		if ( strpos( $url, '://' ) === false ) {

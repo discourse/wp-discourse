@@ -294,7 +294,7 @@ class DiscoursePublish extends DiscourseBase {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
 
-			$body                = array(
+			$body = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'title'            => $title,
@@ -303,8 +303,13 @@ class DiscoursePublish extends DiscourseBase {
 				'skip_validations' => 'true',
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => $unlisted ? 'false' : 'true',
-				'tags'             => $tags,
 			);
+
+			$tags = array_filter( $tags );
+			if ( ! empty( $tags ) ) {
+				$body['tags'] = $tags;
+			}
+
 			$path                = '/posts';
 			$remote_post_options = array(
 				'method' => 'POST',
@@ -476,8 +481,7 @@ class DiscoursePublish extends DiscourseBase {
 	 */
 	public function remote_post( $url, $remote_options, $remote_type, $post_id ) {
 		$remote_options['raw'] = true;
-
-		$response = $this->discourse_request( $url, $remote_options );
+		$response              = $this->discourse_request( $url, $remote_options );
 
 		if ( ! $this->validate( $response ) ) {
 			$response = $this->handle_error( $remote_type, $response, $post_id );
