@@ -42,7 +42,7 @@ If you haven't already, run ``composer install`` in the root plugin directory to
 
 One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct. 
 
-For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have a lines in your ``php.ini`` that look like this
+For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have a line in your ``php.ini`` that look like this
 
 ```
 xdebug.mode = coverage
