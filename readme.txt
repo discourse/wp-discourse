@@ -123,9 +123,9 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-#### 2.3.8 01/28/2022
+#### 2.3.8 02/04/2022
 
-- Confirm Wordpress 5.9 support.
+- Add Wordpress 5.9 support.
 - Complete wp_remote_request standardisation.
 - Add method checks to all request tests.
 
