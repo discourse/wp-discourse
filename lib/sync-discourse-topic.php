@@ -213,35 +213,21 @@ class SyncDiscourseTopic extends DiscourseBase {
 	 * @return null|\WP_Error
 	 */
 	protected function list_topic( $post_id, $topic_id ) {
-		$url          = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
-		$api_key      = ! empty( $this->options['api-key'] ) ? $this->options['api-key'] : null;
-		$api_username = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : null;
-
-		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
-
-			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
-		}
-
-		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
-
-		$data         = array(
+		$status_path = "/t/{$topic_id}/status";
+		$body        = array(
 			'status'  => 'visible',
 			'enabled' => 'true',
 		);
-		$post_options = array(
-			'timeout' => 30,
-			'method'  => 'PUT',
-			'headers' => array(
-				'Api-Key'      => sanitize_key( $api_key ),
-				'Api-Username' => sanitize_text_field( $api_username ),
-			),
-			'body'    => http_build_query( $data ),
+		$args        = array(
+			'body'   => $body,
+			'method' => 'PUT',
 		);
 
-		$response = wp_remote_post( $status_url, $post_options );
+		$response = $this->discourse_request( $status_url, $args );
 
-		if ( ! $this->validate( $response ) ) {
-
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		} elseif ( ! $this->validate( $response ) ) {
 			return new \WP_Error( 'discourse_response_error', 'Unable to unlist the Discourse topic.' );
 		}
 

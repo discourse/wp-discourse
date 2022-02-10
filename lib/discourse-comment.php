@@ -220,15 +220,15 @@ class DiscourseComment extends DiscourseBase {
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
 					$result    = $this->discourse_request( $permalink, array( 'raw' => true ) );
 
-					if ( is_wp_error( $result ) ) {
-						$message    = $result->get_error_message();
-						$error_data = $result->get_error_data();
+					if ( ! $this->validate( $result ) ) {
+						$message = wp_remote_retrieve_response_message( $result );
+						$code    = wp_remote_retrieve_response_code( $result );
 
 						$log_args = array(
 							'message'            => $message,
 							'discourse_topic_id' => $topic_id,
 							'wp_post_id'         => $post_id,
-							'http_code'          => $error_data['http_code'],
+							'http_code'          => $code,
 						);
 						$this->logger->error( 'sync_comments.response_error', $log_args );
 					} else {

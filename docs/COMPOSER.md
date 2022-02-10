@@ -63,6 +63,8 @@ The non-namespaced version will still be present in development (in your ``vendo
 
 #### Step 4. Build for production
 
+> Production builds and deployment are now handled in the deploy.yml github workflow. The following section is here for descriptive purposes only.
+
 When building for production, use composer as you normally would when preparing a production build of a Wordpress plugin, i.e. by installing optimized non-development packages
 
 ```

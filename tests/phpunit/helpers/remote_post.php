@@ -96,17 +96,20 @@ trait RemotePost {
   /**
    * Mock remote post response.
    *
-   * @param object $response Remote post response object.
-   * @param object $second_request Second request response of second request in tested method.
+   * @param object $first_request First request in tested method.
+   * @param object $second_request Second request in tested method.
    */
-  protected function mock_remote_post( $response, $second_request = null ) {
+  protected function mock_remote_post( $first_request, $second_request = null ) {
       add_filter(
           'pre_http_request',
-          function( $prempt, $args, $url ) use ( $response, $second_request ) {
-              if ( ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false ) ) {
-                  return $second_request['response'];
+          function( $prempt, $args, $url ) use ( $first_request, $second_request ) {
+              $is_sr = ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false );
+              $request = $is_sr ? $second_request : $first_request;
+
+              if ( $request['method'] != $args['method'] ) {
+                return new \WP_Error( 'http_request_failed', 'Incorrect method' );
               } else {
-                  return $response;
+                return $request['response'];
               }
           },
           10,
@@ -120,11 +123,15 @@ trait RemotePost {
    * @param string $type Type of response.
    * @param object $second_request Second request response of second request in tested method.
    */
-  protected function mock_remote_post_success( $type, $second_request = null ) {
+  protected function mock_remote_post_success( $type, $method = 'GET', $second_request = null ) {
       $raw_body         = $this->response_body_json( $type );
       $response         = $this->build_response( 'success' );
       $response['body'] = $raw_body;
-      $this->mock_remote_post( $response, $second_request );
+      $first_request    = array(
+        'method'  => $method,
+        'response' => $response
+      );
+      $this->mock_remote_post( $first_request, $second_request );
       return json_decode( $raw_body );
   }
 }

@@ -130,9 +130,9 @@ trait PluginUtilities {
 	}
 
 	/**
-	 * Validates the response from `wp_remote_get` or `wp_remote_post`.
+	 * Validates the response from `wp_remote_request`.
 	 *
-	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
+	 * @param array $response The response from `wp_remote_request`.
 	 *
 	 * @return int
 	 */
@@ -331,8 +331,8 @@ trait PluginUtilities {
 		$response_body = $this->discourse_request(
 			$path,
 			array(
-				'type' => 'post',
-				'body' => $body,
+				'method' => 'POST',
+				'body'   => $body,
 			)
 		);
 
@@ -363,7 +363,7 @@ trait PluginUtilities {
 	 */
 	protected function discourse_request( $url, $args = array() ) {
 		if ( ! $url ) {
-			return;
+			return new \WP_Error( 'discourse_configuration_error', 'No discourse url provided to request.' );
 		}
 
 		$api_credentials = $this->get_api_credentials();
@@ -377,20 +377,36 @@ trait PluginUtilities {
 			'Accept'       => 'application/json',
 		);
 		$opts    = array(
-			'headers' => $headers,
+			'timeout' => 30,
 		);
+
 		if ( ! empty( $args['body'] ) ) {
-			$opts['body'] = $args['body'];
+			$headers['Content-Type'] = 'application/json';
+			$opts['body']            = json_encode( $args['body'] );
 		}
+
+		if ( ! empty( $args['headers'] ) ) {
+			foreach ( $args['headers'] as $key => $value ) {
+				$headers[ $key ] = $value;
+			}
+		}
+
+		$opts['headers'] = $headers;
 
 		// support relative paths.
 		if ( strpos( $url, '://' ) === false ) {
 			$url = esc_url_raw( $api_credentials['url'] . $url );
 		}
 
-		$type     = isset( $args['type'] ) ? $args['type'] : 'get';
-		$request  = "wp_remote_$type";
-		$response = $request( $url, $opts );
+		if ( isset( $args['method'] ) ) {
+			$opts['method'] = $args['method']; // default GET.
+		}
+
+		$response = wp_remote_request( $url, $opts );
+
+		if ( isset( $args['raw'] ) && $args['raw'] ) {
+			return $response;
+		}
 
 		if ( ! $this->validate( $response ) ) {
 			return new \WP_Error(
@@ -401,10 +417,6 @@ trait PluginUtilities {
 					'http_body' => wp_remote_retrieve_body( $response ),
 				)
 			);
-		}
-
-		if ( isset( $args['raw'] ) && $args['raw'] ) {
-			return $response;
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );

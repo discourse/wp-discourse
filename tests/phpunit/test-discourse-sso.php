@@ -127,9 +127,10 @@ class DiscourseSSOTest extends UnitTest {
 
     $second_request = array(
       'url'      => "log_out",
+      'method'   => 'POST',
       'response' => $this->build_response( 'success' ),
     );
-    $discourse_user = $this->mock_remote_post_success( 'user', $second_request );
+    $discourse_user = $this->mock_remote_post_success( 'user', 'GET', $second_request );
 
     $logout_result = $this->discourse_sso->logout_from_discourse();
     $this->assertTrue( $logout_result );
@@ -145,8 +146,11 @@ class DiscourseSSOTest extends UnitTest {
   public function test_logout_from_discourse_failed_to_get_discourse_user() {
     $user = wp_set_current_user( $this->user_id );
 
-    $raw_response = $this->build_response( 'invalid_parameters' );
-    $this->mock_remote_post( $raw_response );
+    $request = array(
+      'method'   => 'POST',
+      'response' => $this->build_response( 'invalid_parameters' )
+    );
+    $this->mock_remote_post( $request );
 
     $logout_result = $this->discourse_sso->logout_from_discourse();
 
@@ -165,11 +169,13 @@ class DiscourseSSOTest extends UnitTest {
    */
   public function test_logout_from_discourse_failed_to_logout() {
     $user = wp_set_current_user( $this->user_id );
+    $response = $this->build_response( 'not_found' );
     $second_request = array(
       'url'      => "log_out",
-      'response' => $this->build_response( 'not_found' )
+      'method'   => 'POST',
+      'response' => $response
     );
-    $discourse_user = $this->mock_remote_post_success( 'user', $second_request );
+    $discourse_user = $this->mock_remote_post_success( 'user', 'GET', $second_request );
 
     $logout_result = $this->discourse_sso->logout_from_discourse();
 

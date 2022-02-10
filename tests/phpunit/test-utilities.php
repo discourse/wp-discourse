@@ -78,7 +78,7 @@ class UtilitiesTest extends UnitTest {
     update_option( 'discourse_sso_common', array( 'sso-secret' => '12345678910' ) );
     update_option( 'discourse_sso_provider', array( 'enable-sso' => 1 ) );
 
-    $this->mock_remote_post_success( 'sync_sso' );
+    $this->mock_remote_post_success( 'sync_sso', 'POST' );
     $user = get_user_by( 'id', $this->user_id );
     Utilities::sync_sso_record( Utilities::get_sso_params( $user ) );
     $this->assertEquals( get_user_meta( $this->user_id, 'discourse_username', true ), 'angus' );
@@ -124,7 +124,7 @@ class UtilitiesTest extends UnitTest {
    * create_discourse_user creates a Discourse user.
    */
   public function test_create_discourse_user() {
-    $this->mock_remote_post_success( 'user_create' );
+    $this->mock_remote_post_success( 'user_create', 'POST' );
     $user = get_user_by( 'id', $this->user_id );
     $response = Utilities::create_discourse_user( $user );
     $this->assertEquals( $response, 1 );
@@ -137,7 +137,7 @@ class UtilitiesTest extends UnitTest {
     update_option( 'discourse_sso_common', array( 'sso-secret' => '12345678910' ) );
     update_option( 'discourse_sso_provider', array( 'enable-sso' => 1 ) );
 
-    $this->mock_remote_post_success( 'sync_sso' );
+    $this->mock_remote_post_success( 'sync_sso', 'POST' );
     $response = Utilities::add_user_to_discourse_group( $this->user_id, 'test_group' );
     $this->assertTrue( $response );
   }
@@ -149,7 +149,7 @@ class UtilitiesTest extends UnitTest {
     update_option( 'discourse_sso_common', array( 'sso-secret' => '12345678910' ) );
     update_option( 'discourse_sso_provider', array( 'enable-sso' => 1 ) );
 
-    $this->mock_remote_post_success( 'sync_sso' );
+    $this->mock_remote_post_success( 'sync_sso', 'POST' );
     $response = Utilities::remove_user_from_discourse_group( $this->user_id, 'test_group' );
     $this->assertTrue( $response );
   }
