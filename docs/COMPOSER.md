@@ -2,7 +2,7 @@
 
 WP Discourse uses [Composer](https://getcomposer.org) in the standard fashion, but there are a few things that are worth pointing out when developing this plugin and using composer packages in production.
 
-> Please note, this guide is intended for developers of this plugin. If you're using this plugin via composer, this does not apply to you. Use it as you normally would.
+> Please note, this guide is intended for developers of this plugin. If you're using this plugin via composer, this does not apply to you; see "Installation: With Composer" in the README.md instead.
 
 ### Adding Composer Packages For Production Use
 
@@ -62,6 +62,8 @@ not
 The non-namespaced version will still be present in development (in your ``vendor`` folder), but shouldn't be used in the plugin code, and won't be bundled in the production build.
 
 #### Step 4. Build for production
+
+> Production builds and deployment are now handled in the deploy.yml github workflow. The following section is here for descriptive purposes only.
 
 When building for production, use composer as you normally would when preparing a production build of a Wordpress plugin, i.e. by installing optimized non-development packages
 

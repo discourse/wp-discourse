@@ -1,0 +1,79 @@
+name: WP Discourse Metadata
+
+on:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Metadata
+    steps:
+      - name: Checkout base repository
+        uses: actions/checkout@v2
+        with:
+          ref: "${{ github.base_ref }}"
+
+      - name: Store base versions
+        run: |
+          echo "base_readme_version=$(grep -Pio -m 1 '(?<=Stable tag: )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "base_change_version=$(grep -Pio -m 1 '(?<=#### )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "base_change_date=$(grep -Pio -m 1 "(?<=#### (\d\.\d\.\d) )(\d\d\/\d\d\/\d\d\d\d)" readme.txt)" >> $GITHUB_ENV
+          echo "base_plugin_version=$(grep -Pio -m 1 "(?<=Version: )(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+          echo "base_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+
+      - name: Checkout head repository
+        uses: actions/checkout@v2
+
+      - name: Store head versions
+        run: |
+          echo "head_readme_version=$(grep -Pio -m 1 '(?<=Stable tag: )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "head_change_version=$(grep -Pio -m 1 '(?<=#### )(\d\.\d\.\d)' readme.txt)" >> $GITHUB_ENV
+          echo "head_change_date=$(grep -Pio -m 1 "(?<=#### (\d\.\d\.\d) )(\d\d\/\d\d\/\d\d\d\d)" readme.txt)" >> $GITHUB_ENV
+          echo "head_plugin_version=$(grep -Pio -m 1 "(?<=Version: )(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+          echo "head_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+      - run: npm install --include=dev
+
+      - name: Run checks
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const semver = require('semver');
+            const variables = [
+              'readme_version',
+              'change_version',
+              'change_date',
+              'plugin_version',
+              'constant_version'
+            ];
+            const headVersions = [];
+
+            variables.forEach(variable => {
+              let headVar = process.env[`head_${variable}`];
+              let baseVar = process.env[`base_${variable}`];
+              let type = variable.split('_')[1];
+
+              if (type === 'version') {
+                if (semver.lte(headVar, baseVar)) {
+                  core.setFailed(`Head ${variable} is less than or equal to base ${variable}.`);
+                }
+                headVersions.push(headVar);
+              }
+
+              if (type === 'date') {
+                let headDate = new Date(headVar);
+                let baseDate = new Date(baseVar);
+
+                if (headDate.getTime() <= baseDate.getTime()) {
+                  core.setFailed(`Head ${variable} is older than or the same as base ${variable}.`);
+                }
+              }
+            });
+
+            if (!headVersions.every(hv => hv === headVersions[0])) {
+              core.setFailed('Head versions do not match.');
+            }

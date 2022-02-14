@@ -38,6 +38,67 @@ class DiscourseCommentTest extends UnitTest {
         $this->comment->setup_options( self::$plugin_options );
   	}
 
+    public function test_sync_comments() {
+        // Mock objects and endpoints
+        $discourse_post      = json_decode( $this->response_body_file( 'post_create' ) );
+        $post_id             = wp_insert_post( self::$post_atts, false, false );
+        $comments_response   = $this->mock_remote_post_success( 'comments' );
+
+        // Setup the post meta
+        $discourse_topic_id  = $discourse_post->topic_id;
+        $discourse_permalink = self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id;
+        update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
+        update_post_meta( $post_id, 'discourse_topic_id', $discourse_topic_id );
+
+        // Setup transients
+        set_transient( "wpdc_comment_html_$discourse_topic_id", $comments_response, 10 * MINUTE_IN_SECONDS );
+
+        // Perform sync
+        $this->comment->sync_comments( $post_id, true );
+
+        // Ensure right comment json is saved
+        $comments_raw = get_post_meta( $post_id, 'discourse_comments_raw' );
+        $this->assertEquals( $comments_response, json_decode( $comments_raw[0] ) );
+
+        // Ensure HTML transient is cleared
+        $this->assertFalse( get_transient( "wpdc_comment_html_$discourse_topic_id" ) );
+
+        // Cleanup
+        wp_delete_post( $post_id );
+    }
+
+    public function test_sync_comments_handle_error_response() {
+        // Mock objects and endpoints
+        $discourse_post = json_decode( $this->response_body_file( 'post_create' ) );
+        $post_id        = wp_insert_post( self::$post_atts, false, false );
+        $response       = $this->build_response( 'not_found' );
+        $request        = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
+
+        // Setup the post meta
+        $discourse_topic_id  = $discourse_post->topic_id;
+        $discourse_permalink = self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id;
+        update_post_meta( $post_id, 'discourse_permalink', $discourse_permalink );
+        update_post_meta( $post_id, 'discourse_topic_id', $discourse_topic_id );
+
+        // Perform sync
+        $this->comment->sync_comments( $post_id, true );
+
+        // Ensure we've made the right logs
+        $log = $this->get_last_log();
+        $this->assertRegExp( "/comment.ERROR: sync_comments.response_error/", $log );
+        $this->assertRegExp( '/"message":"Not found"/', $log );
+        $this->assertRegExp( '/"discourse_topic_id":"'. $discourse_topic_id . '"/', $log );
+        $this->assertRegExp( '/"wp_post_id":'. $post_id . '/', $log );
+        $this->assertRegExp( '/"http_code":404/', $log );
+
+        // Cleanup
+        wp_delete_post( $post_id );
+    }
+
     /**
      * Get comment type for posts works with display_public_comments_only.
      */
@@ -50,7 +111,11 @@ class DiscourseCommentTest extends UnitTest {
         $site_json         = $this->response_body_file( 'site' );
         $response          = $this->build_response( 'success' );
         $response['body']  = $site_json;
-        $this->mock_remote_post( $response );
+        $request = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
         $site = json_decode( $site_json );
@@ -91,11 +156,10 @@ class DiscourseCommentTest extends UnitTest {
     }
 
     /**
-     * Get comment type for posts works with display_public_comments_only.
+     * Get comment type for posts handles connection errors with display_public_comments_only.
      */
     public function test_get_comment_type_for_post_display_public_comments_only_when_connection_fails() {
         $response_error = 'forbidden';
-        $response_message = 'There was an error establishing a connection with Discourse';
 
         // Setup plugin options
         self::$plugin_options[ "comment-type" ] = "display-public-comments-only";
@@ -104,7 +168,11 @@ class DiscourseCommentTest extends UnitTest {
         // Setup the categories response
         delete_transient( "wpdc_discourse_categories" );
         $response = $this->build_response( $response_error );
-        $this->mock_remote_post( $response );
+        $request = array(
+          'method'   => 'GET',
+          'response' => $response
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
         $site = json_decode( $this->response_body_file( 'site' ) );
@@ -141,8 +209,8 @@ class DiscourseCommentTest extends UnitTest {
 
         // Ensure we've made the right logs
         $log = $this->get_last_log();
-        $this->assertRegExp( '/comment.ERROR: test.get_discourse_category/', $log );
-        $this->assertRegExp( '/"message":"' . $response_message . '"/', $log );
+        $this->assertRegExp( "/comment.ERROR: $context.get_discourse_category/", $log );
+        $this->assertRegExp( '/"message":"An invalid response was returned from Discourse"/', $log );
 
         // Cleanup.
         wp_delete_post( $public_post_id );

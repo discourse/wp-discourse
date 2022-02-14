@@ -50,7 +50,7 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_sync_to_discourse_when_creating() {
         // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create' );
+        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
         $discourse_post_id   = $body->id;
         $discourse_topic_id  = $body->topic_id;
         $discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
@@ -81,7 +81,11 @@ class DiscoursePublishTest extends UnitTest {
         // Set up the error responses.
         $raw_response  = $this->build_response( 'unprocessable', 'embed' );
         $error_message = json_decode( $raw_response['body'] )->errors[0];
-        $this->mock_remote_post( $raw_response );
+        $request = array(
+          'response' => $raw_response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -119,7 +123,11 @@ class DiscoursePublishTest extends UnitTest {
         // Set up the error responses.
         $raw_response  = $this->build_response( 'invalid_parameters', 'category' );
         $error_message = json_decode( $raw_response['body'] )->errors[0];
-        $this->mock_remote_post( $raw_response );
+        $request = array(
+          'response' => $raw_response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -156,7 +164,11 @@ class DiscoursePublishTest extends UnitTest {
         // Setup the invalid respond body.
         $response  = $this->build_response( 'success' );
         $response['body'] = '{ "invalid_body" : true }';
-        $this->mock_remote_post( $response );
+        $request = array(
+          'response' => $response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -192,7 +204,11 @@ class DiscoursePublishTest extends UnitTest {
         // Setup the enqueued response body.
         $response  = $this->build_response( 'success' );
         $response['body'] = '';
-        $this->mock_remote_post( $response );
+        $request = array(
+          'response' => $response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -231,7 +247,7 @@ class DiscoursePublishTest extends UnitTest {
         $this->publish->setup_options( self::$plugin_options );
       
         // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create' );
+        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
         $discourse_post_id   = $body->id;
         $discourse_topic_id  = $body->topic_id;
         $discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
@@ -260,19 +276,14 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_sync_to_discourse_pin_topic() {
         // Set up a response body for creating a new post, with subsequent pin request.
+        $discourse_post = json_decode( $this->response_body_file( "post_create" ) );
         $pin_until      = '2021-02-17';
-        $pin_until_body = http_build_query(
-            array(
-				'status'  => 'pinned',
-				'enabled' => 'true',
-				'until'   => $pin_until,
-			)
-        );
         $second_request = array(
-            'body'     => $pin_until_body,
+            'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/status",
+            'method'   => 'PUT',
             'response' => $this->build_response( 'success' ),
         );
-        $body           = $this->mock_remote_post_success( 'post_create', $second_request );
+        $body           = $this->mock_remote_post_success( 'post_create', 'POST', $second_request );
 
         // Add a post that will be pinned.
         $post_atts                                 = self::$post_atts;
@@ -300,7 +311,7 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_sync_to_discourse_when_updating() {
         // Set up a response body for updating an existing post.
-        $body = $this->mock_remote_post_success( 'post_update' );
+        $body = $this->mock_remote_post_success( 'post_update', 'PUT' );
         $post = $body->post;
 
         $discourse_post_id   = $post->id;
@@ -339,7 +350,11 @@ class DiscoursePublishTest extends UnitTest {
         $body = json_decode( $raw_body );
         $body->post->deleted_at = '2021-03-10T23:06:05.328Z';
         $response['body'] = json_encode( $body );
-        $this->mock_remote_post( $response );
+        $request = array(
+          'response' => $response,
+          'method'   => 'PUT'
+        );
+        $this->mock_remote_post( $request );
 
         // Add a post that's already been published to Discourse.
         $discourse_post_id                            = $body->post->id;
@@ -389,16 +404,12 @@ class DiscoursePublishTest extends UnitTest {
         $post_id                                      = wp_insert_post( $post_atts, false, false );
 
         // Set up a response body for updating an existing post, and the featured link in the second request.
-        $featured_link_body = http_build_query(
-            array(
-				'featured_link' => get_permalink( $post_id ),
-			)
-            );
         $second_request     = array(
-            'body'     => $featured_link_body,
+            'url'      => self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id,
+            'method'   => 'PUT',
             'response' => $this->build_response( 'success' ),
         );
-        $body               = $this->mock_remote_post_success( 'post_update', $second_request );
+        $body               = $this->mock_remote_post_success( 'post_update', 'PUT', $second_request );
         $post               = $body->post;
 
         // Run the update.
@@ -426,7 +437,7 @@ class DiscoursePublishTest extends UnitTest {
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for updating an existing post.
-        $body = $this->mock_remote_post_success( 'post_update' );
+        $body = $this->mock_remote_post_success( 'post_update', 'PUT' );
         $post = $body->post;
 
         $discourse_post_id   = $post->id;
@@ -464,16 +475,16 @@ class DiscoursePublishTest extends UnitTest {
         if ( ! $excluded_term ) {
           $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
         }
-        $excluded_term_id = $excluded_term['term_id'];
+        $excluded_term = get_tag( $excluded_term['term_id'] );
+        $excluded_term_slug = $excluded_term->slug;
 
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        // Enable exclude_tags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create' );
-        $discourse_post_id   = $body->id;
-        $discourse_category  = self::$post_atts['tags_input'] = array( $excluded_term_id );
+        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
+        self::$post_atts['tags_input'] = array( $excluded_term_slug );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -488,7 +499,7 @@ class DiscoursePublishTest extends UnitTest {
 
         // Cleanup.
         wp_delete_post( $post_id );
-        wp_delete_term( $excluded_term_id, 'post_tags' );
+        wp_delete_term( $excluded_term->ID, 'post_tags' );
     }
 
     /**
@@ -500,23 +511,25 @@ class DiscoursePublishTest extends UnitTest {
         if ( ! $term ) {
           $term = wp_insert_term( 'publish', 'post_tag' );
         }
-        $term_id = $term['term_id'];
+        $term = get_tag( $term['term_id'] );
+        $term_slug = $term->slug;
 
         // Create the exclusionary tag
         $excluded_term = term_exists( 'dont_publish', 'post_tag' );
         if ( ! $excluded_term ) {
           $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
         }
-        $excluded_term_id = $excluded_term['term_id'];
+        $excluded_term = get_tag( $excluded_term['term_id'] );
+        $excluded_term_slug = $excluded_term->slug;
 
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_id );
+        // Enable excluded tags option.
+        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create' );
+        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
         $discourse_post_id   = $body->id;
-        $discourse_category  = self::$post_atts['tags_input'] = array( $term_id );
+        self::$post_atts['tags_input'] = array( $term_slug );
 
         // Add the post.
         $post_id = wp_insert_post( self::$post_atts, false, false );
@@ -531,8 +544,8 @@ class DiscoursePublishTest extends UnitTest {
 
         // Cleanup.
         wp_delete_post( $post_id );
-        wp_delete_term( $term_id, 'post_tags' );
-        wp_delete_term( $excluded_term_id, 'post_tags' );
+        wp_delete_term( $term->ID, 'post_tags' );
+        wp_delete_term( $excluded_term->ID, 'post_tags' );
     }
 
     /**
@@ -540,7 +553,11 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_remote_post_success() {
         $success_response = $this->build_response( 'success' );
-        $this->mock_remote_post( $success_response );
+        $request = array(
+          'response' => $success_response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
         $response = $this->publish->remote_post( ...self::$remote_post_params );
         $this->assertEquals( $response, $success_response );
     }
@@ -550,7 +567,11 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_remote_post_forbidden() {
         $raw_response = $this->build_response( 'forbidden' );
-        $this->mock_remote_post( $raw_response );
+        $request = array(
+          'response' => $raw_response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         $response = $this->publish->remote_post( ...self::$remote_post_params );
         $this->assertEquals( $response, $this->build_post_error() );
@@ -565,7 +586,11 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_remote_post_unprocessable() {
         $raw_response = $this->build_response( 'unprocessable', 'title' );
-        $this->mock_remote_post( $raw_response );
+        $request = array(
+          'response' => $raw_response,
+          'method'   => 'POST'
+        );
+        $this->mock_remote_post( $request );
 
         $response = $this->publish->remote_post( ...self::$remote_post_params );
         $this->assertEquals( $response, $this->build_post_error() );
@@ -579,12 +604,14 @@ class DiscoursePublishTest extends UnitTest {
      * Forbidden remote_post request returns standardised WP_Error and creates correct log.
      */
     public function test_remote_post_failed_to_connect() {
-        $this->mock_remote_post(
-            new \WP_Error(
-                'http_request_failed',
-                'cURL error 7: Failed to connect to localhost port 3000: Connection refused'
-            )
+        $request = array(
+          'method'   => 'POST',
+          'response' => new \WP_Error(
+              'http_request_failed',
+              'cURL error 7: Failed to connect to localhost port 3000: Connection refused'
+          )
         );
+        $this->mock_remote_post( $request );
 
         $response = $this->publish->remote_post( ...self::$remote_post_params );
         $this->assertEquals( $response, $this->build_post_error() );

@@ -22,15 +22,17 @@ trait RemotePost {
           'success'            => 200,
           'invalid_parameters' => 400,
           'forbidden'          => 403,
+          'not_found'          => 404,
           'unprocessable'      => 422,
       );
       $messages = array(
           'success'            => 'OK',
           'invalid_parameters' => 'Bad Request',
           'forbidden'          => 'Forbidden',
+          'not_found'          => 'Not found',
           'unprocessable'      => 'Unprocessable Entity',
       );
-      if ( in_array( $type, array( 'invalid_parameters', 'unprocessable' ), true ) ) {
+      if ( in_array( $type, array( 'invalid_parameters', 'unprocessable', 'not_found' ), true ) ) {
           $body = $this->response_body_json( $type, $sub_type );
       } else {
           $body = array(
@@ -56,7 +58,7 @@ trait RemotePost {
    * @param string $action_type Action type of test.
    */
   protected function response_body_json( $type, $sub_type = null, $action_type = 'create_post' ) {
-      if ( in_array( $type, array( 'post_create', 'post_update' ), true ) ) {
+      if ( in_array( $type, array( 'post_create', 'post_update', 'user', 'comments', 'site', 'users', 'sync_sso', 'groups', 'user_create' ), true ) ) {
           return $this->response_body_file( $type );
       }
       if ( 'unprocessable' === $type ) {
@@ -68,6 +70,7 @@ trait RemotePost {
       } else {
           $messages     = array(
               'invalid_parameters' => "You supplied invalid parameters to the request: $sub_type",
+              'not_found'          => "Sorry, that resource doesn't exist in our system.",
               'forbidden'          => 'You are not permitted to view the requested resource. The API username or key is invalid.',
           );
           $message_type = $type;
@@ -93,17 +96,20 @@ trait RemotePost {
   /**
    * Mock remote post response.
    *
-   * @param object $response Remote post response object.
-   * @param object $second_request Second request response of second request in tested method.
+   * @param object $first_request First request in tested method.
+   * @param object $second_request Second request in tested method.
    */
-  protected function mock_remote_post( $response, $second_request = null ) {
+  protected function mock_remote_post( $first_request, $second_request = null ) {
       add_filter(
           'pre_http_request',
-          function( $prempt, $args, $url ) use ( $response, $second_request ) {
-              if ( ! empty( $second_request ) && ( $second_request['body'] === $args['body'] ) ) {
-                  return $second_request['response'];
+          function( $prempt, $args, $url ) use ( $first_request, $second_request ) {
+              $is_sr = ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false );
+              $request = $is_sr ? $second_request : $first_request;
+
+              if ( $request['method'] != $args['method'] ) {
+                return new \WP_Error( 'http_request_failed', 'Incorrect method' );
               } else {
-                  return $response;
+                return $request['response'];
               }
           },
           10,
@@ -117,11 +123,15 @@ trait RemotePost {
    * @param string $type Type of response.
    * @param object $second_request Second request response of second request in tested method.
    */
-  protected function mock_remote_post_success( $type, $second_request = null ) {
+  protected function mock_remote_post_success( $type, $method = 'GET', $second_request = null ) {
       $raw_body         = $this->response_body_json( $type );
       $response         = $this->build_response( 'success' );
       $response['body'] = $raw_body;
-      $this->mock_remote_post( $response, $second_request );
+      $first_request    = array(
+        'method'  => $method,
+        'response' => $response
+      );
+      $this->mock_remote_post( $first_request, $second_request );
       return json_decode( $raw_body );
   }
 }

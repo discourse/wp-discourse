@@ -170,23 +170,25 @@ class FormHelper {
 	 * Outputs the tag select input.
 	 *
 	 * @param string $option Used to set the selected option.
-	 * @param array  $tags An array of available tags.
+	 * @param string $option_group The option group of the settings field.
 	 * @param string $description The description of the settings field.
 	 */
-	public function tags_select_input( $option, $tags, $description = '' ) {
-		$options = $this->options;
-		$allowed = array(
-			'strong' => array(),
-		);
+	public function tags_select_input( $option, $option_group, $description = '' ) {
+		$options  = $this->options;
+		$tax_name = 'post_tag';
+		$comma    = _x( ',', 'tag delimiter' );
+		$selected = isset( $options[ $option ] ) ? $options[ $option ] : array();
+		$value    = join( "$comma ", $selected );
+		$name     = $this->option_name( $option, $option_group );
 
-		if ( empty( $tags ) ) {
-			echo '<p class="no-tags">' . esc_html_e( 'No tags to select.', 'wp-discourse' ) . '</p>';
-		} else {
-			echo "<select multiple id='discourse-exclude-tags' class='discourse-select-input' name='discourse_publish[exclude_tags][]'>";
-			$this->select_options( $option, $tags );
-			echo '</select>';
-			echo '<p class="description">' . wp_kses( $description, $allowed ) . '</p>';
-		}
+		?>
+			<div class="tagsdiv" id="wpdc-tags-select">
+				<div class="ajaxtag">
+					<input data-wp-taxonomy="<?php echo esc_attr( $tax_name ); ?>" type="text" id="discourse-<?php echo esc_attr( $option ); ?>" name="<?php echo esc_attr( $name ); ?>" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php echo esc_attr( $value ); ?>" />
+				</div>
+			</div>
+			<p class="description"><?php echo esc_attr( $description ); ?></p>
+		<?php
 	}
 
 	/**
@@ -282,22 +284,6 @@ class FormHelper {
 	}
 
 	/**
-	 * Returns post tags ordered by name
-	 *
-	 * @return array
-	 */
-	public function post_tags() {
-		$tags = get_tags(
-			array(
-			    'taxonomy' => 'post_tag',
-			    'orderby'  => 'name',
-			)
-		);
-
-		return apply_filters( 'discourse_tags_to_publish', $tags );
-	}
-
-	/**
 	 * The callback for validating the 'discourse' options.
 	 *
 	 * @param array $inputs The inputs to be validated.
@@ -343,9 +329,9 @@ class FormHelper {
 		// Only check the connection status on the main settings tab.
 		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
 			$connection_status = $this->check_connection_status();
-			if ( 0 === $connection_status || is_wp_error( $connection_status ) ) {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 
+			if ( is_wp_error( $connection_status ) || empty( $connection_status ) || 0 === $connection_status ) {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'connected' ) );
 			}
@@ -365,8 +351,8 @@ class FormHelper {
 						// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
 						__(
 							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
-                                             an existing Discourse admin account, before enabling SSO please ensure that your email
-                                             addresses on Discourse and WordPress match. This is required for SSO login to an
+                                             an existing Discourse admin account, before enabling DiscourseConnect please ensure that your email
+                                             addresses on Discourse and WordPress match. This is required for DiscourseConnect login to an
                                              existing Discourse account.',
 							'wp-discourse'
 						),

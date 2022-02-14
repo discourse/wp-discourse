@@ -123,6 +123,17 @@ class WebhookSettings {
 				'discourse_webhook_settings_section'
 			);
 
+			add_settings_field(
+				'discourse_verbose_webhook_logs',
+				__( 'Verbose Webhook Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_webhook_logs',
+				),
+				'discourse_webhook',
+				'discourse_webhook_settings_section'
+			);
+
 		}// End if().
 
 		register_setting(
@@ -210,7 +221,7 @@ class WebhookSettings {
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
 				'Used to automatically fill in the WordPress user\'s Discourse Name field and store their Discourse Id as metadata.
-This setting will only be activated if your site is functioning as the SSO provider for Discourse (this can be overridden by hooking into the
+This setting will only be activated if your site is functioning as the DiscourseConnect provider for Discourse (this can be overridden by hooking into the
 \'wpdc_use_discourse_user_webhook\' filter.) Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
  URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
 				'wp-discourse'
@@ -279,6 +290,21 @@ This setting will only be activated if your site is functioning as the SSO provi
 	}
 
 	/**
+	 * Outputs markup for the discourse_verbose_webhook_logs checkbox.
+	 */
+	public function verbose_webhook_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-webhook-logs',
+			'discourse_webhook',
+			__(
+				'Enable verbose logs for webhooks.',
+				'wp-discourse'
+			),
+			__( 'Will log successful syncs as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
+		);
+	}
+
+	/**
 	 * Details for the 'webhook_options' tab.
 	 */
 	public function webhook_settings_tab_details() {
@@ -293,9 +319,9 @@ This setting will only be activated if your site is functioning as the SSO provi
 				setup. The WP Discourse plugin has two webhook endpoints, Sync Comment Data and Update Userdata. The
 				Sync Comment Data webhook is used to let the plugin know when a Discourse topic has had a new post added to it.
 				Using it will reduce the number of API requests made between WordPress and your forum. The Update Userdata
-				webhook will only be functional when WordPress is used as the SSO Provider for Discourse. If enabled, it
+				webhook will only be functional when WordPress is used as the DiscourseConnect Provider for Discourse. If enabled, it
 				automatically fills in the user's WordPress name field when a new account is created or updated on Discourse
-				through SSO.",
+				through DiscourseConnect.",
 					'wp-discourse'
 				);
 				?>

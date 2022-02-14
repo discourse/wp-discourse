@@ -18,6 +18,22 @@ class UnitTest extends \WP_UnitTestCase {
   use RemotePost;
 
   /**
+   * Connection options.
+   *
+   * @access public
+   * @var object
+   */
+  public static $connection_options;
+
+  /**
+   * Publish options.
+   *
+   * @access public
+   * @var object
+   */
+  public static $publish_options;
+
+  /**
    * Plugin options.
    *
    * @access public
@@ -57,10 +73,10 @@ class UnitTest extends \WP_UnitTestCase {
   }
 
   /**
-   * Teardown each test.
+   * Setup each test.
    */
   public function setUp() {
-  }
+	}
 
   /**
    * Teardown each test.
@@ -76,12 +92,16 @@ class UnitTest extends \WP_UnitTestCase {
    */
   public static function initialize_shared_variables() {
       self::$discourse_url = 'http://meta.discourse.org';
-      self::$plugin_options = array(
+      self::$connection_options = array(
           'url'                => self::$discourse_url,
           'api-key'            => '1235567',
-          'publish-username'   => 'angus',
-          'allowed_post_types' => array( 'post' )
+          'publish-username'   => 'angus'
       );
+      self::$publish_options = array(
+        'allowed_post_types'      => array( 'post' ),
+        'publish-category-update' => 1
+      );
+      self::$plugin_options = array_merge( self::$connection_options, self::$publish_options );
       self::$post_atts = array(
           'post_author'  => 0,
           'post_content' => 'This is a new post',

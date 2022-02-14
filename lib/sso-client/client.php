@@ -13,17 +13,19 @@ namespace WPDiscourse\SSOClient;
 class Client extends SSOClientBase {
 
 	/**
-	 * Gives access to the plugin options.
+	 * Logger context
 	 *
 	 * @access protected
-	 * @var mixed|void
+	 * @var string
 	 */
-	protected $options;
+	protected $logger_context = 'sso_client';
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'init', array( $this, 'setup_options' ), 4 );
+		add_action( 'init', array( $this, 'setup_logger' ), 4 );
 		add_action( 'init', array( $this, 'parse_request' ), 5 );
 		add_filter( 'wp_login_errors', array( $this, 'handle_login_errors' ) );
 		add_action( 'clear_auth_cookie', array( $this, 'logout_from_discourse' ) );
@@ -107,8 +109,8 @@ class Client extends SSOClientBase {
 	 */
 	public function discourse_sso_alter_user_profile() {
 		$auto_inject_button = $this->discourse_sso_auto_inject_button();
-		$link_text          = ! empty( $this->options['link-to-discourse-text'] ) ? $this->options['link-to-discourse-text'] : '';
-		$linked_text        = ! empty( $this->options['linked-to-discourse-text'] ) ? $this->options['linked-to-discourse-text'] : '';
+		$link_text          = ! empty( self::get_text_options( 'link-to-discourse-text' ) ) ? self::get_text_options( 'link-to-discourse-text' ) : '';
+		$linked_text        = ! empty( self::get_text_options( 'linked-to-discourse-text' ) ) ? self::get_text_options( 'linked-to-discourse-text' ) : '';
 		$user               = wp_get_current_user();
 
 		if ( ! apply_filters( 'wpdc_sso_client_add_link_buttons_on_profile', $auto_inject_button ) ) {
@@ -141,32 +143,31 @@ class Client extends SSOClientBase {
 	 * Parse Request Hook
 	 */
 	public function parse_request() {
-		$this->options = $this->get_options();
-
 		if ( empty( $this->options['sso-client-enabled'] ) || empty( $_GET['sso'] ) || empty( $_GET['sig'] ) ) {
 			return;
 		}
 
 		if ( ! $this->is_valid_signature() ) {
+			$this->logger->error( 'parse_request.invalid_signature' );
 			return;
 		}
 
 		$user_id = $this->get_user_id();
 
 		if ( is_wp_error( $user_id ) ) {
-			$this->handle_errors( $user_id );
+			$this->handle_errors( $user_id, 'parse_request.get_user_id' );
 
 			return;
 		}
 
 		$updated_user = $this->update_user( $user_id );
 		if ( is_wp_error( $updated_user ) ) {
-			$this->handle_errors( $updated_user );
+			$this->handle_errors( $updated_user, 'parse_request.update_user' );
 
 			return;
 		}
 
-		$this->auth_user( $user_id );
+		return $this->auth_user( $user_id );
 	}
 
 	/**
@@ -198,24 +199,18 @@ class Client extends SSOClientBase {
 			$user_id  = get_current_user_id();
 			$redirect = $this->get_sso_response( 'return_sso_url' );
 			if ( get_user_meta( $user_id, 'discourse_sso_user_id', true ) ) {
-				wp_safe_redirect( $redirect );
-
-				exit;
+				return $this->redirect_to( $redirect );
 			} else {
 				$discourse_email = $this->get_sso_response( 'email' );
 				$wp_email        = wp_get_current_user()->user_email;
 				if ( $discourse_email === $wp_email ) {
 					update_user_meta( $user_id, 'discourse_sso_user_id', $this->get_sso_response( 'external_id' ) );
 					update_user_meta( $user_id, 'discourse_sso_client_synced', 1 );
-					wp_safe_redirect( $redirect );
-
-					exit;
+					return $this->redirect_to( $redirect );
 				} else {
 					update_user_meta( $user_id, 'discourse_mismatched_emails', 1 );
 					$profile_url = get_edit_profile_url();
-					wp_safe_redirect( $profile_url );
-
-					exit;
+					return $this->redirect_to( $profile_url );
 				}
 			}
 		} else {
@@ -312,30 +307,40 @@ class Client extends SSOClientBase {
 		wp_set_current_user( $user_id, $query['username'] );
 		wp_set_auth_cookie( $user_id );
 		$user = wp_get_current_user();
-		if ( ! $user->exists() ) {
 
+		if ( ! $user->exists() ) {
+			$log_args = array( 'user_id' => $user_id );
+			$this->logger->error( 'auth_user.user_does_not_exist', $log_args );
 			return null;
 		}
 		do_action( 'wp_login', $query['username'], $user );
 
+		$result      = wp_get_current_user();
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_login', $query['return_sso_url'] );
 
-		wp_safe_redirect( $redirect_to );
-		exit;
+		if ( ! empty( $this->options['verbose-sso-logs'] ) ) {
+			$log_args = array( 'user_id' => $user_id );
+			$this->logger->info( 'auth_user.success', $log_args );
+		}
+
+		return $this->redirect_to( $redirect_to );
 	}
 
 	/**
 	 * Handle Login errors
 	 *
 	 * @param  \WP_Error $error WP_Error object.
+	 * @param  string    $context error context.
 	 */
-	private function handle_errors( $error ) {
+	private function handle_errors( $error, $context ) {
+		$log_args = array(
+			'code'    => $error->get_error_code(),
+			'message' => $error->get_error_message(),
+		);
+		$this->logger->error( $context, $log_args );
 		$redirect_to = apply_filters( 'wpdc_sso_client_redirect_after_failed_login', wp_login_url() );
-
-		$redirect_to = add_query_arg( 'discourse_sso_error', $error->get_error_code(), $redirect_to );
-
-		wp_safe_redirect( $redirect_to );
-		exit;
+		$redirect_to = add_query_arg( 'discourse_sso_error', $log_args['code'], $redirect_to );
+		$this->redirect_to( $redirect_to );
 	}
 
 	/**
@@ -410,7 +415,7 @@ class Client extends SSOClientBase {
 	private function get_sso_response( $return_key = '' ) {
 		if ( empty( $_GET['sso'] ) ) { // Input var okay.
 			return null;
-		};
+		}
 
 		if ( 'raw' === $return_key ) {
 
@@ -457,9 +462,6 @@ class Client extends SSOClientBase {
 
 		$user              = wp_get_current_user();
 		$user_id           = $user->ID;
-		$base_url          = $this->options['url'];
-		$api_key           = $this->options['api-key'];
-		$api_username      = $this->options['publish-username'];
 		$discourse_user_id = get_user_meta( $user_id, 'discourse_sso_user_id', true );
 
 		if ( empty( $discourse_user_id ) ) {
@@ -473,24 +475,23 @@ class Client extends SSOClientBase {
 			update_user_meta( $user_id, 'discourse_sso_user_id', $discourse_user_id );
 		}
 
-		$logout_url      = $base_url . "/admin/users/$discourse_user_id/log_out";
-		$logout_url      = esc_url_raw( $logout_url );
-		$logout_response = wp_remote_post(
-			$logout_url,
-			array(
-				'method'  => 'POST',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_key ),
-					'Api-Username' => sanitize_text_field( $api_username ),
-				),
-			)
-		);
+		$path     = "/admin/users/$discourse_user_id/log_out";
+		$response = $this->discourse_request( $path, array( 'method' => 'POST' ) );
 
-		if ( ! $this->validate( $logout_response ) ) {
-
+		if ( ! $this->validate( $response ) ) {
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );
+		} else {
+			return null;
 		}
+	}
 
-		return null;
+	/**
+	 * Handle redirects
+	 *
+	 * @param string $url Url to redirect to.
+	 */
+	public function redirect_to( $url ) {
+		wp_safe_redirect( esc_url_raw( $url ) );
+		exit;
 	}
 }

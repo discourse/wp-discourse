@@ -1,0 +1,44 @@
+name: WP-Discourse Tests
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Tests on PHP ${{ matrix.php }}
+    strategy:
+      matrix:
+        include:
+          - php: "7.4"
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Install Composer
+        uses: ramsey/composer-install@v1
+        with:
+          dependency-versions: "highest"
+          composer-options: "--ignore-platform-reqs"
+
+      - name: Install PHPEnv
+        run: |
+          git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
+          export PATH="$HOME/.phpenv/bin:$PATH"
+          phpenv rehash
+
+      - name: PHPUnit
+        run: |
+          sudo /etc/init.d/mysql start
+          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
+          vendor/bin/phpunit
+
+      - name: PHPUnit Multisite
+        run: |
+          vendor/bin/phpunit -c tests/phpunit/multisite.xml

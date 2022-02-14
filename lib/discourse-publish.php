@@ -8,25 +8,15 @@
 
 namespace WPDiscourse\DiscoursePublish;
 
+use WPDiscourse\DiscourseBase;
 use WPDiscourse\Templates\HTMLTemplates as Templates;
-use WPDiscourse\Shared\PluginUtilities;
 use WPDiscourse\Shared\TemplateFunctions;
-use WPDiscourse\Logs\Logger;
 
 /**
  * Class DiscoursePublish
  */
-class DiscoursePublish {
-	use PluginUtilities;
+class DiscoursePublish extends DiscourseBase {
 	use TemplateFunctions;
-
-	/**
-	 * Gives access to the plugin options.
-	 *
-	 * @access protected
-	 * @var mixed|void
-	 */
-	protected $options;
 
 	/**
 	 * An email_notification object that has a publish_failure_notification method.
@@ -37,12 +27,12 @@ class DiscoursePublish {
 	protected $email_notifier;
 
 	/**
-	 * Instance of Logger
-	 *
-	 * @access protected
-	 * @var \WPDiscourse\Logs\Logger
-	 */
-	protected $logger;
+     * Logger context
+     *
+     * @access protected
+     * @var string
+     */
+  protected $logger_context = 'publish';
 
 	/**
 	 * Instance store for log args
@@ -76,28 +66,6 @@ class DiscoursePublish {
 
 			add_action( 'xmlrpc_publish_post', array( $this, 'xmlrpc_publish_post_to_discourse' ) );
 		}
-	}
-
-	/**
-	 * Setup options.
-	 *
-	 * @param object $extra_options Extra options used for testing.
-	 */
-	public function setup_options( $extra_options = null ) {
-		$this->options = $this->get_options();
-
-		if ( ! empty( $extra_options ) ) {
-			foreach ( $extra_options as $key => $value ) {
-				$this->options[ $key ] = $value;
-			}
-		}
-	}
-
-	/**
-	 * Setup Logger for the pubish context.
-	 */
-	public function setup_logger() {
-		$this->logger = Logger::create( 'publish' );
 	}
 
 	/**
@@ -310,9 +278,8 @@ class DiscoursePublish {
 			if ( ! is_array( $tags ) ) {
 				$tags = explode( ',', $tags );
 			}
-			$tags_param = $this->tags_param( $tags );
 		} else {
-			$tags_param = '';
+			$tags = array();
 		}
 
 		$remote_post_type = '';
@@ -327,7 +294,7 @@ class DiscoursePublish {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
 
-			$data                = array(
+			$body = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'title'            => $title,
@@ -337,38 +304,34 @@ class DiscoursePublish {
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => $unlisted ? 'false' : 'true',
 			);
-			$url                 = $options['url'] . '/posts';
+
+			$tags = array_filter( $tags );
+			if ( ! empty( $tags ) ) {
+				$body['tags'] = $tags;
+			}
+
+			$path                = '/posts';
 			$remote_post_options = array(
-				'timeout' => 30,
-				'method'  => 'POST',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $options['api-key'] ),
-					'Api-Username' => sanitize_text_field( $username ),
-				),
-				'body'    => http_build_query( $data ) . $tags_param,
+				'method' => 'POST',
+				'body'   => $body,
 			);
 			$remote_post_type    = 'create_post';
 		} else {
 			// The post has already been published.
-			$data                = array(
+			$body                = array(
 				'title'            => $title,
 				'post[raw]'        => $baked,
 				'skip_validations' => 'true',
 			);
-			$url                 = $options['url'] . '/posts/' . $discourse_id;
+			$path                = '/posts/' . $discourse_id;
 			$remote_post_options = array(
-				'timeout' => 30,
-				'method'  => 'PUT',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $options['api-key'] ),
-					'Api-Username' => sanitize_text_field( $username ),
-				),
-				'body'    => http_build_query( $data ),
+				'method' => 'PUT',
+				'body'   => $body,
 			);
 			$remote_post_type    = 'update_post';
 		}
 
-		$response = $this->remote_post( $url, $remote_post_options, $remote_post_type, $post_id );
+		$response = $this->remote_post( $path, $remote_post_options, $remote_post_type, $post_id );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -384,10 +347,11 @@ class DiscoursePublish {
 			$discourse_id = intval( $body->id );
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
+			$topic_url    = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 
 			$this->dc_add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 			$this->dc_add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
-			$this->dc_add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
+			$this->dc_add_post_meta( $post_id, 'discourse_permalink', $topic_url, true );
 			update_post_meta( $post_id, 'publish_post_category', $category );
 
 			$this->log_args['discourse_post_id'] = $discourse_id;
@@ -413,12 +377,12 @@ class DiscoursePublish {
 		}
 
 		if ( 'update_post' === $remote_post_type ) {
-			$discourse_post      = $body->post;
-			$topic_slug          = sanitize_text_field( $discourse_post->topic_slug );
-			$topic_id            = intval( $discourse_post->topic_id );
-			$discourse_topic_url = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+			$discourse_post = $body->post;
+			$topic_slug     = sanitize_text_field( $discourse_post->topic_slug );
+			$topic_id       = intval( $discourse_post->topic_id );
+			$topic_url      = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 
-			update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
+			update_post_meta( $post_id, 'discourse_permalink', $topic_url );
 			update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 			// Allows the publish_post_category to be set by clicking the "Update Discourse Topic" button.
@@ -434,20 +398,15 @@ class DiscoursePublish {
 
 			// Update the topic's featured_link property.
 			if ( ! empty( $options['add-featured-link'] ) ) {
-				$data                = array(
+				$body                = array(
 					'featured_link' => $permalink,
 				);
 				$remote_post_options = array(
-					'timeout' => 30,
-					'method'  => 'PUT',
-					'headers' => array(
-						'Api-Key'      => sanitize_key( $options['api-key'] ),
-						'Api-Username' => sanitize_text_field( $username ),
-					),
-					'body'    => http_build_query( $data ),
+					'method' => 'PUT',
+					'body'   => $body,
 				);
 
-				$featured_response = $this->remote_post( $discourse_topic_url, $remote_post_options, 'featured_link', $post_id );
+				$featured_response = $this->remote_post( $topic_url, $remote_post_options, 'featured_link', $post_id );
 
 				if ( is_wp_error( $featured_response ) ) {
 					return $featured_response;
@@ -462,29 +421,6 @@ class DiscoursePublish {
 	}
 
 	/**
-	 * Generates the tags parameter in the form that is required by Discourse.
-	 *
-	 * @param array $tags The array of tags for the topic.
-	 *
-	 * @return string
-	 */
-	protected function tags_param( $tags ) {
-		$tags_string = '';
-		if ( ! empty( $tags ) ) {
-			foreach ( $tags as $tag ) {
-				$tag = sanitize_text_field( $tag );
-				if ( empty( $tag ) ) {
-
-					break;
-				}
-				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
-			}
-		}
-
-		return $tags_string;
-	}
-
-	/**
 	 * Pins a Discourse topic.
 	 *
 	 * @param int    $post_id The WordPress id of the pinned post.
@@ -494,23 +430,18 @@ class DiscoursePublish {
 	 * @return null|\WP_Error
 	 */
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
-		$status_url   = $this->options['url'] . "/t/$topic_id/status";
-		$data         = array(
+		$status_path  = "/t/$topic_id/status";
+		$body         = array(
 			'status'  => 'pinned',
 			'enabled' => 'true',
 			'until'   => $pin_until,
 		);
 		$post_options = array(
-			'timeout' => 30,
-			'method'  => 'PUT',
-			'headers' => array(
-				'Api-Key'      => $this->options['api-key'],
-				'Api-Username' => $this->options['publish-username'],
-			),
-			'body'    => http_build_query( $data ),
+			'method' => 'PUT',
+			'body'   => $body,
 		);
 
-		$response = $this->remote_post( $status_url, $post_options, 'pin_topic', $post_id );
+		$response = $this->remote_post( $status_path, $post_options, 'pin_topic', $post_id );
 
 		delete_post_meta( $post_id, 'wpdc_pin_until' );
 
@@ -541,15 +472,16 @@ class DiscoursePublish {
 	}
 
 	/**
-	 * Wrapper of wp_remote_post to handle validation, logging and error handling.
+	 * Wrapper of discourse_request to handle validation, logging and error handling.
 	 *
-	 * @param string $url Url of the remote post.
+	 * @param string $url Url or path of the remote post.
 	 * @param object $remote_options Options to pass to remote post.
 	 * @param string $remote_type Remote post type.
 	 * @param int    $post_id ID of post being sent.
 	 */
 	public function remote_post( $url, $remote_options, $remote_type, $post_id ) {
-		$response = wp_remote_post( esc_url_raw( $url ), $remote_options );
+		$remote_options['raw'] = true;
+		$response              = $this->discourse_request( $url, $remote_options );
 
 		if ( ! $this->validate( $response ) ) {
 			$response = $this->handle_error( $remote_type, $response, $post_id );
@@ -633,7 +565,7 @@ class DiscoursePublish {
 	}
 
 	/**
-	 * Handle publication errors.s
+	 * Handle publication errors
 	 *
 	 * @param string $remote_type Remote post type.
 	 * @param object $response Remote post response.
@@ -752,12 +684,12 @@ class DiscoursePublish {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param null|int $post_id The ID of the post in question.
+	 * @param int      $post_id The ID of the post in question.
 	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return bool
 	 */
-	protected function has_excluded_tag( $post_id = null, $post ) {
+	protected function has_excluded_tag( $post_id, $post ) {
 		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
 			return false;
 		}
@@ -766,14 +698,15 @@ class DiscoursePublish {
 		if ( empty( $post_tags ) || is_wp_error( $post_tags ) ) {
 			return false;
 		}
-		$post_tag_ids = wp_list_pluck( $post_tags, 'term_id' );
 
-		$excluded_tag_ids = $this->get_excluded_tag_ids();
-		if ( empty( $excluded_tag_ids ) ) {
+		$excluded_tag_slugs = $this->get_excluded_tag_slugs();
+		if ( empty( $excluded_tag_slugs ) ) {
 			return false;
 		}
 
-		return count( array_intersect( $post_tag_ids, $excluded_tag_ids ) ) > 0;
+		$post_tag_slugs = wp_list_pluck( $post_tags, 'slug' );
+
+		return count( array_intersect( $post_tag_slugs, $excluded_tag_slugs ) ) > 0;
 	}
 
 	/**
@@ -798,11 +731,11 @@ class DiscoursePublish {
 	 *
 	 * @return mixed
 	 */
-	protected function get_excluded_tag_ids() {
+	protected function get_excluded_tag_slugs() {
 		if ( isset( $this->options['exclude_tags'] ) && is_array( $this->options['exclude_tags'] ) ) {
-			$exclude_tags = $this->options['exclude_tags'];
+			$excluded_tag_slugs = $this->options['exclude_tags'];
 
-			return $exclude_tags;
+			return $excluded_tag_slugs;
 		} else {
 			return array();
 		}
@@ -817,30 +750,6 @@ class DiscoursePublish {
 	 */
 	protected function sanitize_title( $title ) {
 		return wp_strip_all_tags( $title );
-	}
-
-	/**
-	 * Saves the topic_id/blog_id to the wpdc_topic_blog table.
-	 *
-	 * Used for multisite installations so that a Discourse topic_id can be associated with a blog_id.
-	 *
-	 * @param int $topic_id The topic_id to save to the database.
-	 * @param int $blog_id The blog_id to save to the database.
-	 */
-	protected function save_topic_blog_id( $topic_id, $blog_id ) {
-		global $wpdb;
-		$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
-		$wpdb->insert(
-			$table_name,
-			array(
-				'topic_id' => $topic_id,
-				'blog_id'  => $blog_id,
-			),
-			array(
-				'%d',
-				'%d',
-			)
-		); // db call whitelist.
 	}
 
 	/**

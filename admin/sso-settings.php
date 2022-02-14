@@ -76,11 +76,11 @@ class SSOSettings {
 		$this->use_network_sso_settings   = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
 		$this->remove_sso_client_settings = is_multisite() && empty( $this->options['multisite-configuration-enabled'] );
 
-		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=sso' : null;
+		$this->discourse_sso_settings_url = ! empty( $this->options['url'] ) ? $this->options['url'] . '/admin/site_settings/category/all_results?filter=discourse%20connect' : null;
 
 		add_settings_section(
 			'discourse_sso_common_settings_section',
-			__( 'WP Discourse SSO', 'wp-discourse' ),
+			__( 'DiscourseConnect (formerly WP Discourse SSO)', 'wp-discourse' ),
 			array(
 				$this,
 				'common_settings_details',
@@ -90,7 +90,7 @@ class SSOSettings {
 
 		add_settings_field(
 			'discourse_sso_secret',
-			__( 'SSO Secret Key', 'wp-discourse' ),
+			__( 'DiscourseConnect Secret Key', 'wp-discourse' ),
 			array(
 				$this,
 				'sso_secret_input',
@@ -98,6 +98,19 @@ class SSOSettings {
 			'discourse_sso_common',
 			'discourse_sso_common_settings_section'
 		);
+
+		if ( ! $this->use_network_sso_settings ) {
+			add_settings_field(
+				'discourse_verbose_sso_logs',
+				__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_sso_logs',
+				),
+				'discourse_sso_common',
+				'discourse_sso_common_settings_section'
+			);
+		}
 
 		register_setting(
 			'discourse_sso_common',
@@ -110,7 +123,7 @@ class SSOSettings {
 
 		add_settings_section(
 			'discourse_sso_provider_settings_section',
-			__( 'SSO Provider Settings', 'wp-discourse' ),
+			__( 'DiscourseConnect Provider Settings', 'wp-discourse' ),
 			array(
 				$this,
 				'sso_provider_settings_details',
@@ -120,7 +133,7 @@ class SSOSettings {
 
 		add_settings_field(
 			'discourse_enable_sso',
-			__( 'Enable SSO Provider', 'wp-discourse' ),
+			__( 'Enable DiscourseConnect Provider', 'wp-discourse' ),
 			array(
 				$this,
 				'enable_sso_provider_checkbox',
@@ -195,7 +208,7 @@ class SSOSettings {
 
 		add_settings_section(
 			'discourse_sso_client_settings_section',
-			__( 'SSO Client Settings', 'wp-discourse' ),
+			__( 'DiscourseConnect Client Settings', 'wp-discourse' ),
 			array(
 				$this,
 				'sso_client_settings_details',
@@ -206,7 +219,7 @@ class SSOSettings {
 		if ( ! $this->remove_sso_client_settings ) {
 			add_settings_field(
 				'discourse_enable_discourse_sso',
-				__( 'Enable SSO Client', 'wp-discourse' ),
+				__( 'Enable DiscourseConnect Client', 'wp-discourse' ),
 				array(
 					$this,
 					'enable_sso_client_checkbox',
@@ -326,16 +339,16 @@ class SSOSettings {
 			<h3 class="nav-tab-wrapper nav-tab-second-level">
 				<a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
 				   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Secret Key', 'wpdc' ); ?>
+					<?php esc_html_e( 'DiscourseConnect Secret Key', 'wpdc' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
 				   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
-					<?php esc_html_e( 'SSO Provider', 'wpdc' ); ?>
+					<?php esc_html_e( 'DiscourseConnect Provider', 'wpdc' ); ?>
 				</a>
 				<?php if ( ! $this->remove_sso_client_settings ) : ?>
 					<a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
 					   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
-						<?php esc_html_e( 'SSO Client', 'wpdc' ); ?>
+						<?php esc_html_e( 'DiscourseConnect Client', 'wpdc' ); ?>
 					</a>
 				<?php endif; ?>
 			</h3>
@@ -358,7 +371,7 @@ class SSOSettings {
 			?>
 			<p>
 				<em>
-					<?php esc_html_e( 'The SSO Secret Key for your site has been set on the main site in the network.', 'wp-discourse' ); ?>
+					<?php esc_html_e( 'The DiscourseConnect Secret Key for your site has been set on the main site in the network.', 'wp-discourse' ); ?>
 				</em>
 			</p>
 
@@ -369,11 +382,26 @@ class SSOSettings {
 				'discourse_sso_common',
 				__(
 					"A string of text (numbers, letters, and symbols)
-		at least 10 characters long. Use the same value in your forum's 'sso secret' setting.",
+		at least 10 characters long. Use the same value in your forum's 'discourse connect secret' setting.",
 					'wp-discourse'
 				)
 			);
 		}
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_sso_logs checkbox.
+	 */
+	public function verbose_sso_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-sso-logs',
+			'discourse_sso_common',
+			__(
+				'Enable verbose logs for DiscourseConnect.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
+		);
 	}
 
 	/**
@@ -394,8 +422,8 @@ class SSOSettings {
 					<em>
 						<?php
 						esc_html_e(
-							"Your site has been enabled as the SSO provider for your Discourse forum through the main
-                        site on this network. You can configure your site's SSO settings on this tab.",
+							"Your site has been enabled as the DiscourseConnect provider for your Discourse forum through the main
+                        site on this network. You can configure your site's DiscourseConnect settings on this tab.",
 							'wp-discourse'
 						);
 						?>
@@ -406,7 +434,7 @@ class SSOSettings {
 					<em>
 						<?php
 						esc_html_e(
-							'The use of all sites on this network as SSO providers for your Discourse forum
+							'The use of all sites on this network as DiscourseConnect providers for your Discourse forum
                         has been disabled by the main site on this network. Enabling any of the settings on this tab will
                         have no effect.',
 							'wp-discourse'
@@ -419,7 +447,7 @@ class SSOSettings {
 
 			<?php
 		} else {
-			$description = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+			$description = __( 'Use this WordPress instance as the DiscourseConnect provider for your Discourse forum.', 'wp-discourse' );
 			$this->form_helper->checkbox_input( 'enable-sso', 'discourse_sso_provider', $description );
 		}// End if().
 	}//end enable_sso_provider_checkbox()
@@ -488,7 +516,7 @@ class SSOSettings {
 	 */
 	public function redirect_without_login_checkbox() {
 		$description = __(
-			'By default, when using WordPress as the SSO provider, links to the Discourse comments automatically log
+			'By default, when using WordPress as the DiscourseConnect provider, links to the Discourse comments automatically log
         the user into Discourse.'
 		);
 		$this->form_helper->checkbox_input( 'redirect-without-login', 'discourse_sso_provider', __( 'Do not force login for links to Discourse comments.' ), $description );
@@ -510,7 +538,7 @@ class SSOSettings {
 				?>
 				<p>
 					<em>
-						<?php esc_html_e( 'The use of your site as an SSO client for Discourse has been enabled by the main site on this network.', 'wp-discourse' ); ?>
+						<?php esc_html_e( 'The use of your site as a DiscourseConnect client for Discourse has been enabled by the main site on this network.', 'wp-discourse' ); ?>
 					</em>
 				</p>
 				<?php
@@ -520,8 +548,8 @@ class SSOSettings {
 					<em>
 						<?php
 						esc_html_e(
-							'The use of all sites on this network to function as an SSO client for Discourse has been
-                        disabled by the main site on this network. Enabling any of the setting on this tab will have no effect.',
+							'The use of all sites on this network to function as a DiscourseConnect client for Discourse has been
+                        disabled by the main site on this network. Enabling any of the settings in this tab will have no effect.',
 							'wp-discourse'
 						);
 						?>
@@ -531,7 +559,7 @@ class SSOSettings {
 				<?php
 			}
 		} else {
-			$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' ) );
+			$this->form_helper->checkbox_input( 'sso-client-enabled', 'discourse_sso_client', __( 'Allow your WordPress site to function as a DiscourseConnect client to Discourse.', 'wp-discourse' ) );
 		}
 	}
 
@@ -593,7 +621,7 @@ class SSOSettings {
 			__(
 				"Used for syncing a WordPress account created through the WordPress registration process with
             an account created by the same user on Discourse. If not enabled, accounts can be synced by clicking on the
-            'Link account with Discourse' link on the user's profile page. Accounts created through the SSO login process
+            'Link account with Discourse' link on the user's profile page. Accounts created through the DiscourseConnect login process
              are automatically synced.",
 				'wp-discourse'
 			)
@@ -620,9 +648,9 @@ class SSOSettings {
 			<em>
 				<?php
 				esc_html_e(
-					'Your WordPress site can be used as either the SSO provider, or as an SSO client with your Discourse forum.
-                When used as the SSO provider, all user authentication for your forum will be handled through WordPress.
-                When used as an SSO client, user authentication for your WordPress site can either be handled through your forum or WordPress.',
+					'Your WordPress site can be used as either the DiscourseConnect provider, or as a DiscourseConnect client with your Discourse forum.
+                When used as the DiscourseConnect provider, all user authentication for your forum will be handled through WordPress.
+                When used as a DiscourseConnect client, user authentication for your WordPress site can either be handled through your forum or WordPress.',
 					'wp-discourse'
 				);
 				?>
@@ -632,8 +660,8 @@ class SSOSettings {
 			<em>
 				<?php
 				esc_html_e(
-					"All SSO functionality requires you to create a secret key that's shared between your forum
-                and your website. Set the secret key on both before enabling SSO.",
+					"All DiscourseConnect functionality requires you to create a secret key that's shared between your forum
+                and your website. Set the secret key on both before enabling DiscourseConnect.",
 					'wp-discourse'
 				);
 				?>
@@ -642,7 +670,7 @@ class SSOSettings {
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
-					<?php esc_html_e( "You can find your forum's SSO settings ", 'wp-discourse' ); ?>
+					<?php esc_html_e( "You can find your forum's DiscourseConnect settings ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
 					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
@@ -660,7 +688,7 @@ class SSOSettings {
 			<em>
 				<?php
 				esc_html_e(
-					'Enabling your site to function as the SSO provider transfers all user authentication from
+					'Enabling your site to function as the DiscourseConnect provider transfers all user authentication from
                 Discourse to WordPress. Use of this setting requires some configuration on Discourse:',
 					'wp-discourse'
 				);
@@ -674,10 +702,10 @@ class SSOSettings {
 			<li>
 				<em><?php esc_html_e( 'add the home URL of your site ', 'wp-discourse' ); ?></em>
 				<code class="wpdc-select-all"><?php echo esc_url( home_url() ); ?></code>
-				<em><?php esc_html_e( " to the 'sso url' setting", 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( " to the 'discourse connect url' setting", 'wp-discourse' ); ?></em>
 			</li>
 			<li>
-				<em><?php esc_html_e( "make sure that the 'sso secret' has been set, and that it's value matches the 'SSO Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
+				<em><?php esc_html_e( "make sure that the 'DiscourseConnect Secret' has been set, and that it's value matches the 'DiscourseConnect Secret Key' setting on your WordPress site", 'wp-discourse' ); ?></em>
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
@@ -695,7 +723,7 @@ class SSOSettings {
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
-					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
+					<?php esc_html_e( "Your forum's DiscourseConnect settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
 					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
@@ -713,8 +741,8 @@ class SSOSettings {
 			<em>
 				<?php
 				esc_html_e(
-					"Enabling your site to function as an SSO client allows WordPress user authentication to be handled
-                through either your Discourse forum, or your WordPress site. If a Discourse user logs into WordPress through an SSO link,
+					"Enabling your site to function as a DiscourseConnect client allows WordPress user authentication to be handled
+                through either your Discourse forum, or your WordPress site. If a Discourse user logs into WordPress through a DiscourseConnect link,
                 they will be authenticated based on their Discourse credentials. If that user doesn't yet exist on your WordPress site, a new
                 user will be created.",
 					'wp-discourse'
@@ -733,14 +761,14 @@ class SSOSettings {
 					<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
 				</li>
 				<li>
-					<?php esc_html_e( "add your 'SSO Secret Key' to the 'sso provider secrets' setting (use your WordPress domain for the domain field)", 'wp-discourse' ); ?>
+					<?php esc_html_e( "add your 'DiscourseConnect Secret Key' to the 'discourse connect provider secrets' setting (use your WordPress domain for the domain field)", 'wp-discourse' ); ?>
 				</li>
 			</em>
 		</ul>
-		<h3>SSO Client Shortcode</h3>
+		<h3>DiscourseConnect Client Shortcode</h3>
 		<p class="wpdc-options-documentation">
 			<em><?php esc_html_e( 'You can add a ', 'wp-discourse' ); ?></em>
-			<code class="wpdc-select-all"><?php esc_html_e( '[discourse_sso_client]' ); ?></code>
+			<code class="wpdc-select-all"><?php esc_html_e( '[discourse_connect_client]' ); ?></code>
 			<em>
 			<?php
 			esc_html_e(
@@ -782,12 +810,12 @@ class SSOSettings {
 			</li>
 		</ul>
 		<p class="wpdc-options-documentation">
-			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_sso_client login='Login Through the Forum' redirect=https://example.com/welcome]", 'wp-discourse' ); ?></code>
+			<em><?php esc_html_e( 'Example: ', 'wp-discourse' ); ?></em><code><?php esc_html_e( "[discourse_connect_client login='Login Through the Forum' redirect=https://example.com/welcome]", 'wp-discourse' ); ?></code>
 		</p>
 		<?php if ( $this->discourse_sso_settings_url ) : ?>
 			<p class="wpdc-options-documentation">
 				<em>
-					<?php esc_html_e( "Your forum's SSO settings are ", 'wp-discourse' ); ?>
+					<?php esc_html_e( "Your forum's DiscourseConnect settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
 					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>

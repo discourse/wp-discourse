@@ -100,6 +100,17 @@ class ConnectionSettings {
 				'discourse_connect',
 				'discourse_connection_settings_section'
 			);
+
+			add_settings_field(
+				'discourse_connection_logs',
+				__( 'Connection Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'connection_logs',
+				),
+				'discourse_connect',
+				'discourse_connection_settings_section'
+			);
 		}// End if().
 
 		register_setting(
@@ -130,7 +141,7 @@ class ConnectionSettings {
 				'discourse_connect',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
 																	   '/admin/api/keys" target="_blank" rel="norefferer noopener">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
-				"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
+				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
 		} else {
@@ -139,7 +150,7 @@ class ConnectionSettings {
 				'discourse_connect',
 				__(
 					"Found on your forum at /admin/api/keys.
-			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
+			If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 					'wp-discourse'
 				)
 			);
@@ -158,6 +169,21 @@ class ConnectionSettings {
 		The Publishing Username is also used for making API calls to Discourse. It must be set to a Discourse admin username.',
 				'wp-discourse'
 			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_connection_logs checkbox.
+	 */
+	public function connection_logs() {
+		$this->form_helper->checkbox_input(
+			'connection-logs',
+			'discourse_connect',
+			__(
+				'Enable connection logs.',
+				'wp-discourse'
+			),
+			__( 'Log attempts to check the connection with Discourse.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 
