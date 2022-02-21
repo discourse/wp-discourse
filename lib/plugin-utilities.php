@@ -399,7 +399,7 @@ trait PluginUtilities {
 		}
 
 		if ( isset( $args['method'] ) ) {
-			$opts['method'] = $args['method']; // default GET.
+			$opts['method'] = strtoupper( $args['method'] ); // default GET.
 		}
 
 		$response = wp_remote_request( $url, $opts );

@@ -245,7 +245,7 @@ class DiscoursePublishTest extends UnitTest {
         // Enable direct db pubilcation flags option.
         self::$plugin_options['direct-db-publication-flags'] = 1;
         $this->publish->setup_options( self::$plugin_options );
-      
+
         // Set up a response body for creating a new post.
         $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
         $discourse_post_id   = $body->id;
@@ -301,6 +301,49 @@ class DiscoursePublishTest extends UnitTest {
         // Ensure the right result.
         $this->assertFalse( is_wp_error( $response ) );
         $this->assertTrue( empty( get_post_meta( $post_id, 'wpdc_pin_until', true ) ) );
+
+        // Cleanup.
+        wp_delete_post( $post_id );
+    }
+
+    /**
+     * Sync_to_discourse when creating a new post with Discourse Username set.
+     */
+    public function test_sync_to_discourse_discourse_username() {
+        $discourse_username = 'angus';
+
+        // Setup the user
+        $user_id = $this->factory->user->create();
+        add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
+
+        // Set up a response body for creating a new post
+        $discourse_post = json_decode( $this->response_body_file( "post_create" ) );
+        $second_request = array(
+            'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/change-owner",
+            'method'   => 'POST',
+            'body'     => json_encode(array(
+              'username'  => $discourse_username,
+        			'post_ids' => [ "{$discourse_post->id}" ]
+            )),
+            'response' => $this->build_response( 'success' ),
+        );
+        $body           = $this->mock_remote_post_success( 'post_create', 'POST', $second_request );
+
+        // Add the post.
+        $post_atts = self::$post_atts;
+        $post_atts['post_author'] = $user_id;
+        $post_id = wp_insert_post( $post_atts, false, false );
+
+        // Run the publication.
+        $post     = get_post( $post_id );
+        $response = $this->publish->sync_to_discourse_without_lock(
+            $post_id,
+            $post->title,
+            $post->post_content
+        );
+
+        // Ensure the right result.
+        $this->assertFalse( is_wp_error( $response ) );
 
         // Cleanup.
         wp_delete_post( $post_id );
@@ -635,7 +678,7 @@ class DiscoursePublishTest extends UnitTest {
         $message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
         return new \WP_Error( 'discourse_publishing_response_error', $message );
     }
-    
+
     /**
      * Build an error notice returned by discourse-publish when post queued or topic deleted.
      */
@@ -654,7 +697,7 @@ class DiscoursePublishTest extends UnitTest {
 				'method'  => 'POST',
 				'headers' => array(
 					'Api-Key'      => '1234',
-					'Api-Username' => 'angus',
+					'Api-Username' => 'system',
 				),
 				'body'    => http_build_query(
 					array(
@@ -674,4 +717,3 @@ class DiscoursePublishTest extends UnitTest {
         );
     }
 }
-
