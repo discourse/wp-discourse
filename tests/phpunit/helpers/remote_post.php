@@ -108,9 +108,13 @@ trait RemotePost {
 
               if ( $request['method'] != $args['method'] ) {
                 return new \WP_Error( 'http_request_failed', 'Incorrect method' );
-              } else {
-                return $request['response'];
               }
+
+              if ( isset( $request['body'] ) && $request['body'] != $args['body'] ) {
+                return new \WP_Error( 'http_request_failed', 'Incorrect body' );
+              }
+
+              return $request['response'];
           },
           10,
           3
