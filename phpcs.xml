@@ -19,13 +19,23 @@
     <extensions>php</extensions>
     <exclude-pattern>*/lib/wp-new-user-notification.php*</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
-    <exclude-pattern>*/admin/discourse-sidebar/build/index.asset.php**</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/node_modules</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/build</exclude-pattern>
     <exclude-pattern>*/vendor_namespaced/*</exclude-pattern>
     <exclude-pattern>*.js</exclude-pattern>
     <exclude-pattern>*.css</exclude-pattern>
     <exclude-pattern>scoper.inc.php</exclude-pattern>
 
-    <rule ref="Squiz.Commenting">
+    <rule ref="Squiz.Commenting.FunctionComment.Missing">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ParamNameNoMatch">
       <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
     <rule ref="Generic.Commenting">
