@@ -302,6 +302,17 @@ class PublishSettings {
 				'discourse_publish',
 				'discourse_publishing_settings_section'
 			);
+
+			add_settings_field(
+				'discourse_single_user_api_key_publication',
+				__( 'Single User API Key Publication', 'wp-discourse' ),
+				array(
+					$this,
+					'single_user_api_key_publication',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
 		}
 
 		register_setting(
@@ -603,6 +614,21 @@ class PublishSettings {
 				'wp-discourse'
 			),
 			__( 'Will log successful publications as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_direct_discourse_user_publication checkbox.
+	 */
+	public function single_user_api_key_publication() {
+		$this->form_helper->checkbox_input(
+			'single-user-api-key-publication',
+			'discourse_publish',
+			__(
+				"Enable if you're using a Single User API Key",
+				'wp-discourse'
+			),
+			__( 'This allows you to publish to Discourse using the Discourse Username of the post author while using a Single User API Key.', 'wp-discourse' )
 		);
 	}
 

@@ -110,6 +110,10 @@ trait RemotePost {
                 return new \WP_Error( 'http_request_failed', 'Incorrect method' );
               }
 
+              if ( isset( $request['headers'] ) && $request['headers'] != $args['headers'] ) {
+                return new \WP_Error( 'http_request_failed', 'Incorrect headers' );
+              }
+
               if ( isset( $request['body'] ) && $request['body'] != $args['body'] ) {
                 return new \WP_Error( 'http_request_failed', 'Incorrect body' );
               }

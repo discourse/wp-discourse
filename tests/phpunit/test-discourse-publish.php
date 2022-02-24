@@ -310,14 +310,78 @@ class DiscoursePublishTest extends UnitTest {
      * Sync_to_discourse when creating a new post with Discourse Username set.
      */
     public function test_sync_to_discourse_discourse_username() {
-        $discourse_username = 'angus';
+        $discourse_username = 'angus2';
 
         // Setup the user
         $user_id = $this->factory->user->create();
         add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
 
         // Set up a response body for creating a new post
-        $discourse_post = json_decode( $this->response_body_file( "post_create" ) );
+        $raw_body         = $this->response_body_file( "post_create" );
+        $discourse_post   = json_decode( $raw_body );
+        $response         = $this->build_response( 'success' );
+        $response['body'] = $raw_body;
+        $request          = array(
+          'headers' => array(
+            'Api-Key'      => self::$connection_options['api-key'],
+            'Api-Username' => $discourse_username,
+      			'Accept'       => 'application/json',
+            'Content-Type' => 'application/json'
+          ),
+          'method'  => 'POST',
+          'response' => $response
+        );
+        $body = $this->mock_remote_post( $request );
+
+        // Add the post.
+        $post_atts = self::$post_atts;
+        $post_atts['post_author'] = $user_id;
+        $post_id = wp_insert_post( $post_atts, false, false );
+
+        // Run the publication.
+        $post     = get_post( $post_id );
+        $response = $this->publish->sync_to_discourse_without_lock(
+            $post_id,
+            $post->title,
+            $post->post_content
+        );
+
+        // Ensure the right result.
+        $this->assertFalse( is_wp_error( $response ) );
+
+        // Cleanup.
+        wp_delete_post( $post_id );
+    }
+
+    /**
+     * Sync_to_discourse when creating a new post with Discourse Username set.
+     */
+    public function test_sync_to_discourse_discourse_username_with_single_user_api_key() {
+        $discourse_username = 'angus';
+
+        // Enable single user api key
+        self::$plugin_options['single-user-api-key-publication'] = 1;
+        $this->publish->setup_options( self::$plugin_options );
+
+        // Setup the user
+        $user_id = $this->factory->user->create();
+        add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
+
+        // Set up a response body for creating a new post
+        $raw_body         = $this->response_body_file( "post_create" );
+        $discourse_post   = json_decode( $raw_body );
+        $response         = $this->build_response( 'success' );
+        $response['body'] = $raw_body;
+        $first_request          = array(
+          'headers' => array(
+            'Api-Key'      => self::$connection_options['api-key'],
+            'Api-Username' => self::$connection_options['publish-username'],
+      			'Accept'       => 'application/json',
+            'Content-Type' => 'application/json'
+          ),
+          'method'  => 'POST',
+          'response' => $response
+        );
         $second_request = array(
             'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/change-owner",
             'method'   => 'POST',
@@ -327,7 +391,7 @@ class DiscoursePublishTest extends UnitTest {
             )),
             'response' => $this->build_response( 'success' ),
         );
-        $body           = $this->mock_remote_post_success( 'post_create', 'POST', $second_request );
+        $body = $this->mock_remote_post( $first_request, $second_request );
 
         // Add the post.
         $post_atts = self::$post_atts;
@@ -696,8 +760,8 @@ class DiscoursePublishTest extends UnitTest {
 				'timeout' => 30,
 				'method'  => 'POST',
 				'headers' => array(
-					'Api-Key'      => '1234',
-					'Api-Username' => 'system',
+					'Api-Key'      => self::$connection_options['api-key'],
+					'Api-Username' => self::$connection_options['publish-username'],
 				),
 				'body'    => http_build_query(
 					array(

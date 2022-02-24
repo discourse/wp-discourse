@@ -322,9 +322,17 @@ class DiscoursePublish extends DiscourseBase {
 			$path                = '/posts/' . $discourse_id;
 			$remote_post_options = array(
 				'method' => 'PUT',
-				'body'   => $body,
+				'body'   => $body
 			);
 			$remote_post_type    = 'update_post';
+		}
+
+		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
+		$username_exists = $username && strlen( $username ) > 1;
+		$single_user_api_key = ! empty( $this->options['single-user-api-key-publication'] );
+
+		if ( $remote_post_type === 'create_post' && !$single_user_api_key && $username_exists ) {
+			$remote_post_options['api_username'] = $username;
 		}
 
 		$response = $this->remote_post( $path, $remote_post_options, $remote_post_type, $post_id );
@@ -368,8 +376,7 @@ class DiscoursePublish extends DiscourseBase {
 				}
 			}
 
-			$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
-			if ( $username && strlen( $username ) > 1 ) {
+			if ( $single_user_api_key && $username_exists ) {
 				$change_response = $this->change_post_owner( $post_id, $username );
 
 				if ( is_wp_error( $change_response ) ) {

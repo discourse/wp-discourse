@@ -367,13 +367,19 @@ trait PluginUtilities {
 		}
 
 		$api_credentials = $this->get_api_credentials();
+
 		if ( is_wp_error( $api_credentials ) ) {
 			return $api_credentials;
 		}
 
+		$api_username = $api_credentials['api_username'];
+		if ( ! empty( $args['api_username'] ) ) {
+			$api_username = $args['api_username'];
+		}
+
 		$headers = array(
 			'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-			'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
+			'Api-Username' => sanitize_text_field( $api_username ),
 			'Accept'       => 'application/json',
 		);
 		$opts    = array(
