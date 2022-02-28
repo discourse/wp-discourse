@@ -316,7 +316,9 @@ class DiscoursePublish extends DiscourseBase {
 			// The post has already been published.
 			$body                = array(
 				'title'            => $title,
-				'post[raw]'        => $baked,
+				'post'             => array(
+					'raw' => $baked,
+				),
 				'skip_validations' => 'true',
 			);
 			$path                = '/posts/' . $discourse_id;
