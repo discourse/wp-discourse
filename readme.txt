@@ -4,7 +4,7 @@ Tags: discourse, forum, comments, sso
 Requires at least: 4.7
 Tested up to: 5.9
 Requires PHP: 5.6.0
-Stable tag: 2.4.0
+Stable tag: 2.4.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,11 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.4.1 02/28/2022
+
+- Bugfix "Update Discourse Topic" functionality.
+- Update API Key copy.
 
 #### 2.4.0 02/24/2022
 
