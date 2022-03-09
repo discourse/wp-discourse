@@ -261,10 +261,6 @@ class DiscoursePublish extends DiscourseBase {
 		if ( ! empty( $featured ) ) {
 			$baked = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 		}
-		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
-		if ( ! $username || strlen( $username ) < 2 ) {
-			$username = $options['publish-username'];
-		}
 
 		// Get publish category of a post.
 		$publish_post_category = get_post_meta( $post_id, 'publish_post_category', true );
@@ -320,7 +316,9 @@ class DiscoursePublish extends DiscourseBase {
 			// The post has already been published.
 			$body                = array(
 				'title'            => $title,
-				'post[raw]'        => $baked,
+				'post'             => array(
+					'raw' => $baked,
+				),
 				'skip_validations' => 'true',
 			);
 			$path                = '/posts/' . $discourse_id;
@@ -329,6 +327,14 @@ class DiscoursePublish extends DiscourseBase {
 				'body'   => $body,
 			);
 			$remote_post_type    = 'update_post';
+		}
+
+		$username            = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
+		$username_exists     = $username && strlen( $username ) > 1;
+		$single_user_api_key = ! empty( $this->options['single-user-api-key-publication'] );
+
+		if ( 'create_post' === $remote_post_type && ! $single_user_api_key && $username_exists ) {
+			$remote_post_options['api_username'] = $username;
 		}
 
 		$response = $this->remote_post( $path, $remote_post_options, $remote_post_type, $post_id );
@@ -369,6 +375,14 @@ class DiscoursePublish extends DiscourseBase {
 
 				if ( is_wp_error( $pin_response ) ) {
 					return $pin_response;
+				}
+			}
+
+			if ( $single_user_api_key && $username_exists ) {
+				$change_response = $this->change_post_owner( $post_id, $username );
+
+				if ( is_wp_error( $change_response ) ) {
+					return $change_response;
 				}
 			}
 
@@ -446,6 +460,31 @@ class DiscoursePublish extends DiscourseBase {
 		delete_post_meta( $post_id, 'wpdc_pin_until' );
 
 		return $response;
+	}
+
+	/**
+	 * Changes the owner of a Discourse topic associated with a WordPress post.
+	 *
+	 * @param int    $post_id The WordPress post_id.
+	 * @param string $username The username of the Discourse user to change ownership to.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function change_post_owner( $post_id, $username ) {
+		$discourse_post_id  = get_post_meta( $post_id, 'discourse_post_id', true );
+		$discourse_topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
+
+		$path    = "/t/$discourse_topic_id/change-owner";
+		$body    = array(
+			'username' => $username,
+			'post_ids' => array( $discourse_post_id ),
+		);
+		$options = array(
+			'method' => 'POST',
+			'body'   => $body,
+		);
+
+		return $this->remote_post( $path, $options, 'change_owner', $post_id );
 	}
 
 	/**

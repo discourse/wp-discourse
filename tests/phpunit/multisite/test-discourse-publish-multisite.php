@@ -4,7 +4,7 @@
  *
  * @package WPDiscourse
  */
- 
+
 use WPDiscourse\Test\Multisite;
 use WPDiscourse\Test\DiscoursePublishTest;
 
