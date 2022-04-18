@@ -46,8 +46,11 @@ class DiscourseConnectionTest extends UnitTest {
    * check_connection_status fails when connection fails.
    */
   public function test_check_connection_status_response_error() {
-    $response = $this->build_response( 'not_found' );
-    $this->mock_remote_post( $response );
+		$request = array(
+			'response' => $this->build_response( 'not_found' ),
+			'method'   => 'POST'
+		);
+    $this->mock_remote_post( $request );
 
     $result = $this->form_helper->check_connection_status();
     $this->assertFalse( $result );
@@ -68,7 +71,11 @@ class DiscourseConnectionTest extends UnitTest {
     $scopes = array_filter( $body->scopes, function( $scope ) { return $scope->key !== 'commenting'; });
     $response = $this->build_response( 'success' );
     $response['body'] = json_encode( array( "scopes" => array_values( $scopes ) ) );
-    $this->mock_remote_post( $response );
+		$request = array(
+			'response' => $response,
+			'method'   => 'GET'
+		);
+    $this->mock_remote_post( $request );
 
     $result = $this->form_helper->check_connection_status();
     $this->assertFalse( $result );
@@ -86,4 +93,3 @@ class DiscourseConnectionTest extends UnitTest {
     $this->assertRegExp( '/connection.INFO: check_connection_status.valid_scopes/', $log );
   }
 }
-
