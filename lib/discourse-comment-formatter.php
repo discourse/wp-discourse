@@ -59,7 +59,8 @@ class DiscourseCommentFormatter extends DiscourseBase {
 		}
 
 		if ( ! empty( $missing_post_custom ) ) {
-			$this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );
+			// TO FIX: This call is involved in errors on multiple sites.
+			// $this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );.
 			return wp_kses_post( Templates::bad_response_html() );
 		}
 

@@ -38,6 +38,28 @@ class DiscourseCommentTest extends UnitTest {
         $this->comment->setup_options( self::$plugin_options );
   	}
 
+    public function test_comments_disabled() {
+        global $post; // phpcs:disable WordPress.WP.GlobalVariablesOverride
+        $post_id = wp_insert_post( self::$post_atts, false, false );
+        $post    = get_post( $post_id, OBJECT );
+        setup_postdata( $post );
+
+        // Setup plugin options
+        self::$plugin_options['comment-type'] = 0;
+        $this->comment->setup_options( self::$plugin_options );
+
+        // Run comments_template
+        $template_path = get_stylesheet_directory() . '/comments.php';
+        $result        = $this->comment->comments_template( $template_path );
+
+        // Ensure we got the old template.
+        $this->assertEquals( $result, $template_path );
+
+        // Cleanup
+        wp_delete_post( $post_id );
+        wp_reset_postdata();
+    }
+
     public function test_sync_comments() {
         // Mock objects and endpoints
         $discourse_post    = json_decode( $this->response_body_file( 'post_create' ) );

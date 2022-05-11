@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Setup
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:

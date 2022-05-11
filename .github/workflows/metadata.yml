@@ -9,7 +9,7 @@ jobs:
     name: Metadata
     steps:
       - name: Checkout base repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: "${{ github.base_ref }}"
 
