@@ -57,6 +57,7 @@ class DiscourseCommentTest extends UnitTest {
 
         // Cleanup
         wp_delete_post( $post_id );
+        wp_reset_postdata();
     }
 
     public function test_sync_comments() {
