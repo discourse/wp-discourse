@@ -123,9 +123,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-#### 2.4.2 05/06/2022
+#### 2.4.2 05/11/2022
 
 - Temporarily remove comment formatter log call causing issues on some sites.
+- If comments are disabled return comment template without running comment formatter.
 - Update Github Actions to support Action changes
 
 #### 2.4.1 02/28/2022

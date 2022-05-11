@@ -300,6 +300,11 @@ class DiscourseComment extends DiscourseBase {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
+		if ( empty( $comment_type ) ) {
+
+			return $old;
+		}
+
 		$discourse_comments = null;
 		switch ( $comment_type ) {
 			case 'display-comments':
@@ -319,10 +324,7 @@ class DiscourseComment extends DiscourseBase {
 		// Use $post->comment_count because get_comments_number will return the Discourse comments
 		// number for posts that are published to Discourse.
 		$num_wp_comments = $post->comment_count;
-		if ( empty( $comment_type ) ) {
-
-			return $old;
-		} elseif ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+		if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 			echo wp_kses_post( $discourse_comments );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';
