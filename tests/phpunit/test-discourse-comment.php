@@ -39,9 +39,9 @@ class DiscourseCommentTest extends UnitTest {
   	}
 
     public function test_comments_disabled() {
-        global $post;
+        global $post; // phpcs:disable WordPress.WP.GlobalVariablesOverride
         $post_id = wp_insert_post( self::$post_atts, false, false );
-        $post = get_post( $post_id, OBJECT );
+        $post    = get_post( $post_id, OBJECT );
         setup_postdata( $post );
 
         // Setup plugin options
@@ -50,7 +50,7 @@ class DiscourseCommentTest extends UnitTest {
 
         // Run comments_template
         $template_path = get_stylesheet_directory() . '/comments.php';
-        $result = $this->comment->comments_template( $template_path );
+        $result        = $this->comment->comments_template( $template_path );
 
         // Ensure we got the old template.
         $this->assertEquals( $result, $template_path );
