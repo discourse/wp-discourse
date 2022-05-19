@@ -392,12 +392,7 @@ class FormHelper {
 			<p>
 				<strong>
 				<?php
-				esc_html_e(
-					'You are not connected to Discourse. If you are setting up the plugin, this
-                notice should go away after completing the form on this page.
-								If the issue persists, enable connection logs and look for errors in the log viewer.',
-					'wp-discourse'
-				);
+				esc_html_e( 'You are not connected to Discourse. Check that your connection settings are correct. If the issue persists, enable connection logs and check Logs.', 'wp-discourse' );
 				?>
 </strong>
 			</p>

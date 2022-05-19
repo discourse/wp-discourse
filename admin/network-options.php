@@ -846,7 +846,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 							'</p></div>';
 			} elseif ( empty( $this->check_connection_status() ) ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'You are not connected to Discourse. Check that your connection settings are correct.', 'wp-discourse' ) .
+							__( 'You are not connected to Discourse. Check that your connection settings are correct. If the issue persists, enable connection logs and check Logs.', 'wp-discourse' ) .
 							'</p></div>';
 			} else {
 				$notices .= '<div class="notice notice-success is-dismissible"><p>' .

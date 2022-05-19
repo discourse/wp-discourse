@@ -101,17 +101,31 @@ trait PluginUtilities {
 			return false;
 		}
 
-		$path = '/session/scopes.json';
-		$body = $this->discourse_request( $path );
+		// discourse >= 2.9.0.beta5.
+		$path   = '/session/scopes.json';
+		$scopes = true;
+		$body   = $this->discourse_request( $path );
+
+		// discourse < 2.9.0.beta5.
+		if ( is_wp_error( $body ) ) {
+			$error_data = $body->get_error_data();
+
+			if ( 404 === $error_data['http_code'] ) {
+				$scopes = false;
+				$path   = "/users/{$api_credentials['api_username']}.json";
+				$body   = $this->discourse_request( $path );
+			}
+		}
 
 		if ( ! empty( $options['connection-logs'] ) ) {
 			$log_args = array();
 
 			if ( is_wp_error( $body ) ) {
-				$error_code = $body->get_error_code();
-				$error_data = $body->get_error_data();
-				$log_type   = 'failed_to_connect';
+				$log_type            = 'failed_to_connect';
+				$log_args['error']   = $body->get_error_code();
+				$log_args['message'] = $body->get_error_message();
 
+				$error_data = $body->get_error_data();
 				if ( isset( $error_data['http_code'] ) ) {
 					$log_args['http_code'] = $error_data['http_code'];
 				}
@@ -127,6 +141,11 @@ trait PluginUtilities {
 
 		if ( is_wp_error( $body ) ) {
 			return false;
+		}
+
+		// discourse < 2.9.0.beta5.
+		if ( ! $scopes ) {
+			return true;
 		}
 
 		$scope_validation = $this->validate_scopes( $body->scopes );
