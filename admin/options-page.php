@@ -52,7 +52,7 @@ class OptionsPage {
 		<div class="wrap discourse-options-page-wrap">
 			<h2>
 				<img
-						src="<?php echo WPDISCOURSE_LOGO ?>"
+						src="<?php echo esc_attr( WPDISCOURSE_LOGO ); ?>"
 						alt="Discourse logo" class="discourse-logo">
 				<?php esc_html_e( 'WP Discourse', 'wp-discourse' ); ?>
 			</h2>
