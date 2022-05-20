@@ -2,7 +2,7 @@
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.9
+Tested up to: 6.0
 Requires PHP: 5.6.0
 Stable tag: 2.4.3
 License: GPLv2 or later
@@ -127,6 +127,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 - Granular API Key support (backwards compatible)
 - DiscourseConnect copy fix
+- Wordpress 6.0 support
 
 #### 2.4.2 05/11/2022
 
