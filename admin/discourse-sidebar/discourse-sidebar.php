@@ -120,7 +120,7 @@ class DiscourseSidebar {
 			'set_tag_meta_nonce'      => wp_create_nonce( 'set_tag_meta_nonce' ),
 			'link_topic_nonce'        => wp_create_nonce( 'link_topic_nonce' ),
 			'unlink_post_nonce'       => wp_create_nonce( 'unlink_post_nonce' ),
-			'logo'										=> WPDISCOURSE_LOGO
+			'logo'                    => WPDISCOURSE_LOGO,
 		);
 
 		wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
