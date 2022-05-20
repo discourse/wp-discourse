@@ -329,6 +329,8 @@ class DiscoursePublish extends DiscourseBase {
 			$remote_post_type    = 'update_post';
 		}
 
+		$remote_post_options['body'] = apply_filters( 'wpdc_publish_body', $remote_post_options['body'], $remote_post_type );
+
 		$username            = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
 		$username_exists     = $username && strlen( $username ) > 1;
 		$single_user_api_key = ! empty( $this->options['single-user-api-key-publication'] );

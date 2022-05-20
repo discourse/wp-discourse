@@ -658,6 +658,56 @@ class DiscoursePublishTest extends UnitTest {
     }
 
     /**
+     * wpdc_publish_options filters publish_options
+     */
+    public function test_wpdc_publish_options() {
+        $tags = array( 'tag1', 'tag2' );
+
+        // Add filter.
+        add_filter(
+             'wpdc_publish_body', function( $body, $remote_post_type ) use ( $tags ) {
+          if ( 'create_post' === $remote_post_type ) {
+					$body['tags'] = $tags;
+          }
+          return $body;
+        }, 10, 2
+            );
+
+        $raw_body             = $this->response_body_json( 'post_create' );
+    		$response         = $this->build_response( 'success' );
+    		$response['body'] = $raw_body;
+        $body                 = json_decode( $raw_body );
+
+        // Check tags are in the body passed to request.
+        add_filter(
+             'pre_http_request', function( $prempt, $args, $url ) use ( $tags, $response ) {
+          $body = json_decode( $args['body'] );
+
+          if ( ! isset( $body->tags ) || ! ( $tags === $body->tags ) ) {
+						return new \WP_Error( 'http_request_failed', 'Failed to add tags' );
+  				} else {
+            return $response;
+          }
+        }, 10, 3
+            );
+
+        // Setup post.
+        $post_id           = wp_insert_post( self::$post_atts, false, false );
+        $discourse_post_id = $body->id;
+
+        // Run the publication.
+        $post = get_post( $post_id );
+        $this->publish->publish_post_after_save( $post_id, $post );
+
+        // Ensure publication occurs.
+        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+        // Cleanup.
+        wp_delete_post( $post_id );
+    }
+
+    /**
      * Successful remote_post request returns original response.
      */
     public function test_remote_post_success() {
