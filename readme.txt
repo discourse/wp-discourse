@@ -125,9 +125,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 #### 2.4.3 05/23/2022
 
+- Wordpress 6.0 support
 - Granular API Key support (backwards compatible)
 - DiscourseConnect copy fix
-- Wordpress 6.0 support
+- Add wpdc_publish_body filter
 
 #### 2.4.2 05/11/2022
 
