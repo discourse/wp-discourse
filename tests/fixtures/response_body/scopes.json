@@ -1,0 +1,53 @@
+{
+  "scopes": [
+    {
+      "resource": "wordpress",
+      "action": "publishing",
+      "parameters": [],
+      "urls": [
+        "/site (GET)",
+        "/posts (POST)",
+        "/t/:id (GET)",
+        "/t/:id (PUT)",
+        "/t/:slug/:topic_id/print (GET)",
+        "/t/:slug/:topic_id/summary (GET)",
+        "/t/:topic_id/summary (GET)",
+        "/t/:slug/:topic_id (PUT)",
+        "/t/:slug/:topic_id/status (PUT)",
+        "/t/:topic_id/status (PUT)",
+        "/t/:topic_id/:post_number (GET)",
+        "/t/:topic_id/last (GET)",
+        "/t/:slug/:topic_id (GET)",
+        "/t/:slug/:topic_id/:post_number (GET)",
+        "/t/:slug/:topic_id/last (GET)"
+      ],
+      "allowed_parameters": null,
+      "key": "publishing"
+    },
+    {
+      "resource": "wordpress",
+      "action": "commenting",
+      "parameters": [],
+      "urls": [
+        "/t/:slug/:topic_id/wordpress (GET)",
+        "/t/:topic_id/wordpress (GET)"
+      ],
+      "allowed_parameters": null,
+      "key": "commenting"
+    },
+    {
+      "resource": "wordpress",
+      "action": "discourse connect",
+      "parameters": [],
+      "urls": [
+        "/admin/users/list (GET)",
+        "/admin/users/list/:query (GET)",
+        "/admin/users/:user_id/log_out (POST)",
+        "/admin/users (GET)",
+        "/admin/users/sync_sso (POST)"
+      ],
+      "allowed_parameters": null,
+      "key": "discourse_connect"
+    }
+  ]
+}

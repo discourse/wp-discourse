@@ -58,7 +58,7 @@ trait RemotePost {
    * @param string $action_type Action type of test.
    */
   protected function response_body_json( $type, $sub_type = null, $action_type = 'create_post' ) {
-		if ( in_array( $type, array( 'post_create', 'post_update', 'user', 'comments', 'site', 'users', 'sync_sso', 'groups', 'user_create' ), true ) ) {
+		if ( in_array( $type, array( 'post_create', 'post_update', 'user', 'comments', 'site', 'users', 'sync_sso', 'groups', 'user_create', 'scopes' ), true ) ) {
 			return $this->response_body_file( $type );
 			}
 		if ( 'unprocessable' === $type ) {
