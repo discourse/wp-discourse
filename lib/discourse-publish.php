@@ -211,10 +211,9 @@ class DiscoursePublish extends DiscourseBase {
 		$permalink                   = get_permalink( $post_id );
 
 		$this->log_args = array(
-			'wp_title'          => $title,
-			'wp_author_id'      => $author_id,
-			'wp_post_id'        => $post_id,
-			'discourse_post_id' => $discourse_id,
+			'wp_title'     => $title,
+			'wp_author_id' => $author_id,
+			'wp_post_id'   => $post_id,
 		);
 
 		if ( $use_full_post ) {
@@ -388,6 +387,8 @@ class DiscoursePublish extends DiscourseBase {
 				}
 			}
 
+			$this->after_publish( $post_id, $remote_post_type );
+
 			// The topic has been created and its associated post's metadata has been updated.
 			return null;
 		}
@@ -428,6 +429,8 @@ class DiscoursePublish extends DiscourseBase {
 					return $featured_response;
 				}
 			}
+
+			$this->after_publish( $post_id, $remote_post_type );
 
 			// The topic has been updated, and its associated post's metadata has been updated.
 			return null;
@@ -884,5 +887,28 @@ class DiscoursePublish extends DiscourseBase {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 
 		return $result ? true : false;
+	}
+
+	/**
+	 * Runs after publication successfully completes
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $remote_post_type The remote post type.
+	 *
+	 * @return void
+	 */
+	protected function after_publish( $post_id, $remote_post_type ) {
+		if ( ! empty( $this->options['verbose-publication-logs'] ) ) {
+			$log_args = array(
+				'post_id'             => $post_id,
+				'remote_post_type'    => $remote_post_type,
+				'discourse_post_id'   => get_post_meta( $post_id, 'discourse_post_id', true ),
+				'discourse_topic_id'  => get_post_meta( $post_id, 'discourse_topic_id', true ),
+				'discourse_permalink' => get_post_meta( $post_id, 'discourse_permalink', true ),
+			);
+			$this->logger->info( "$remote_post_type.after_publish", $log_args );
+		}
+
+		do_action( 'wp_discourse_after_publish', $post_id, $remote_post_type );
 	}
 }
