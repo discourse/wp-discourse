@@ -123,6 +123,10 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
+#### 2.4.6 05/09/2022
+
+- Fix logging error when installed alongside S3 Uploads plugin.
+
 #### 2.4.5 07/06/2022
 
 - Fix logout when WP is the DiscourseConnect client and sync logout is enabled.
