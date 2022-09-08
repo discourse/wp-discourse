@@ -328,9 +328,9 @@ class Utilities {
 	/**
 	 * Get the Discourse comment HTML so that it can be displayed without loading the comments template.
 	 *
-	 * @param int $post_id The post ID to display the comments for.
-	 * @param bool $perform_sync Determines whether a comment sync is maybe performed when loading comments.
-	 * @param bool $force_sync Determines whether comment sync cache is bypassed when loading comments.
+	 * @param int    $post_id The post ID to display the comments for.
+	 * @param bool   $perform_sync Determines whether a comment sync is maybe performed when loading comments.
+	 * @param bool   $force_sync Determines whether comment sync cache is bypassed when loading comments.
 	 * @param string $comment_type Type of comment display.
 	 *
 	 * @return string
