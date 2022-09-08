@@ -41,7 +41,7 @@ class DiscourseComment extends DiscourseBase {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
-		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
+		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ), 10, 3 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
@@ -166,12 +166,13 @@ class DiscourseComment extends DiscourseBase {
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int  $post_id The WordPress post id.
-	 * @param bool $force Force comment sync.
+	 * @param int    $post_id The WordPress post id.
+	 * @param bool   $force Force comment sync.
+	 * @param string $comment_type Set comment type for the post.
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $post_id, $force = false ) {
+	public function sync_comments( $post_id, $force = false, $comment_type = null ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -197,7 +198,7 @@ class DiscourseComment extends DiscourseBase {
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
-					$comment_type             = $this->get_comment_type_for_post( $post_id, 'sync_comments' );
+					$comment_type             = $comment_type ? $comment_type : $this->get_comment_type_for_post( $post_id, 'sync_comments' );
 					$comment_count            = 'display-comments' === $comment_type ? intval( $discourse_options['max-comments'] ) : 0;
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
