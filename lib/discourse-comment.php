@@ -54,8 +54,6 @@ class DiscourseComment extends DiscourseBase {
 	 */
 	public function discourse_comments_js() {
 		if ( ! empty( $this->options['ajax-load'] ) ) {
-			$script_path = '../js/load-comments.js';
-			wp_register_script( 'load_comments_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 			$data = array(
 				'commentsURL' => home_url( '/wp-json/wp-discourse/v1/discourse-comments' ),
 			);
@@ -64,8 +62,6 @@ class DiscourseComment extends DiscourseBase {
 		}
 
 		if ( ! empty( $this->options['load-comment-css'] ) ) {
-			$style_path = '../css/comments.css';
-			wp_register_style( 'comment_styles', plugins_url( $style_path, __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . $style_path ) );
 			wp_enqueue_style( 'comment_styles' );
 		}
 	}

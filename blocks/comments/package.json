@@ -1,0 +1,23 @@
+{
+	"name": "wp-discourse-comments",
+	"version": "1.0.0",
+	"description": "WP Discourse Comments",
+	"main": "build/index.js",
+	"scripts": {
+		"build": "wp-scripts build",
+		"format": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"start": "wp-scripts start"
+	},
+	"author": "Discourse",
+	"license": "GPL",
+	"devDependencies": {
+		"@wordpress/scripts": "*"
+	},
+	"dependencies": {
+		"date-fns": "^2.29.3",
+		"html-react-parser": "^3.0.4",
+		"react-inlinesvg": "^3.0.1"
+	}
+}
