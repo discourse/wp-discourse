@@ -9,13 +9,13 @@
  use \WPDiscourse\DiscourseComment\DiscourseComment;
 
  /**
- * Renders the `wp-discourse/comments` block on the server.
- *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post comments for the current post wrapped inside "p" tags.
- */
+  * Renders the `wp-discourse/comments` block on the server.
+  *
+  * @param array    $attributes Block attributes.
+  * @param string   $content    Block default content.
+  * @param WP_Block $block      Block instance.
+  * @return string Returns the filtered post comments for the current post wrapped inside "p" tags.
+  */
 function render_block_wpdc_comments( $attributes, $content, $block ) {
 	$post_id = $block->context['postId'];
   if ( ! isset( $post_id ) ) {
@@ -24,7 +24,7 @@ function render_block_wpdc_comments( $attributes, $content, $block ) {
 
 	$comment_formatter = new DiscourseCommentFormatter();
 	$comment           = new DiscourseComment( $comment_formatter );
-  $default           = '';
+  $default             = '';
 
   $comment->setup_options();
   $comment_formatter->setup_options();
@@ -46,7 +46,7 @@ function register_wpdc_blocks() {
 	register_block_type_from_metadata(
 		WPDISCOURSE_PATH . 'blocks/comments/build/block.json',
 		array(
-			'render_callback' => 'render_block_wpdc_comments'
+			'render_callback' => 'render_block_wpdc_comments',
 		)
 	);
 }
