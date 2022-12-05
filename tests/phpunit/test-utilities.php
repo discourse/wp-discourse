@@ -23,7 +23,7 @@ class UtilitiesTest extends UnitTest {
 		$publish_options = array_merge( $publish_options, self::$publish_options );
 		update_option( 'discourse_publish', $publish_options );
 
-		$this->user_id = $this->factory->user->create();
+		$this->user_id = self::factory()->user->create();
   }
 
   /**

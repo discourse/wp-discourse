@@ -32,7 +32,7 @@ class DiscourseSSOTest extends UnitTest {
 			'sso' => $this->payload,
 			'sig' => rawurlencode( $this->signature ),
 		);
-		$this->user_id = $this->factory->user->create();
+		$this->user_id = self::factory()->user->create();
   }
 
   public function tearDown() {
