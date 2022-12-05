@@ -279,14 +279,14 @@ class Discourse {
 	 * Adds the WP Discourse icon to the <head> for use in the client.
 	 */
 	public function wpdc_icon() {
-		echo '<meta name="wpdc-icon" content="' . WPDISCOURSE_LOGO . '" />';
+		echo '<meta name="wpdc-icon" content="' . esc_html( WPDISCOURSE_LOGO ) . '" />';
 	}
 
 	/**
 	 * Adds the WP Discourse URL to the <head> for use in the client.
 	 */
 	public function wpdc_url() {
-		echo '<meta name="wpdc-url" content="' . $this->options['url'] . '" />';
+		echo '<meta name="wpdc-url" content="' . esc_html( $this->options['url'] ) . '" />';
 	}
 
 	/**
