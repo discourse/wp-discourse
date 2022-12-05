@@ -13,7 +13,7 @@ import { format } from "date-fns";
  * WP Discourse Comments Placeholder
  */
 
-export default function WPDiscourseCommentsPlaceholder() {
+export default function WPDiscourseCommentsPlaceholder( props ) {
   const avatarUrls = [
     aAvatarUrl,
     bAvatarUrl,
@@ -93,8 +93,8 @@ export default function WPDiscourseCommentsPlaceholder() {
             class="wpdc-discourse-topic-link"
             target="_blank"
             rel="noreferrer noopener"
-            href={ __( 'https://discourse.mysite.com/t/1', 'wp-discourse' ) }>
-            { __( 'https://discourse.mysite.com', 'wp-discourse' ) }
+            href={ props.discourse_url }>
+            { props.discourse_url }
           </a>
 				</h3>
 				<div class="comment-reply-title">

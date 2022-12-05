@@ -16,14 +16,14 @@ export default {
   		"name": "Beth Smith",
   		"username": "beth",
   		"created_at": "2021-10-17T11:34:53.978Z",
-  		"cooked": "<p>Great post Cathy! I'll use your advice and let you know how I go.</p>",
+  		"cooked": "<p>Great post Cathy! I'll let you know how I go.</p>",
   		"post_number": 3
   	},{
   		"id": 17,
   		"name": "Cathy Roberts",
   		"username": "cathy",
   		"created_at": "2021-10-17T11:34:53.978Z",
-  		"cooked": "<p>Thanks guys! Getting positive feedback makes me feel like a part of the community.</p>",
+  		"cooked": "<p>Thanks guys! Positive feedback is always appreciated.</p>",
   		"post_number": 4
   	}
   ],

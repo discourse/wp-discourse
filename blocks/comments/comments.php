@@ -27,6 +27,7 @@ function render_block_wpdc_comments( $attributes, $content, $block ) {
   $default           = '';
 
   $comment->setup_options();
+  $comment_formatter->setup_options();
 
   ob_start();
 

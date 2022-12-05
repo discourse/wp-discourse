@@ -2,7 +2,7 @@
   "$schema": "https://schemas.wp.org/trunk/block.json",
   "apiVersion": 2,
   "name": "wp-discourse/comments",
-  "title": "WP Discourse Comments",
+  "title": "Discourse Comments",
   "category": "theme",
   "description": "Shows replies in Discourse as comments in Wordpress.",
   "keywords": [
@@ -12,7 +12,13 @@
   "version": "1.0.0",
   "textdomain": "wp-discourse",
   "supports": {
-    "align": true
+    "align": true,
+    "__experimentalLayout": {
+      "allowSwitching": false,
+      "default": {
+        "inherit": true
+      }
+    }
   },
   "usesContext": [
     "postId",

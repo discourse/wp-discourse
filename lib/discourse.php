@@ -272,6 +272,7 @@ class Discourse {
 	 */
 	public function wpdc_admin_head() {
 		$this->wpdc_icon();
+		$this->wpdc_url();
 	}
 
 	/**
@@ -279,6 +280,13 @@ class Discourse {
 	 */
 	public function wpdc_icon() {
 		echo '<meta name="wpdc-icon" content="' . WPDISCOURSE_LOGO . '" />';
+	}
+
+	/**
+	 * Adds the WP Discourse URL to the <head> for use in the client.
+	 */
+	public function wpdc_url() {
+		echo '<meta name="wpdc-url" content="' . $this->options['url'] . '" />';
 	}
 
 	/**
