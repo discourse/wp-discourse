@@ -87,7 +87,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create();
+      $user_id        = self::factory()->user->create();
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
       add_user_meta( $user->ID, 'discourse_sso_user_id', $discourse_user->id, true );
@@ -117,7 +117,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create( array( 'user_email' => $payload->user->email ) );
+      $user_id        = self::factory()->user->create( array( 'user_email' => $payload->user->email ) );
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
 
@@ -142,7 +142,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create();
+      $user_id        = self::factory()->user->create();
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
 

@@ -238,7 +238,7 @@ class LogViewer {
 				$site_title  = str_replace( ' ', '-', strtolower( get_bloginfo( 'name' ) ) );
 
 				$filename = "{$site_title}-{$plugin_name}-logs-$date_range.zip";
-				$file     = tempnam( 'tmp', $filename );
+				$file     = wp_tempnam( 'tmp', $filename );
 				$zip      = new \ZipArchive();
 				$zip->open( $file, \ZipArchive::OVERWRITE );
 

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 2.4.6
+ * Version: 2.4.7
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,8 +34,10 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.6.0' );
-define( 'WPDISCOURSE_VERSION', '2.4.6' );
-define( 'WPDISCOURSE_LOGO', 'data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMjNweCIgaGVpZ2h0PSIyM3B4IiB2aWV3Qm94PSIwIDAgMjMgMjMiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+CiAgICA8dGl0bGU+R3JvdXA8L3RpdGxlPgogICAgPGcgaWQ9IlBhZ2UtMSIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+CiAgICAgICAgPGcgaWQ9Ikdyb3VwIiBmaWxsPSIjMDAwMDAwIiBmaWxsLXJ1bGU9Im5vbnplcm8iPgogICAgICAgICAgICA8cGF0aCBkPSJNMTEuNTk3NTQ0NiwwIEM1LjMwMzM0ODIxLDAgMCw1LjA1NjkxOTY0IDAsMTEuMjk5Nzc2OCBDMCwxMS41IDAuMDA1MTMzOTI4NTcsMjMgMC4wMDUxMzM5Mjg1NywyMyBMMTEuNTk3NTQ0NiwyMi45ODk3MzIxIEMxNy44OTY4NzUsMjIuOTg5NzMyMSAyMywxNy43Mzc3MjMyIDIzLDExLjQ5NDg2NjEgQzIzLDUuMjUyMDA4OTMgMTcuODk2ODc1LDAgMTEuNTk3NTQ0NiwwIFogTTExLjUsMTguMDcxNDI4NiBDMTAuNTA0MDE3OSwxOC4wNzE0Mjg2IDkuNTU0MjQxMDcsMTcuODUwNjY5NiA4LjcwNzE0Mjg2LDE3LjQ1MDIyMzIgTDQuNTQzNTI2NzksMTguNDgyMTQyOSBMNS43MTkxOTY0MywxNC42MzE2OTY0IEM1LjIxNjA3MTQzLDEzLjcwMjQ1NTQgNC45Mjg1NzE0MywxMi42MzQ1OTgyIDQuOTI4NTcxNDMsMTEuNSBDNC45Mjg1NzE0Myw3Ljg3MDMxMjUgNy44NzAzMTI1LDQuOTI4NTcxNDMgMTEuNSw0LjkyODU3MTQzIEMxNS4xMjk2ODc1LDQuOTI4NTcxNDMgMTguMDcxNDI4Niw3Ljg3MDMxMjUgMTguMDcxNDI4NiwxMS41IEMxOC4wNzE0Mjg2LDE1LjEyOTY4NzUgMTUuMTI5Njg3NSwxOC4wNzE0Mjg2IDExLjUsMTguMDcxNDI4NiBaIiBpZD0iU2hhcGUiPjwvcGF0aD4KICAgICAgICA8L2c+CiAgICA8L2c+Cjwvc3ZnPg==' );
+define( 'WPDISCOURSE_VERSION', '2.4.7' );
+define( 'WPDISCOURSE_LOGO_URL', WPDISCOURSE_PATH . 'assets/icon.svg' );
+$base64 = base64_encode( file_get_contents( WPDISCOURSE_LOGO_URL ) );
+define( 'WPDISCOURSE_LOGO', "data:image/svg+xml;base64,$base64" );
 
 require_once WPDISCOURSE_PATH . 'lib/plugin-utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/template-functions.php';
@@ -61,6 +63,7 @@ require_once WPDISCOURSE_PATH . 'admin/discourse-sidebar/discourse-sidebar.php';
 require_once WPDISCOURSE_PATH . 'vendor_namespaced/autoload.php';
 require_once WPDISCOURSE_PATH . 'lib/logs/logger.php';
 require_once WPDISCOURSE_PATH . 'admin/admin.php';
+require_once WPDISCOURSE_PATH . 'blocks/comments/comments.php';
 
 new WPDiscourse\Discourse\Discourse();
 $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();

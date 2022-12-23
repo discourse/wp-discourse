@@ -120,6 +120,16 @@ article.onebox-body:after {
 	color: #222;
 }
 
+.comment-body .comment-meta {
+	display: flex;
+	gap: 1em;
+}
+
+.comment-body .comment-author {
+	display: flex;
+	gap: 1em;
+}
+
 span.badge-category-bg {
 	width: 9px;
 	height: 9px;
@@ -142,6 +152,7 @@ span.badge-category-bg {
 
 .discourse-comments-area ol {
 	list-style: none;
+	padding: 0;
 }
 
 .discourse-comments-area .comment-reply-title {
@@ -152,3 +163,11 @@ span.badge-category-bg {
 	max-width: none;
 }
 
+.block-editor-block-preview__content-iframe .comments-title-wrap,
+.block-editor-block-preview__content-iframe .comment-respond {
+	display: none;
+}
+.block-editor-block-preview__content-iframe .comment-body img.avatar {
+	width: 50px;
+	height: 50px;
+}

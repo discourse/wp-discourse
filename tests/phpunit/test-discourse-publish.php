@@ -313,7 +313,7 @@ class DiscoursePublishTest extends UnitTest {
         $discourse_username = 'angus2';
 
         // Setup the user
-        $user_id = $this->factory->user->create();
+        $user_id = self::factory()->user->create();
         add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
 
         // Set up a response body for creating a new post
@@ -364,7 +364,7 @@ class DiscoursePublishTest extends UnitTest {
         $this->publish->setup_options( self::$plugin_options );
 
         // Setup the user
-        $user_id = $this->factory->user->create();
+        $user_id = self::factory()->user->create();
         add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
 
         // Set up a response body for creating a new post
