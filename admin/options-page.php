@@ -162,8 +162,7 @@ class OptionsPage {
 					$multisite_configuration = get_site_option( 'wpdc_multisite_configuration' );
 					$hide_submit_button      = ( is_multisite() &&
 										  ( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
-										  ! empty( $multisite_configuration ) ) ||
-											'log_viewer' === $tab;
+										  ! empty( $multisite_configuration ) );
 
 					if ( ! $hide_submit_button ) {
 						submit_button( 'Save Options', 'primary', 'discourse_save_options', false );

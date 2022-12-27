@@ -25,6 +25,14 @@ class LogViewer {
 		protected $enabled;
 
 		/**
+		 * An instance of the FormHelper class.
+		 *
+		 * @access protected
+		 * @var \WPDiscourse\Admin\FormHelper
+		 */
+		protected $form_helper;
+
+		/**
 		 * LogViewer's instance of FileHandler
 		 *
 		 * @var \WPDiscourse\Logs\FileHandler
@@ -53,11 +61,39 @@ class LogViewer {
 		protected $metafile_name;
 
 		/**
-		 * LogViewer constructor.
+		 * Gives access to the plugin options.
+		 *
+		 * @access protected
+		 * @var mixed|void
 		 */
-		public function __construct() {
+		protected $options;
+
+		/**
+		 * LogViewer constructor.
+		 *
+		 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+		 */
+		public function __construct( $form_helper ) {
 				$this->metafile_name = 'logs-metafile';
+				$this->form_helper   = $form_helper;
+
+				add_action( 'admin_init', array( $this, 'setup_options' ) );
 				add_action( 'admin_init', array( $this, 'setup_log_viewer' ) );
+		}
+
+		/**
+		 * Sets the plugin options.
+		 *
+		 * @param object $extra_options Extra options used for testing.
+		 */
+		public function setup_options( $extra_options = null ) {
+			$this->options = $this->get_options();
+
+			if ( ! empty( $extra_options ) ) {
+				foreach ( $extra_options as $key => $value ) {
+					$this->options[ $key ] = $value;
+				}
+			}
 		}
 
 		/**
@@ -72,7 +108,8 @@ class LogViewer {
 						$this->file_handler = new FileHandler( new FileManager() );
 				}
 
-				$this->enabled = $this->file_handler->enabled();
+				$handler_enabled = $this->file_handler->enabled();
+				$this->enabled = ! empty( $this->options['logs-enabled'] ) && $handler_enabled;
 
 				if ( $this->enabled ) {
 						$this->setup_logs();
@@ -98,7 +135,33 @@ class LogViewer {
 					),
 					'discourse_logs'
 				);
+
+				add_settings_field(
+					'discourse_logs_enabled',
+					__( 'Logging enabled', 'wp-discourse' ),
+					array(
+						$this,
+						'logs_enabled',
+					),
+					'discourse_logs',
+					'discourse_log_viewer'
+				);
+
 				register_setting( 'discourse_logs', 'discourse_logs' );
+		}
+
+		/**
+		 * Outputs markup for the discourse_logs checkbox.
+		 */
+		public function logs_enabled() {
+			$this->form_helper->checkbox_input(
+				'logs-enabled',
+				'discourse_logs',
+				__(
+					'Enable WP Discourse logs.',
+					'wp-discourse'
+				)
+			);
 		}
 
 		/**

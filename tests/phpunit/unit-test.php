@@ -34,6 +34,14 @@ class UnitTest extends \WP_UnitTestCase {
   public static $publish_options;
 
   /**
+   * Log options.
+   *
+   * @access public
+   * @var object
+   */
+  public static $log_options;
+
+  /**
    * Plugin options.
    *
    * @access public
@@ -101,7 +109,10 @@ class UnitTest extends \WP_UnitTestCase {
 			'allowed_post_types'      => array( 'post' ),
 			'publish-category-update' => 1,
 		);
-		self::$plugin_options     = array_merge( self::$connection_options, self::$publish_options );
+    self::$log_options    = array(
+			'logs-enabled' => 1,
+		);
+		self::$plugin_options     = array_merge( self::$connection_options, self::$publish_options, self::$log_options );
 		self::$post_atts          = array(
 			'post_author'  => 0,
 			'post_content' => 'This is a new post',

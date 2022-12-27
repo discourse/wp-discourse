@@ -168,6 +168,16 @@ class Discourse {
 	);
 
 	/**
+	 * The discourse_logs options.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_logs = array(
+		'logs-enabled' => 1,
+	);
+
+	/**
 	 * The array of option groups, used for assembling the options into a single array.
 	 *
 	 * @var array
@@ -181,6 +191,7 @@ class Discourse {
 		'discourse_sso_common',
 		'discourse_sso_provider',
 		'discourse_sso_client',
+		'discourse_logs',
 	);
 
 	/**

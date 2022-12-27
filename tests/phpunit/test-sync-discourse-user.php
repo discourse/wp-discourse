@@ -34,8 +34,8 @@ class SyncDiscourseUserTest extends UnitTest {
       self::$plugin_options['enable-sso']                 = 1;
 
       $this->sync_user = new SyncDiscourseUser();
-      $this->sync_user->setup_logger();
       $this->sync_user->setup_options( self::$plugin_options );
+      $this->sync_user->setup_logger();
 
       $this->payload   = $this->response_body_file( 'webhook_user' );
       $this->signature = hash_hmac( 'sha256', $this->payload, self::$plugin_options['webhook-secret'] );

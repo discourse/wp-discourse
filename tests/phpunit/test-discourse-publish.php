@@ -41,8 +41,8 @@ class DiscoursePublishTest extends UnitTest {
 
         $register_actions = false;
         $this->publish    = new DiscoursePublish( new EmailNotification(), $register_actions );
-        $this->publish->setup_logger();
         $this->publish->setup_options( self::$plugin_options );
+        $this->publish->setup_logger();
   	}
 
     /**
