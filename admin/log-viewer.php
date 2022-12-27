@@ -76,7 +76,6 @@ class LogViewer {
 
 				if ( $this->enabled ) {
 						$this->setup_logs();
-						$this->update_meta_file();
 
 						add_action( 'wp_ajax_wpdc_view_log', array( $this, 'log_file_contents' ) );
 						add_action( 'wp_ajax_wpdc_view_logs_metafile', array( $this, 'meta_file_contents' ) );
@@ -219,8 +218,10 @@ class LogViewer {
 		 * Return log meta file contents.
 		 */
 		public function meta_file_contents() {
+				$metafile_contents = $this->build_metafile_contents();
+
 				$response = array(
-					'contents' => file_get_contents( $this->get_metafile_path() ),
+					'contents' => $metafile_contents,
 					'name'     => 'Log Meta File',
 				);
 				wp_send_json_success( $response );
@@ -248,8 +249,10 @@ class LogViewer {
 				}
 
 				$metafile_name     = $this->metafile_name;
-				$metafile_path     = $this->get_metafile_path();
 				$metafile_filename = "{$plugin_name}-{$metafile_name}-{$date_range}.txt";
+				$metafile_path     = $this->get_metafile_path( $metafile_filename );
+
+				$this->update_meta_file( $metafile_path );
 
 				$zip->addFile( $metafile_path, $metafile_filename );
 				$zip->close();
@@ -265,11 +268,35 @@ class LogViewer {
 
 		/**
 		 * Update meta file.
+		 *
+		 * @param string $metafile_path Metafile path.
 		 */
-		public function update_meta_file() {
-				$filename = $this->get_metafile_path();
-				$contents = $this->build_metafile_contents();
-				file_put_contents( $filename, $contents );
+		public function update_meta_file( $metafile_path ) {
+				$this->remove_meta_files();
+				$metafile_contents = $this->build_metafile_contents();
+				file_put_contents( $metafile_path, $metafile_contents );
+		}
+
+		/**
+		 * Remove meta files.
+		 */
+		public function remove_meta_files() {
+			$metafile_name = $this->metafile_name;
+			$metafiles     = glob( $this->file_handler->file_manager->upload_dir . "/*{$metafile_name}*.txt" );
+
+			foreach ( $metafiles as $metafile ) {
+					if ( is_writable( $metafile ) ) {
+							// phpcs:disable WordPress.PHP.DevelopmentFunctions
+							set_error_handler(
+									function () {
+											return false;
+									}
+							);
+							unlink( $metafile );
+							restore_error_handler();
+							// phpcs:enabled WordPress.PHP.DevelopmentFunctions
+					}
+			}
 		}
 
 		/**
@@ -383,10 +410,12 @@ class LogViewer {
 
 		/**
 		 * Get metafile name.
+		 *
+		 * @param string $filename Metafile filename.
 		 */
-		protected function get_metafile_path() {
+		protected function get_metafile_path( $filename ) {
 				$metafile_dir = $this->file_handler->file_manager->upload_dir;
-				return "$metafile_dir/{$this->metafile_name}.txt";
+				return "$metafile_dir/{$filename}";
 		}
 
 		/**
