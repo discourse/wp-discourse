@@ -109,7 +109,7 @@ class UnitTest extends \WP_UnitTestCase {
 			'allowed_post_types'      => array( 'post' ),
 			'publish-category-update' => 1,
 		);
-    self::$log_options    = array(
+		self::$log_options        = array(
 			'logs-enabled' => 1,
 		);
 		self::$plugin_options     = array_merge( self::$connection_options, self::$publish_options, self::$log_options );
