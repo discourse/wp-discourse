@@ -30,8 +30,8 @@ class DiscourseCommentFormatterTest extends UnitTest {
         parent::setUp();
 
         $this->comment_formatter = new DiscourseCommentFormatter();
-        $this->comment_formatter->setup_logger();
         $this->comment_formatter->setup_options( self::$plugin_options );
+        $this->comment_formatter->setup_logger();
 
         // Mock objects and endpoints.
         $this->discourse_post = json_decode( $this->response_body_file( 'post_create' ) );

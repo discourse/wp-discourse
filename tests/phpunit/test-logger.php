@@ -19,10 +19,19 @@ use \WPDiscourse\Test\UnitTest;
 class LoggerTest extends UnitTest {
 
 		/**
+		 * Teardown each test.
+		 */
+		public function tearDown() {
+			parent::tearDown();
+
+			self::$plugin_options['logs-enabled'] = 1;
+		}
+
+		/**
 		 * It creates an instance of Logger
 		 */
 		public function test_create() {
-				$logger = Logger::create( 'test' );
+				$logger = Logger::create( 'test', self::$plugin_options );
 				$this->assertInstanceOf( Logger::class, $logger );
 
 				return $logger;
@@ -61,7 +70,19 @@ class LoggerTest extends UnitTest {
 				$file_handler_double = \Mockery::mock( FileHandler::class )->makePartial();
 				$file_handler_double->shouldReceive( 'enabled' )->andReturn( false );
 
-				$logger   = Logger::create( 'test', $file_handler_double );
+				$logger   = Logger::create( 'test', self::$plugin_options, $file_handler_double );
+				$handlers = $logger->getHandlers();
+
+				$this->assertCount( 1, $handlers );
+				$this->assertContainsOnlyInstancesOf( NullHandler::class, $handlers );
+		}
+
+		/**
+		 * It attaches NullHandler if logs are not enabled
+		 */
+		public function test_create_logs_not_enabled() {
+				self::$plugin_options['logs-enabled'] = 0;
+				$logger   = Logger::create( 'test', self::$plugin_options );
 				$handlers = $logger->getHandlers();
 
 				$this->assertCount( 1, $handlers );

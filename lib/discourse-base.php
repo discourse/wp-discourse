@@ -59,6 +59,6 @@ class DiscourseBase {
    * Setup Logger for the context.
    */
   public function setup_logger() {
-		$this->logger = Logger::create( $this->logger_context );
+		$this->logger = Logger::create( $this->logger_context, $this->options );
   }
 }

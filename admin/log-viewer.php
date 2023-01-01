@@ -25,6 +25,14 @@ class LogViewer {
 		protected $enabled;
 
 		/**
+		 * An instance of the FormHelper class.
+		 *
+		 * @access protected
+		 * @var \WPDiscourse\Admin\FormHelper
+		 */
+		protected $form_helper;
+
+		/**
 		 * LogViewer's instance of FileHandler
 		 *
 		 * @var \WPDiscourse\Logs\FileHandler
@@ -53,11 +61,39 @@ class LogViewer {
 		protected $metafile_name;
 
 		/**
-		 * LogViewer constructor.
+		 * Gives access to the plugin options.
+		 *
+		 * @access protected
+		 * @var mixed|void
 		 */
-		public function __construct() {
+		protected $options;
+
+		/**
+		 * LogViewer constructor.
+		 *
+		 * @param \WPDiscourse\Admin\FormHelper $form_helper An instance of the FormHelper class.
+		 */
+		public function __construct( $form_helper ) {
 				$this->metafile_name = 'logs-metafile';
+				$this->form_helper   = $form_helper;
+
+				add_action( 'admin_init', array( $this, 'setup_options' ) );
 				add_action( 'admin_init', array( $this, 'setup_log_viewer' ) );
+		}
+
+		/**
+		 * Sets the plugin options.
+		 *
+		 * @param object $extra_options Extra options used for testing.
+		 */
+		public function setup_options( $extra_options = null ) {
+			$this->options = $this->get_options();
+
+			if ( ! empty( $extra_options ) ) {
+				foreach ( $extra_options as $key => $value ) {
+					$this->options[ $key ] = $value;
+				}
+			}
 		}
 
 		/**
@@ -72,11 +108,11 @@ class LogViewer {
 						$this->file_handler = new FileHandler( new FileManager() );
 				}
 
-				$this->enabled = $this->file_handler->enabled();
+				$handler_enabled = $this->file_handler->enabled();
+				$this->enabled = ! empty( $this->options['logs-enabled'] ) && $handler_enabled;
 
 				if ( $this->enabled ) {
 						$this->setup_logs();
-						$this->update_meta_file();
 
 						add_action( 'wp_ajax_wpdc_view_log', array( $this, 'log_file_contents' ) );
 						add_action( 'wp_ajax_wpdc_view_logs_metafile', array( $this, 'meta_file_contents' ) );
@@ -99,7 +135,33 @@ class LogViewer {
 					),
 					'discourse_logs'
 				);
+
+				add_settings_field(
+					'discourse_logs_enabled',
+					__( 'Logging enabled', 'wp-discourse' ),
+					array(
+						$this,
+						'logs_enabled',
+					),
+					'discourse_logs',
+					'discourse_log_viewer'
+				);
+
 				register_setting( 'discourse_logs', 'discourse_logs' );
+		}
+
+		/**
+		 * Outputs markup for the discourse_logs checkbox.
+		 */
+		public function logs_enabled() {
+			$this->form_helper->checkbox_input(
+				'logs-enabled',
+				'discourse_logs',
+				__(
+					'Enable WP Discourse logs.',
+					'wp-discourse'
+				)
+			);
 		}
 
 		/**
@@ -219,8 +281,10 @@ class LogViewer {
 		 * Return log meta file contents.
 		 */
 		public function meta_file_contents() {
+				$metafile_contents = $this->build_metafile_contents();
+
 				$response = array(
-					'contents' => file_get_contents( $this->get_metafile_path() ),
+					'contents' => $metafile_contents,
 					'name'     => 'Log Meta File',
 				);
 				wp_send_json_success( $response );
@@ -248,8 +312,10 @@ class LogViewer {
 				}
 
 				$metafile_name     = $this->metafile_name;
-				$metafile_path     = $this->get_metafile_path();
 				$metafile_filename = "{$plugin_name}-{$metafile_name}-{$date_range}.txt";
+				$metafile_path     = $this->get_metafile_path( $metafile_filename );
+
+				$this->update_meta_file( $metafile_path );
 
 				$zip->addFile( $metafile_path, $metafile_filename );
 				$zip->close();
@@ -265,11 +331,35 @@ class LogViewer {
 
 		/**
 		 * Update meta file.
+		 *
+		 * @param string $metafile_path Metafile path.
 		 */
-		public function update_meta_file() {
-				$filename = $this->get_metafile_path();
-				$contents = $this->build_metafile_contents();
-				file_put_contents( $filename, $contents );
+		public function update_meta_file( $metafile_path ) {
+				$this->remove_meta_files();
+				$metafile_contents = $this->build_metafile_contents();
+				file_put_contents( $metafile_path, $metafile_contents );
+		}
+
+		/**
+		 * Remove meta files.
+		 */
+		public function remove_meta_files() {
+			$metafile_name = $this->metafile_name;
+			$metafiles     = glob( $this->file_handler->file_manager->upload_dir . "/*{$metafile_name}*.txt" );
+
+			foreach ( $metafiles as $metafile ) {
+					if ( is_writable( $metafile ) ) {
+							// phpcs:disable WordPress.PHP.DevelopmentFunctions
+							set_error_handler(
+									function () {
+											return false;
+									}
+							);
+							unlink( $metafile );
+							restore_error_handler();
+							// phpcs:enabled WordPress.PHP.DevelopmentFunctions
+					}
+			}
 		}
 
 		/**
@@ -383,10 +473,12 @@ class LogViewer {
 
 		/**
 		 * Get metafile name.
+		 *
+		 * @param string $filename Metafile filename.
 		 */
-		protected function get_metafile_path() {
+		protected function get_metafile_path( $filename ) {
 				$metafile_dir = $this->file_handler->file_manager->upload_dir;
-				return "$metafile_dir/{$this->metafile_name}.txt";
+				return "$metafile_dir/{$filename}";
 		}
 
 		/**

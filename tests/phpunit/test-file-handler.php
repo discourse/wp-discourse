@@ -48,7 +48,7 @@ class FileHandlerTest extends UnitTest {
 		 */
 		public function test_log_file_create() {
 				$file_handler = new FileHandler( new FileManager() );
-				$logger       = Logger::create( 'test', $file_handler );
+				$logger       = Logger::create( 'test', self::$plugin_options, $file_handler );
 				$logger->info( 'New Log' );
 
 				$manager   = new FileManager();
@@ -64,7 +64,7 @@ class FileHandlerTest extends UnitTest {
 		 */
 		public function test_log_file_write() {
 				$file_handler = new FileHandler( new FileManager() );
-				$logger       = Logger::create( 'test', $file_handler );
+				$logger       = Logger::create( 'test', self::$plugin_options, $file_handler );
 				$logger->info( 'New Log' );
 
 				$manager   = new FileManager();
@@ -83,7 +83,7 @@ class FileHandlerTest extends UnitTest {
 				$file_manager = new FileManager();
 				$file_handler = new FileHandler( $file_manager );
 
-				$logger = Logger::create( 'test', $file_handler );
+				$logger = Logger::create( 'test', self::$plugin_options, $file_handler );
 				for ( $i = 1; $i <= 10; $i++ ) {
 				$logger->warning( "Multi Log $i" );
 				}
@@ -112,7 +112,7 @@ class FileHandlerTest extends UnitTest {
 				$file_manager = new FileManager();
 				$file_handler = new FileHandler( $file_manager );
 
-				$logger = Logger::create( 'test', $file_handler );
+				$logger = Logger::create( 'test', self::$plugin_options, $file_handler );
 				$logger->warning( "Today's Log" );
 
 				$todays_datetime    = new \DateTimeImmutable( 'now' );
@@ -122,7 +122,7 @@ class FileHandlerTest extends UnitTest {
 				$tomorrows_file_handler = new FileHandler( $file_manager, null, null, $tomorrows_datetime );
 
 				// Make logger think it's tomorrow.
-				$tomorrows_logger = Logger::create( 'test', $tomorrows_file_handler );
+				$tomorrows_logger = Logger::create( 'test', self::$plugin_options, $tomorrows_file_handler );
 				$tomorrows_logger->pushProcessor(
 	      		function ( $record ) use ( $tomorrows_datetime ) {
 				   			$record['datetime'] = $tomorrows_datetime;
@@ -147,7 +147,7 @@ class FileHandlerTest extends UnitTest {
 				$file_manager = new FileManager();
 				$file_handler = new FileHandler( $file_manager );
 
-				$logger = Logger::create( 'high-volume', $file_handler );
+				$logger = Logger::create( 'high-volume', self::$plugin_options, $file_handler );
 				$logger->warning( 'High volume log' );
 
 				// It's inefficient to create a large file via individual logs, so we're
@@ -178,7 +178,7 @@ class FileHandlerTest extends UnitTest {
 				// Size limit to restrict each file to a single line.
 				$low_limit_file_handler = new FileHandler( $file_manager, 200 );
 
-				$logger = Logger::create( 'one-log-per-file', $low_limit_file_handler );
+				$logger = Logger::create( 'one-log-per-file', self::$plugin_options, $low_limit_file_handler );
 
 				for ( $i = 1; $i <= 7; $i++ ) {
 				$logger->warning( 'A line long enough to take it over 100 bytes with log metadata' );
@@ -196,7 +196,7 @@ class FileHandlerTest extends UnitTest {
 
 				// Size limit to restrict each file to a single line.
 				$handler = new FileHandler( $file_manager, 200 );
-				$logger  = Logger::create( 'one-log-per-file', $handler );
+				$logger  = Logger::create( 'one-log-per-file', self::$plugin_options, $handler );
 
 				for ( $i = 1; $i <= 15; $i++ ) {
 				$logger->warning( 'A line long enough to take it over 100 bytes with log metadata' );
