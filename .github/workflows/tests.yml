@@ -13,7 +13,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: "7.4"
+          - php: '7.4'
+
     steps:
       - uses: actions/checkout@v3
       - name: Setup PHP
@@ -22,10 +23,10 @@ jobs:
           php-version: ${{ matrix.php }}
 
       - name: Install Composer
-        uses: ramsey/composer-install@v1
+        uses: ramsey/composer-install@v2
         with:
-          dependency-versions: "highest"
-          composer-options: "--ignore-platform-reqs"
+          dependency-versions: 'highest'
+          composer-options: '--ignore-platform-reqs'
 
       - name: PHPUnit
         run: |
