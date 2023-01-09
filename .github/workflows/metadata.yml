@@ -2,16 +2,21 @@ name: WP Discourse Metadata
 
 on:
   pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '**/package.json'
+      - '**/package-lock.json'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Metadata
+
     steps:
       - name: Checkout base repository
         uses: actions/checkout@v3
         with:
-          ref: "${{ github.base_ref }}"
+          ref: '${{ github.base_ref }}'
 
       - name: Store base versions
         run: |
@@ -22,7 +27,7 @@ jobs:
           echo "base_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
 
       - name: Checkout head repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Store head versions
         run: |
@@ -33,13 +38,15 @@ jobs:
           echo "head_constant_version=$(grep -Pio -m 1 "(?<=WPDISCOURSE_VERSION\'\, \')(\d\.\d\.\d)" wp-discourse.php)" >> $GITHUB_ENV
 
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: 14
+          node-version: 18
+          cache: 'npm'
+
       - run: npm install --include=dev
 
       - name: Run checks
-        uses: actions/github-script@v5
+        uses: actions/github-script@v6
         with:
           script: |
             const semver = require('semver');
