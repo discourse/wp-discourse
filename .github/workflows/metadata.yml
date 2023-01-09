@@ -40,6 +40,8 @@ jobs:
           node-version: 18
           cache: 'npm'
 
+      - run: npm install --include=dev
+
       - name: Run checks
         uses: actions/github-script@v6
         with:
