@@ -2,12 +2,15 @@ name: WP Discourse Metadata
 
 on:
   pull_request:
+    paths-ignore:
+      - '.github/**'
+      - '**/package.json'
+      - '**/package-lock.json'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Metadata
-    if: ${{ github.actor != 'dependabot[bot]' }}
 
     steps:
       - name: Checkout base repository
