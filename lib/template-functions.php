@@ -316,13 +316,14 @@ trait TemplateFunctions {
 	}
 
 	/**
-	 * Adds missing alt attributes to avatars.
+	 * Fixes attributes of avatars in quotes.
 	 *
-	 * @param string $content The comment's content.
+	 * @param string $content       The comment's content.
+	 * @param string $discourse_url The Discourse URL.
 	 *
 	 * @return string
 	 */
-	protected function add_avatar_alt( $content ) {
+	protected function fix_avatars_in_quotes( $content, $discourse_url ) {
 		if ( ! extension_loaded( 'libxml' ) ) {
 			return $content;
 		}
@@ -333,13 +334,13 @@ trait TemplateFunctions {
 		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		$finder = new \DOMXPath( $doc );
-		$avatars_without_alt = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ') and @alt='']" );
-		if ( $avatars_without_alt->length ) {
-			foreach ( $avatars_without_alt as $avatar ) {
+		$avatars_in_quotes = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ')]" );
+		if ( $avatars_in_quotes->length ) {
+			foreach ( $avatars_in_quotes as $avatar ) {
 				$alt = __( 'Avatar for', 'wp-discourse' ) . ' ';
 				$src = $avatar->getAttribute( 'src' );
 				if ( preg_match(
-					'#^https?://[^/]+/user_avatar/[^/]+/([^/]+)/#',
+					'/\/\/[^\/]+\/user_avatar\/[^\/]+\/([^\/]+)\//',
 					$src,
 					$matches
 				) ) {
@@ -348,6 +349,13 @@ trait TemplateFunctions {
 					$alt .= __('Discourse user', 'wp-discourse' );
 				}
 				$avatar->setAttribute( 'alt', $alt );
+
+				// Discourse may send protocol-relative URLs for avatars in quotes.
+				if ( substr( $src, 0, 2 ) === "//" ) {
+					$protocol = strpos( $discourse_url, 'https://' ) !== false ? "https" : "http";
+					$src = $protocol . ":" . $src;
+					$avatar->setAttribute( 'src', $src );
+				}
 			}
 
 			$content = $doc->saveHTML( $doc->documentElement );
