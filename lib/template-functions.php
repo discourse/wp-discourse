@@ -316,7 +316,7 @@ trait TemplateFunctions {
 	}
 
 	/**
-	 * Adds alt attributes to avatars in comment bodies.
+	 * Adds missing alt attributes to avatars.
 	 *
 	 * @param string $content The comment's content.
 	 *
@@ -327,22 +327,25 @@ trait TemplateFunctions {
 			return $content;
 		}
 
-		$use_internal_errors = libxml_use_internal_errors( true );
-		$doc                 = new \DOMDocument( '1.0', 'utf-8' );
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
+		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
 		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
 
 		$finder = new \DOMXPath( $doc );
-		$quote_avatars_without_alt = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ') and @alt='']" );
-		if ( $quote_avatars_without_alt->length ) {
-			foreach ( $quote_avatars_without_alt as $avatar ) {
-				$alt = 'Avatar for Discourse user';
+		$avatars_without_alt = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ') and @alt='']" );
+		if ( $avatars_without_alt->length ) {
+			foreach ( $avatars_without_alt as $avatar ) {
+				$alt = __( 'Avatar for', 'wp-discourse' ) . ' ';
 				$src = $avatar->getAttribute( 'src' );
 				if ( preg_match(
 					'#^https?://[^/]+/user_avatar/[^/]+/([^/]+)/#',
 					$src,
 					$matches
 				) ) {
-					$alt = 'Avatar for ' . esc_attr( $matches[1] );
+					$alt .= esc_attr( $matches[1] );
+				} else {
+					$alt .= __('Discourse user', 'wp-discourse' );
 				}
 				$avatar->setAttribute( 'alt', $alt );
 			}
@@ -351,8 +354,7 @@ trait TemplateFunctions {
 			$content = $this->remove_outer_html_elements( $content );
 		}
 
-		libxml_clear_errors();
-		libxml_use_internal_errors( $use_internal_errors );
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
 
 		return $content;
 	}
