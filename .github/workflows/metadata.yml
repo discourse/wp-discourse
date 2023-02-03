@@ -6,9 +6,11 @@ on:
       - '.github/**'
       - '**/package.json'
       - '**/package-lock.json'
+    types: [labeled]
 
 jobs:
   build:
+    if: ${{ github.event.label.name == 'release' }}
     runs-on: ubuntu-latest
     name: Metadata
 
