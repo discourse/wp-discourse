@@ -211,10 +211,9 @@ class DiscoursePublish extends DiscourseBase {
 		$permalink                   = get_permalink( $post_id );
 
 		$this->log_args = array(
-			'wp_title'          => $title,
-			'wp_author_id'      => $author_id,
-			'wp_post_id'        => $post_id,
-			'discourse_post_id' => $discourse_id,
+			'wp_title'     => $title,
+			'wp_author_id' => $author_id,
+			'wp_post_id'   => $post_id,
 		);
 
 		if ( $use_full_post ) {
@@ -261,10 +260,6 @@ class DiscoursePublish extends DiscourseBase {
 		if ( ! empty( $featured ) ) {
 			$baked = str_replace( '{featuredimage}', '![image](' . $featured['0'] . ')', $baked );
 		}
-		$username = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
-		if ( ! $username || strlen( $username ) < 2 ) {
-			$username = $options['publish-username'];
-		}
 
 		// Get publish category of a post.
 		$publish_post_category = get_post_meta( $post_id, 'publish_post_category', true );
@@ -278,9 +273,8 @@ class DiscoursePublish extends DiscourseBase {
 			if ( ! is_array( $tags ) ) {
 				$tags = explode( ',', $tags );
 			}
-			$tags_param = $this->tags_param( $tags );
 		} else {
-			$tags_param = '';
+			$tags = array();
 		}
 
 		$remote_post_type = '';
@@ -295,7 +289,7 @@ class DiscoursePublish extends DiscourseBase {
 				update_post_meta( $post_id, 'wpdc_unlisted_topic', 1 );
 			}
 
-			$data                = array(
+			$body = array(
 				'embed_url'        => $permalink,
 				'featured_link'    => $add_featured_link ? $permalink : null,
 				'title'            => $title,
@@ -305,38 +299,46 @@ class DiscoursePublish extends DiscourseBase {
 				'auto_track'       => ( ! empty( $options['auto-track'] ) ? 'true' : 'false' ),
 				'visible'          => $unlisted ? 'false' : 'true',
 			);
-			$url                 = $options['url'] . '/posts';
+
+			$tags = array_filter( $tags );
+			if ( ! empty( $tags ) ) {
+				$body['tags'] = $tags;
+			}
+
+			$path                = '/posts';
 			$remote_post_options = array(
-				'timeout' => 30,
-				'method'  => 'POST',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $options['api-key'] ),
-					'Api-Username' => sanitize_text_field( $username ),
-				),
-				'body'    => http_build_query( $data ) . $tags_param,
+				'method' => 'POST',
+				'body'   => $body,
 			);
 			$remote_post_type    = 'create_post';
 		} else {
 			// The post has already been published.
-			$data                = array(
+			$body                = array(
 				'title'            => $title,
-				'post[raw]'        => $baked,
+				'post'             => array(
+					'raw' => $baked,
+				),
 				'skip_validations' => 'true',
 			);
-			$url                 = $options['url'] . '/posts/' . $discourse_id;
+			$path                = '/posts/' . $discourse_id;
 			$remote_post_options = array(
-				'timeout' => 30,
-				'method'  => 'PUT',
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $options['api-key'] ),
-					'Api-Username' => sanitize_text_field( $username ),
-				),
-				'body'    => http_build_query( $data ),
+				'method' => 'PUT',
+				'body'   => $body,
 			);
 			$remote_post_type    = 'update_post';
 		}
 
-		$response = $this->remote_post( $url, $remote_post_options, $remote_post_type, $post_id );
+		$remote_post_options['body'] = apply_filters( 'wpdc_publish_body', $remote_post_options['body'], $remote_post_type, $post_id );
+
+		$username            = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
+		$username_exists     = $username && strlen( $username ) > 1;
+		$single_user_api_key = ! empty( $this->options['single-user-api-key-publication'] );
+
+		if ( 'create_post' === $remote_post_type && ! $single_user_api_key && $username_exists ) {
+			$remote_post_options['api_username'] = $username;
+		}
+
+		$response = $this->remote_post( $path, $remote_post_options, $remote_post_type, $post_id );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
@@ -352,10 +354,11 @@ class DiscoursePublish extends DiscourseBase {
 			$discourse_id = intval( $body->id );
 			$topic_slug   = sanitize_text_field( $body->topic_slug );
 			$topic_id     = intval( $body->topic_id );
+			$topic_url    = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 
 			$this->dc_add_post_meta( $post_id, 'discourse_post_id', $discourse_id, true );
 			$this->dc_add_post_meta( $post_id, 'discourse_topic_id', $topic_id, true );
-			$this->dc_add_post_meta( $post_id, 'discourse_permalink', esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id ), true );
+			$this->dc_add_post_meta( $post_id, 'discourse_permalink', $topic_url, true );
 			update_post_meta( $post_id, 'publish_post_category', $category );
 
 			$this->log_args['discourse_post_id'] = $discourse_id;
@@ -376,17 +379,27 @@ class DiscoursePublish extends DiscourseBase {
 				}
 			}
 
+			if ( $single_user_api_key && $username_exists ) {
+				$change_response = $this->change_post_owner( $post_id, $username );
+
+				if ( is_wp_error( $change_response ) ) {
+					return $change_response;
+				}
+			}
+
+			$this->after_publish( $post_id, $remote_post_type );
+
 			// The topic has been created and its associated post's metadata has been updated.
 			return null;
 		}
 
 		if ( 'update_post' === $remote_post_type ) {
-			$discourse_post      = $body->post;
-			$topic_slug          = sanitize_text_field( $discourse_post->topic_slug );
-			$topic_id            = intval( $discourse_post->topic_id );
-			$discourse_topic_url = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
+			$discourse_post = $body->post;
+			$topic_slug     = sanitize_text_field( $discourse_post->topic_slug );
+			$topic_id       = intval( $discourse_post->topic_id );
+			$topic_url      = esc_url_raw( $options['url'] . '/t/' . $topic_slug . '/' . $topic_id );
 
-			update_post_meta( $post_id, 'discourse_permalink', $discourse_topic_url );
+			update_post_meta( $post_id, 'discourse_permalink', $topic_url );
 			update_post_meta( $post_id, 'discourse_topic_id', $topic_id );
 			update_post_meta( $post_id, 'wpdc_publishing_response', 'success' );
 			// Allows the publish_post_category to be set by clicking the "Update Discourse Topic" button.
@@ -402,54 +415,28 @@ class DiscoursePublish extends DiscourseBase {
 
 			// Update the topic's featured_link property.
 			if ( ! empty( $options['add-featured-link'] ) ) {
-				$data                = array(
+				$body                = array(
 					'featured_link' => $permalink,
 				);
 				$remote_post_options = array(
-					'timeout' => 30,
-					'method'  => 'PUT',
-					'headers' => array(
-						'Api-Key'      => sanitize_key( $options['api-key'] ),
-						'Api-Username' => sanitize_text_field( $username ),
-					),
-					'body'    => http_build_query( $data ),
+					'method' => 'PUT',
+					'body'   => $body,
 				);
 
-				$featured_response = $this->remote_post( $discourse_topic_url, $remote_post_options, 'featured_link', $post_id );
+				$featured_response = $this->remote_post( $topic_url, $remote_post_options, 'featured_link', $post_id );
 
 				if ( is_wp_error( $featured_response ) ) {
 					return $featured_response;
 				}
 			}
 
+			$this->after_publish( $post_id, $remote_post_type );
+
 			// The topic has been updated, and its associated post's metadata has been updated.
 			return null;
 		}
 
 		return $this->handle_error( 'unknown', $response, $post_id );
-	}
-
-	/**
-	 * Generates the tags parameter in the form that is required by Discourse.
-	 *
-	 * @param array $tags The array of tags for the topic.
-	 *
-	 * @return string
-	 */
-	protected function tags_param( $tags ) {
-		$tags_string = '';
-		if ( ! empty( $tags ) ) {
-			foreach ( $tags as $tag ) {
-				$tag = sanitize_text_field( $tag );
-				if ( empty( $tag ) ) {
-
-					break;
-				}
-				$tags_string .= '&tags' . rawurlencode( '[]' ) . "={$tag}";
-			}
-		}
-
-		return $tags_string;
 	}
 
 	/**
@@ -462,27 +449,47 @@ class DiscoursePublish extends DiscourseBase {
 	 * @return null|\WP_Error
 	 */
 	protected function pin_discourse_topic( $post_id, $topic_id, $pin_until ) {
-		$status_url   = $this->options['url'] . "/t/$topic_id/status";
-		$data         = array(
+		$status_path  = "/t/$topic_id/status";
+		$body         = array(
 			'status'  => 'pinned',
 			'enabled' => 'true',
 			'until'   => $pin_until,
 		);
 		$post_options = array(
-			'timeout' => 30,
-			'method'  => 'PUT',
-			'headers' => array(
-				'Api-Key'      => $this->options['api-key'],
-				'Api-Username' => $this->options['publish-username'],
-			),
-			'body'    => http_build_query( $data ),
+			'method' => 'PUT',
+			'body'   => $body,
 		);
 
-		$response = $this->remote_post( $status_url, $post_options, 'pin_topic', $post_id );
+		$response = $this->remote_post( $status_path, $post_options, 'pin_topic', $post_id );
 
 		delete_post_meta( $post_id, 'wpdc_pin_until' );
 
 		return $response;
+	}
+
+	/**
+	 * Changes the owner of a Discourse topic associated with a WordPress post.
+	 *
+	 * @param int    $post_id The WordPress post_id.
+	 * @param string $username The username of the Discourse user to change ownership to.
+	 *
+	 * @return null|\WP_Error
+	 */
+	protected function change_post_owner( $post_id, $username ) {
+		$discourse_post_id  = get_post_meta( $post_id, 'discourse_post_id', true );
+		$discourse_topic_id = get_post_meta( $post_id, 'discourse_topic_id', true );
+
+		$path    = "/t/$discourse_topic_id/change-owner";
+		$body    = array(
+			'username' => $username,
+			'post_ids' => array( $discourse_post_id ),
+		);
+		$options = array(
+			'method' => 'POST',
+			'body'   => $body,
+		);
+
+		return $this->remote_post( $path, $options, 'change_owner', $post_id );
 	}
 
 	/**
@@ -509,15 +516,16 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Wrapper of wp_remote_post to handle validation, logging and error handling.
+	 * Wrapper of discourse_request to handle validation, logging and error handling.
 	 *
-	 * @param string $url Url of the remote post.
+	 * @param string $url Url or path of the remote post.
 	 * @param object $remote_options Options to pass to remote post.
 	 * @param string $remote_type Remote post type.
 	 * @param int    $post_id ID of post being sent.
 	 */
 	public function remote_post( $url, $remote_options, $remote_type, $post_id ) {
-		$response = wp_remote_post( esc_url_raw( $url ), $remote_options );
+		$remote_options['raw'] = true;
+		$response              = $this->discourse_request( $url, $remote_options );
 
 		if ( ! $this->validate( $response ) ) {
 			$response = $this->handle_error( $remote_type, $response, $post_id );
@@ -601,7 +609,7 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Handle publication errors.s
+	 * Handle publication errors
 	 *
 	 * @param string $remote_type Remote post type.
 	 * @param object $response Remote post response.
@@ -879,5 +887,28 @@ class DiscoursePublish extends DiscourseBase {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 
 		return $result ? true : false;
+	}
+
+	/**
+	 * Runs after publication successfully completes
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $remote_post_type The remote post type.
+	 *
+	 * @return void
+	 */
+	protected function after_publish( $post_id, $remote_post_type ) {
+		if ( ! empty( $this->options['verbose-publication-logs'] ) ) {
+			$log_args = array(
+				'post_id'             => $post_id,
+				'remote_post_type'    => $remote_post_type,
+				'discourse_post_id'   => get_post_meta( $post_id, 'discourse_post_id', true ),
+				'discourse_topic_id'  => get_post_meta( $post_id, 'discourse_topic_id', true ),
+				'discourse_permalink' => get_post_meta( $post_id, 'discourse_permalink', true ),
+			);
+			$this->logger->info( "$remote_post_type.after_publish", $log_args );
+		}
+
+		do_action( 'wp_discourse_after_publish', $post_id, $remote_post_type );
 	}
 }

@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.8
+Tested up to: 6.1
 Requires PHP: 5.6.0
-Stable tag: 2.3.7
+Stable tag: 2.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,65 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.4.8 12/27/2022
+
+- Improve logs metafile handling.
+- Add logs enabled setting.
+
+#### 2.4.7 12/05/2022
+
+- Adds Discourse Comments block for the Block Editor.
+
+#### 2.4.6 09/20/2022
+
+- Improvements to the functionality and interface of the get_discourse_comments utility function.
+- Adds wpdc_after_webhook_post_update action for use with caching solutions.
+
+#### 2.4.5 07/06/2022
+
+- Fix logout when WP is the DiscourseConnect client and sync logout is enabled.
+- Improve the wpdc_publish_body filter.
+
+#### 2.4.4 06/30/2022
+
+- Add after_publication actions and logging
+
+#### 2.4.3 05/23/2022
+
+- Wordpress 6.0 support
+- Granular API Key support (backwards compatible)
+- DiscourseConnect copy fix
+- Add wpdc_publish_body filter
+
+#### 2.4.2 05/11/2022
+
+- Temporarily remove comment formatter log call causing issues on some sites.
+- If comments are disabled return comment template without running comment formatter.
+- Update Github Actions to support Action changes
+
+#### 2.4.1 02/28/2022
+
+- Bugfix "Update Discourse Topic" functionality.
+- Update API Key copy.
+
+#### 2.4.0 02/24/2022
+
+- Revert to existing Discourse Username approach.
+- Move new Discourse Username support to publication setting.
+- Apply phpcs to unit tests.
+
+#### 2.3.9 02/21/2022
+
+- Add proper Discourse Username support
+- Ensure discourse_request method is uppercase.
+- Update tests config.
+
+#### 2.3.8 02/04/2022
+
+- Add Wordpress 5.9 support.
+- Complete wp_remote_request standardisation.
+- Add method checks to all request tests.
 
 #### 2.3.7 12/07/2021
 

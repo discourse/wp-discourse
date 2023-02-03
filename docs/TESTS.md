@@ -9,6 +9,10 @@ Please make sure you check the version of the PHPUnit Documentation you're viewi
 
 ### Setup
 
+#### Dependencies
+- svn
+- mysql (and mysqladmin)
+
 #### Files and Database
 
 First, set up your tests database by running the following command in the root plugin directory. Make sure you substitute your local root mysql password.
@@ -18,7 +22,7 @@ cd wp-discourse
 bash bin/install-wp-tests.sh wordpress_test root 'password' localhost latest
 ```
 
-If this command returns an error, clean up anything it created before running it again, i.e. 
+If this command returns an error, clean up anything it created before running it again, i.e.
 
 ```
 ## Remove the tmp files
@@ -36,13 +40,13 @@ Make sure that command completes successfully, with no errors, before continuing
 
 #### Environment and Dependencies
 
-If you haven't already, run ``composer install`` in the root plugin directory to pull in the main tests dependencies. 
+If you haven't already, run ``composer install`` in the root plugin directory to pull in the main tests dependencies.
 
 ##### Xdebug
 
-One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct. 
+One additional dependency you need in your environment is the php extension Xdebug. The installation of Xdebug is environment specific, however we would recommend you use the [Xdebug Installation Wizard](https://xdebug.org/wizard) to ensure your installation is correct.
 
-For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have a lines in your ``php.ini`` that look like this
+For testing purposes Xdebug should be run in ``coverage`` mode, which means that you should have a line in your ``php.ini`` that look like this
 
 ```
 xdebug.mode = coverage
@@ -54,7 +58,7 @@ The tests suite is configured by the ``phpunit.xml`` file. Read more about the e
 
 #### Coverage
 
-The tests coverage whitelist in the config file limits the coverage reports to the classes in the plugin that have tests. 
+The tests coverage whitelist in the config file limits the coverage reports to the classes in the plugin that have tests.
 
 ```
 <whitelist processUncoveredFilesFromWhitelist="true">
@@ -81,10 +85,10 @@ vendor/bin/phpunit tests/phpunit/test-discourse-publish.php
 To run a specific test in a suite use the ``--filter`` option
 
 ```
-vendor/bin/phpunit tests/phpunit/test-discourse-publish.php --filter=test_sync_to_discourse_when_creating_with_embed_error 
+vendor/bin/phpunit tests/phpunit/test-discourse-publish.php --filter=test_sync_to_discourse_when_creating_with_embed_error
 ```
 
-To add a coverage report to the output add ``--coverage-text``, which will send the report to stdout. 
+To add a coverage report to the output add ``--coverage-text``, which will send the report to stdout.
 
 ```
 vendor/bin/phpunit --coverage-text

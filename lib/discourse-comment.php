@@ -41,7 +41,7 @@ class DiscourseComment extends DiscourseBase {
 		add_action( 'init', array( $this, 'setup_options' ) );
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_filter( 'get_comments_number', array( $this, 'get_comments_number' ), 10, 2 );
-		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ) );
+		add_action( 'wpdc_sync_discourse_comments', array( $this, 'sync_comments' ), 10, 3 );
 		add_filter( 'comments_template', array( $this, 'comments_template' ), 20, 1 );
 		add_action( 'wp_enqueue_scripts', array( $this, 'discourse_comments_js' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_comment_route' ) );
@@ -54,8 +54,6 @@ class DiscourseComment extends DiscourseBase {
 	 */
 	public function discourse_comments_js() {
 		if ( ! empty( $this->options['ajax-load'] ) ) {
-			$script_path = '../js/load-comments.js';
-			wp_register_script( 'load_comments_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 			$data = array(
 				'commentsURL' => home_url( '/wp-json/wp-discourse/v1/discourse-comments' ),
 			);
@@ -64,8 +62,6 @@ class DiscourseComment extends DiscourseBase {
 		}
 
 		if ( ! empty( $this->options['load-comment-css'] ) ) {
-			$style_path = '../css/comments.css';
-			wp_register_style( 'comment_styles', plugins_url( $style_path, __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . $style_path ) );
 			wp_enqueue_style( 'comment_styles' );
 		}
 	}
@@ -166,12 +162,13 @@ class DiscourseComment extends DiscourseBase {
 	/**
 	 * Syncs Discourse comments to WordPress.
 	 *
-	 * @param int  $post_id The WordPress post id.
-	 * @param bool $force Force comment sync.
+	 * @param int    $post_id The WordPress post id.
+	 * @param bool   $force Force comment sync.
+	 * @param string $comment_type Set comment type for the post.
 	 *
 	 * @return null
 	 */
-	public function sync_comments( $post_id, $force = false ) {
+	public function sync_comments( $post_id, $force = false, $comment_type = null ) {
 		global $wpdb;
 
 		$discourse_options     = $this->options;
@@ -197,7 +194,7 @@ class DiscourseComment extends DiscourseBase {
 				$publish_private = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 				if ( 'publish' === get_post_status( $post_id ) || $publish_private ) {
 					// Possible values are 0 (no Discourse comments), 'display-comments', or 'display-comments-link'.
-					$comment_type             = $this->get_comment_type_for_post( $post_id, 'sync_comments' );
+					$comment_type             = $comment_type ? $comment_type : $this->get_comment_type_for_post( $post_id, 'sync_comments' );
 					$comment_count            = 'display-comments' === $comment_type ? intval( $discourse_options['max-comments'] ) : 0;
 					$min_trust_level          = intval( $discourse_options['min-trust-level'] );
 					$min_score                = intval( $discourse_options['min-score'] );
@@ -220,15 +217,15 @@ class DiscourseComment extends DiscourseBase {
 					$permalink = esc_url_raw( $discourse_permalink ) . '/wordpress.json?' . $options;
 					$result    = $this->discourse_request( $permalink, array( 'raw' => true ) );
 
-					if ( is_wp_error( $result ) ) {
-						$message    = $result->get_error_message();
-						$error_data = $result->get_error_data();
+					if ( ! $this->validate( $result ) ) {
+						$message = wp_remote_retrieve_response_message( $result );
+						$code    = wp_remote_retrieve_response_code( $result );
 
 						$log_args = array(
 							'message'            => $message,
 							'discourse_topic_id' => $topic_id,
 							'wp_post_id'         => $post_id,
-							'http_code'          => $error_data['http_code'],
+							'http_code'          => $code,
 						);
 						$this->logger->error( 'sync_comments.response_error', $log_args );
 					} else {
@@ -300,6 +297,11 @@ class DiscourseComment extends DiscourseBase {
 			return WPDISCOURSE_PATH . 'templates/blank.php';
 		}
 
+		if ( empty( $comment_type ) ) {
+
+			return $old;
+		}
+
 		$discourse_comments = null;
 		switch ( $comment_type ) {
 			case 'display-comments':
@@ -319,10 +321,7 @@ class DiscourseComment extends DiscourseBase {
 		// Use $post->comment_count because get_comments_number will return the Discourse comments
 		// number for posts that are published to Discourse.
 		$num_wp_comments = $post->comment_count;
-		if ( empty( $comment_type ) ) {
-
-			return $old;
-		} elseif ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
+		if ( empty( $this->options['show-existing-comments'] ) || 0 === intval( $num_wp_comments ) ) {
 			echo wp_kses_post( $discourse_comments );
 
 			return WPDISCOURSE_PATH . 'templates/blank.php';

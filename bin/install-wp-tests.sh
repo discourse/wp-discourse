@@ -148,8 +148,8 @@ install_db() {
 			EXTRA=" --host=$DB_HOSTNAME --protocol=tcp"
 		fi
 	fi
-	
-	local exists=$(mysql -s -N -e  "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$DB_NAME'");
+
+	local exists=$(mysql -u $DB_USER -p"$DB_PASS" -s -N -e  "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='$DB_NAME'");
 	if [ -n "$exists" ]; then
 		yes | mysqladmin drop $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 	fi

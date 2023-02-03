@@ -29,14 +29,14 @@ class SyncDiscourseTopicTest extends UnitTest {
     public function setUp() {
       parent::setUp();
 
-      self::$plugin_options['webhook-secret'] = "1234567891011";
+      self::$plugin_options['webhook-secret']        = '1234567891011';
       self::$plugin_options['use-discourse-webhook'] = 1;
 
       $this->sync_topic = new SyncDiscourseTopic();
-      $this->sync_topic->setup_logger();
       $this->sync_topic->setup_options( self::$plugin_options );
+      $this->sync_topic->setup_logger();
 
-      $this->payload = $this->response_body_file( 'webhook_post' );
+      $this->payload   = $this->response_body_file( 'webhook_post' );
       $this->signature = hash_hmac( 'sha256', $this->payload, self::$plugin_options['webhook-secret'] );
 
       $this->request = new \WP_REST_Request();
@@ -50,11 +50,11 @@ class SyncDiscourseTopicTest extends UnitTest {
      */
     public function test_update_topic_content() {
       // Setup the posts
-      $post_id = wp_insert_post( self::$post_atts, false, false );
+      $post_id        = wp_insert_post( self::$post_atts, false, false );
       $discourse_post = json_decode( $this->payload )->post;
 
       // Setup the post meta
-      $discourse_topic_id  = $discourse_post->topic_id;
+      $discourse_topic_id = $discourse_post->topic_id;
       update_post_meta( $post_id, 'discourse_topic_id', $discourse_topic_id );
 
       // Perform update
@@ -73,15 +73,15 @@ class SyncDiscourseTopicTest extends UnitTest {
      */
     public function test_update_topic_content_invalid_signature() {
       // Setup invalid signature
-      self::$plugin_options['webhook-secret'] = "123456789101112";
+      self::$plugin_options['webhook-secret'] = '123456789101112';
       $this->sync_topic->setup_options( self::$plugin_options );
 
       // Setup the posts
-      $post_id = wp_insert_post( self::$post_atts, false, false );
+      $post_id        = wp_insert_post( self::$post_atts, false, false );
       $discourse_post = json_decode( $this->payload )->post;
 
       // Setup the post meta
-      $discourse_topic_id  = $discourse_post->topic_id;
+      $discourse_topic_id = $discourse_post->topic_id;
       update_post_meta( $post_id, 'discourse_topic_id', $discourse_topic_id );
 
       // Perform update

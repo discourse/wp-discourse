@@ -110,3 +110,7 @@ hr.wpdc-sidebar-hr {
 	display: block;
 	margin-top: 8px;
 }
+
+.components-button.is-pressed .wpdc-logo {
+	filter: invert(1);
+}

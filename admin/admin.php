@@ -42,7 +42,7 @@ if ( is_admin() ) {
 	new AdminNotice();
 	new MetaBox();
 	new UserProfile();
-	new LogViewer();
+	new LogViewer( $form_helper );
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 	if ( is_multisite() ) {
@@ -66,8 +66,8 @@ function enqueue_admin_scripts() {
 	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];
 	$data               = array(
 		'maxTags' => $max_tags,
-		'ajax' => admin_url( 'admin-ajax.php' ),
-		'nonce' => wp_create_nonce( 'admin-ajax-nonce' ),
+		'ajax'    => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'admin-ajax-nonce' ),
 	);
 	wp_localize_script( 'admin_js', 'wpdc', $data );
 }

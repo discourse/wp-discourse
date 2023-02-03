@@ -32,17 +32,38 @@ class DiscourseCommentTest extends UnitTest {
 
         $comment_formatter = new DiscourseCommentFormatter();
         $this->comment     = new DiscourseComment( $comment_formatter );
-        $this->comment->setup_logger();
-
-        self::$plugin_options[ 'enable-discourse-comments' ] = true;
+        self::$plugin_options['enable-discourse-comments'] = true;
         $this->comment->setup_options( self::$plugin_options );
+        $this->comment->setup_logger();
   	}
+
+    public function test_comments_disabled() {
+        global $post; // phpcs:disable WordPress.WP.GlobalVariablesOverride
+        $post_id = wp_insert_post( self::$post_atts, false, false );
+        $post    = get_post( $post_id, OBJECT );
+        setup_postdata( $post );
+
+        // Setup plugin options
+        self::$plugin_options['comment-type'] = 0;
+        $this->comment->setup_options( self::$plugin_options );
+
+        // Run comments_template
+        $template_path = get_stylesheet_directory() . '/comments.php';
+        $result        = $this->comment->comments_template( $template_path );
+
+        // Ensure we got the old template.
+        $this->assertEquals( $result, $template_path );
+
+        // Cleanup
+        wp_delete_post( $post_id );
+        wp_reset_postdata();
+    }
 
     public function test_sync_comments() {
         // Mock objects and endpoints
-        $discourse_post      = json_decode( $this->response_body_file( 'post_create' ) );
-        $post_id             = wp_insert_post( self::$post_atts, false, false );
-        $comments_response   = $this->mock_remote_post_success( 'comments' );
+        $discourse_post    = json_decode( $this->response_body_file( 'post_create' ) );
+        $post_id           = wp_insert_post( self::$post_atts, false, false );
+        $comments_response = $this->mock_remote_post_success( 'comments' );
 
         // Setup the post meta
         $discourse_topic_id  = $discourse_post->topic_id;
@@ -71,7 +92,12 @@ class DiscourseCommentTest extends UnitTest {
         // Mock objects and endpoints
         $discourse_post = json_decode( $this->response_body_file( 'post_create' ) );
         $post_id        = wp_insert_post( self::$post_atts, false, false );
-        $this->mock_remote_post( $this->build_response( 'not_found' ) );
+        $response       = $this->build_response( 'not_found' );
+        $request        = array(
+			'method'   => 'GET',
+			'response' => $response,
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the post meta
         $discourse_topic_id  = $discourse_post->topic_id;
@@ -84,10 +110,10 @@ class DiscourseCommentTest extends UnitTest {
 
         // Ensure we've made the right logs
         $log = $this->get_last_log();
-        $this->assertRegExp( "/comment.ERROR: sync_comments.response_error/", $log );
-        $this->assertRegExp( '/"message":"An invalid response was returned from Discourse"/', $log );
-        $this->assertRegExp( '/"discourse_topic_id":"'. $discourse_topic_id . '"/', $log );
-        $this->assertRegExp( '/"wp_post_id":'. $post_id . '/', $log );
+        $this->assertRegExp( '/comment.ERROR: sync_comments.response_error/', $log );
+        $this->assertRegExp( '/"message":"Not found"/', $log );
+        $this->assertRegExp( '/"discourse_topic_id":"' . $discourse_topic_id . '"/', $log );
+        $this->assertRegExp( '/"wp_post_id":' . $post_id . '/', $log );
         $this->assertRegExp( '/"http_code":404/', $log );
 
         // Cleanup
@@ -99,42 +125,46 @@ class DiscourseCommentTest extends UnitTest {
      */
     public function test_get_comment_type_for_post_display_public_comments_only() {
         // Setup plugin options
-        self::$plugin_options[ "comment-type" ] = "display-public-comments-only";
+        self::$plugin_options['comment-type'] = 'display-public-comments-only';
         $this->comment->setup_options( self::$plugin_options );
 
         // Setup the categories response
-        $site_json         = $this->response_body_file( 'site' );
-        $response          = $this->build_response( 'success' );
-        $response['body']  = $site_json;
-        $this->mock_remote_post( $response );
+        $site_json        = $this->response_body_file( 'site' );
+        $response         = $this->build_response( 'success' );
+        $response['body'] = $site_json;
+        $request          = array(
+			'method'   => 'GET',
+			'response' => $response,
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
-        $site = json_decode( $site_json );
-        $categories = $site->categories;
-        $public_category_id = null;
+        $site                = json_decode( $site_json );
+        $categories          = $site->categories;
+        $public_category_id  = null;
         $private_category_id = null;
 
-        foreach( $categories as $category ) {
-          if ( $category->read_restricted === false) {
-            $public_category_id = $category->id;
+        foreach ( $categories as $category ) {
+          if ( false === $category->read_restricted ) {
+				$public_category_id = $category->id;
           }
-          if ( $category->read_restricted === true) {
-            $private_category_id = $category->id;
+          if ( true === $category->read_restricted ) {
+				$private_category_id = $category->id;
           }
         }
 
         // Add the posts.
-        self::$post_atts['meta_input']['discourse_post_id'] = 1;
-        self::$post_atts['meta_input']['publish_post_category'] =  $public_category_id;
+        self::$post_atts['meta_input']['discourse_post_id']     = 1;
+        self::$post_atts['meta_input']['publish_post_category'] = $public_category_id;
         $public_post_id = wp_insert_post( self::$post_atts, false, false );
 
-        self::$post_atts['meta_input']['discourse_post_id'] = 2;
-        self::$post_atts['meta_input']['publish_post_category'] =  $private_category_id;
-        $private_post_id = wp_insert_post( self::$post_atts, false, false );
+        self::$post_atts['meta_input']['discourse_post_id']     = 2;
+        self::$post_atts['meta_input']['publish_post_category'] = $private_category_id;
+        $private_post_id                                        = wp_insert_post( self::$post_atts, false, false );
 
         // Get the comment types.
-        $context = 'test';
-        $public_comment_type = $this->comment->get_comment_type_for_post( $public_post_id, $context );
+        $context              = 'test';
+        $public_comment_type  = $this->comment->get_comment_type_for_post( $public_post_id, $context );
         $private_comment_type = $this->comment->get_comment_type_for_post( $private_post_id, $context );
 
         // Ensure we got the right types.
@@ -153,41 +183,45 @@ class DiscourseCommentTest extends UnitTest {
         $response_error = 'forbidden';
 
         // Setup plugin options
-        self::$plugin_options[ "comment-type" ] = "display-public-comments-only";
+        self::$plugin_options['comment-type'] = 'display-public-comments-only';
         $this->comment->setup_options( self::$plugin_options );
 
         // Setup the categories response
-        delete_transient( "wpdc_discourse_categories" );
+        delete_transient( 'wpdc_discourse_categories' );
         $response = $this->build_response( $response_error );
-        $this->mock_remote_post( $response );
+        $request  = array(
+			'method'   => 'GET',
+			'response' => $response,
+        );
+        $this->mock_remote_post( $request );
 
         // Setup the category ids.
-        $site = json_decode( $this->response_body_file( 'site' ) );
-        $categories = $site->categories;
-        $public_category_id = null;
+        $site                = json_decode( $this->response_body_file( 'site' ) );
+        $categories          = $site->categories;
+        $public_category_id  = null;
         $private_category_id = null;
 
-        foreach( $categories as $category ) {
-          if ( $category->read_restricted === false) {
-            $public_category_id = $category->id;
+        foreach ( $categories as $category ) {
+          if ( false === $category->read_restricted ) {
+				$public_category_id = $category->id;
           }
-          if ( $category->read_restricted === true) {
-            $private_category_id = $category->id;
+          if ( true === $category->read_restricted ) {
+				$private_category_id = $category->id;
           }
         }
 
         // Add the posts.
-        self::$post_atts['meta_input']['discourse_post_id'] = 1;
-        self::$post_atts['meta_input']['publish_post_category'] =  $public_category_id;
+        self::$post_atts['meta_input']['discourse_post_id']     = 1;
+        self::$post_atts['meta_input']['publish_post_category'] = $public_category_id;
         $public_post_id = wp_insert_post( self::$post_atts, false, false );
 
-        self::$post_atts['meta_input']['discourse_post_id'] = 2;
-        self::$post_atts['meta_input']['publish_post_category'] =  $private_category_id;
-        $private_post_id = wp_insert_post( self::$post_atts, false, false );
+        self::$post_atts['meta_input']['discourse_post_id']     = 2;
+        self::$post_atts['meta_input']['publish_post_category'] = $private_category_id;
+        $private_post_id                                        = wp_insert_post( self::$post_atts, false, false );
 
         // Get the comment types.
-        $context = 'test';
-        $public_comment_type = $this->comment->get_comment_type_for_post( $public_post_id, $context );
+        $context              = 'test';
+        $public_comment_type  = $this->comment->get_comment_type_for_post( $public_post_id, $context );
         $private_comment_type = $this->comment->get_comment_type_for_post( $private_post_id, $context );
 
         // Ensure we got the right types.
@@ -204,4 +238,3 @@ class DiscourseCommentTest extends UnitTest {
         wp_delete_post( $private_post_id );
     }
 }
-

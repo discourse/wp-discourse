@@ -48,7 +48,7 @@ class Utilities {
 	/**
 	 * Public static alias for validate.
 	 *
-	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
+	 * @param array $response The response from `wp_remote_request`.
 	 *
 	 * @return int
 	 */
@@ -180,8 +180,8 @@ class Utilities {
 
 		$user_data = static::discourse_request(
              $create_user_url, array(
-				 'body' => $body,
-				 'type' => 'post',
+				 'body'   => $body,
+				 'method' => 'POST',
 			 )
             );
 
@@ -328,14 +328,19 @@ class Utilities {
 	/**
 	 * Get the Discourse comment HTML so that it can be displayed without loading the comments template.
 	 *
-	 * @param int $post_id The post ID to display the comments for.
+	 * @param int    $post_id The post ID to display the comments for.
+	 * @param bool   $perform_sync Determines whether a comment sync is maybe performed when loading comments.
+	 * @param bool   $force_sync Determines whether comment sync cache is bypassed when loading comments.
+	 * @param string $comment_type Type of comment display.
 	 *
 	 * @return string
 	 */
-	public static function get_discourse_comments( $post_id ) {
+	public static function get_discourse_comments( $post_id, $perform_sync = true, $force_sync = false, $comment_type ) {
 		$comment_formatter = new \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
+		$comment_formatter->setup_options();
+		$comment_formatter->setup_logger();
 
-		return $comment_formatter->format( $post_id );
+		return $comment_formatter->format( $post_id, $perform_sync, $force_sync, $comment_type );
 	}
 
 	/**

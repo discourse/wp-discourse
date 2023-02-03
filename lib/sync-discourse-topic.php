@@ -86,6 +86,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 		if ( ! is_wp_error( $json ) && ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
 			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+			$post_ids                    = array();
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
@@ -96,12 +97,14 @@ class SyncDiscourseTopic extends DiscourseBase {
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
-					$this->update_post_metadata( $post_data );
+					$post_ids = $this->update_post_metadata( $post_data );
 					restore_current_blog();
 				}
 			} else {
-				$this->update_post_metadata( $post_data );
+				$post_ids = $this->update_post_metadata( $post_data );
 			}
+
+			do_action( 'wpdc_after_webhook_post_update', $post_ids );
 		} else {
 			$this->logger->error( 'update_topic_content.response_body_error' );
 		}
@@ -161,6 +164,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 		$post_title     = ! empty( $post_data['topic_title'] ) ? sanitize_text_field( $post_data['topic_title'] ) : null;
 		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? intval( $post_data['topic_posts_count'] ) - 1 : null;
 		$post_type      = ! empty( $post_data['post_type'] ) ? intval( $post_data['post_type'] ) : null;
+		$post_ids       = array();
 
 		if ( $topic_id && $post_number && $post_title ) {
 
@@ -201,7 +205,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 			}
 		}
 
-		return null;
+		return $post_ids;
 	}
 
 	/**
@@ -213,35 +217,21 @@ class SyncDiscourseTopic extends DiscourseBase {
 	 * @return null|\WP_Error
 	 */
 	protected function list_topic( $post_id, $topic_id ) {
-		$url          = ! empty( $this->options['url'] ) ? $this->options['url'] : null;
-		$api_key      = ! empty( $this->options['api-key'] ) ? $this->options['api-key'] : null;
-		$api_username = ! empty( $this->options['publish-username'] ) ? $this->options['publish-username'] : null;
-
-		if ( empty( $url ) || empty( $api_key ) || empty( $api_username ) ) {
-
-			return new \WP_Error( 'discourse_configuration_error', 'The Discourse connection options have not been configured.' );
-		}
-
-		$status_url = esc_url_raw( "{$url}/t/{$topic_id}/status" );
-
-		$data         = array(
+		$status_path = "/t/{$topic_id}/status";
+		$body        = array(
 			'status'  => 'visible',
 			'enabled' => 'true',
 		);
-		$post_options = array(
-			'timeout' => 30,
-			'method'  => 'PUT',
-			'headers' => array(
-				'Api-Key'      => sanitize_key( $api_key ),
-				'Api-Username' => sanitize_text_field( $api_username ),
-			),
-			'body'    => http_build_query( $data ),
+		$args        = array(
+			'body'   => $body,
+			'method' => 'PUT',
 		);
 
-		$response = wp_remote_post( $status_url, $post_options );
+		$response = $this->discourse_request( $status_url, $args );
 
-		if ( ! $this->validate( $response ) ) {
-
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		} elseif ( ! $this->validate( $response ) ) {
 			return new \WP_Error( 'discourse_response_error', 'Unable to unlist the Discourse topic.' );
 		}
 

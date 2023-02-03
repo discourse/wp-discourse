@@ -90,8 +90,8 @@ trait PluginUtilities {
 	 * @return int|\WP_Error
 	 */
 	public function check_connection_status() {
-		$logger          = Logger::create( 'connection' );
 		$options         = isset( $this->options ) ? $this->options : $this->get_options();
+		$logger          = Logger::create( 'connection', $options );
 		$api_credentials = $this->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {
@@ -101,17 +101,31 @@ trait PluginUtilities {
 			return false;
 		}
 
-		$path = "/users/{$api_credentials['api_username']}.json";
-		$body = $this->discourse_request( $path );
+		// discourse >= 2.9.0.beta5.
+		$path   = '/session/scopes.json';
+		$scopes = true;
+		$body   = $this->discourse_request( $path );
+
+		// discourse < 2.9.0.beta5.
+		if ( is_wp_error( $body ) ) {
+			$error_data = $body->get_error_data();
+
+			if ( 404 === $error_data['http_code'] ) {
+				$scopes = false;
+				$path   = "/users/{$api_credentials['api_username']}.json";
+				$body   = $this->discourse_request( $path );
+			}
+		}
 
 		if ( ! empty( $options['connection-logs'] ) ) {
 			$log_args = array();
 
 			if ( is_wp_error( $body ) ) {
-				$error_code = $body->get_error_code();
-				$error_data = $body->get_error_data();
-				$log_type   = 'failed_to_connect';
+				$log_type            = 'failed_to_connect';
+				$log_args['error']   = $body->get_error_code();
+				$log_args['message'] = $body->get_error_message();
 
+				$error_data = $body->get_error_data();
 				if ( isset( $error_data['http_code'] ) ) {
 					$log_args['http_code'] = $error_data['http_code'];
 				}
@@ -120,19 +134,45 @@ trait PluginUtilities {
 				}
 			} else {
 				$log_type = 'successful_connection';
-
 			}
 
 			$logger->info( "check_connection_status.$log_type", $log_args );
 		}
 
-		return ! is_wp_error( $body );
+		if ( is_wp_error( $body ) ) {
+			return false;
+		}
+
+		// discourse < 2.9.0.beta5.
+		if ( ! $scopes ) {
+			return true;
+		}
+
+		$scope_validation = $this->validate_scopes( $body->scopes );
+
+		if ( ! empty( $options['connection-logs'] ) ) {
+			$log_args = array();
+
+			if ( $scope_validation->success ) {
+				$log_type = 'valid_scopes';
+			} else {
+				$log_type = 'invalid_scopes';
+			}
+
+			if ( ! empty( $scope_validation->errors ) ) {
+				$log_args['message'] = implode( ', ', $scope_validation->errors );
+			}
+
+			$logger->info( "check_connection_status.$log_type", $log_args );
+		}
+
+		return $scope_validation->success;
 	}
 
 	/**
-	 * Validates the response from `wp_remote_get` or `wp_remote_post`.
+	 * Validates the response from `wp_remote_request`.
 	 *
-	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
+	 * @param array $response The response from `wp_remote_request`.
 	 *
 	 * @return int
 	 */
@@ -152,6 +192,71 @@ trait PluginUtilities {
 			// Valid response.
 			return 1;
 		}
+	}
+
+	/**
+	 * Validates that the api key has sufficient scopes based on the current settings.
+	 *
+	 * @param array $scopes The scopes.
+	 *
+	 * @return int
+	 */
+	protected function validate_scopes( $scopes ) {
+		$result = (object) array(
+			'success' => false,
+			'errors'  => array(),
+		);
+
+		// If scopes are empty the key is global.
+		if ( empty( $scopes ) ) {
+			$result->success = true;
+			return $result;
+		}
+
+		$wordpress_scopes = array_filter(
+             $scopes, function( $scope ) {
+			return 'wordpress' === $scope->resource; // phpcs:ignore WordPress.WP.CapitalPDangit
+		}
+            );
+
+		if ( empty( $wordpress_scopes ) ) {
+			$result->errors[] = 'API Key has no WordPress scopes';
+			return $result;
+		}
+
+		$scoped_actions    = array_column( $wordpress_scopes, 'key' );
+		$feature_groups    = $this->enabled_feature_groups();
+		$unscoped_features = array_diff( $feature_groups, $scoped_actions );
+
+		if ( empty( $unscoped_features ) ) {
+			$result->success = true;
+			return $result;
+		} else {
+			foreach ( $unscoped_features as $usf ) {
+				$result->errors[] = "API Key is missing WordPress $usf scope";
+			}
+			return $result;
+		}
+	}
+
+	/**
+	 * Lists the enabled feature groups.
+	 *
+	 * @return array
+	 */
+	protected function enabled_feature_groups() {
+		// TODO: add 'enabled' setting for publishing features.
+		$groups = array( 'publishing' );
+
+		if ( ! empty( $this->options['enable-discourse-comments'] ) ) {
+			$groups[] = 'commenting';
+		}
+
+		if ( ! empty( $this->options['enable-sso'] ) || ! empty( $this->options['sso-client-enabled'] ) ) {
+			$groups[] = 'discourse_connect';
+		}
+
+		return $groups;
 	}
 
 	/**
@@ -331,8 +436,8 @@ trait PluginUtilities {
 		$response_body = $this->discourse_request(
 			$path,
 			array(
-				'type' => 'post',
-				'body' => $body,
+				'method' => 'POST',
+				'body'   => $body,
 			)
 		);
 
@@ -363,34 +468,56 @@ trait PluginUtilities {
 	 */
 	protected function discourse_request( $url, $args = array() ) {
 		if ( ! $url ) {
-			return;
+			return new \WP_Error( 'discourse_configuration_error', 'No discourse url provided to request.' );
 		}
 
 		$api_credentials = $this->get_api_credentials();
+
 		if ( is_wp_error( $api_credentials ) ) {
 			return $api_credentials;
 		}
 
+		$api_username = $api_credentials['api_username'];
+		if ( ! empty( $args['api_username'] ) ) {
+			$api_username = $args['api_username'];
+		}
+
 		$headers = array(
 			'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-			'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
+			'Api-Username' => sanitize_text_field( $api_username ),
 			'Accept'       => 'application/json',
 		);
 		$opts    = array(
-			'headers' => $headers,
+			'timeout' => 30,
 		);
+
 		if ( ! empty( $args['body'] ) ) {
-			$opts['body'] = $args['body'];
+			$headers['Content-Type'] = 'application/json';
+			$opts['body']            = json_encode( $args['body'] );
 		}
+
+		if ( ! empty( $args['headers'] ) ) {
+			foreach ( $args['headers'] as $key => $value ) {
+				$headers[ $key ] = $value;
+			}
+		}
+
+		$opts['headers'] = $headers;
 
 		// support relative paths.
 		if ( strpos( $url, '://' ) === false ) {
 			$url = esc_url_raw( $api_credentials['url'] . $url );
 		}
 
-		$type     = isset( $args['type'] ) ? $args['type'] : 'get';
-		$request  = "wp_remote_$type";
-		$response = $request( $url, $opts );
+		if ( isset( $args['method'] ) ) {
+			$opts['method'] = strtoupper( $args['method'] ); // default GET.
+		}
+
+		$response = wp_remote_request( $url, $opts );
+
+		if ( isset( $args['raw'] ) && $args['raw'] ) {
+			return $response;
+		}
 
 		if ( ! $this->validate( $response ) ) {
 			return new \WP_Error(
@@ -401,10 +528,6 @@ trait PluginUtilities {
 					'http_body' => wp_remote_retrieve_body( $response ),
 				)
 			);
-		}
-
-		if ( isset( $args['raw'] ) && $args['raw'] ) {
-			return $response;
 		}
 
 		return json_decode( wp_remote_retrieve_body( $response ) );

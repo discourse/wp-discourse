@@ -141,7 +141,7 @@ class ConnectionSettings {
 				'discourse_connect',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
 																	   '/admin/api/keys" target="_blank" rel="norefferer noopener">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
-				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
+				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'All Users', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
 		} else {
@@ -150,7 +150,7 @@ class ConnectionSettings {
 				'discourse_connect',
 				__(
 					"Found on your forum at /admin/api/keys.
-			If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
+			If you haven't yet created an API key, Click 'New API Key', set User Level to 'All Users', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 					'wp-discourse'
 				)
 			);

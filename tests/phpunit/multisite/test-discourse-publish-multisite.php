@@ -4,7 +4,7 @@
  *
  * @package WPDiscourse
  */
- 
+
 use WPDiscourse\Test\Multisite;
 use WPDiscourse\Test\DiscoursePublishTest;
 
@@ -23,7 +23,7 @@ class DiscoursePublishMultisiteTest extends DiscoursePublishTest {
         $this->publish->setup_options( self::$plugin_options );
 
         // Set up a response body for creating a new post.
-        $body               = $this->mock_remote_post_success( 'post_create' );
+        $body               = $this->mock_remote_post_success( 'post_create', 'POST' );
         $discourse_topic_id = $body->topic_id;
 
         // Add the post.
