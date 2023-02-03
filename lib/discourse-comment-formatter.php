@@ -36,15 +36,17 @@ class DiscourseCommentFormatter extends DiscourseBase {
 	/**
 	 * Formats the Discourse comments for a given post.
 	 *
-	 * @param int  $post_id The post_id to retrieve comments for.
-	 * @param bool $perform_sync Determines whether sync is performed.
+	 * @param int    $post_id The post_id to retrieve comments for.
+	 * @param bool   $perform_sync Determines whether sync is performed.
+	 * @param bool   $force_sync Determines whether sync is forced.
+	 * @param string $comment_type Set comment type for the post.
 	 *
 	 * @return string
 	 */
-	public function format( $post_id, $perform_sync = true ) {
+	public function format( $post_id, $perform_sync = true, $force_sync = false, $comment_type = null ) {
 		// Sync the comments.
 		if ( $perform_sync ) {
-			do_action( 'wpdc_sync_discourse_comments', $post_id );
+			do_action( 'wpdc_sync_discourse_comments', $post_id, $force_sync, $comment_type );
 		}
 		$options = $this->options;
 

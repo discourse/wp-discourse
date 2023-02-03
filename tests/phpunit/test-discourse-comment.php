@@ -32,10 +32,9 @@ class DiscourseCommentTest extends UnitTest {
 
         $comment_formatter = new DiscourseCommentFormatter();
         $this->comment     = new DiscourseComment( $comment_formatter );
-        $this->comment->setup_logger();
-
         self::$plugin_options['enable-discourse-comments'] = true;
         $this->comment->setup_options( self::$plugin_options );
+        $this->comment->setup_logger();
   	}
 
     public function test_comments_disabled() {

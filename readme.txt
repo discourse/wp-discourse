@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 6.0
+Tested up to: 6.1
 Requires PHP: 5.6.0
-Stable tag: 2.4.5
+Stable tag: 2.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -123,9 +123,19 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-#### 2.4.6 05/09/2022
+#### 2.4.8 12/27/2022
 
-- Fix logging error when installed alongside S3 Uploads plugin.
+- Improve logs metafile handling.
+- Add logs enabled setting.
+
+#### 2.4.7 12/05/2022
+
+- Adds Discourse Comments block for the Block Editor.
+
+#### 2.4.6 09/20/2022
+
+- Improvements to the functionality and interface of the get_discourse_comments utility function.
+- Adds wpdc_after_webhook_post_update action for use with caching solutions.
 
 #### 2.4.5 07/06/2022
 

@@ -1,3 +1,7 @@
+admin/js/admin.js
 admin/discourse-sidebar/src/*
 admin/discourse-sidebar/build/*
+blocks/comments/build/*
+blocks/comments/node_modules/*
+blocks/comments/src/*
 vendor/*

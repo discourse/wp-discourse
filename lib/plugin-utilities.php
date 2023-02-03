@@ -90,8 +90,8 @@ trait PluginUtilities {
 	 * @return int|\WP_Error
 	 */
 	public function check_connection_status() {
-		$logger          = Logger::create( 'connection' );
 		$options         = isset( $this->options ) ? $this->options : $this->get_options();
+		$logger          = Logger::create( 'connection', $options );
 		$api_credentials = $this->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {

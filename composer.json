@@ -28,11 +28,11 @@
   "require-dev": {
     "squizlabs/php_codesniffer": "3.*",
     "dealerdirect/phpcodesniffer-composer-installer": "^0.7.1",
-    "10up/wp_mock": "dev-master",
+    "10up/wp_mock": "0.4.2",
     "phpunit/phpunit": "7.5.20",
     "phpunit/php-code-coverage": "^6.1.4",
     "phpcompatibility/php-compatibility": "^9.3.5",
-    "wp-coding-standards/wpcs": "dev-develop#7cd46bed1e6a7a2af3fe24c7f4a044da3076d8f4",
+    "wp-coding-standards/wpcs": "^2.3",
     "monolog/monolog": "^1.25",
     "yoast/phpunit-polyfills": "^1.0.1"
   },
