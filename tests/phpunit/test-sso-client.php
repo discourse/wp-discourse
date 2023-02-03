@@ -25,7 +25,7 @@ class SSOClientTest extends UnitTest {
 		parent::setUp();
 
 		$this->discourse_user_id = 5;
-		$this->user_id           = $this->factory->user->create();
+		$this->user_id           = self::factory()->user->create();
 		$this->secret            = 'secret';
 		$this->nonce             = 'abcd';
 		$this->query_args        = array(

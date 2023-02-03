@@ -1,5 +1,5 @@
 # WP Discourse
-[![OpenCollective](https://opencollective.com/wp-discourse/backers/badge.svg)](#backers) 
+[![OpenCollective](https://opencollective.com/wp-discourse/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/wp-discourse/sponsors/badge.svg)](#sponsors)
 
 **Note:** the wp-discourse plugin requires >= PHP-5.4.0.
@@ -30,10 +30,7 @@ that strictly require such a setup, e.g. a site that is already using WordPress 
 
 ### Contact
 
-- Bug reports and other developer inquiries should be directed at our GitHub Issues:
-[https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
-
-- Please post support requests to our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
+Please post bug reports, support requests and all other inquiries in our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
 
 ### Installation
 
@@ -79,7 +76,7 @@ Discourse forum. You can install Discourse for yourself following either of thes
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
 
-#### Can I import old WordPress comments as Discourse comments (i.e. "replies")? 
+#### Can I import old WordPress comments as Discourse comments (i.e. "replies")?
 
 No.
 

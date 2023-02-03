@@ -28,23 +28,27 @@ class Logger extends \WPDiscourse\Monolog\Logger {
      * will be used, which throws records away.
      *
      * @param string $context The context for the logs, e.g. 'publish'.
+     * @param object $options WP Discourse options.
      * @param object $handler optional. The handler for the logs.
      * @param object $formatter optional. The formatter for the handler.
      *
      * @return Logger
      */
-    public static function create( $context, $handler = null, $formatter = null ) {
+    public static function create( $context, $options, $handler = null, $formatter = null ) {
     		$logger = new Logger( $context );
 
     		if ( ! $handler ) {
-    		    $handler = new FileHandler( new FileManager() );
+			$handler = new FileHandler( new FileManager() );
     		}
 
     		if ( ! $formatter ) {
-    		    $formatter = new LineFormatter();
+			$formatter = new LineFormatter();
     		}
 
-    		if ( $handler && $handler->enabled() ) {
+        $handler_enabled = $handler && $handler->enabled();
+        $logs_enabled    = ! empty( $options['logs-enabled'] ) && $handler_enabled;
+
+    		if ( $logs_enabled ) {
             if ( $formatter ) {
                 $handler->setFormatter( $formatter );
             }

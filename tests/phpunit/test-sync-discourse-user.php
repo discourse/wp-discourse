@@ -34,8 +34,8 @@ class SyncDiscourseUserTest extends UnitTest {
       self::$plugin_options['enable-sso']                 = 1;
 
       $this->sync_user = new SyncDiscourseUser();
-      $this->sync_user->setup_logger();
       $this->sync_user->setup_options( self::$plugin_options );
+      $this->sync_user->setup_logger();
 
       $this->payload   = $this->response_body_file( 'webhook_user' );
       $this->signature = hash_hmac( 'sha256', $this->payload, self::$plugin_options['webhook-secret'] );
@@ -87,7 +87,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create();
+      $user_id        = self::factory()->user->create();
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
       add_user_meta( $user->ID, 'discourse_sso_user_id', $discourse_user->id, true );
@@ -117,7 +117,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create( array( 'user_email' => $payload->user->email ) );
+      $user_id        = self::factory()->user->create( array( 'user_email' => $payload->user->email ) );
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
 
@@ -142,7 +142,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
 
       // Setup the user
-      $user_id        = $this->factory->user->create();
+      $user_id        = self::factory()->user->create();
       $discourse_user = $payload->user;
       $user           = wp_set_current_user( $user_id );
 
