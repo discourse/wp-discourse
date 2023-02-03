@@ -243,6 +243,19 @@ class PublishSettings {
 			'discourse_publishing_settings_section'
 		);
 
+		if ( version_compare( get_bloginfo( 'version' ), '5.6', '>=' ) ) {
+			add_settings_field(
+				'discourse_exclude_tags',
+				__( 'Exclude Posts By Tag', 'wp-discourse' ),
+				array(
+					$this,
+					'tags_select',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+		}
+
 		// These options should be set for the whole network when multi-site support is enabled.
 		if ( ! $this->use_network_publish_settings ) {
 			add_settings_field(
@@ -263,6 +276,39 @@ class PublishSettings {
 				array(
 					$this,
 					'discourse_username_editable_checkbox',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+
+			add_settings_field(
+				'discourse_direct_db_publication_flags',
+				__( 'Direct Database Publication Flags', 'wp-discourse' ),
+				array(
+					$this,
+					'direct_db_publication_flags',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+
+			add_settings_field(
+				'discourse_verbose_publication_logs',
+				__( 'Verbose Publication Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_publication_logs',
+				),
+				'discourse_publish',
+				'discourse_publishing_settings_section'
+			);
+
+			add_settings_field(
+				'discourse_single_user_api_key_publication',
+				__( 'Single User API Key Publication', 'wp-discourse' ),
+				array(
+					$this,
+					'single_user_api_key_publication',
 				),
 				'discourse_publish',
 				'discourse_publishing_settings_section'
@@ -416,7 +462,7 @@ class PublishSettings {
 			'auto-publish',
 			'discourse_publish',
 			__( 'Mark all new posts to be published to Discourse.', 'wp-discourse' ),
-                __( 'This can be overridden in the Discourse Sidebar before you publish a post.', 'wp-discourse' )
+			__( 'This can be overridden in the Discourse Sidebar before you publish a post.', 'wp-discourse' )
 		);
 	}
 
@@ -428,7 +474,7 @@ class PublishSettings {
 			'force-publish',
 			'discourse_publish',
 			__( 'Automatically publish all new posts and updates. Posts will be published to the Default Discourse Category.', 'wp-discourse' ),
-			__( '<strong>This setting cannot be overridden.</strong>', 'wp-discourse' )
+			__( '<strong>This setting is only applied when the Block Editor is used to publish posts.</strong>', 'wp-discourse' )
 		);
 	}
 
@@ -524,6 +570,65 @@ class PublishSettings {
 			'allowed_post_types',
 			$this->form_helper->post_types_to_publish( array( 'attachment' ) ),
 			__( 'Hold the <strong>control</strong> button (Windows) or the <strong>command</strong> button (Mac) to select multiple post-types.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the tags select input.
+	 */
+	public function tags_select() {
+		$this->form_helper->tags_select_input(
+			'exclude_tags',
+			'discourse_publish',
+			__( 'Do not auto-publish posts to Discourse if they have one of these tags.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_direct_db_publication_meta checkbox.
+	 */
+	public function direct_db_publication_flags() {
+		$this->form_helper->checkbox_input(
+			'direct-db-publication-flags',
+			'discourse_publish',
+			__(
+				'Use direct database calls for flags that control publication to discourse (EXPERIMENTAL).',
+				'wp-discourse'
+			),
+			__(
+				'Potentially prevents concurrency issues arising from object cache usage.',
+				'wp-discourse'
+			)
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_publication_logs checkbox.
+	 */
+	public function verbose_publication_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-publication-logs',
+			'discourse_publish',
+			__(
+				'Enable verbose logs for publication.',
+				'wp-discourse'
+			),
+			__( 'Will log successful publications as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_direct_discourse_user_publication checkbox.
+	 */
+	public function single_user_api_key_publication() {
+		$this->form_helper->checkbox_input(
+			'single-user-api-key-publication',
+			'discourse_publish',
+			__(
+				"Enable if you're using a Single User API Key",
+				'wp-discourse'
+			),
+			__( 'This allows you to publish to Discourse using the Discourse Username of the post author while using a Single User API Key.', 'wp-discourse' )
 		);
 	}
 

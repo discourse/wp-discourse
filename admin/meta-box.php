@@ -107,7 +107,6 @@ class MetaBox {
 		$post_id          = $post->ID;
 		$published        = get_post_meta( $post_id, 'discourse_post_id', true );
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
-		$force_publish    = ! empty( $this->options['force-publish'] );
 		$saved            = 'publish' === get_post_status( $post_id ) ||
 							   'future' === get_post_status( $post_id ) ||
 							   'draft' === get_post_status( $post_id ) ||
@@ -125,17 +124,14 @@ class MetaBox {
 
 		if ( ! $published ) {
 			if ( $publishing_error ) {
-				$error_handled = $this->publishing_error_markup( $publishing_error, $force_publish );
+				$error_handled = $this->publishing_error_markup( $publishing_error );
 
 				if ( 'handled_error' === $error_handled ) {
 
 					return null;
 				}
 			}
-			if ( $force_publish ) {
-				$this->force_publish_markup( $default_category_id );
-			} else {
-				?>
+			?>
 				<label for="wpdc_publish_option">
 					<input type="radio" name="wpdc_publish_options" value="new" checked><?php esc_html_e( 'Create new Topic' ); ?>
 				</label><br>
@@ -165,11 +161,10 @@ class MetaBox {
 					</div>
 					<?php
 				}
-			} // End if().
 		} else {
 			// The post has already been published to Discourse.
 			if ( ! empty( $publishing_error ) ) {
-				$error_handled = $this->publishing_error_markup( $publishing_error, $force_publish, true );
+				$error_handled = $this->publishing_error_markup( $publishing_error, true );
 
 				if ( 'handled_error' === $error_handled ) {
 
@@ -181,14 +176,10 @@ class MetaBox {
 			// translators: Discourse post_is_linked_to_discourse message. Placeholder: A link to the Discourse topic.
 			$message = sprintf( __( 'This post is linked to %1$s.<br><hr>', 'wp-discourse' ), $discourse_link );
 			echo wp_kses_post( $message );
-			if ( $force_publish ) {
-				esc_html_e( 'The Force Publish option is enabled. All post updates will be automatically republished to Discourse.', 'wp-discourse' );
-			} else {
-				$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
-				$this->update_discourse_topic_checkbox( $publish_text );
-				echo '<br>';
-				$this->unlink_from_discourse_checkbox();
-			}
+			$publish_text = __( 'Update Discourse topic', 'wp-discourse' );
+			$this->update_discourse_topic_checkbox( $publish_text );
+			echo '<br>';
+			$this->unlink_from_discourse_checkbox();
 		} // End if().
 
 		return null;
@@ -287,26 +278,6 @@ class MetaBox {
 		}
 
 		return $post_id;
-	}
-
-	/**
-	 * Outputs the markup that is displayed when the force_publish option is enabled.
-	 *
-	 * @param int $default_category_id The category_id to publish to.
-	 */
-	protected function force_publish_markup( $default_category_id ) {
-		$category_name = $this->get_discourse_category_name( $default_category_id );
-		if ( ! is_wp_error( $category_name ) ) {
-			// translators: Discourse force-publish message. Placeholder: category_name.
-			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled. All WordPress posts will be published to Discourse in the <strong>%1$s</strong> category.', 'wp-discourse' ), $category_name );
-		} else {
-			$publishing_url  = admin_url( '/admin.php?page=publishing_options' );
-			$publishing_link = '<a href="' . esc_url( $publishing_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'Publishing Options', 'wp-discourse' ) . '</a>';
-			// translators: Discourse force-publish-category-not-set message. Placeholder: publishing_options_link.
-			$message = sprintf( __( 'The <strong>force-publish</strong> option has been enabled, but you have not set a default publishing category. You can set that category on your %1s tab.', 'wp-discourse' ), $publishing_link );
-
-		}
-		echo wp_kses_post( $message );
 	}
 
 	/**
@@ -582,11 +553,10 @@ class MetaBox {
 	 * The message to be displayed when a 404 or 500 error has been returned after publishing a post to Discourse.
 	 *
 	 * @param string $publishing_error The publishing error that has been returned.
-	 * @param bool   $force_publish Whether or not the force_publish option has been selected.
 	 * @param bool   $already_published Whether or not the post has already been published.
 	 * @return string
 	 */
-	protected function publishing_error_markup( $publishing_error, $force_publish, $already_published = false ) {
+	protected function publishing_error_markup( $publishing_error, $already_published = false ) {
 		switch ( $publishing_error ) {
 			case 'deleted_topic':
 				esc_html_e(
@@ -598,11 +568,9 @@ class MetaBox {
 
 				echo '<hr>';
 				$this->unlink_from_discourse_checkbox();
-				if ( ! $force_publish ) {
-					echo '<br>';
-					$publish_text = __( 'Try Updating the Topic', 'wp-discourse' );
-					$this->update_discourse_topic_checkbox( $publish_text );
-				}
+				echo '<br>';
+				$publish_text = __( 'Try Updating the Topic', 'wp-discourse' );
+				$this->update_discourse_topic_checkbox( $publish_text );
 
 				return 'handled_error';
 

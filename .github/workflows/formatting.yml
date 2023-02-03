@@ -1,0 +1,54 @@
+name: WP-Discourse Formatting
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Formatting on PHP ${{ matrix.php }}
+    strategy:
+      matrix:
+        include:
+          - php: '5.6'
+            sniff: true
+          - php: '7.0'
+            sniff: true
+          - php: '7.4'
+            sniff: true
+            jshint: true
+          - php: '8.0'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+
+      - name: Syntax Check
+        run: |
+          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+
+      - name: Install Composer
+        if: 'matrix.sniff'
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: 'highest'
+          composer-options: '--ignore-platform-reqs'
+
+      - name: WordPress Coding Standards
+        if: 'matrix.sniff'
+        run: |
+          vendor/bin/phpcs -p -s -v -n .
+
+      - name: JSHint
+        if: 'matrix.jshint'
+        run: |
+          sudo npm install -g jshint
+          wget https://develop.svn.wordpress.org/trunk/.jshintrc
+          jshint .

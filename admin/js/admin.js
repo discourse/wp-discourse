@@ -125,4 +125,112 @@
 				$( '.discourse-comment-type' ).toggleClass( 'hidden' );
 		}
 	);
+	
+	var $logControls = $('#wpdc-log-viewer-controls');
+	var $logViewer = $('#wpdc-log-viewer');
+	
+	function handleLogResponse(response, logKey, meta) {
+		if (response && response.data) {
+			var title = (meta ? '' : 'Log for ') + response.data.name;
+			$logControls.find('h3').html(title);
+			$logViewer.find('pre').html(response.data.contents);
+		}
+
+		if (logKey) {
+			$logViewer.data('log-key', logKey);
+		}
+
+		$logControls.toggleClass('meta', meta);
+		$logViewer.removeClass('loading');
+	}
+	
+	$logControls.find('select').on('change', function() {
+		var logKey = $logControls.find('select').val();
+		
+		if (logKey) {
+			$logViewer.addClass('loading');
+			
+			$.ajax({
+				url: wpdc.ajax,
+				type: 'post',
+				data: {
+					action: 'wpdc_view_log',
+					nonce: wpdc.nonce,
+					key: logKey
+				},
+				success: function(response) {
+					if (response.success) {
+						handleLogResponse(response, logKey, false);
+					}
+				}
+			});
+		}
+	});
+	
+	$logControls.find('.load-log').on('click', function() {		
+		var logKey = $logViewer.data('log-key');
+		
+		if (logKey) {
+			$logViewer.addClass('loading');
+			
+			$.ajax({
+				url: wpdc.ajax,
+				type: 'post',
+				data: {
+					action: 'wpdc_view_log',
+					nonce: wpdc.nonce,
+					key: logKey
+				},
+				success: function(response) {
+					if (response.success) {
+						handleLogResponse(response, logKey, false);
+					}
+				}
+			});
+		}
+	});
+	
+	$logControls.find('.button.view-meta').on('click', function() {		
+		$logViewer.addClass('loading');	
+		$.ajax({
+			url: wpdc.ajax,
+			type: 'post',
+			data: {
+				action: 'wpdc_view_logs_metafile'
+			},
+			success: function(response) {
+				if (response.success) {
+					handleLogResponse(response, null, true);
+				}
+			}
+		});
+	});
+	
+	$logControls.find('.button.download-logs').on('click', function() {		
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST', wpdc.ajax + '?action=wpdc_download_logs', true);
+		xhr.onload = function() {
+			if (xhr.readyState === 4 && xhr.status === 200) {
+				var blob = new Blob([ xhr.response ], { type: 'application/zip' });
+				var url = window.URL.createObjectURL(blob);
+				var a = document.createElement('a');
+        
+				document.body.appendChild(a);
+        a.style = 'display:none';
+        a.href = url;
+        a.download = xhr.getResponseHeader('Content-Disposition').split('filename=')[1];
+        a.click();
+        a.remove();
+				setTimeout(function() {
+					window.URL.revokeObjectURL(url);
+				});
+			}
+		};
+		xhr.responseType = 'arraybuffer';
+		xhr.send();
+	});
+	
+	if ( $('.tagsdiv').length ) {
+		window.tagBox && window.tagBox.init();
+	}
 })( jQuery );

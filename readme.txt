@@ -1,10 +1,10 @@
 === WP Discourse ===
-Contributors: scossar, cdck, retlehs, samsaffron, techapj
+Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 4.7
-Tested up to: 5.5
-Requires PHP: 5.4.0
-Stable tag: 2.1.2
+Tested up to: 6.1
+Requires PHP: 5.6.0
+Stable tag: 2.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,7 +18,7 @@ The WP Discourse plugin acts as an interface between your WordPress site and you
 ### Use Discourse for comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
-- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Associates WP author accounts with their respective Discourse accounts. Does not require DiscourseConnect.
 - Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
 based on post score and commenter "trust level" -- see docs.
 
@@ -27,10 +27,10 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 
-### Single Sign On from WordPress to Discourse
+### DiscourseConnect
 
-The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
-Single Sign On provider for your Discourse forum.
+The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the
+DiscourseConnect provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
@@ -71,7 +71,7 @@ will fail.
 
 = Does it work with a WordPress multisite configuration? =
 
-All of the plugin's functionality except for using Discourse as the SSO provider for WordPress works with multisite configurations.
+All of the plugin's functionality except for using Discourse as the DiscourseConnect provider for WordPress works with multisite configurations.
 
 = Does this plugin install Discourse for me? =
 
@@ -117,11 +117,174 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 6. Configuring the plugin: the Text Content settings tab.
 
-7. Configuring the plugin: the SSO settings tab.
+7. Configuring the plugin: the DiscourseConnect settings tab.
 
-8. Configuring the plugin: the SSO Client settings tab.
+8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.4.8 12/27/2022
+
+- Improve logs metafile handling.
+- Add logs enabled setting.
+
+#### 2.4.7 12/05/2022
+
+- Adds Discourse Comments block for the Block Editor.
+
+#### 2.4.6 09/20/2022
+
+- Improvements to the functionality and interface of the get_discourse_comments utility function.
+- Adds wpdc_after_webhook_post_update action for use with caching solutions.
+
+#### 2.4.5 07/06/2022
+
+- Fix logout when WP is the DiscourseConnect client and sync logout is enabled.
+- Improve the wpdc_publish_body filter.
+
+#### 2.4.4 06/30/2022
+
+- Add after_publication actions and logging
+
+#### 2.4.3 05/23/2022
+
+- Wordpress 6.0 support
+- Granular API Key support (backwards compatible)
+- DiscourseConnect copy fix
+- Add wpdc_publish_body filter
+
+#### 2.4.2 05/11/2022
+
+- Temporarily remove comment formatter log call causing issues on some sites.
+- If comments are disabled return comment template without running comment formatter.
+- Update Github Actions to support Action changes
+
+#### 2.4.1 02/28/2022
+
+- Bugfix "Update Discourse Topic" functionality.
+- Update API Key copy.
+
+#### 2.4.0 02/24/2022
+
+- Revert to existing Discourse Username approach.
+- Move new Discourse Username support to publication setting.
+- Apply phpcs to unit tests.
+
+#### 2.3.9 02/21/2022
+
+- Add proper Discourse Username support
+- Ensure discourse_request method is uppercase.
+- Update tests config.
+
+#### 2.3.8 02/04/2022
+
+- Add Wordpress 5.9 support.
+- Complete wp_remote_request standardisation.
+- Add method checks to all request tests.
+
+#### 2.3.7 12/07/2021
+
+- Update CI and developer documentation
+
+#### 2.3.6 12/06/2021
+
+- Fix wrong verb being used in `sync_sso` request
+
+#### 2.3.5 11/17/2021
+
+- Structural code improvements
+- Add logging to connection, comments, webhooks and DiscourseConnect
+- Add unit tests to connection, comments, webhooks, DiscourseConnect and multisite
+
+#### 2.3.4 10/30/2021
+
+- Improve comment HTML tag sanitization
+
+#### 2.3.3 10/29/2021
+
+- Update Discourse API key help text
+
+#### 2.3.2 10/07/2021
+
+- Add translation pipeline for configurable text
+- Support WPML in translation pipeline for configurable text
+
+#### 2.3.1 08/31/2021
+
+- Adopt Discourse approach to tag cleaning, including diacritic support
+
+#### 2.3.0 07/26/2021
+
+- Discourse SSO is now DiscourseConnect
+
+#### 2.2.9 01/05/2021
+
+- Add performance improvement for exclude-by-tag publishing feature
+
+#### 2.2.8 01/05/2021
+
+- Add exclude-by-tag publishing feature (>= WP 5.6)
+
+#### 2.2.7 01/05/2021
+
+- Add PHP 8.0.0 support
+
+#### 2.2.6 05/28/2021
+
+- Error handling, logging and unit tests for comment type detection in comment publishing.
+
+#### 2.2.4 05/11/2021
+
+- Add a logging system. This update adds a Logs tab to the plugin's options menu.
+
+#### 2.2.3 04/05/2021
+
+- Add `wpdc_comments_count` filter to allow comments count for posts that have not been published to Discourse to be filtered
+
+#### 2.2.2 03/19/2021
+
+- Update wp-scripts dev-dependency
+- Move Discourse Sidebar styles.css to the root of the `/discourse-sidebar` directory
+
+#### 2.2.1 12/23/2020
+
+- Bugfix for exception in sidebar when “Post Types to Publish” is set to "Page".
+
+#### 2.2.0 12/10/2020
+
+- Add Direct Database Publication option to deal with concurrency issues that may arrise when the plugin is used in conjunction with object caching plugins
+- Fix state being initialized for unallowed post types
+
+#### 2.1.9 11/24/2020
+
+- Improve state handling in the Discourse Sidebar
+
+#### 2.1.8 11/10/2020
+
+- Prevent Discourse post metadata from being updated via post API endpoints
+
+#### 2.1.7 10/16/2020
+
+- Fix paginated results not being handled by get_discourse_groups utility function
+
+#### 2.1.6 10/09/2020
+
+- Fix Publish to Discourse checkbox being unchecked for scheduled posts
+- Fix blank template not being loaded for sites that have enabled the 'hide WordPress comments' option
+
+#### 2.1.5 09/22/2020
+
+- Fix comment template sometimes being modified for wrong post type
+- Update copy for SSO Client settings to suggest using the WordPress domain instead of a wildcard character in the Discourse
+sso client secrets setting
+
+#### 2.1.4 09/11/2020
+
+- Add explicit permission callback to update-user REST Route for WordPress 5.5
+
+#### 2.1.3 09/10/2020
+
+- Remove Force Publish option for when the Classic Editor is used to publish posts
 
 #### 2.1.2 08/19/2020
 

@@ -53,9 +53,17 @@ class FormHelper {
 
 	/**
 	 * Sets the plugin options.
+	 *
+	 * @param object $extra_options Extra options used for testing.
 	 */
-	public function setup_options() {
+	public function setup_options( $extra_options = null ) {
 		$this->options = $this->get_options();
+
+		if ( ! empty( $extra_options ) ) {
+			foreach ( $extra_options as $key => $value ) {
+				$this->options[ $key ] = $value;
+			}
+		}
 	}
 
 	/**
@@ -160,21 +168,35 @@ class FormHelper {
 			'strong' => array(),
 		);
 
-		echo "<select multiple id='discourse-allowed-post-types' class='discourse-allowed-types' name='discourse_publish[allowed_post_types][]'>";
-
-		foreach ( $post_types as $post_type ) {
-
-			if ( array_key_exists( $option, $options ) && in_array( $post_type, $options[ $option ], true ) ) {
-				$value = 'selected';
-			} else {
-				$value = '';
-			}
-
-			echo '<option ' . esc_attr( $value ) . ' value="' . esc_attr( $post_type ) . '">' . esc_html( $post_type ) . '</option>';
-		}
-
+		echo "<select multiple id='discourse-allowed-post-types' class='discourse-select-input' name='discourse_publish[allowed_post_types][]'>";
+		$this->select_options( $option, $post_types );
 		echo '</select>';
 		echo '<p class="description">' . wp_kses( $description, $allowed ) . '</p>';
+	}
+
+	/**
+	 * Outputs the tag select input.
+	 *
+	 * @param string $option Used to set the selected option.
+	 * @param string $option_group The option group of the settings field.
+	 * @param string $description The description of the settings field.
+	 */
+	public function tags_select_input( $option, $option_group, $description = '' ) {
+		$options  = $this->options;
+		$tax_name = 'post_tag';
+		$comma    = _x( ',', 'tag delimiter' );
+		$selected = isset( $options[ $option ] ) ? $options[ $option ] : array();
+		$value    = join( "$comma ", $selected );
+		$name     = $this->option_name( $option, $option_group );
+
+		?>
+			<div class="tagsdiv" id="wpdc-tags-select">
+				<div class="ajaxtag">
+					<input data-wp-taxonomy="<?php echo esc_attr( $tax_name ); ?>" type="text" id="discourse-<?php echo esc_attr( $option ); ?>" name="<?php echo esc_attr( $name ); ?>" class="newtag form-input-tip" size="16" autocomplete="off" value="<?php echo esc_attr( $value ); ?>" />
+				</div>
+			</div>
+			<p class="description"><?php echo esc_attr( $description ); ?></p>
+		<?php
 	}
 
 	/**
@@ -303,23 +325,28 @@ class FormHelper {
 			$current_page = null;
 		}
 
-		if ( $current_page && ( 'sso_provider' === $current_page ) ) {
+		$check_connection_on = array(
+			'wp_discourse_options',
+			'connection_options',
+			'sso_provider',
+		);
+
+		if ( $current_page && in_array( $current_page, $check_connection_on ) ) {
+			$connection_status = $this->check_connection_status();
+
+			if ( is_wp_error( $connection_status ) || empty( $connection_status ) || 0 === $connection_status ) {
+				add_action( 'admin_notices', array( $this, 'disconnected' ) );
+			} else {
+				add_action( 'admin_notices', array( $this, 'connected' ) );
+			}
+		}
+
+		if ( $current_page && 'sso_provider' === $current_page && ! empty( $this->options['enable-sso'] ) ) {
 			// Check if the user saving the options has an email address on Discourse.
 			$current_user_email = wp_get_current_user()->user_email;
 			$discourse_user     = $this->get_discourse_user_by_email( $current_user_email );
 			if ( is_wp_error( $discourse_user ) || empty( $discourse_user->admin ) ) {
 				add_action( 'admin_notices', array( $this, 'no_matching_discourse_user' ) );
-			}
-		}
-
-		// Only check the connection status on the main settings tab.
-		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
-			$connection_status = $this->check_connection_status();
-			if ( 0 === $connection_status || is_wp_error( $connection_status ) ) {
-				add_action( 'admin_notices', array( $this, 'disconnected' ) );
-
-			} else {
-				add_action( 'admin_notices', array( $this, 'connected' ) );
 			}
 		}
 	}
@@ -337,8 +364,8 @@ class FormHelper {
 						// translators: Discourse admin-email-mismatch message. Placeholder: The current user's email address.
 						__(
 							'There is no admin user on Discourse with the email address <strong>%s</strong>. If you have
-                                             an existing Discourse admin account, before enabling SSO please ensure that your email
-                                             addresses on Discourse and WordPress match. This is required for SSO login to an
+                                             an existing Discourse admin account, before enabling DiscourseConnect please ensure that your email
+                                             addresses on Discourse and WordPress match. This is required for DiscourseConnect login to an
                                              existing Discourse account.',
 							'wp-discourse'
 						),
@@ -365,11 +392,7 @@ class FormHelper {
 			<p>
 				<strong>
 				<?php
-				esc_html_e(
-					'You are not connected to Discourse. If you are setting up the plugin, this
-                notice should go away after completing the form on this page.',
-					'wp-discourse'
-				);
+				esc_html_e( 'You are not connected to Discourse. Check that your connection settings are correct. If the issue persists, enable connection logs and check Logs.', 'wp-discourse' );
 				?>
 </strong>
 			</p>
@@ -400,5 +423,35 @@ class FormHelper {
 	 */
 	protected function option_name( $option, $option_group ) {
 		return $option_group . '[' . esc_attr( $option ) . ']';
+	}
+
+	/**
+	 * Outputs markup for select options
+	 *
+	 * @param string $option The name of the option.
+	 * @param array  $items An array of items to display as options.
+	 *
+	 * @return void
+	 */
+	protected function select_options( $option, $items ) {
+		$options = $this->options;
+
+		foreach ( $items as $item ) {
+			if ( is_a( $item, 'WP_Term' ) ) {
+				$item_id   = strval( $item->term_id );
+				$item_name = $item->name;
+			} else {
+				$item_id   = $item;
+				$item_name = $item;
+			}
+
+			if ( array_key_exists( $option, $options ) && in_array( $item_id, $options[ $option ], true ) ) {
+				$value = 'selected';
+			} else {
+				$value = '';
+			}
+
+			echo '<option ' . esc_attr( $value ) . ' value="' . esc_attr( $item_id ) . '">' . esc_html( $item_name ) . '</option>';
+		}
 	}
 }

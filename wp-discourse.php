@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 2.1.2
+ * Version: 2.4.8
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -33,18 +33,21 @@
 define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
-define( 'MIN_PHP_VERSION', '5.4.0' );
-define( 'WPDISCOURSE_VERSION', '2.1.2' );
+define( 'MIN_PHP_VERSION', '5.6.0' );
+define( 'WPDISCOURSE_VERSION', '2.4.8' );
+define( 'WPDISCOURSE_LOGO_URL', WPDISCOURSE_PATH . 'assets/icon.svg' );
+$base64 = base64_encode( file_get_contents( WPDISCOURSE_LOGO_URL ) );
+define( 'WPDISCOURSE_LOGO', "data:image/svg+xml;base64,$base64" );
 
 require_once WPDISCOURSE_PATH . 'lib/plugin-utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/template-functions.php';
 require_once WPDISCOURSE_PATH . 'lib/utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse.php';
+require_once WPDISCOURSE_PATH . 'lib/discourse-base.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse-comment.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse-publish.php';
 require_once WPDISCOURSE_PATH . 'lib/sso-provider/sso.php';
 require_once WPDISCOURSE_PATH . 'lib/sso-provider/discourse-sso.php';
-require_once WPDISCOURSE_PATH . 'lib/webhook.php';
 require_once WPDISCOURSE_PATH . 'lib/sync-discourse-user.php';
 require_once WPDISCOURSE_PATH . 'lib/sync-discourse-topic.php';
 require_once WPDISCOURSE_PATH . 'lib/email-notification.php';
@@ -57,11 +60,14 @@ require_once WPDISCOURSE_PATH . 'lib/sso-client/query-redirect.php';
 require_once WPDISCOURSE_PATH . 'lib/shortcodes/sso-client.php';
 require_once WPDISCOURSE_PATH . 'templates/html-templates.php';
 require_once WPDISCOURSE_PATH . 'admin/discourse-sidebar/discourse-sidebar.php';
+require_once WPDISCOURSE_PATH . 'vendor_namespaced/autoload.php';
+require_once WPDISCOURSE_PATH . 'lib/logs/logger.php';
 require_once WPDISCOURSE_PATH . 'admin/admin.php';
+require_once WPDISCOURSE_PATH . 'blocks/comments/comments.php';
 
 new WPDiscourse\Discourse\Discourse();
 $discourse_email_notification = new WPDiscourse\EmailNotification\EmailNotification();
-$discourse_publish = new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
+$discourse_publish            = new WPDiscourse\DiscoursePublish\DiscoursePublish( $discourse_email_notification );
 new WPDiscourse\Admin\DiscourseSidebar( $discourse_publish );
 $discourse_comment_formatter = new WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
 new WPDiscourse\DiscourseComment\DiscourseComment( $discourse_comment_formatter );

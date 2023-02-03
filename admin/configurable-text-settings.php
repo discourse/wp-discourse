@@ -425,7 +425,7 @@ class ConfigurableTextSettings {
 	 * Outputs the markup for the external-login-text input.
 	 */
 	public function external_login_text() {
-		$this->form_helper->input( 'external-login-text', 'discourse_configurable_text', __( 'Text for the login page login link when Discourse is used as the SSO provider.', 'wp-discourse' ) );
+		$this->form_helper->input( 'external-login-text', 'discourse_configurable_text', __( 'Text for the login page login link when Discourse is used as the DiscourseConnect provider.', 'wp-discourse' ) );
 	}
 
 	/**
@@ -437,7 +437,7 @@ class ConfigurableTextSettings {
 			'discourse_configurable_text',
 			__(
 				'Text added to the login and profile pages when Discourse is used as the
-	    SSO provider. Used for linking existing accounts between Discourse and WordPress.',
+	    DiscourseConnect provider. Used for linking existing accounts between Discourse and WordPress.',
 				'wp-discourse'
 			)
 		);
@@ -452,7 +452,7 @@ class ConfigurableTextSettings {
 			'discourse_configurable_text',
 			__(
 				"Text added to the user's profile page when Discourse is used as the
-	    SSO proveder. Used to indicate that the user's account is linked to Discourse.",
+	    DiscourseConnect provider. Used to indicate that the user's account is linked to Discourse.",
 				'wp-discourse'
 			)
 		);

@@ -32,7 +32,8 @@ const el = wp.element.createElement;
 const iconEl = el( 'img', {
     width: 20,
     height: 20,
-    src: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII='
+    src: pluginOptions.logo,
+    class: 'wpdc-logo'
 });
 
 const buttonClass = 'components-button is-button is-default is-primary is-large wpdc-button';
@@ -58,6 +59,8 @@ const upArrow = ( <svg
         <path d={ 'M12,8l-6,6l1.41,1.41L12,10.83l4.59,4.58L18,14L12,8z' }/>
     </g>
 </svg> );
+
+const tagsFilterRegExp = /[\/\?#\[\]@!\$&'\(\)\*\+,;=\.%\\`^\s|\{\}"<>]+/;
 
 class Notification extends Component {
     constructor( props ) {
@@ -446,9 +449,8 @@ class TagTopic extends Component {
     }
 
     handleKeyPress( e ) {
-        const keyVal = e.key,
-            val = e.target.value,
-            allowedChars = new RegExp("^[a-zA-Z0-9\-\_ ]+$");
+        let keyVal = e.key,
+            val = e.target.value;
 
         if ( 'Enter' === keyVal || ',' === keyVal ) {
             let currentChoices = this.state.chosenTags;
@@ -459,8 +461,11 @@ class TagTopic extends Component {
                 } );
                 return null;
             }
-            if ( allowedChars.test( val ) ) {
-                currentChoices.push( val.trim().replace( / /g, '-' ) );
+
+            val = this.cleanTag(val);
+
+            if ( val.length ) {
+                currentChoices.push( val );
                 currentChoices = TagTopic.sanitizeArray( currentChoices );
                 this.setState( {
                     chosenTags: currentChoices,
@@ -474,6 +479,15 @@ class TagTopic extends Component {
                 });
             }
         }
+    }
+
+    // see discourse/lib/discourse_tagging.rb#clean_tag
+    cleanTag( val ) {
+      val = val.trim(); // remove surrounding whitespace
+      val = val.replace( / /g, '-' ); // replace whitespace with hyphen
+      val = val.replace( /(-)\1+/g, '-'); // remove duplicate hyphens
+      val = val.replace( new RegExp(tagsFilterRegExp, 'g'), '' ); // remove special characters
+      return val;
     }
 
     handleClick( key ) {
@@ -603,31 +617,7 @@ class PinTopic extends Component {
 class DiscourseSidebar extends Component {
     constructor( props ) {
         super( props );
-        this.state = {
-            published: false,
-            postStatus: '',
-            publishingMethod: 'publish_post',
-            forcePublish: pluginOptions.forcePublish,
-            publishToDiscourse: pluginOptions.autoPublish,
-            publishPostCategory: pluginOptions.defaultCategory,
-            allowTags: pluginOptions.allowTags,
-            maxTags: pluginOptions.maxTags,
-            topicTags: [],
-            pinTopic: false,
-            pinUntil: null,
-            discoursePostId: null,
-            discoursePermalink: null,
-            publishingError: null,
-            busyUnlinking: false,
-            busyUpdating: false,
-            busyLinking: false,
-            busyPublishing: false,
-            statusMessage: null,
-            discourseCategories: null,
-            categoryError: false,
-        };
-
-        this.updateStateFromDatabase( this.props.postId );
+        this.state = this.initializePostState(this.props.post);
         this.getDiscourseCategories();
 
         this.handleToBePublishedChange = this.handleToBePublishedChange.bind( this );
@@ -639,6 +629,123 @@ class DiscourseSidebar extends Component {
         this.handleUpdateChange = this.handleUpdateChange.bind( this );
         this.handleLinkTopicClick = this.handleLinkTopicClick.bind( this );
         this.handlePinChange = this.handlePinChange.bind( this );
+    }
+
+    componentDidUpdate(prevProps) {
+      if (this.isAllowedPostType()) {
+        if (this.publishedPostHasChanged(prevProps.post, this.props.post)) {
+          this.updatePostState(this.props.post);
+        }
+      }
+    }
+
+    publishedPostHasChanged(prev, post) {
+      if (!prev || !post || !prev.meta || !post.meta) return false;
+
+      // We don't refresh state if post is not yet published
+      if ([post.status, prev.status].every(s => s !== 'publish')) return false;
+
+      // We always refresh state on a status change
+      if (post.status !== prev.status) return true;
+
+      // We refresh state on publishing error or linked post change
+      return [
+        'discourse_post_id',
+        'wpdc_publishing_response',
+        'wpdc_publishing_error'
+      ].some(attr => post.meta[attr] !== prev.meta[attr]);
+    }
+
+    initializePostState(post) {
+      if (!this.isAllowedPostType()) {
+        return {};
+      }
+
+      let state = {
+        published: false,
+        postStatus: '',
+        publishingMethod: 'publish_post',
+        forcePublish: pluginOptions.forcePublish,
+        publishToDiscourse: pluginOptions.autoPublish,
+        publishPostCategory: pluginOptions.defaultCategory,
+        allowTags: pluginOptions.allowTags,
+        maxTags: pluginOptions.maxTags,
+        topicTags: [],
+        pinTopic: false,
+        pinUntil: null,
+        discoursePostId: null,
+        discoursePermalink: null,
+        publishingError: null,
+        busyUnlinking: false,
+        busyUpdating: false,
+        busyLinking: false,
+        busyPublishing: false,
+        statusMessage: null,
+        discourseCategories: null,
+        categoryError: false,
+      }
+
+      if (post && post.meta) {
+        state = Object.assign(state, this.buildPostState(post));
+      }
+
+      return state;
+    }
+
+    updatePostState(post) {
+      this.setState(this.buildPostState(post));
+    }
+
+    buildPostState(post) {
+      if (!post || !post.meta) return {};
+
+      const meta = post.meta;
+      const topicTags = typeof meta.wpdc_topic_tags === 'string' ?
+        meta.wpdc_topic_tags.split(',') :
+        [];
+
+      let postState = {
+        publishToDiscourse: this.determinePublishToDiscourse(meta),
+        published: meta.discourse_post_id > 0,
+        postStatus: post.status,
+        topicTags,
+        pinTopic: meta.wpdc_pin_topic > 0
+      };
+
+      if (meta.publish_post_category > 0) {
+        postState.publishPostCategory = meta.publish_post_category;
+      }
+      if (meta.wpdc_pin_until) {
+        postState.pinUntil = meta.wpdc_pin_until;
+      }
+      if (meta.discourse_post_id) {
+        postState.discoursePostId = meta.discourse_post_id;
+      }
+      if (meta.discourse_permalink) {
+        postState.discoursePermalink = meta.discourse_permalink;
+      }
+      if (meta.wpdc_publishing_error) {
+        postState.publishingError = meta.wpdc_publishing_error;
+      }
+
+      return postState;
+    }
+
+    determinePublishToDiscourse(meta) {
+      const autoPublish = pluginOptions.autoPublish,
+            autoPublishOverridden = 1 === parseInt(meta.wpdc_auto_publish_overridden, 10);
+
+      let publishToDiscourse;
+
+      if (['deleted_topic','queued_topic'].includes(meta.wpdc_publishing_error)) {
+        publishToDiscourse = false;
+      } else if (autoPublish && !autoPublishOverridden) {
+        publishToDiscourse = true;
+      } else {
+        publishToDiscourse = 1 === parseInt(meta.wpdc_publish_to_discourse, 10);
+      }
+
+      return publishToDiscourse;
     }
 
     getDiscourseCategories() {
@@ -661,59 +768,6 @@ class DiscourseSidebar extends Component {
                     this.setState( { categoryError: true } );
                 }
             )
-        }
-    }
-
-    updateStateFromDatabase( postId ) {
-        if ( this.isAllowedPostType() ) {
-            const postType = this.props.post.type;
-            let postRouteName;
-            switch ( postType ) {
-                case 'post':
-                    postRouteName = 'posts';
-                    break;
-                case 'page':
-                    postRouteName = 'pages';
-                    break;
-                default:
-                    postRouteName = postType;
-            }
-            wp.apiFetch( { path: `/wp/v2/${postRouteName}/${postId}`, method: 'GET' } ).then(
-                ( data ) => {
-                    if ( ! data.meta ) {
-                        return;
-                    }
-                    const meta = data.meta,
-                        autoPublish = pluginOptions.autoPublish;
-                    let publishToDiscourse;
-                    if ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error ) {
-                        publishToDiscourse = false;
-
-                    } else if ( autoPublish ) {
-                        const autoPublishOverridden = 1 === parseInt( meta.wpdc_auto_publish_overridden, 10 );
-                        publishToDiscourse =  autoPublishOverridden ? 1 === parseInt( meta.wpdc_publish_to_discourse, 10 ) : true;
-
-                    } else {
-                        publishToDiscourse = 1 === parseInt( meta.wpdc_publish_to_discourse, 10 );
-                    }
-                    this.setState( {
-                        published: meta.discourse_post_id > 0,
-                        postStatus: data.status,
-                        publishToDiscourse: publishToDiscourse,
-                        publishPostCategory: meta.publish_post_category > 0 ? meta.publish_post_category : pluginOptions.defaultCategory,
-                        topicTags: meta.wpdc_topic_tags.split( ',' ),
-                        pinTopic: meta.wpdc_pin_topic > 0,
-                        pinUntil: meta.wpdc_pin_until,
-                        discoursePostId: meta.discourse_post_id,
-                        discoursePermalink: meta.discourse_permalink,
-                        publishingError: meta.wpdc_publishing_error,
-                    });
-                    return null;
-                },
-                ( err ) => {
-                    return null;
-                }
-            );
         }
     }
 
@@ -962,31 +1016,6 @@ class DiscourseSidebar extends Component {
                 return null;
             }
         );
-    }
-
-    componentDidUpdate( prevProps ) {
-        if ( this.isAllowedPostType() ) {
-            const post = this.props.post,
-                prevPost = prevProps.post,
-                meta = this.props.post.meta,
-                prevMeta = prevProps.post.meta;
-
-            if ( meta &&
-                prevMeta && ( post.status !== prevPost.status ||
-                meta.discourse_post_id !== prevMeta.discourse_post_id ||
-                meta.wpdc_publishing_response !== prevMeta.wpdc_publishing_response ||
-                meta.wpdc_publishing_error !== prevMeta.wpdc_publishing_error ) ) {
-                const publishToDiscourse = ( 'deleted_topic' === meta.wpdc_publishing_error || 'queued_topic' === meta.wpdc_publishing_error) ? false : 1 === parseInt( meta.publish_to_discourse, 10 );
-                this.setState( {
-                    published: meta.discourse_post_id > 0,
-                    postStatus: post.status,
-                    publishToDiscourse: publishToDiscourse,
-                    discoursePostId: meta.discourse_post_id,
-                    discoursePermalink: meta.discourse_permalink,
-                    publishingError: meta.wpdc_publishing_error,
-                } );
-            }
-        }
     }
 
     render() {

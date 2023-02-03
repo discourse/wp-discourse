@@ -88,6 +88,17 @@ class NetworkOptions {
 		);
 
 		add_settings_field(
+			'discourse_network_connection_logs',
+			__( 'Connection Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'connection_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_network_use_discourse_webhook',
 			__( 'Sync Comment Data', 'wp-discourse' ),
 			array(
@@ -143,6 +154,17 @@ class NetworkOptions {
 		);
 
 		add_settings_field(
+			'discourse_network_verbose_webhook_logs',
+			__( 'Verbose Webhook Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_webhook_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_network_hide_name_field',
 			__( 'Do Not Display Discourse Name Field', 'wp-discourse' ),
 			array(
@@ -154,8 +176,30 @@ class NetworkOptions {
 		);
 
 		add_settings_field(
+			'discourse_network_verbose_publication_logs',
+			__( 'Verbose Publication Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_publication_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_network_verbose_comment_logs',
+			__( 'Verbose Comment Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_comment_logs',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
 			'discourse_network_enable_sso',
-			__( 'Enable SSO Provider', 'wp-discourse' ),
+			__( 'Enable DiscourseConnect Provider', 'wp-discourse' ),
 			array(
 				$this,
 				'enable_sso_provider_checkbox',
@@ -166,7 +210,7 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_network_enable_discourse_sso',
-			__( 'Enable SSO Client', 'wp-discourse' ),
+			__( 'Enable DiscourseConnect Client', 'wp-discourse' ),
 			array(
 				$this,
 				'enable_sso_client_checkbox',
@@ -177,10 +221,21 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_network_sso_secret',
-			__( 'SSO Secret Key', 'wp-discourse' ),
+			__( 'DiscourseConnect Secret Key', 'wp-discourse' ),
 			array(
 				$this,
 				'sso_secret_input',
+			),
+			'discourse_network_options',
+			'discourse_network_settings_section'
+		);
+
+		add_settings_field(
+			'discourse_network_verbose_sso_logs',
+			__( 'Verbose DiscourseConnect Logs', 'wp-discourse' ),
+			array(
+				$this,
+				'verbose_sso_logs',
 			),
 			'discourse_network_options',
 			'discourse_network_settings_section'
@@ -197,7 +252,7 @@ class NetworkOptions {
 			'manage_network_options',
 			'discourse_network_options',
 			array( $this, 'network_options_page' ),
-			'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII=',
+			WPDISCOURSE_LOGO,
 			5
 		);
 	}
@@ -248,7 +303,7 @@ class NetworkOptions {
 				'api-key',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
 									 '/admin/api/keys" target="_blank" rel="noreferrer noopener">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
-				"If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
+				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
 		} else {
@@ -256,7 +311,7 @@ class NetworkOptions {
 				'api-key',
 				__(
 					"Found on your forum at /admin/api/keys.
-			If you haven't yet created an API key, Click 'Generate Master API Key'. Copy and paste the API key here.",
+			If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 					'wp-discourse'
 				)
 			);
@@ -278,6 +333,20 @@ class NetworkOptions {
 			null,
 			null,
 			'system'
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_connection_logs checkbox.
+	 */
+	public function connection_logs() {
+		$this->checkbox_input(
+			'connection-logs',
+			__(
+				'Enable connection logs.',
+				'wp-discourse'
+			),
+			__( 'Log attempts to check the connection with Discourse.', 'wp-discourse' )
 		);
 		$this->next_setting_heading( __( 'Webhook Settings', 'wp-discourse' ) );
 	}
@@ -360,7 +429,7 @@ class NetworkOptions {
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
-				'This webhook is only active when WordPress is enabled as the SSO Provider for Discourse (this can be overridden by
+				'This webhook is only active when WordPress is enabled as the DiscourseConnect Provider for Discourse (this can be overridden by
 hooking into the \'wpdc_use_discourse_user_webhook\' filter.) It supplies the Discourse username to WordPress when a user is created or updated on your forum.
 Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
 URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
@@ -418,6 +487,20 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		);
 
 		$this->input( 'webhook-secret', $description );
+	}
+
+	/**
+	 * Outputs markup for the verbose-webhook-logs checkbox.
+	 */
+	public function verbose_webhook_logs() {
+		$this->checkbox_input(
+			'verbose-webhook-logs',
+			__(
+				'Enable verbose logs for webhooks.',
+				'wp-discourse'
+			),
+			__( 'Will log successful syncs as well as errors.', 'wp-discourse' )
+		);
 		$this->next_setting_heading( __( 'Publishing Settings', 'wp-discourse' ) );
 	}
 
@@ -445,13 +528,48 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				'wp-discourse'
 			)
 		);
-		$this->next_setting_heading( __( 'SSO Settings', 'wp-discourse' ) );
+	}
+
+	/**
+	 * Outputs markup for the verbose-publication-logs checkbox.
+	 */
+	public function verbose_publication_logs() {
+		$this->checkbox_input(
+			'verbose-publication-logs',
+			__(
+				'Enable verbose logs for publication.',
+				'wp-discourse'
+			),
+			__( 'Will log successful publications as well as errors.', 'wp-discourse' )
+		);
+		$this->next_setting_heading( __( 'Comment Settings', 'wp-discourse' ) );
+	}
+
+	/**
+	 * ***********************
+	 *
+	 * Comment Settings Fields.
+	 **************************/
+
+	/**
+	 * Outputs markup for the verbose-comment-logs checkbox.
+	 */
+	public function verbose_comment_logs() {
+		$this->checkbox_input(
+			'verbose-comment-logs',
+			__(
+				'Enable verbose logs for comments.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' )
+		);
+		$this->next_setting_heading( __( 'DiscourseConnect Settings', 'wp-discourse' ) );
 	}
 
 	/**
 	 * *******************
 	 *
-	 * SSO Settings Fields.
+	 * DiscourseConnect Settings Fields.
 	 **********************/
 
 
@@ -460,11 +578,11 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_provider_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Provider tab', 'wp-discourse' ) . '</a>';
-		$description            = __( 'Use this WordPress instance as the SSO provider for your Discourse forum.', 'wp-discourse' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'DiscourseConnect Provider tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Use this WordPress instance as the DiscourseConnect provider for your Discourse forum.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_provider input. Placeholder: sso_documentation_link.
-			__( 'For details about using WordPress as the SSO Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ),
+			__( 'For details about using WordPress as the DiscourseConnect Provider, please visit the %1s of the main site in your network.', 'wp-discourse' ),
 			$sso_documentation_link
 		);
 		$this->checkbox_input( 'enable-sso', $description, $details );
@@ -475,11 +593,11 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function enable_sso_client_checkbox() {
 		$sso_documentation_url  = get_admin_url( BLOG_ID_CURRENT_SITE, '/admin.php?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options' );
-		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'SSO Client tab', 'wp-discourse' ) . '</a>';
-		$description            = __( 'Allow your WordPress site to function as an SSO client to Discourse.', 'wp-discourse' );
+		$sso_documentation_link = '<a href="' . esc_url( $sso_documentation_url ) . '" target="_blank" rel="noreferrer noopener">' . __( 'DiscourseConnect Client tab', 'wp-discourse' ) . '</a>';
+		$description            = __( 'Allow your WordPress site to function as a DiscourseConnect client to Discourse.', 'wp-discourse' );
 		$details                = sprintf(
 			// translators: enable_sso_client checkbox. Placeholder: sso_documentation_link.
-			__( 'For details about using WordPress as an SSO Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ),
+			__( 'For details about using WordPress as a DiscourseConnect Client for Discourse, please visit the %1s of the main site in your network.', 'wp-discourse' ),
 			$sso_documentation_link
 		);
 		$this->checkbox_input( 'sso-client-enabled', $description, $details );
@@ -500,13 +618,27 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$description = sprintf(
 			// translators: SSO secret input. Placeholder: discourse_sso_url.
 			__(
-				'The secret key used to verify Discourse SSO requests. Set it to a string of text, at least 10
+				'The secret key used to verify Discourse DiscourseConnect requests. Set it to a string of text, at least 10
 		        characters long. It needs to match the key set at %1$s.',
 				'wp-discourse'
 			),
 			$discourse_sso_url
 		);
 		$this->input( 'sso-secret', $description );
+	}
+
+	/**
+	 * Outputs markup for the verbose-sso-logs checkbox.
+	 */
+	public function verbose_sso_logs() {
+		$this->checkbox_input(
+			'verbose-sso-logs',
+			__(
+				'Enable verbose logs for DiscourseConnect.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' )
+		);
 	}
 
 	/**
@@ -526,7 +658,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		<div class="wrap discourse-options-page-wrap">
 			<h2>
 				<img
-						src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyhpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNi1jMTExIDc5LjE1ODMyNSwgMjAxNS8wOS8xMC0wMToxMDoyMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIDIwMTUgKE1hY2ludG9zaCkiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6MUYxNjlGNkY3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6MUYxNjlGNzA3NjAxMTFFNjkyRkZBRTlDQTMwREJDQzUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDoxRjE2OUY2RDc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDoxRjE2OUY2RTc2MDExMUU2OTJGRkFFOUNBMzBEQkNDNSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pq7th6IAAAP8SURBVHjalFbbT5tlHH56grKWnicw5ijdAjNGg5CxbPGIM7qx7cIlxihxd7oLr/wHlpgsu/FWjbdeeOWFwUQixmW6GGbKpDKcgqhj7AA90CM9t/j8Xr+vKZW08Gue0O/jfZ/n/R3fGg73+dHE2ogzxEvEU4SPMBJxYon4kZjUnnc0QxOBD4j3iX40txjxKfEhUdqNwJPE58SwWmAwoFQqoVQsolqtwmgyoa2tDWazGVtbW/X7FokJYrb+pbGB/DliTsiNRiPyuRw2YjEY+HF7fejqOQCHw4FcNotoOKyEZZ1mg0SQeKWe0Fz3PUBck3cGCepGDE6XG8dOnIQ/cBgutwcmnrpcLiEaieB2KIRfgj+jnd54fT5UKhWdZ1oTW2oUmFTkDEl8Y4OkAbx69jwOPn5IhaO76zH0dHfB7Xaj3WpFMpXGt1Pf4KOrV7Fy9x/4+wMUL+tcX2sitRxckkQJeTIRRy9J35h4B06nEz6vFyPDQ/D3HYKJ8W+0UGgeFyfexh93fqeIv94TKZCPdYH7RK/EVBJ54c23MHD0CXXiU2MvorPT3rSM7q7cw8ljo8xZFr79+xUH7SFxUDL0gpDLm81MBkcGj6qY2237cOrl1uRi4t3lK1dQYojy+Zz++gAxJgJj8iQlJyHo6e1VZTgy/Aw67a3JdXvt9GmcePZ5hjihSlszJTAg38QtIXY4nHC5nAgE+rEX28fED42MwGazq/LVS1cEOvQn8UKEfCy7Dmv7ngTyhbyKv4coFAr6a58IqNqShimyW1OpJOx2G/ZqaZatgRxWelKt1ippq9aGErdKpYzVlRWeprBngYeP1lApVxSMhhptZNuosDGpfy0t4vr31+rruaWtcWys3n9AL5LIpFOwWCz6v37bJmC1dnBBGqG5ORRK5V2RS1hv3gyqA/29/CcS8Q20tdfyN10/Kv5rdYZq9Pgoq6J1ktPpDG78NIP1cASRSBi/3rrFsWJRHKyYZS6Z2SZQZOzFi7Pj402Js9kcVu6tYmHhDuLJJDY3M5ia/Arh9Udwe7z6GL/cOOwQjUVxZvwchoaeRjyRxPztBczOztKzCr06rhovzW6PcYTH2VClYkkNuh++m8Yyc+fkINTIZ4gv/icgwy3HeXLp3fcQDM5ifW1dzReLxYwjA4Po4wiRNSazCSkKPFhdxfLiIkOVgsvjUZVIgRSpXq+/0b7k3wvyINlPcGMkGoHD3qlq2sLulubLMgxym0kIhahYLCgPbDabGt/ayRPabJvf6cJRLS4bBI2mSCgk1SKTRkaCsdOoiDVy+QFwUYZr443Wvat6JImcXC6f+tGinfYT4rOdtsnqKSkMfWS0MIOGtEZ8g7jebMO/AgwANr2XXAf8LaoAAAAASUVORK5CYII="
+						src="<?php echo esc_attr( WPDISCOURSE_LOGO ); ?>"
 						alt="Discourse logo" class="discourse-logo">
 				<?php esc_html_e( 'WP Discourse Network Settings', 'wp-discourse' ); ?>
 			</h2>
@@ -646,14 +778,14 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				?>
 			</em>
 		</p>
-		<h2><?php esc_html_e( 'SSO', 'wp-discourse' ); ?></h2>
+		<h2><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?></h2>
 		<p>
 			<em>
 				<?php
 				esc_html_e(
-					'When Multisite Configuration is enabled, SSO functionality to either use WordPress as the
-                SSO provider for Discourse, or WordPress as an SSO client to Discourse is enabled on this page. The SSO Secret
-                Key is also set here. In a multisite setup, the SSO Client functionality is only available when Multisite Configuration
+					'When Multisite Configuration is enabled, DiscourseConnect functionality to either use WordPress as the
+                DiscourseConnect provider for Discourse, or WordPress as a DiscourseConnect client to Discourse is enabled on this page. The DiscourseConnect Secret
+                Key is also set here. In a multisite setup, the DiscourseConnect Client functionality is only available when Multisite Configuration
                 is enabled.',
 					'wp-discourse'
 				);
@@ -712,9 +844,9 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				$notices .= '<div class="notice notice-warning is-dismissible"><p>' .
 							__( 'To connect with Discourse, you need to supply the Discourse URL, API Key, and Publishing Username.', 'wp-discourse' ) .
 							'</p></div>';
-			} elseif ( ! $this->check_connection_status() ) {
+			} elseif ( empty( $this->check_connection_status() ) ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'You are not connected to Discourse. Check that your connection settings are correct.', 'wp-discourse' ) .
+							__( 'You are not connected to Discourse. Check that your connection settings are correct. If the issue persists, enable connection logs and check Logs.', 'wp-discourse' ) .
 							'</p></div>';
 			} else {
 				$notices .= '<div class="notice notice-success is-dismissible"><p>' .
@@ -739,26 +871,26 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			if ( ! empty( $enable_sso ) && empty( $sso_secret )
 			) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'To use WordPress as the SSO Provider, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+							__( 'To use WordPress as the DiscourseConnect Provider, you need to supply a DiscourseConnect Secret Key.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $sso_client_enabled ) && empty( $sso_secret )
 			) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'To use WordPress as the SSO Client, you need to supply an SSO Secret Key.', 'wp-discourse' ) .
+							__( 'To use WordPress as the DiscourseConnect Client, you need to supply a DiscourseConnect Secret Key.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $enable_sso ) && ! empty( $sso_client_enabled ) ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( "You can't enable both the SSO Client and SSO Provider functionality.", 'wp-discourse' ) .
+							__( "You can't enable both the DiscourseConnect Client and DiscourseConnect Provider functionality.", 'wp-discourse' ) .
 							'</p></div>';
 			}
 
 			if ( ! empty( $sso_secret ) && strlen( $sso_secret ) < 10 ) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
-							__( 'The SSO Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
+							__( 'The DiscourseConnect Secret Key must be at least 10 characters long.', 'wp-discourse' ) .
 							'</p></div>';
 			}
 		}// End if().

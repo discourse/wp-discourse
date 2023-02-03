@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<ruleset name="">
+    <description>A custom set of code standard rules for the WP Discourse plugin.</description>
+    <rule ref="WordPress">
+        <exclude name="Generic.Files.LowercasedFilename" />
+        <exclude name="Generic.WhiteSpace.ScopeIndent.IncorrectExact" />
+        <exclude name="Generic.WhiteSpace.ScopeIndent.Incorrect" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.Indent" />
+        <exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments" />
+        <exclude name="WordPress.Files.FileName.InvalidClassFileName" />
+        <exclude name="Generic.WhiteSpace.DisallowSpaceIndent.SpacesUsed" />
+        <!-- DOMDocument uses camelCase. -->
+        <exclude name="WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase" />
+        <exclude name="WordPress.NamingConventions.ValidVariableName.NotSnakeCase" />
+    </rule>
+
+    <rule ref="PHPCompatibility"/>
+
+    <extensions>php</extensions>
+    <exclude-pattern>*/blocks/comments/build</exclude-pattern>
+    <exclude-pattern>*/lib/wp-new-user-notification.php*</exclude-pattern>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/node_modules</exclude-pattern>
+    <exclude-pattern>*/admin/discourse-sidebar/build</exclude-pattern>
+    <exclude-pattern>*/vendor_namespaced/*</exclude-pattern>
+    <exclude-pattern>*.js</exclude-pattern>
+    <exclude-pattern>*.css</exclude-pattern>
+    <exclude-pattern>scoper.inc.php</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+
+    <rule ref="Squiz.Commenting.FunctionComment.Missing">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.InlineComment.InvalidEndChar">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.MissingParamTag">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Commenting.FunctionComment.ParamNameNoMatch">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="Generic.Commenting">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+    <rule ref="WordPress.DB.PreparedSQL">
+      <exclude-pattern>*/tests/*</exclude-pattern>
+    </rule>
+</ruleset>

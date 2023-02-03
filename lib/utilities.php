@@ -1,11 +1,33 @@
 <?php
 /**
- * Static utility functions used throughout the plugin.
+ * Static utility functions for external use.
  *
  * @package WPDiscourse
  */
 
 namespace WPDiscourse\Utilities;
+
+use WPDiscourse\Shared\PluginUtilities;
+
+/**
+ * Class PublicPluginUtilities
+ *
+ * @package WPDiscourse
+ */
+class PublicPluginUtilities {
+	use PluginUtilities {
+		get_options as public;
+		validate as public;
+		get_discourse_categories as public;
+		get_discourse_user as public;
+		get_discourse_user_by_email as public;
+		sync_sso as public;
+		discourse_request as public;
+		get_api_credentials as public;
+		get_sso_params as public;
+		verify_discourse_webhook_request as public;
+	}
+}
 
 /**
  * Class Utilities
@@ -13,133 +35,112 @@ namespace WPDiscourse\Utilities;
  * @package WPDiscourse
  */
 class Utilities {
-
 	/**
-	 * Returns a single array of options from a given array of arrays.
+	 * Public static alias for get_options.
 	 *
 	 * @return array
 	 */
 	public static function get_options() {
-		static $options = array();
-
-		if ( empty( $options ) ) {
-			$discourse_option_groups = get_option( 'discourse_option_groups' );
-			if ( $discourse_option_groups ) {
-				foreach ( $discourse_option_groups as $option_name ) {
-					if ( get_option( $option_name ) ) {
-						$option  = get_option( $option_name );
-						$options = array_merge( $options, $option );
-					}
-				}
-
-				$multisite_configuration_enabled = get_site_option( 'wpdc_multisite_configuration' );
-				if ( 1 === intval( $multisite_configuration_enabled ) ) {
-					$site_options = get_site_option( 'wpdc_site_options' );
-					foreach ( $site_options as $key => $value ) {
-						$options[ $key ] = $value;
-					}
-				}
-			}
-		}
-
-		return apply_filters( 'wpdc_utilities_options_array', $options );
+		$utils = new PublicPluginUtilities();
+		return $utils->get_options();
 	}
 
 	/**
-	 * Validates the response from `wp_remote_get` or `wp_remote_post`.
+	 * Public static alias for validate.
 	 *
-	 * @param array $response The response from `wp_remote_get` or `wp_remote_post`.
+	 * @param array $response The response from `wp_remote_request`.
 	 *
 	 * @return int
 	 */
 	public static function validate( $response ) {
-		if ( empty( $response ) ) {
-
-			return 0;
-		} elseif ( is_wp_error( $response ) ) {
-
-			return 0;
-
-			// There is a response from the server, but it's not what we're looking for.
-		} elseif ( intval( wp_remote_retrieve_response_code( $response ) ) !== 200 ) {
-
-			return 0;
-		} else {
-			// Valid response.
-			return 1;
-		}
+		$utils = new PublicPluginUtilities();
+		return $utils->validate( $response );
 	}
 
 	/**
-	 * Gets the Discourse categories.
+	 * Public static alias for get_discourse_categories.
 	 *
 	 * @return \WP_Error|array
 	 */
 	public static function get_discourse_categories() {
-		$options    = self::get_options();
-		$categories = get_transient( 'wpdcu_discourse_categories' );
+		$utils = new PublicPluginUtilities();
+		return $utils->get_discourse_categories();
+	}
 
-		if ( ! empty( $options['publish-category-update'] ) || ! $categories ) {
-			$api_credentials = self::get_api_credentials();
-			if ( is_wp_error( $api_credentials ) ) {
+	/**
+	 * Public static alias for sync_sso.
+	 *
+	 * @param array $sso_params The sso params to sync.
+	 * @param int   $user_id The WordPress user's ID.
+	 *
+	 * @return int|string|\WP_Error
+	 */
+	public static function sync_sso_record( $sso_params, $user_id = null ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->sync_sso( $sso_params, $user_id );
+	}
 
-				return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-			}
+	/**
+	 * Public static alias for get_discourse_user.
+	 *
+	 * @param int  $user_id The WordPress user_id.
+	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
+	 *
+	 * @return array|mixed|object|\WP_Error
+	 */
+	public static function get_discourse_user( $user_id, $match_by_email = false ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->get_discourse_user( $user_id, $match_by_email );
+	}
 
-			$base_url     = $api_credentials['url'];
-			$api_username = $api_credentials['api_username'];
-			$api_key      = $api_credentials['api_key'];
+	/**
+	 * Public static alias for get_discourse_user_by_email.
+	 *
+	 * @param string $email The email address to search for.
+	 *
+	 * @return object \WP_Error
+	 */
+	public static function get_discourse_user_by_email( $email ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->get_discourse_user_by_email( $email );
+	}
 
-			$site_url = esc_url_raw( "{$base_url}/site.json" );
+	/**
+	 * Public static alias for discourse_request.
+	 *
+	 * @param string $path Request path.
+	 * @param array  $args Request args.
+	 *
+	 * @return array|\WP_Error|void
+	 */
+	public static function discourse_request( $path, $args = array() ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->discourse_request( $path, $args );
+	}
 
-			$remote = wp_remote_get(
-				$site_url,
-				array(
-					'headers' => array(
-						'Api-Key'      => sanitize_key( $api_key ),
-						'Api-Username' => sanitize_text_field( $api_username ),
-					),
-				)
-			);
+	/**
+	 * Public static alias for get_sso_params.
+	 *
+	 * @param object $user The WordPress user.
+	 * @param array  $sso_options An optional array of extra SSO parameters.
+	 *
+	 * @return array
+	 */
+	public static function get_sso_params( $user, $sso_options = array() ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->get_sso_params( $user, $sso_options );
+	}
 
-			if ( ! self::validate( $remote ) ) {
-
-				return new \WP_Error( 'connection_not_established', 'There was an error establishing a connection with Discourse' );
-			}
-
-			$remote = json_decode( wp_remote_retrieve_body( $remote ), true );
-			if ( array_key_exists( 'categories', $remote ) ) {
-				$categories           = $remote['categories'];
-				$discourse_categories = array();
-				foreach ( $categories as $category ) {
-					if ( ( empty( $options['display-subcategories'] ) ) && array_key_exists( 'parent_category_id', $category ) ) {
-
-						continue;
-					}
-					$current_category                     = array();
-					$current_category['id']               = intval( $category['id'] );
-					$current_category['name']             = sanitize_text_field( $category['name'] );
-					$current_category['color']            = sanitize_key( $category['color'] );
-					$current_category['text_color']       = sanitize_key( $category['text_color'] );
-					$current_category['slug']             = sanitize_text_field( $category['slug'] );
-					$current_category['topic_count']      = intval( $category['topic_count'] );
-					$current_category['post_count']       = intval( $category['post_count'] );
-					$current_category['description_text'] = sanitize_text_field( $category['description_text'] );
-					$current_category['read_restricted']  = intval( $category['read_restricted'] );
-
-					$discourse_categories[] = $current_category;
-				}
-
-				set_transient( 'wpdcu_discourse_categories', $discourse_categories, 10 * MINUTE_IN_SECONDS );
-
-				return $discourse_categories;
-			} else {
-
-				return new \WP_Error( 'key_not_found', 'The categories key was not found in the response from Discourse.' );
-			}
-		}// End if().
-
-		return $categories;
+	/**
+	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
+	 *
+	 * @param \WP_REST_Request $data The WP_REST_Request object.
+	 *
+	 * @return \WP_Error|\WP_REST_Request
+	 */
+	public static function verify_discourse_webhook_request( $data ) {
+		$utils = new PublicPluginUtilities();
+		return $utils->verify_discourse_webhook_request( $data );
 	}
 
 	/**
@@ -151,15 +152,14 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
+		$utils           = new PublicPluginUtilities();
+		$api_credentials = $utils->get_api_credentials();
 
-		$api_credentials = self::get_api_credentials();
 		if ( is_wp_error( $api_credentials ) ) {
-
 			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
 		}
 
 		if ( empty( $user ) || empty( $user->ID ) || is_wp_error( $user ) ) {
-
 			return new \WP_Error( 'wpdc_user_not_set_error', 'The Discourse user you are attempting to create does not exist on WordPress.' );
 		}
 
@@ -169,31 +169,26 @@ class Utilities {
 		$name               = $user->display_name;
 		$email              = $user->user_email;
 		$password           = wp_generate_password( 20 );
-		$response           = wp_remote_post(
-			$create_user_url,
-			array(
-				'method'  => 'POST',
-				'body'    => array(
-					'name'     => $name,
-					'email'    => $email,
-					'password' => $password,
-					'username' => $username,
-					'active'   => $require_activation ? 'false' : 'true',
-					'approved' => 'true',
-				),
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
+		$body               = array(
+			'name'     => $name,
+			'email'    => $email,
+			'password' => $password,
+			'username' => $username,
+			'active'   => $require_activation ? 'false' : 'true',
+			'approved' => 'true',
 		);
 
-		if ( ! self::validate( $response ) ) {
+		$user_data = static::discourse_request(
+             $create_user_url, array(
+				 'body'   => $body,
+				 'method' => 'POST',
+			 )
+            );
 
-			return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'An error was returned from Discourse when attempting to create a user.' );
+		if ( is_wp_error( $user_data ) ) {
+			return $user_data;
 		}
 
-		$user_data = json_decode( wp_remote_retrieve_body( $response ) );
 		if ( empty( $user_data->success ) ) {
 
 			return new \WP_Error( 'wpdc_response_error', $user_data->message );
@@ -204,167 +199,80 @@ class Utilities {
 			return $user_data->user_id;
 		}
 
-		return new \WP_Error( wp_remote_retrieve_response_code( $response ), 'The Discourse user could not be created.' );
+		return null;
 	}
 
+	const GROUP_SCHEMA = array(
+		'id'                          => 'int',
+		'name'                        => 'text',
+		'full_name'                   => 'text',
+		'user_count'                  => 'int',
+		'mentionable_level'           => 'int',
+		'messageable_level'           => 'int',
+		'visibility_level'            => 'int',
+		'primary_group'               => 'bool',
+		'title'                       => 'text',
+		'grant_trust_level'           => 'int',
+		'incoming_email'              => 'text',
+		'has_messages'                => 'bool',
+		'flair_url'                   => 'text',
+		'flair_bg_color'              => 'text',
+		'flair_color'                 => 'text',
+		'bio_raw'                     => 'textarea',
+		'bio_cooked'                  => 'html',
+		'bio_excerpt'                 => 'html',
+		'public_admission'            => 'bool',
+		'public_exit'                 => 'bool',
+		'allow_membership_requests'   => 'bool',
+		'default_notification_level'  => 'int',
+		'membership_request_template' => 'text',
+		'members_visibility_level'    => 'int',
+		'publish_read_state'          => 'bool',
+	);
+
 	/**
-	 * Gets the Discourse groups and saves the non-automatic groups in a transient.
+	 * Gets the non-automatic Discourse groups and saves them in a transient.
 	 *
 	 * The transient has an expiry time of 10 minutes.
 	 *
 	 * @return array|\WP_Error
 	 */
 	public static function get_discourse_groups() {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
+		$groups = get_transient( 'wpdc_non_automatic_groups' );
+		if ( ! empty( $groups ) ) {
+			return $groups;
 		}
 
-		$groups_url = esc_url_raw( "{$api_credentials['url']}/groups.json" );
+		$path                = '/groups';
+		$response            = static::discourse_request( $path );
+		$discourse_page_size = 36;
 
-		$response = wp_remote_get(
-			$groups_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
+		if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+			$groups         = static::extract_groups( $response->groups );
+			$total_groups   = $response->total_rows_groups;
+			$load_more_path = $response->load_more_groups;
 
-		if ( ! self::validate( $response ) ) {
+			if ( ( $total_groups > $discourse_page_size ) ) {
+				$last_page = ( ceil( $total_groups / $discourse_page_size ) ) - 1;
 
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned from Discourse when retrieving Discourse groups data' );
-		}
+				foreach ( range( 1, $last_page ) as $index ) {
+					if ( $load_more_path ) {
+						$response       = static::discourse_request( $load_more_path );
+						$load_more_path = $response->load_more_groups;
 
-		$response = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( ! empty( $response->groups ) ) {
-			$groups               = $response->groups;
-			$non_automatic_groups = array();
-
-			foreach ( $groups as $group ) {
-				if ( empty( $group->automatic ) ) {
-					$non_automatic_groups[] = $group;
+						if ( ! is_wp_error( $response ) && ! empty( $response->groups ) ) {
+						 	$groups = array_merge( $groups, static::extract_groups( $response->groups ) );
+						}
+					}
 				}
 			}
-			set_transient( 'wpdc_non_automatic_groups', $non_automatic_groups, 10 * MINUTE_IN_SECONDS );
 
-			return $non_automatic_groups;
+			set_transient( 'wpdc_non_automatic_groups', $groups, 10 * MINUTE_IN_SECONDS );
+
+			return $groups;
+		} else {
+			return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
 		}
-
-		return new \WP_Error( 'wpdc_response_error', 'No groups were returned from Discourse.' );
-	}
-
-	/**
-	 * Gets the SSO parameters for a user.
-	 *
-	 * @param object $user The WordPress user.
-	 * @param array  $sso_options An optional array of extra SSO parameters.
-	 *
-	 * @return array
-	 */
-	public static function get_sso_params( $user, $sso_options = array() ) {
-		$plugin_options      = self::get_options();
-		$user_id             = $user->ID;
-		$require_activation  = get_user_meta( $user_id, 'discourse_email_not_verified', true ) ? true : false;
-		$require_activation  = apply_filters( 'discourse_email_verification', $require_activation, $user );
-		$force_avatar_update = ! empty( $plugin_options['force-avatar-update'] );
-		$avatar_url          = get_avatar_url(
-			$user_id,
-			array(
-				'default' => '404',
-			)
-		);
-		$avatar_url          = apply_filters( 'wpdc_sso_avatar_url', $avatar_url, $user_id );
-
-		if ( ! empty( $plugin_options['real-name-as-discourse-name'] ) ) {
-			$first_name = ! empty( $user->first_name ) ? $user->first_name : '';
-			$last_name  = ! empty( $user->last_name ) ? $user->last_name : '';
-
-			if ( $first_name || $last_name ) {
-				$name = trim( $first_name . ' ' . $last_name );
-			}
-		}
-
-		if ( empty( $name ) ) {
-			$name = $user->display_name;
-		}
-
-		$params = array(
-			'external_id'         => $user_id,
-			'username'            => $user->user_login,
-			'email'               => $user->user_email,
-			'require_activation'  => $require_activation ? 'true' : 'false',
-			'name'                => $name,
-			'bio'                 => $user->description,
-			'avatar_url'          => $avatar_url,
-			'avatar_force_update' => $force_avatar_update ? 'true' : 'false',
-		);
-
-		if ( ! empty( $sso_options ) ) {
-			foreach ( $sso_options as $option_key => $option_value ) {
-				$params[ $option_key ] = $option_value;
-			}
-		}
-
-		return apply_filters( 'wpdc_sso_params', $params, $user );
-	}
-
-	/**
-	 * Syncs a user with Discourse through SSO.
-	 *
-	 * @param array $sso_params The sso params to sync.
-	 *
-	 * @return int|string|\WP_Error
-	 */
-	public static function sync_sso_record( $sso_params ) {
-		$plugin_options = self::get_options();
-		if ( empty( $plugin_options['enable-sso'] ) ) {
-
-			return new \WP_Error( 'wpdc_sso_error', 'The sync_sso_record function can only be used when SSO is enabled.' );
-		}
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$url         = $api_credentials['url'] . '/admin/users/sync_sso';
-		$sso_secret  = $plugin_options['sso-secret'];
-		$sso_payload = base64_encode( http_build_query( $sso_params ) );
-		// Create the signature for Discourse to match against the payload.
-		$sig = hash_hmac( 'sha256', $sso_payload, $sso_secret );
-
-		$response = wp_remote_post(
-			esc_url_raw( $url ),
-			array(
-				'body'    => array(
-					'sso' => $sso_payload,
-					'sig' => $sig,
-				),
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
-
-		if ( ! self::validate( $response ) ) {
-
-			return new \WP_Error( 'wpdc_response_error', 'An error was returned from Discourse while trying to sync the sso record.' );
-		}
-
-		$discourse_user = json_decode( wp_remote_retrieve_body( $response ) );
-
-		if ( ! empty( $discourse_user->id ) ) {
-			$wordpress_user_id = $sso_params['external_id'];
-			update_user_meta( $wordpress_user_id, 'discourse_sso_user_id', intval( $discourse_user->id ) );
-			update_user_meta( $wordpress_user_id, 'discourse_username', sanitize_text_field( $discourse_user->username ) );
-		}
-
-		return wp_remote_retrieve_response_code( $response );
 	}
 
 	/**
@@ -379,7 +287,7 @@ class Utilities {
 		$options = self::get_options();
 		if ( empty( $options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The add_user_to_discourse_group function can only be used when DiscourseConnect is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
@@ -389,7 +297,7 @@ class Utilities {
 			)
 		);
 
-		return self::sync_sso_record( $sso_params );
+		return static::sync_sso_record( $sso_params );
 	}
 
 	/**
@@ -404,7 +312,7 @@ class Utilities {
 		$options = self::get_options();
 		if ( empty( $options['enable-sso'] ) ) {
 
-			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when SSO is enabled.' );
+			return new \WP_Error( 'wpdc_sso_error', 'The remove_user_from_discourse_group function can only be used when DiscourseConnect is enabled.' );
 		}
 		$user       = get_user_by( 'id', $user_id );
 		$sso_params = self::get_sso_params(
@@ -418,174 +326,82 @@ class Utilities {
 	}
 
 	/**
-	 * Get a Discourse user object.
-	 *
-	 * @param int  $user_id The WordPress user_id.
-	 * @param bool $match_by_email Whether or not to attempt to get the user by their email address.
-	 *
-	 * @return array|mixed|object|\WP_Error
-	 */
-	public static function get_discourse_user( $user_id, $match_by_email = false ) {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse connection options are not properly configured.' );
-		}
-
-		$external_user_url = esc_url_raw( "{$api_credentials['url']}/users/by-external/{$user_id}.json" );
-
-		$response = wp_remote_get(
-			$external_user_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
-
-		if ( self::validate( $response ) ) {
-
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			if ( isset( $body->user ) ) {
-
-				return $body->user;
-			}
-		}
-
-		if ( $match_by_email ) {
-			$user = get_user_by( 'id', $user_id );
-
-			if ( ! empty( $user ) && ! is_wp_error( $user ) ) {
-
-				return self::get_discourse_user_by_email( $user->user_email );
-			} else {
-
-				return new \WP_Error( 'wpdc_param_error', 'There is no WordPress user with the supplied id.' );
-			}
-		}
-
-		return new \WP_Error( 'wpdc_response_error', 'The Discourse user could not be retrieved.' );
-	}
-
-	/**
-	 * Gets a Discourse user by their email address.
-	 *
-	 * @param string $email The email address to search for.
-	 *
-	 * @return object \WP_Error
-	 */
-	public static function get_discourse_user_by_email( $email ) {
-		$api_credentials = self::get_api_credentials();
-		if ( is_wp_error( $api_credentials ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse Connection options are not properly configured.' );
-		}
-
-		$users_url = "{$api_credentials['url']}/admin/users/list/all.json";
-		$users_url = esc_url_raw(
-			add_query_arg(
-				array(
-					'email'  => rawurlencode_deep( $email ),
-					'filter' => rawurlencode_deep( $email ),
-				),
-				$users_url
-			)
-		);
-
-		$response = wp_remote_get(
-			$users_url,
-			array(
-				'headers' => array(
-					'Api-Key'      => sanitize_key( $api_credentials['api_key'] ),
-					'Api-Username' => sanitize_text_field( $api_credentials['api_username'] ),
-				),
-			)
-		);
-		if ( self::validate( $response ) ) {
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			// The reqest returns a valid response even if the user isn't found, so check for empty.
-			if ( ! empty( $body ) && ! empty( $body[0] ) ) {
-
-				return $body[0];
-			} else {
-
-				// A valid response was returned, but the user wasn't found.
-				return new \WP_Error( 'wpdc_response_error', 'The user could not be retrieved by their email address.' );
-			}
-		} else {
-
-			return new \WP_Error( 'wpdc_response_error', 'An invalid response was returned when trying to find the user by email address.' );
-		}
-	}
-
-	/**
 	 * Get the Discourse comment HTML so that it can be displayed without loading the comments template.
 	 *
-	 * @param int $post_id The post ID to display the comments for.
+	 * @param int    $post_id The post ID to display the comments for.
+	 * @param bool   $perform_sync Determines whether a comment sync is maybe performed when loading comments.
+	 * @param bool   $force_sync Determines whether comment sync cache is bypassed when loading comments.
+	 * @param string $comment_type Type of comment display.
 	 *
 	 * @return string
 	 */
-	public static function get_discourse_comments( $post_id ) {
+	public static function get_discourse_comments( $post_id, $perform_sync = true, $force_sync = false, $comment_type ) {
 		$comment_formatter = new \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
+		$comment_formatter->setup_options();
+		$comment_formatter->setup_logger();
 
-		return $comment_formatter->format( $post_id );
+		return $comment_formatter->format( $post_id, $perform_sync, $force_sync, $comment_type );
 	}
 
 	/**
-	 * Gets the Discourse API credentials from the options array.
+	 * Helper function for get_discourse_groups().
 	 *
-	 * @return array|\WP_Error
+	 * @param array $raw_groups raw groups data array.
+	 *
+	 * @return array
 	 */
-	protected static function get_api_credentials() {
-		$options      = self::get_options();
-		$url          = ! empty( $options['url'] ) ? $options['url'] : null;
-		$api_key      = ! empty( $options['api-key'] ) ? $options['api-key'] : null;
-		$api_username = ! empty( $options['publish-username'] ) ? $options['publish-username'] : null;
-
-		if ( ! ( $url && $api_key && $api_username ) ) {
-
-			return new \WP_Error( 'wpdc_configuration_error', 'The Discourse configuration options have not been set.' );
-		}
-
-		return array(
-			'url'          => $url,
-			'api_key'      => $api_key,
-			'api_username' => $api_username,
-		);
+	public static function extract_groups( $raw_groups ) {
+		return array_reduce(
+						 $raw_groups,
+						function( $result, $group ) {
+			if ( empty( $group->automatic ) ) {
+									$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
+			}
+			return $result;
+		},
+						array()
+						);
 	}
 
 	/**
-	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
+	 * Munge raw discourse data
 	 *
-	 * @param \WP_REST_Request $data The WP_REST_Request object.
+	 * @param array  $data Data to munge.
+	 * @param   schema $schema Schema to apply.
 	 *
-	 * @return \WP_Error|\WP_REST_Request
+	 * @return object
 	 */
-	public static function verify_discourse_webhook_request( $data ) {
-		$options = self::get_options();
-		// The X-Discourse-Event-Signature consists of 'sha256=' . hamc of raw payload.
-		// It is generated by computing `hash_hmac( 'sha256', $payload, $secret )`.
-		$sig = substr( $data->get_header( 'X-Discourse-Event-Signature' ), 7 );
-		if ( $sig ) {
-			$payload = $data->get_body();
-			// Key used for verifying the request - a matching key needs to be set on the Discourse webhook.
-			$secret = ! empty( $options['webhook-secret'] ) ? $options['webhook-secret'] : '';
+	public static function discourse_munge( $data, $schema ) {
+		$result = (object) array();
 
-			if ( ! $secret ) {
-
-				return new \WP_Error( 'discourse_webhook_configuration_error', 'The webhook secret key has not been set.' );
-			}
-
-			if ( hash_hmac( 'sha256', $payload, $secret ) === $sig ) {
-
-				return $data;
-			} else {
-
-				return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: signatures did not match.' );
+		foreach ( $data as $key => $value ) {
+			if ( isset( $schema[ $key ] ) ) {
+				if ( null !== $value ) {
+					switch ( $schema[ $key ] ) {
+						case 'int':
+												$result->{$key} = intval( $value );
+                            break;
+						case 'bool':
+												$result->{$key} = true == $value;
+                            break;
+						case 'text':
+												$result->{$key} = sanitize_text_field( $value );
+                            break;
+						case 'textarea':
+												$result->{$key} = sanitize_textarea_field( $value );
+                            break;
+						case 'html':
+												$result->{$key} = $value;
+                            break;
+						default:
+                            break;
+					}
+				} else {
+					$result->{$key} = null;
+				}
 			}
 		}
 
-		return new \WP_Error( 'discourse_webhook_authentication_error', 'Discourse Webhook Request Error: the X-Discourse-Event-Signature was not set for the request.' );
+		return $result;
 	}
 }

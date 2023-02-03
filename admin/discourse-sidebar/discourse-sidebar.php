@@ -86,7 +86,7 @@ class DiscourseSidebar {
 			return null;
 		}
 		$block_path = '/build/index.js';
-		$style_path = '/build/styles.css';
+		$style_path = '/styles.css';
 
 		wp_register_script(
 			'discourse-sidebar-js',
@@ -120,6 +120,7 @@ class DiscourseSidebar {
 			'set_tag_meta_nonce'      => wp_create_nonce( 'set_tag_meta_nonce' ),
 			'link_topic_nonce'        => wp_create_nonce( 'link_topic_nonce' ),
 			'unlink_post_nonce'       => wp_create_nonce( 'unlink_post_nonce' ),
+			'logo'                    => WPDISCOURSE_LOGO,
 		);
 
 		wp_localize_script( 'discourse-sidebar-js', 'pluginOptions', $data );
@@ -148,8 +149,9 @@ class DiscourseSidebar {
 					$post_type,
 					$meta_key,
 					array(
-						'single'       => true,
-						'show_in_rest' => true,
+						'single'        => true,
+						'show_in_rest'  => true,
+						'auth_callback' => __return_false(),
 					)
 				);
 			}

@@ -1,5 +1,5 @@
 # WP Discourse
-[![OpenCollective](https://opencollective.com/wp-discourse/backers/badge.svg)](#backers) 
+[![OpenCollective](https://opencollective.com/wp-discourse/backers/badge.svg)](#backers)
 [![OpenCollective](https://opencollective.com/wp-discourse/sponsors/badge.svg)](#sponsors)
 
 **Note:** the wp-discourse plugin requires >= PHP-5.4.0.
@@ -12,7 +12,7 @@ The plugin is not a substitute for Disqus-like commenting systems.
 ### Use Discourse for Comments:
 
 - Automatically creates a forum topic for discussion when a new blog post is published.
-- Associates WP author accounts with their respective Discourse accounts. Does not require SSO.
+- Associates WP author accounts with their respective Discourse accounts. Does not require DiscourseConnect.
 - Replies from the forum discussion can be embedded in the WP blog post. Select which replies to display
 based on post score and commenter "trust level" -- see docs.
 
@@ -21,20 +21,16 @@ based on post score and commenter "trust level" -- see docs.
 - [blog.discourse.org](http://blog.discourse.org/)
 - [boingboing.net](http://boingboing.net/)
 
-### Single Sign On
+### DiscourseConnect
 
-The plugin also comes with optional SSO functionality which lets you use your WordPress site as the
-Single Sign On provider for your Discourse forum.
+The plugin also comes with optional DiscourseConnect functionality which lets you use your WordPress site as the DiscourseConnect provider for your Discourse forum.
 
 This will override Discourse's native (and powerful) login flow and is only recommended for use cases
 that strictly require such a setup, e.g. a site that is already using WordPress for large scale user management.
 
 ### Contact
 
-- Bug reports and other developer inquiries should be directed at our GitHub Issues:
-[https://github.com/discourse/wp-discourse/issues](https://github.com/discourse/wp-discourse/issues)
-
-- Please post support requests to our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
+Please post bug reports, support requests and all other inquiries in our [dedicated support forum](https://meta.discourse.org/c/support/wordpress)
 
 ### Installation
 
@@ -80,7 +76,7 @@ Discourse forum. You can install Discourse for yourself following either of thes
 - [Install Discourse in Under 30 Minutes](https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md)
 - [How to use the Discourse One-Click Application on DigitalOcean](https://www.digitalocean.com/community/tutorials/how-to-use-the-discourse-one-click-application-on-digitalocean)
 
-#### Can I import old WordPress comments as Discourse comments (i.e. "replies")? 
+#### Can I import old WordPress comments as Discourse comments (i.e. "replies")?
 
 No.
 
@@ -98,8 +94,4 @@ For more details on template customization, see: [WP Discourse template customiz
 
 #### Contributing
 
-1. Fork this repo
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create a new pull request
+Before you start contributing or developing this plugin please read the documentation in ``docs/``, starting with [contributing.md](https://github.com/discourse/wp-discourse/blob/main/docs/contributing.md). If you have any questions about those process, please post in [#dev](https://meta.discourse.org/c/dev/7) for assistance.

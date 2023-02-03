@@ -46,7 +46,9 @@ class CommentSettings {
 	 * Add settings section, settings fields, and register the setting.
 	 */
 	public function register_comment_settings() {
-		$this->options = $this->get_options();
+		$this->options                = $this->get_options();
+		$use_network_comment_settings = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+
 		add_settings_section(
 			'discourse_commenting_settings_section',
 			__( 'Comment Settings', 'wp-discourse' ),
@@ -233,6 +235,19 @@ class CommentSettings {
 			'discourse_commenting_settings_section'
 		);
 
+		if ( ! $use_network_comment_settings ) {
+			add_settings_field(
+				'discourse_verbose_comment_logs',
+				__( 'Verbose Comment Logs', 'wp-discourse' ),
+				array(
+					$this,
+					'verbose_comment_logs',
+				),
+				'discourse_comment',
+				'discourse_commenting_settings_section'
+			);
+		}
+
 		register_setting(
 			'discourse_comment',
 			'discourse_comment',
@@ -301,6 +316,21 @@ class CommentSettings {
 				'wp-discourse'
 			),
 			__( 'Only enabled for a single request.', 'wp-discourse' )
+		);
+	}
+
+	/**
+	 * Outputs markup for the discourse_verbose_comment_logs checkbox.
+	 */
+	public function verbose_comment_logs() {
+		$this->form_helper->checkbox_input(
+			'verbose-comment-logs',
+			'discourse_comment',
+			__(
+				'Enable verbose logs for comments.',
+				'wp-discourse'
+			),
+			__( 'Will log successful operations as well as errors.', 'wp-discourse' ) . ' View logs in the <a href="?page=wp_discourse_options&tab=log_viewer">' . __( 'Log Viewer', 'wp-discourse' ) . '</a>.'
 		);
 	}
 

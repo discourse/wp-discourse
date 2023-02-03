@@ -38,7 +38,7 @@
 	margin-bottom: 6px;
 }
 
-#discourse-allowed-post-types {
+.discourse-select-input {
 	min-width: 160px;
 }
 
@@ -204,4 +204,75 @@ button.wpdc-remove-tag:hover .wpdc-remove-tag-icon:before {
 /* Padding for the Commenting options comment-type radio input. */
 .discourse-comment-type {
 	padding-left: 23px;
+}
+
+#wpdc-log-viewer-controls {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+#wpdc-log-viewer-controls .name {
+	display: flex;
+	align-items: center;
+}
+
+#wpdc-log-viewer-controls .name h3 {
+	font-size: 1.2em;
+	margin-right: 1em;
+}
+
+#wpdc-log-viewer-controls .load-log {
+	cursor: pointer;
+}
+
+#wpdc-log-viewer-controls .load-log .return-to {
+	display: none;
+}
+
+#wpdc-log-viewer-controls.meta .load-log .return-to {
+	display: block;
+}
+
+#wpdc-log-viewer-controls.meta .load-log .refresh {
+	display: none;
+}
+
+#wpdc-log-viewer {
+	height: 700px;
+	background: white;
+	display: inline-block;
+	width: 100%;
+	position: relative;
+	overflow: scroll;
+}
+
+#wpdc-log-viewer .spinner {
+	visibility: hidden;
+	float: none;
+  position: absolute;
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%);
+}
+
+#wpdc-log-viewer.loading .spinner {
+	visibility: visible;
+}
+
+#wpdc-log-viewer pre {
+	visibility: visible;
+}
+
+#wpdc-log-viewer.loading pre {
+	visibility: hidden;
+}
+
+#wpdc-tags-select {
+	display: inline-block;
+}
+
+#wpdc-tags-select .newtag {
+	width: 350px;
 }
