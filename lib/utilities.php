@@ -335,7 +335,7 @@ class Utilities {
 	 *
 	 * @return string
 	 */
-	public static function get_discourse_comments( $post_id, $perform_sync = true, $force_sync = false, $comment_type ) {
+	public static function get_discourse_comments( $post_id, $perform_sync = true, $force_sync = false, $comment_type = null ) {
 		$comment_formatter = new \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
 		$comment_formatter->setup_options();
 		$comment_formatter->setup_logger();
