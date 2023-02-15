@@ -235,7 +235,7 @@ class DiscoursePublish extends DiscourseBase {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $parsed, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
-				$wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+				$wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt, $post );
 				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt, $options['custom-excerpt-length'], $use_full_post );
 			}
 
