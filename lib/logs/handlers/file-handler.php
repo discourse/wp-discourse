@@ -298,7 +298,7 @@ class FileHandler extends StreamHandler {
     protected function validate_size() {
         // Note https://github.com/WordPress/WordPress-Coding-Standards/pull/1265#issuecomment-405143028.
         // Note https://github.com/woocommerce/woocommerce/issues/6091.
-        $handle                = fopen( $this->url, 'r+' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+        $handle                = fopen( $this->url, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
         $stat                  = fstat( $handle );
         $last_line_byte_buffer = 100;
         return $stat['size'] <= ( $this->file_size_limit - $last_line_byte_buffer );
