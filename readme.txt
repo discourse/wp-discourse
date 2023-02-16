@@ -129,7 +129,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 - Fix compatibility with S3 uploads plugin.
 - Fix usage of get_the_excerpt filter.
 - Fixed HTML of avatars in quotes in comments.
-- Verified backwards compatibility for WP > 5.1.2.
+- Verified backwards compatibility for WP > 5.1
 
 #### 2.4.8 12/27/2022
 
