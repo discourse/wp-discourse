@@ -12,7 +12,7 @@ jobs:
     name: Tests on PHP ${{ matrix.php }}
     strategy:
       matrix:
-        php: '7.4'
+        php: ['7.4']
         wordpress: ['5.1.2', 'latest']
 
     steps:
