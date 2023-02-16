@@ -14,6 +14,7 @@ jobs:
       matrix:
         include:
           - php: '7.4'
+          - wordpress: ['5.1.2', 'latest']
 
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +32,7 @@ jobs:
       - name: PHPUnit
         run: |
           sudo /etc/init.d/mysql start
-          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
+          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost ${{ matrix.wordpress }}
           vendor/bin/phpunit
 
       - name: PHPUnit Multisite
