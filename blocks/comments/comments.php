@@ -43,13 +43,13 @@ function render_block_wpdc_comments( $attributes, $content, $block ) {
  * Registers the `wp-discourse/comments` block on the server.
  */
 function register_wpdc_blocks() {
-  if ( version_compare( get_bloginfo('version'), '5.5', '>=' ) ) {
-    register_block_type_from_metadata(
+  if ( version_compare( get_bloginfo( 'version' ), '5.5', '>=' ) ) {
+		register_block_type_from_metadata(
   		WPDISCOURSE_PATH . 'blocks/comments/build/block.json',
   		array(
   			'render_callback' => 'render_block_wpdc_comments',
   		)
-  	);
+		  );
   }
 }
 add_action( 'init', 'register_wpdc_blocks' );

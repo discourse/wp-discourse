@@ -580,8 +580,8 @@ class DiscoursePublishTest extends UnitTest {
      */
     public function test_exclude_tags_with_exclusionary_tag() {
         if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
-          $this->markTestSkipped(
-            'Not supported on wordpress version.'
+        $this->markTestSkipped(
+            'Not supported on WordPress version.'
           );
         }
 
