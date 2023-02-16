@@ -234,8 +234,8 @@ class DiscourseSSO extends DiscourseBase {
 			$user_id = get_current_user_id();
 			wp_logout();
 
-			if ( version_compare( get_bloginfo('version'), '5.3', '<' ) ) {
-				// See https://core.trac.wordpress.org/ticket/35488
+			if ( version_compare( get_bloginfo( 'version' ), '5.3', '<' ) ) {
+				// See https://core.trac.wordpress.org/ticket/35488.
 				wp_set_current_user( 0 );
 			}
 
