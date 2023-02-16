@@ -12,9 +12,8 @@ jobs:
     name: Tests on PHP ${{ matrix.php }}
     strategy:
       matrix:
-        include:
-          - php: '7.4'
-          - wordpress: ['5.1.2', 'latest']
+        php: '7.4'
+        wordpress: ['5.1.2', 'latest']
 
     steps:
       - uses: actions/checkout@v3
