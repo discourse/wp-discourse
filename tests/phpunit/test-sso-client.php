@@ -19,6 +19,11 @@ class SSOClientTest extends UnitTest {
   public static function setUpBeforeClass() {
 		parent::initialize_shared_variables();
 		wp_logout();
+
+		if ( version_compare( get_bloginfo( 'version' ), '5.3', '<' ) ) {
+			// See https://core.trac.wordpress.org/ticket/35488
+			wp_set_current_user( 0 );
+			}
   }
 
   public function setUp() {
@@ -63,6 +68,11 @@ class SSOClientTest extends UnitTest {
 		delete_metadata( 'user', null, 'discourse_username', null, true );
 		delete_metadata( 'user', null, 'discourse_sso_user_id', null, true );
 		wp_logout();
+
+		if ( version_compare( get_bloginfo( 'version' ), '5.3', '<' ) ) {
+			// See https://core.trac.wordpress.org/ticket/35488
+			wp_set_current_user( 0 );
+			}
   }
 
   /**

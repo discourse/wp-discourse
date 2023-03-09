@@ -579,6 +579,12 @@ class DiscoursePublishTest extends UnitTest {
      * Exclude_tags prevents publication if excluded tag is present
      */
     public function test_exclude_tags_with_exclusionary_tag() {
+        if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
+        $this->markTestSkipped(
+            'Not supported on WordPress version.'
+          );
+        }
+
         // Create the exclusionary tag
         $excluded_term = term_exists( 'dont_publish', 'post_tag' );
         if ( ! $excluded_term ) {

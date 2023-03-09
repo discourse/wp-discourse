@@ -2,7 +2,9 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 2.4.8
+ * Version: 2.4.9
+ * Requires at least: 5.1
+ * Requires PHP: 5.6
  * Author: Discourse
  * Text Domain: wp-discourse
  * Domain Path: /languages
@@ -34,7 +36,7 @@ define( 'WPDISCOURSE_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPDISCOURSE_URL', plugins_url( '', __FILE__ ) );
 define( 'MIN_WP_VERSION', '4.7' );
 define( 'MIN_PHP_VERSION', '5.6.0' );
-define( 'WPDISCOURSE_VERSION', '2.4.8' );
+define( 'WPDISCOURSE_VERSION', '2.4.9' );
 define( 'WPDISCOURSE_LOGO_URL', WPDISCOURSE_PATH . 'assets/icon.svg' );
 $base64 = base64_encode( file_get_contents( WPDISCOURSE_LOGO_URL ) );
 define( 'WPDISCOURSE_LOGO', "data:image/svg+xml;base64,$base64" );

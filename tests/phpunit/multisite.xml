@@ -6,6 +6,7 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	convertDeprecationsToExceptions="false"
 	>
 	<php>
      <const name="WP_TESTS_MULTISITE" value="1" />
