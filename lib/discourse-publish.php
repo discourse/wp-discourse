@@ -27,12 +27,12 @@ class DiscoursePublish extends DiscourseBase {
 	protected $email_notifier;
 
 	/**
-     * Logger context
-     *
-     * @access protected
-     * @var string
-     */
-  protected $logger_context = 'publish';
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'publish';
 
 	/**
 	 * Instance store for log args
@@ -69,14 +69,50 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Published a post to Discourse after it has been saved.
+	 * Determines if a post should be published to Discourse after it is saved on WordPress.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
-	 * @param object $post The Post object.
+	 * @param int      $post_id The id of the post that has been saved.
+	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return null
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
+		if ( $this->exclude_post( $post_id, $post ) ) {
+			return null;
+		}
+
+		$post_should_be_auto_published = $this->auto_publish( $post_id );
+		$post_already_published        = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
+		$post_marked_to_be_published   = $this->dc_get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_new_post_to_discourse = ( $post_marked_to_be_published || $post_should_be_auto_published ) && ! $post_already_published;
+		$topic_should_be_updated       = $this->dc_get_post_meta( $post_id, 'update_discourse_topic', true );
+		$publish_to_discourse          = $publish_new_post_to_discourse || $topic_should_be_updated;
+		$publish_to_discourse          = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+
+		$force_publish_post = $this->force_publish_post( $post_id, $post );
+
+		if ( $publish_to_discourse || $force_publish_post ) {
+			$title = $this->sanitize_title( $post->post_title );
+			$title = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
+			// Clear existing publishing errors.
+			delete_post_meta( $post_id, 'wpdc_publishing_error' );
+			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+		}
+		return null;
+	}
+
+	/**
+	 * Excludes a post from being published under various conditions.
+	 *
+	 * Posts are excluded from publishing if the plugin is unconfigured, the post's status is not set to 'publish',
+	 * the post is a revision, doesn't have a title, is not a valid post type, or has an excluded tag.
+	 *
+	 * @param int      $post_id The ID of the post.
+	 * @param \WP_Post $post The Post object.
+	 *
+	 * @return bool
+	 */
+	protected function exclude_post( $post_id, $post ) {
 		$plugin_unconfigured    = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
 		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
 		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
@@ -85,24 +121,46 @@ class DiscoursePublish extends DiscourseBase {
 			 || $plugin_unconfigured
 			 || empty( $post->post_title )
 			 || ! $this->is_valid_sync_post_type( $post_id )
-			 || $this->has_excluded_tag( $post_id, $post )
+			 || $this->has_excluded_tag( $post )
 		) {
-
-			return null;
+			return true;
+		} else {
+			return false;
 		}
+	}
 
-		// Clear existing publishing errors.
-		delete_post_meta( $post_id, 'wpdc_publishing_error' );
-
+	/**
+	 * Determines if the plugin's 'auto-publish' option is enabled and if it has been overridden for a particular post.
+	 *
+	 * The auto-publish option causes the 'Publish to Discourse' checkbox in the post editor to be pre-checked for all new
+	 * posts. It is 'overridden' if the checkbox is manually unchecked.
+	 *
+	 * @param int $post_id The ID of the post.
+	 *
+	 * @return bool
+	 */
+	protected function auto_publish( $post_id ) {
 		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
-		$auto_publish_overridden = intval( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
-		$auto_publish            = ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
+		$auto_publish_overridden = intval( $this->dc_get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
+		return ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
+	}
 
-		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true ) || $auto_publish;
-		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-
+	/**
+	 * Determines if a post should be 'force published.'
+	 *
+	 * Posts are force published if the 'force-publish' option is enabled and the post was created within the time period
+	 * set by the 'force-publish-max-age' setting (ignored when 'force-publish-max-age is set to 0.)
+	 *
+	 * The 'force-publish' option forces all posts to be published in the Discourse category set by the plugin's
+	 * 'publish-category' option.
+	 *
+	 * @param int    $post_id The ID of the post.
+	 * @param object $post The Post object.
+	 *
+	 * @return bool
+	 */
+	protected function force_publish_post( $post_id, $post ) {
 		$force_publish_enabled = ! empty( $this->options['force-publish'] );
-		$force_publish_post    = false;
 		if ( $force_publish_enabled ) {
 			// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
 			// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
@@ -112,21 +170,11 @@ class DiscoursePublish extends DiscourseBase {
 			$post_time             = strtotime( $post->post_date );
 
 			if ( ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) && $is_rest_request ) {
-				$force_publish_post = true;
 				update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
+				return true;
 			}
 		}
-
-		$already_published      = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
-		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
-		$title                  = $this->sanitize_title( $post->post_title );
-		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
-		if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
-		}
-
-		return null;
+		return false;
 	}
 
 	/**
@@ -148,7 +196,7 @@ class DiscoursePublish extends DiscourseBase {
 		$title                = $this->sanitize_title( $post->post_title );
 		$title                = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) && ! $this->has_excluded_tag( $post_id ) ) {
+		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) && ! $this->has_excluded_tag( $post ) ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
@@ -728,12 +776,11 @@ class DiscoursePublish extends DiscourseBase {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param int      $post_id The ID of the post in question.
 	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return bool
 	 */
-	protected function has_excluded_tag( $post_id, $post ) {
+	protected function has_excluded_tag( $post ) {
 		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
 			return false;
 		}
