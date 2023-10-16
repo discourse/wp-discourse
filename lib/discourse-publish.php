@@ -89,7 +89,11 @@ class DiscoursePublish extends DiscourseBase {
 		$publish_to_discourse          = $publish_new_post_to_discourse || $topic_should_be_updated;
 		$publish_to_discourse          = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
 
-		$force_publish_post = $this->force_publish_post( $post_id, $post );
+		$force_publish_post = $this->force_publish_post( $post );
+		if ( $force_publish_post ) {
+			// All force published posts are published to the default publish-category.
+			update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
+		}
 
 		if ( $publish_to_discourse || $force_publish_post ) {
 			$title = $this->sanitize_title( $post->post_title );
@@ -116,17 +120,12 @@ class DiscoursePublish extends DiscourseBase {
 		$plugin_unconfigured    = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
 		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
 		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
-		if ( wp_is_post_revision( $post_id )
+		return wp_is_post_revision( $post_id )
 			 || ( $publish_status_not_set && ! $publish_private )
 			 || $plugin_unconfigured
 			 || empty( $post->post_title )
 			 || ! $this->is_valid_sync_post_type( $post_id )
-			 || $this->has_excluded_tag( $post )
-		) {
-			return true;
-		} else {
-			return false;
-		}
+			 || $this->has_excluded_tag( $post );
 	}
 
 	/**
@@ -151,30 +150,22 @@ class DiscoursePublish extends DiscourseBase {
 	 * Posts are force published if the 'force-publish' option is enabled and the post was created within the time period
 	 * set by the 'force-publish-max-age' setting (ignored when 'force-publish-max-age is set to 0.)
 	 *
-	 * The 'force-publish' option forces all posts to be published in the Discourse category set by the plugin's
-	 * 'publish-category' option.
-	 *
-	 * @param int    $post_id The ID of the post.
 	 * @param object $post The Post object.
 	 *
 	 * @return bool
 	 */
-	protected function force_publish_post( $post_id, $post ) {
-		$force_publish_enabled = ! empty( $this->options['force-publish'] );
-		if ( $force_publish_enabled ) {
-			// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
-			// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
-			$is_rest_request       = defined( 'REST_REQUEST' ) && REST_REQUEST;
-			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
-			$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
-			$post_time             = strtotime( $post->post_date );
-
-			if ( ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) && $is_rest_request ) {
-				update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
-				return true;
-			}
+	protected function force_publish_post( $post ) {
+		if ( empty( $this->options['force-publish'] ) ) {
+			return false;
 		}
-		return false;
+		// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
+		// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
+		$is_rest_request       = defined( 'REST_REQUEST' ) && REST_REQUEST;
+		$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
+		$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
+		$post_time             = strtotime( $post->post_date );
+
+		return ( 0 === $force_publish_max_age || $post_time >= $min_date ) && $is_rest_request;
 	}
 
 	/**
