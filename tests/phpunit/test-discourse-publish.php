@@ -17,6 +17,7 @@ use \WPDiscourse\Test\UnitTest;
  */
 class DiscoursePublishTest extends UnitTest {
 
+
     /**
      * Instance of DiscoursePublish.
      *
@@ -31,6 +32,8 @@ class DiscoursePublishTest extends UnitTest {
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         self::initialize_variables();
+		// Needs to be defined for the 'force-publish' tests.
+		define( 'REST_REQUEST', true );
     }
 
     /**
@@ -45,9 +48,9 @@ class DiscoursePublishTest extends UnitTest {
         $this->publish->setup_logger();
   	}
 
-    /**
-     * Sync_to_discourse handles new posts correctly.
-     */
+	 /**
+      * Sync_to_discourse handles new posts correctly.
+      */
     public function test_sync_to_discourse_when_creating() {
         // Set up a response body for creating a new post.
         $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
@@ -712,6 +715,92 @@ class DiscoursePublishTest extends UnitTest {
         // Cleanup.
         wp_delete_post( $post_id );
     }
+
+	public function test_force_publish_disabled_and_publish_to_discourse_not_set() {
+		// Enable the 'force-publish' option.
+		self::$plugin_options['force-publish'] = 0;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Set up a response body for creating a new post.
+		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id = $body->id;
+
+		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
+		$post_atts                                       = self::$post_atts;
+		$post_atts['meta_input']['publish_to_discourse'] = 0;
+		$post_id = wp_insert_post( $post_atts, false, false );
+
+		// Trigger the publish_post_after_save method.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has occurred.
+		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
+		$this->assertEmpty( get_post_meta( $post_id, 'wpdc_publishing_response', true ) );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * When the 'force-publish' option is enabled, the 'publish_to_discourse' post meta is ignored.
+	 */
+	public function test_force_publish_overrides_publish_to_discourse_meta() {
+		// Enable the 'force-publish' option.
+		self::$plugin_options['force-publish'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Set up a response body for creating a new post.
+		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id = $body->id;
+
+		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
+		$post_atts                                       = self::$post_atts;
+		$post_atts['meta_input']['publish_to_discourse'] = 0;
+		$post_id = wp_insert_post( $post_atts, false, false );
+
+		// Trigger the publish_post_after_save method.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has occurred.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * Posts created before the date set through the 'force-publish-max-age' option are not published.
+	 */
+	public function test_force_publish_max_age_prevents_older_posts_from_being_published() {
+		// Enable the 'force-publish' option and set the 'force-publish-max-age' option.
+		self::$plugin_options['force-publish']         = 1;
+		self::$plugin_options['force-publish-max-age'] = 2;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Set up a response hook for creating a new post.
+		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id = $body->id;
+
+		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
+		// Set 'post_date' to 7 days in the past.
+		$post_atts                                       = self::$post_atts;
+		$post_atts['meta_input']['publish_to_discourse'] = 0;
+		$post_atts['post_date']                          = date( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		$post_id = wp_insert_post( $post_atts, false, false );
+
+		// Trigger the publish_post_after_save method
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has not occurred.
+		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
     /**
      * Successful remote_post request returns original response.

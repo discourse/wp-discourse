@@ -86,16 +86,16 @@ class DiscoursePublish extends DiscourseBase {
 		$post_marked_to_be_published   = $this->dc_get_post_meta( $post_id, 'publish_to_discourse', true );
 		$publish_new_post_to_discourse = ( $post_marked_to_be_published || $post_should_be_auto_published ) && ! $post_already_published;
 		$topic_should_be_updated       = $this->dc_get_post_meta( $post_id, 'update_discourse_topic', true );
-		$publish_to_discourse          = $publish_new_post_to_discourse || $topic_should_be_updated;
-		$publish_to_discourse          = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-
-		$force_publish_post = $this->force_publish_post( $post );
+		$force_publish_post            = $this->force_publish_post( $post );
 		if ( $force_publish_post ) {
 			// All force published posts are published to the default publish-category.
 			update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
 		}
 
-		if ( $publish_to_discourse || $force_publish_post ) {
+		$publish_to_discourse = $publish_new_post_to_discourse || $topic_should_be_updated || $force_publish_post;
+		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+
+		if ( $publish_to_discourse ) {
 			$title = $this->sanitize_title( $post->post_title );
 			$title = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 			// Clear existing publishing errors.
