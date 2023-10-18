@@ -788,7 +788,7 @@ class DiscoursePublishTest extends UnitTest {
 		// Set 'post_date' to 7 days in the past.
 		$post_atts                                       = self::$post_atts;
 		$post_atts['meta_input']['publish_to_discourse'] = 0;
-		$post_atts['post_date']                          = date( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
+		$post_atts['post_date']                          = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
 		$post_id = wp_insert_post( $post_atts, false, false );
 
 		// Trigger the publish_post_after_save method
