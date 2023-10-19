@@ -43,6 +43,16 @@ class DiscoursePublish extends DiscourseBase {
 	protected $log_args;
 
 	/**
+	 * Allows the `force_publish_allowed` method to return `true` in unit tests.
+	 *
+	 * @access public
+	 * @var bool
+	 */
+	public bool $force_publish_allowed = false;
+
+
+
+	/**
 	 * DiscoursePublish constructor.
 	 *
 	 * @param object $email_notifier An object for sending an email verification notice.
@@ -155,17 +165,27 @@ class DiscoursePublish extends DiscourseBase {
 	 * @return bool
 	 */
 	protected function force_publish_post( $post ) {
-		if ( empty( $this->options['force-publish'] ) ) {
+		if ( empty( $this->options['force-publish'] ) || ! $this->force_publish_allowed() ) {
 			return false;
 		}
-		// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
-		// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
-		$is_rest_request       = defined( 'REST_REQUEST' ) && REST_REQUEST;
+
 		$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
 		$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
 		$post_time             = strtotime( $post->post_date );
 
-		return ( 0 === $force_publish_max_age || $post_time >= $min_date ) && $is_rest_request;
+		return 0 === $force_publish_max_age || $post_time >= $min_date;
+	}
+
+	/**
+	 * Checks if the post was published via REST_REQUEST.
+	 *
+	 * Currently, the force-publish option is only supported for posts published via the Block editor (a REST_REQUEST.)
+	 * The `force_publish_allowed` property is used in unit tests.
+	 *
+	 * @return bool
+	 */
+	protected function force_publish_allowed() {
+		return ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || $this->force_publish_allowed;
 	}
 
 	/**

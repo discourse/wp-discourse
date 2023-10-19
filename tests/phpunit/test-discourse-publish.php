@@ -18,313 +18,312 @@ use \WPDiscourse\Test\UnitTest;
 class DiscoursePublishTest extends UnitTest {
 
 
-    /**
-     * Instance of DiscoursePublish.
-     *
-     * @access protected
-     * @var \WPDiscourse\DiscoursePublish\DiscoursePublish
-     */
-    protected $publish;
+	/**
+	 * Instance of DiscoursePublish.
+	 *
+	 * @access protected
+	 * @var \WPDiscourse\DiscoursePublish\DiscoursePublish
+	 */
+	protected $publish;
 
-    /**
-     * Setup test class
-     */
-    public static function setUpBeforeClass() {
-        parent::setUpBeforeClass();
-        self::initialize_variables();
-		// Needs to be defined for the 'force-publish' tests.
-		define( 'REST_REQUEST', true );
-    }
+	/**
+	 * Setup test class
+	 */
+	public static function setUpBeforeClass() {
+		parent::setUpBeforeClass();
+		self::initialize_variables();
 
-    /**
-     * Setup each test.
-     */
-    public function setUp() {
-        parent::setUp();
+	}
 
-        $register_actions = false;
-        $this->publish    = new DiscoursePublish( new EmailNotification(), $register_actions );
-        $this->publish->setup_options( self::$plugin_options );
-        $this->publish->setup_logger();
-  	}
+	/**
+	 * Setup each test.
+	 */
+	public function setUp() {
+		parent::setUp();
+
+		$register_actions = false;
+		$this->publish    = new DiscoursePublish( new EmailNotification(), $register_actions );
+		$this->publish->setup_options( self::$plugin_options );
+		$this->publish->setup_logger();
+	}
 
 	 /**
-      * Sync_to_discourse handles new posts correctly.
-      */
-    public function test_sync_to_discourse_when_creating() {
-        // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
-        $discourse_post_id   = $body->id;
-        $discourse_topic_id  = $body->topic_id;
-        $discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
-        $discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
+	  * Sync_to_discourse handles new posts correctly.
+	  */
+	public function test_sync_to_discourse_when_creating() {
+		// Set up a response body for creating a new post.
+		$body                = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id   = $body->id;
+		$discourse_topic_id  = $body->topic_id;
+		$discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
+		$discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post = get_post( $post_id );
-        $this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
 
-        // Ensure the right post meta is created.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
-        $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure the right post meta is created.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with embed error response.
-     */
-    public function test_sync_to_discourse_when_creating_with_embed_error() {
-        // Set up the error responses.
-        $raw_response  = $this->build_response( 'unprocessable', 'embed' );
-        $error_message = json_decode( $raw_response['body'] )->errors[0];
-        $request       = array(
+	/**
+	 * Sync_to_discourse when creating a new post with embed error response.
+	 */
+	public function test_sync_to_discourse_when_creating_with_embed_error() {
+		// Set up the error responses.
+		$raw_response  = $this->build_response( 'unprocessable', 'embed' );
+		$error_message = json_decode( $raw_response['body'] )->errors[0];
+		$request       = array(
 			'response' => $raw_response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right error is returned.
-        $this->assertEquals( $response, $this->build_post_error() );
+		// Ensure the right error is returned.
+		$this->assertEquals( $response, $this->build_post_error() );
 
-        // Ensure the post meta is updated correctly.
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ), 1 );
-        $this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), $error_message );
+		// Ensure the post meta is updated correctly.
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ), 1 );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), $error_message );
 
-        // Ensure the right log is created.
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-        $this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-        $this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
+		// Ensure the right log is created.
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with category error response.
-     */
-    public function test_sync_to_discourse_when_creating_with_category_error() {
-        // Set up the error responses.
-        $raw_response  = $this->build_response( 'invalid_parameters', 'category' );
-        $error_message = json_decode( $raw_response['body'] )->errors[0];
-        $request       = array(
+	/**
+	 * Sync_to_discourse when creating a new post with category error response.
+	 */
+	public function test_sync_to_discourse_when_creating_with_category_error() {
+		// Set up the error responses.
+		$raw_response  = $this->build_response( 'invalid_parameters', 'category' );
+		$error_message = json_decode( $raw_response['body'] )->errors[0];
+		$request       = array(
 			'response' => $raw_response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right error is returned.
-        $this->assertEquals( $response, $this->build_post_error() );
+		// Ensure the right error is returned.
+		$this->assertEquals( $response, $this->build_post_error() );
 
-        // Ensure the post meta is updated correctly.
-        $this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), $error_message );
+		// Ensure the post meta is updated correctly.
+		$this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), $error_message );
 
-        // Ensure the right log is created.
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-        $this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-        $this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
+		// Ensure the right log is created.
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
 
-        // cleanup.
-        wp_delete_post( $post_id );
-    }
+		// cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with invalid body in response.
-     */
-    public function test_sync_to_discourse_when_creating_with_response_body_error() {
-        // Setup the invalid respond body.
-        $response         = $this->build_response( 'success' );
-        $response['body'] = '{ "invalid_body" : true }';
-        $request          = array(
+	/**
+	 * Sync_to_discourse when creating a new post with invalid body in response.
+	 */
+	public function test_sync_to_discourse_when_creating_with_response_body_error() {
+		// Setup the invalid respond body.
+		$response         = $this->build_response( 'success' );
+		$response['body'] = '{ "invalid_body" : true }';
+		$request          = array(
 			'response' => $response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right error is returned.
-        $this->assertEquals( $response, $this->build_body_error() );
+		// Ensure the right error is returned.
+		$this->assertEquals( $response, $this->build_body_error() );
 
-        // Ensure the post meta is updated correctly.
-        $this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'OK' );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'error' );
+		// Ensure the post meta is updated correctly.
+		$this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), '' );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'OK' );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'error' );
 
-        // Ensure the right log is created.
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.body_validation_error/', $log );
+		// Ensure the right log is created.
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.body_validation_error/', $log );
 
-        // cleanup.
-        wp_delete_post( $post_id );
-    }
+		// cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post and post is enqueued.
-     */
-    public function test_sync_to_discourse_when_creating_with_enqueued_post() {
-        // Setup the enqueued response body.
-        $response         = $this->build_response( 'success' );
-        $response['body'] = '';
-        $request          = array(
+	/**
+	 * Sync_to_discourse when creating a new post and post is enqueued.
+	 */
+	public function test_sync_to_discourse_when_creating_with_enqueued_post() {
+		// Setup the enqueued response body.
+		$response         = $this->build_response( 'success' );
+		$response['body'] = '';
+		$request          = array(
 			'response' => $response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right error is returned.
-        $message = __( 'The published post has been added to the Discourse approval queue', 'wp-discourse' );
-        $this->assertEquals( $response, $this->build_notice( $message ) );
+		// Ensure the right error is returned.
+		$message = __( 'The published post has been added to the Discourse approval queue', 'wp-discourse' );
+		$this->assertEquals( $response, $this->build_notice( $message ) );
 
-        // Ensure the post meta is updated correctly.
-        $this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), 1 );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), '' );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'queued_topic' );
+		// Ensure the post meta is updated correctly.
+		$this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), 1 );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), '' );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'queued_topic' );
 
-        // Ensure the right log is created.
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.WARNING: create_post.queued_topic_notice/', $log );
+		// Ensure the right log is created.
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.WARNING: create_post.queued_topic_notice/', $log );
 
-        // cleanup.
-        wp_delete_post( $post_id );
-    }
+		// cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with direct-db-publication-flags.
-     */
-    public function test_sync_to_discourse_when_creating_with_direct_db_publication_flags() {
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['direct-db-publication-flags'] = 1;
-        $this->publish->setup_options( self::$plugin_options );
+	/**
+	 * Sync_to_discourse when creating a new post with direct-db-publication-flags.
+	 */
+	public function test_sync_to_discourse_when_creating_with_direct_db_publication_flags() {
+		// Enable direct db pubilcation flags option.
+		self::$plugin_options['direct-db-publication-flags'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Set up a response body for creating a new post.
-        $body                = $this->mock_remote_post_success( 'post_create', 'POST' );
-        $discourse_post_id   = $body->id;
-        $discourse_topic_id  = $body->topic_id;
-        $discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
-        $discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
+		// Set up a response body for creating a new post.
+		$body                = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id   = $body->id;
+		$discourse_topic_id  = $body->topic_id;
+		$discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
+		$discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post = get_post( $post_id );
-        $this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
 
-        // Ensure the right post meta is created.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
-        $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure the right post meta is created.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post and pinning topics.
-     */
-    public function test_sync_to_discourse_pin_topic() {
-        // Set up a response body for creating a new post, with subsequent pin request.
-        $discourse_post = json_decode( $this->response_body_file( 'post_create' ) );
-        $pin_until      = '2021-02-17';
-        $second_request = array(
-            'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/status",
-            'method'   => 'PUT',
-            'response' => $this->build_response( 'success' ),
-        );
-        $body           = $this->mock_remote_post_success( 'post_create', 'POST', $second_request );
+	/**
+	 * Sync_to_discourse when creating a new post and pinning topics.
+	 */
+	public function test_sync_to_discourse_pin_topic() {
+		// Set up a response body for creating a new post, with subsequent pin request.
+		$discourse_post = json_decode( $this->response_body_file( 'post_create' ) );
+		$pin_until      = '2021-02-17';
+		$second_request = array(
+			'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/status",
+			'method'   => 'PUT',
+			'response' => $this->build_response( 'success' ),
+		);
+		$body           = $this->mock_remote_post_success( 'post_create', 'POST', $second_request );
 
-        // Add a post that will be pinned.
-        $post_atts                                 = self::$post_atts;
-        $post_atts['meta_input']['wpdc_pin_until'] = $pin_until;
-        $post_id                                   = wp_insert_post( $post_atts, false, false );
+		// Add a post that will be pinned.
+		$post_atts                                 = self::$post_atts;
+		$post_atts['meta_input']['wpdc_pin_until'] = $pin_until;
+		$post_id                                   = wp_insert_post( $post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right result.
-        $this->assertFalse( is_wp_error( $response ) );
-        $this->assertTrue( empty( get_post_meta( $post_id, 'wpdc_pin_until', true ) ) );
+		// Ensure the right result.
+		$this->assertFalse( is_wp_error( $response ) );
+		$this->assertTrue( empty( get_post_meta( $post_id, 'wpdc_pin_until', true ) ) );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with Discourse Username set.
-     */
-    public function test_sync_to_discourse_discourse_username() {
-        $discourse_username = 'angus2';
+	/**
+	 * Sync_to_discourse when creating a new post with Discourse Username set.
+	 */
+	public function test_sync_to_discourse_discourse_username() {
+		$discourse_username = 'angus2';
 
-        // Setup the user
-        $user_id = self::factory()->user->create();
-        add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
+		// Setup the user
+		$user_id = self::factory()->user->create();
+		add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
 
-        // Set up a response body for creating a new post
-        $raw_body         = $this->response_body_file( 'post_create' );
-        $discourse_post   = json_decode( $raw_body );
-        $response         = $this->build_response( 'success' );
-        $response['body'] = $raw_body;
-        $request          = array(
+		// Set up a response body for creating a new post
+		$raw_body         = $this->response_body_file( 'post_create' );
+		$discourse_post   = json_decode( $raw_body );
+		$response         = $this->build_response( 'success' );
+		$response['body'] = $raw_body;
+		$request          = array(
 			'headers'  => array(
 				'Api-Key'      => self::$connection_options['api-key'],
 				'Api-Username' => $discourse_username,
@@ -333,49 +332,49 @@ class DiscoursePublishTest extends UnitTest {
 			),
 			'method'   => 'POST',
 			'response' => $response,
-        );
-        $body             = $this->mock_remote_post( $request );
+		);
+		$body             = $this->mock_remote_post( $request );
 
-        // Add the post.
-        $post_atts                = self::$post_atts;
-        $post_atts['post_author'] = $user_id;
-        $post_id                  = wp_insert_post( $post_atts, false, false );
+		// Add the post.
+		$post_atts                = self::$post_atts;
+		$post_atts['post_author'] = $user_id;
+		$post_id                  = wp_insert_post( $post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right result.
-        $this->assertFalse( is_wp_error( $response ) );
+		// Ensure the right result.
+		$this->assertFalse( is_wp_error( $response ) );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when creating a new post with Discourse Username set.
-     */
-    public function test_sync_to_discourse_discourse_username_with_single_user_api_key() {
-        $discourse_username = 'angus';
+	/**
+	 * Sync_to_discourse when creating a new post with Discourse Username set.
+	 */
+	public function test_sync_to_discourse_discourse_username_with_single_user_api_key() {
+		$discourse_username = 'angus';
 
-        // Enable single user api key
-        self::$plugin_options['single-user-api-key-publication'] = 1;
-        $this->publish->setup_options( self::$plugin_options );
+		// Enable single user api key
+		self::$plugin_options['single-user-api-key-publication'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Setup the user
-        $user_id = self::factory()->user->create();
-        add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
+		// Setup the user
+		$user_id = self::factory()->user->create();
+		add_user_meta( $user_id, 'discourse_username', $discourse_username, true );
 
-        // Set up a response body for creating a new post
-        $raw_body         = $this->response_body_file( 'post_create' );
-        $discourse_post   = json_decode( $raw_body );
-        $response         = $this->build_response( 'success' );
-        $response['body'] = $raw_body;
-        $first_request    = array(
+		// Set up a response body for creating a new post
+		$raw_body         = $this->response_body_file( 'post_create' );
+		$discourse_post   = json_decode( $raw_body );
+		$response         = $this->build_response( 'success' );
+		$response['body'] = $raw_body;
+		$first_request    = array(
 			'headers'  => array(
 				'Api-Key'      => self::$connection_options['api-key'],
 				'Api-Username' => self::$connection_options['publish-username'],
@@ -384,348 +383,357 @@ class DiscoursePublishTest extends UnitTest {
 			),
 			'method'   => 'POST',
 			'response' => $response,
-        );
-        $second_request   = array(
-            'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/change-owner",
-            'method'   => 'POST',
-            'body'     => json_encode(
-                array(
+		);
+		$second_request   = array(
+			'url'      => self::$discourse_url . "/t/{$discourse_post->topic_id}/change-owner",
+			'method'   => 'POST',
+			'body'     => json_encode(
+				array(
 					'username' => $discourse_username,
 					'post_ids' => array( "{$discourse_post->id}" ),
 				)
-                ),
-            'response' => $this->build_response( 'success' ),
-        );
-        $body             = $this->mock_remote_post( $first_request, $second_request );
+			),
+			'response' => $this->build_response( 'success' ),
+		);
+		$body             = $this->mock_remote_post( $first_request, $second_request );
 
-        // Add the post.
-        $post_atts                = self::$post_atts;
-        $post_atts['post_author'] = $user_id;
-        $post_id                  = wp_insert_post( $post_atts, false, false );
+		// Add the post.
+		$post_atts                = self::$post_atts;
+		$post_atts['post_author'] = $user_id;
+		$post_id                  = wp_insert_post( $post_atts, false, false );
 
-        // Run the publication.
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the publication.
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right result.
-        $this->assertFalse( is_wp_error( $response ) );
+		// Ensure the right result.
+		$this->assertFalse( is_wp_error( $response ) );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when updating a post.
-     */
-    public function test_sync_to_discourse_when_updating() {
-        // Set up a response body for updating an existing post.
-        $body = $this->mock_remote_post_success( 'post_update', 'PUT' );
-        $post = $body->post;
+	/**
+	 * Sync_to_discourse when updating a post.
+	 */
+	public function test_sync_to_discourse_when_updating() {
+		// Set up a response body for updating an existing post.
+		$body = $this->mock_remote_post_success( 'post_update', 'PUT' );
+		$post = $body->post;
 
-        $discourse_post_id   = $post->id;
-        $discourse_topic_id  = $post->topic_id;
-        $discourse_permalink = self::$discourse_url . '/t/' . $post->topic_slug . '/' . $post->topic_id;
-        $discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
+		$discourse_post_id   = $post->id;
+		$discourse_topic_id  = $post->topic_id;
+		$discourse_permalink = self::$discourse_url . '/t/' . $post->topic_slug . '/' . $post->topic_id;
+		$discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
 
-        // Add a post that's already been published to Discourse.
-        $post_atts                                    = self::$post_atts;
-        $post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
-        $post_id                                      = wp_insert_post( $post_atts, false, false );
+		// Add a post that's already been published to Discourse.
+		$post_atts                                    = self::$post_atts;
+		$post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
+		$post_id                                      = wp_insert_post( $post_atts, false, false );
 
-        // Run the update.
-        update_post_meta( $post_id, 'update_discourse_topic', 1 );
-        $post = get_post( $post_id );
-        $this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
+		// Run the update.
+		update_post_meta( $post_id, 'update_discourse_topic', 1 );
+		$post = get_post( $post_id );
+		$this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
 
-        // Ensure the right post meta still exists.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
-        $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure the right post meta still exists.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when updating a post and post is deleted.
-     */
-    public function test_sync_to_discourse_when_updating_with_deleted_topic() {
-        // Setup the response body for an existing post that's been deleted.
-        $response               = $this->build_response( 'success' );
-        $raw_body               = $this->response_body_json( 'post_update' );
-        $body                   = json_decode( $raw_body );
-        $body->post->deleted_at = '2021-03-10T23:06:05.328Z';
-        $response['body']       = json_encode( $body );
-        $request                = array(
+	/**
+	 * Sync_to_discourse when updating a post and post is deleted.
+	 */
+	public function test_sync_to_discourse_when_updating_with_deleted_topic() {
+		// Setup the response body for an existing post that's been deleted.
+		$response               = $this->build_response( 'success' );
+		$raw_body               = $this->response_body_json( 'post_update' );
+		$body                   = json_decode( $raw_body );
+		$body->post->deleted_at = '2021-03-10T23:06:05.328Z';
+		$response['body']       = json_encode( $body );
+		$request                = array(
 			'response' => $response,
 			'method'   => 'PUT',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        // Add a post that's already been published to Discourse.
-        $discourse_post_id                            = $body->post->id;
-        $post_atts                                    = self::$post_atts;
-        $post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
-        $post_id                                      = wp_insert_post( $post_atts, false, false );
+		// Add a post that's already been published to Discourse.
+		$discourse_post_id                            = $body->post->id;
+		$post_atts                                    = self::$post_atts;
+		$post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
+		$post_id                                      = wp_insert_post( $post_atts, false, false );
 
-        // Run the update.
-        update_post_meta( $post_id, 'update_discourse_topic', 1 );
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-           $post_id,
-           $post->title,
-           $post->post_content
-        );
+		// Run the update.
+		update_post_meta( $post_id, 'update_discourse_topic', 1 );
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right error is returned.
-        $message = __( 'The Discourse topic associated with this post has been deleted', 'wp-discourse' );
-        $this->assertEquals( $response, $this->build_notice( $message ) );
+		// Ensure the right error is returned.
+		$message = __( 'The Discourse topic associated with this post has been deleted', 'wp-discourse' );
+		$this->assertEquals( $response, $this->build_notice( $message ) );
 
-        // Ensure the post meta is updated correctly.
-        $this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), 1 );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'deleted_topic' );
+		// Ensure the post meta is updated correctly.
+		$this->assertEquals( get_post_meta( $post_id, 'publish_to_discourse', true ), 1 );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_error', true ), 'deleted_topic' );
 
-        // Ensure the right log is created.
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.WARNING: update_post.deleted_topic_notice/', $log );
+		// Ensure the right log is created.
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.WARNING: update_post.deleted_topic_notice/', $log );
 
-        // cleanup.
-        wp_delete_post( $post_id );
-    }
+		// cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when updating a post and adding featured link.
-     */
-    public function test_sync_to_discourse_when_updating_with_featured_link() {
-        // Enable featured link option.
-        self::$plugin_options['add-featured-link'] = 1;
-        $this->publish->setup_options( self::$plugin_options );
+	/**
+	 * Sync_to_discourse when updating a post and adding featured link.
+	 */
+	public function test_sync_to_discourse_when_updating_with_featured_link() {
+		// Enable featured link option.
+		self::$plugin_options['add-featured-link'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Add a post that's already been published to Discourse.
-        $body           = json_decode( $this->response_body_json( 'post_update' ) );
-        $discourse_post = $body->post;
-        $post_atts      = self::$post_atts;
-        $post_atts['meta_input']['discourse_post_id'] = $discourse_post->id;
-        $post_id                                      = wp_insert_post( $post_atts, false, false );
+		// Add a post that's already been published to Discourse.
+		$body           = json_decode( $this->response_body_json( 'post_update' ) );
+		$discourse_post = $body->post;
+		$post_atts      = self::$post_atts;
+		$post_atts['meta_input']['discourse_post_id'] = $discourse_post->id;
+		$post_id                                      = wp_insert_post( $post_atts, false, false );
 
-        // Set up a response body for updating an existing post, and the featured link in the second request.
-        $second_request = array(
-            'url'      => self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id,
-            'method'   => 'PUT',
-            'response' => $this->build_response( 'success' ),
-        );
-        $body           = $this->mock_remote_post_success( 'post_update', 'PUT', $second_request );
-        $post           = $body->post;
+		// Set up a response body for updating an existing post, and the featured link in the second request.
+		$second_request = array(
+			'url'      => self::$discourse_url . '/t/' . $discourse_post->topic_slug . '/' . $discourse_post->topic_id,
+			'method'   => 'PUT',
+			'response' => $this->build_response( 'success' ),
+		);
+		$body           = $this->mock_remote_post_success( 'post_update', 'PUT', $second_request );
+		$post           = $body->post;
 
-        // Run the update.
-        update_post_meta( $post_id, 'update_discourse_topic', 1 );
-        $post     = get_post( $post_id );
-        $response = $this->publish->sync_to_discourse_without_lock(
-            $post_id,
-            $post->title,
-            $post->post_content
-        );
+		// Run the update.
+		update_post_meta( $post_id, 'update_discourse_topic', 1 );
+		$post     = get_post( $post_id );
+		$response = $this->publish->sync_to_discourse_without_lock(
+			$post_id,
+			$post->title,
+			$post->post_content
+		);
 
-        // Ensure the right result.
-        $this->assertFalse( is_wp_error( $response ) );
+		// Ensure the right result.
+		$this->assertFalse( is_wp_error( $response ) );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Sync_to_discourse when updating a post with direct-db-publication-flags.
-     */
-    public function test_sync_to_discourse_when_updating_with_direct_db_publication_flags() {
-        // Enable direct db pubilcation flags option.
-        self::$plugin_options['direct-db-publication-flags'] = 1;
-        $this->publish->setup_options( self::$plugin_options );
+	/**
+	 * Sync_to_discourse when updating a post with direct-db-publication-flags.
+	 */
+	public function test_sync_to_discourse_when_updating_with_direct_db_publication_flags() {
+		// Enable direct db pubilcation flags option.
+		self::$plugin_options['direct-db-publication-flags'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Set up a response body for updating an existing post.
-        $body = $this->mock_remote_post_success( 'post_update', 'PUT' );
-        $post = $body->post;
+		// Set up a response body for updating an existing post.
+		$body = $this->mock_remote_post_success( 'post_update', 'PUT' );
+		$post = $body->post;
 
-        $discourse_post_id   = $post->id;
-        $discourse_topic_id  = $post->topic_id;
-        $discourse_permalink = self::$discourse_url . '/t/' . $post->topic_slug . '/' . $post->topic_id;
-        $discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
+		$discourse_post_id   = $post->id;
+		$discourse_topic_id  = $post->topic_id;
+		$discourse_permalink = self::$discourse_url . '/t/' . $post->topic_slug . '/' . $post->topic_id;
+		$discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
 
-        // Add a post that's already been published to Discourse.
-        $post_atts                                    = self::$post_atts;
-        $post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
-        $post_id                                      = wp_insert_post( $post_atts, false, false );
+		// Add a post that's already been published to Discourse.
+		$post_atts                                    = self::$post_atts;
+		$post_atts['meta_input']['discourse_post_id'] = $discourse_post_id;
+		$post_id                                      = wp_insert_post( $post_atts, false, false );
 
-        // Run the update.
-        update_post_meta( $post_id, 'update_discourse_topic', 1 );
-        $post   = get_post( $post_id );
-        $result = $this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
+		// Run the update.
+		update_post_meta( $post_id, 'update_discourse_topic', 1 );
+		$post   = get_post( $post_id );
+		$result = $this->publish->sync_to_discourse_without_lock( $post_id, $post->title, $post->post_content );
 
-        // Ensure the right post meta still exists.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
-        $this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure the right post meta still exists.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-    /**
-     * Exclude_tags prevents publication if excluded tag is present
-     */
-    public function test_exclude_tags_with_exclusionary_tag() {
-        if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
-        $this->markTestSkipped(
-            'Not supported on WordPress version.'
-          );
-        }
+	/**
+	 * Exclude_tags prevents publication if excluded tag is present
+	 */
+	public function test_exclude_tags_with_exclusionary_tag() {
+		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
+			$this->markTestSkipped(
+				'Not supported on WordPress version.'
+			);
+		}
 
-        // Create the exclusionary tag
-        $excluded_term = term_exists( 'dont_publish', 'post_tag' );
-        if ( ! $excluded_term ) {
-          $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
-        }
-        $excluded_term      = get_tag( $excluded_term['term_id'] );
-        $excluded_term_slug = $excluded_term->slug;
+		// Create the exclusionary tag
+		$excluded_term = term_exists( 'dont_publish', 'post_tag' );
+		if ( ! $excluded_term ) {
+			$excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
+		}
+		$excluded_term      = get_tag( $excluded_term['term_id'] );
+		$excluded_term_slug = $excluded_term->slug;
 
-        // Enable exclude_tags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
-        $this->publish->setup_options( self::$plugin_options );
+		// Enable exclude_tags option.
+		self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Set up a response body for creating a new post.
-        $body                          = $this->mock_remote_post_success( 'post_create', 'POST' );
-        self::$post_atts['tags_input'] = array( $excluded_term_slug );
+		// Set up a response body for creating a new post.
+		$body                          = $this->mock_remote_post_success( 'post_create', 'POST' );
+		self::$post_atts['tags_input'] = array( $excluded_term_slug );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post = get_post( $post_id );
-        $this->publish->publish_post_after_save( $post_id, $post );
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
 
-        // Ensure no publication occurs.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), null );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), null );
+		// Ensure no publication occurs.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), null );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), null );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-        wp_delete_term( $excluded_term->ID, 'post_tags' );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+		wp_delete_term( $excluded_term->ID, 'post_tags' );
+	}
 
-    /**
-     * Exclude_tags does not prevent publication if excluded tag is not present
-     */
-    public function test_exclude_tags_with_non_exclusionary_tag() {
-        // Create a non exclusionary tag
-        $term = term_exists( 'publish', 'post_tag' );
-        if ( ! $term ) {
-          $term = wp_insert_term( 'publish', 'post_tag' );
-        }
-        $term      = get_tag( $term['term_id'] );
-        $term_slug = $term->slug;
+	/**
+	 * Exclude_tags does not prevent publication if excluded tag is not present
+	 */
+	public function test_exclude_tags_with_non_exclusionary_tag() {
+		// Create a non exclusionary tag
+		$term = term_exists( 'publish', 'post_tag' );
+		if ( ! $term ) {
+			$term = wp_insert_term( 'publish', 'post_tag' );
+		}
+		$term      = get_tag( $term['term_id'] );
+		$term_slug = $term->slug;
 
-        // Create the exclusionary tag
-        $excluded_term = term_exists( 'dont_publish', 'post_tag' );
-        if ( ! $excluded_term ) {
-          $excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
-        }
-        $excluded_term      = get_tag( $excluded_term['term_id'] );
-        $excluded_term_slug = $excluded_term->slug;
+		// Create the exclusionary tag
+		$excluded_term = term_exists( 'dont_publish', 'post_tag' );
+		if ( ! $excluded_term ) {
+			$excluded_term = wp_insert_term( 'dont_publish', 'post_tag' );
+		}
+		$excluded_term      = get_tag( $excluded_term['term_id'] );
+		$excluded_term_slug = $excluded_term->slug;
 
-        // Enable excluded tags option.
-        self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
-        $this->publish->setup_options( self::$plugin_options );
+		// Enable excluded tags option.
+		self::$plugin_options['exclude_tags'] = array( $excluded_term_slug );
+		$this->publish->setup_options( self::$plugin_options );
 
-        // Set up a response body for creating a new post.
-        $body                          = $this->mock_remote_post_success( 'post_create', 'POST' );
-        $discourse_post_id             = $body->id;
-        self::$post_atts['tags_input'] = array( $term_slug );
+		// Set up a response body for creating a new post.
+		$body                          = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id             = $body->id;
+		self::$post_atts['tags_input'] = array( $term_slug );
 
-        // Add the post.
-        $post_id = wp_insert_post( self::$post_atts, false, false );
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
 
-        // Run the publication.
-        $post = get_post( $post_id );
-        $this->publish->publish_post_after_save( $post_id, $post );
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
 
-        // Ensure publication occurs.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure publication occurs.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-        wp_delete_term( $term->ID, 'post_tags' );
-        wp_delete_term( $excluded_term->ID, 'post_tags' );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+		wp_delete_term( $term->ID, 'post_tags' );
+		wp_delete_term( $excluded_term->ID, 'post_tags' );
+	}
 
-    /**
-     * wpdc_publish_options filters publish_options
-     */
-    public function test_wpdc_publish_options() {
-        $tags = array( 'tag1', 'tag2' );
+	/**
+	 * wpdc_publish_options filters publish_options
+	 */
+	public function test_wpdc_publish_options() {
+		$tags = array( 'tag1', 'tag2' );
 
-        // Add filter.
-        add_filter(
-             'wpdc_publish_body', function( $body, $remote_post_type ) use ( $tags ) {
-          if ( 'create_post' === $remote_post_type ) {
+		// Add filter.
+		add_filter(
+			'wpdc_publish_body',
+			function( $body, $remote_post_type ) use ( $tags ) {
+				if ( 'create_post' === $remote_post_type ) {
 					$body['tags'] = $tags;
-          }
-          return $body;
-        }, 10, 2
-            );
+				}
+				return $body;
+			},
+			10,
+			2
+		);
 
-        $raw_body             = $this->response_body_json( 'post_create' );
-    		$response         = $this->build_response( 'success' );
-    		$response['body'] = $raw_body;
-        $body                 = json_decode( $raw_body );
+		$raw_body             = $this->response_body_json( 'post_create' );
+			$response         = $this->build_response( 'success' );
+			$response['body'] = $raw_body;
+		$body                 = json_decode( $raw_body );
 
-        // Check tags are in the body passed to request.
-        add_filter(
-             'pre_http_request', function( $prempt, $args, $url ) use ( $tags, $response ) {
-          $body = json_decode( $args['body'] );
+		// Check tags are in the body passed to request.
+		add_filter(
+			'pre_http_request',
+			function( $prempt, $args, $url ) use ( $tags, $response ) {
+				$body = json_decode( $args['body'] );
 
-          if ( ! isset( $body->tags ) || ! ( $tags === $body->tags ) ) {
+				if ( ! isset( $body->tags ) || ! ( $tags === $body->tags ) ) {
 						return new \WP_Error( 'http_request_failed', 'Failed to add tags' );
-  				} else {
-            return $response;
-          }
-        }, 10, 3
-            );
+				} else {
+					return $response;
+				}
+			},
+			10,
+			3
+		);
 
-        // Setup post.
-        $post_id           = wp_insert_post( self::$post_atts, false, false );
-        $discourse_post_id = $body->id;
+		// Setup post.
+		$post_id           = wp_insert_post( self::$post_atts, false, false );
+		$discourse_post_id = $body->id;
 
-        // Run the publication.
-        $post = get_post( $post_id );
-        $this->publish->publish_post_after_save( $post_id, $post );
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
 
-        // Ensure publication occurs.
-        $this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
-        $this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+		// Ensure publication occurs.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
 
-        // Cleanup.
-        wp_delete_post( $post_id );
-    }
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
 
-	public function test_force_publish_disabled_and_publish_to_discourse_not_set() {
-		// Enable the 'force-publish' option.
-		self::$plugin_options['force-publish'] = 0;
+	/**
+	 * Test that the default value of the force_publish_allowed property prevents force-publishing.
+	 */
+	public function test_force_publish_allowed_property() {
+		// Enable the force-publish option, but don't override default value of the force_publish_allowed property.
+		self::$plugin_options['force-publish'] = 1;
 		$this->publish->setup_options( self::$plugin_options );
 
 		// Set up a response body for creating a new post.
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
 		$discourse_post_id = $body->id;
 
-		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
+		// Set publish_to_discourse to 0 to test the force-publish option.
 		$post_atts                                       = self::$post_atts;
 		$post_atts['meta_input']['publish_to_discourse'] = 0;
 		$post_id = wp_insert_post( $post_atts, false, false );
@@ -734,33 +742,13 @@ class DiscoursePublishTest extends UnitTest {
 		$post = get_post( $post_id );
 		$this->publish->publish_post_after_save( $post_id, $post );
 
-		// Ensure that publication has occurred.
+		// Ensure that publication has not occurred.
 		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
-		$this->assertEmpty( get_post_meta( $post_id, 'wpdc_publishing_response', true ) );
 
-		// Cleanup.
-		wp_delete_post( $post_id );
-	}
-
-	/**
-	 * When the 'force-publish' option is enabled, the 'publish_to_discourse' post meta is ignored.
-	 */
-	public function test_force_publish_overrides_publish_to_discourse_meta() {
-		// Enable the 'force-publish' option.
-		self::$plugin_options['force-publish'] = 1;
-		$this->publish->setup_options( self::$plugin_options );
-
-		// Set up a response body for creating a new post.
-		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
-		$discourse_post_id = $body->id;
-
-		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
-		$post_atts                                       = self::$post_atts;
-		$post_atts['meta_input']['publish_to_discourse'] = 0;
-		$post_id = wp_insert_post( $post_atts, false, false );
+		// Set force_publish_allowed to true.
+		$this->publish->force_publish_allowed = true;
 
 		// Trigger the publish_post_after_save method.
-		$post = get_post( $post_id );
 		$this->publish->publish_post_after_save( $post_id, $post );
 
 		// Ensure that publication has occurred.
@@ -772,11 +760,52 @@ class DiscoursePublishTest extends UnitTest {
 	}
 
 	/**
-	 * Posts created before the date set through the 'force-publish-max-age' option are not published.
+	 * Test that enabling the force-publish overrides the publish_to_discourse meta-data.
+	 */
+	public function test_force_publish_option() {
+		$this->publish->force_publish_allowed = true;
+		// Explicitly disable the force-publish option.
+		self::$plugin_options['force-publish'] = 0;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Set up a response body for creating a new post.
+		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id = $body->id;
+
+		// Set publish_to_discourse to 0 to test the force-publish option.
+		$post_atts                                       = self::$post_atts;
+		$post_atts['meta_input']['publish_to_discourse'] = 0;
+		$post_id = wp_insert_post( $post_atts, false, false );
+
+		// Trigger the publish_post_after_save method.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has not occurred.
+		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
+
+		// Enable the force-publish option.
+		self::$plugin_options['force-publish'] = 1;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Trigger the publish_post_after_save method.
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has occurred.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * Test that the force-publish-max-age option prevents older posts from being published.
 	 */
 	public function test_force_publish_max_age_prevents_older_posts_from_being_published() {
-		// Enable the 'force-publish' option and set the 'force-publish-max-age' option.
-		self::$plugin_options['force-publish']         = 1;
+		$this->publish->force_publish_allowed = true;
+		self::$plugin_options['force-publish'] = 1;
+		// Don't publish posts that were created greater than 2 days ago.
 		self::$plugin_options['force-publish-max-age'] = 2;
 		$this->publish->setup_options( self::$plugin_options );
 
@@ -784,125 +813,136 @@ class DiscoursePublishTest extends UnitTest {
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
 		$discourse_post_id = $body->id;
 
-		// Set 'publish_to_discourse' to 0 to test the 'force-publish' option.
-		// Set 'post_date' to 7 days in the past.
+		// Set publish_to_discourse to 0 to test the force-publish option.
+		// Set post_date to 7 days in the past.
 		$post_atts                                       = self::$post_atts;
 		$post_atts['meta_input']['publish_to_discourse'] = 0;
 		$post_atts['post_date']                          = gmdate( 'Y-m-d H:i:s', strtotime( '-7 days' ) );
 		$post_id = wp_insert_post( $post_atts, false, false );
 
-		// Trigger the publish_post_after_save method
+		// Trigger the publish_post_after_save method.
 		$post = get_post( $post_id );
 		$this->publish->publish_post_after_save( $post_id, $post );
 
 		// Ensure that publication has not occurred.
 		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
 
+		// Change force-publish-max-age to 20.
+		self::$plugin_options['force-publish-max-age'] = 20;
+		$this->publish->setup_options( self::$plugin_options );
+
+		// Trigger the publish_post_after_save method.
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure that publication has occurred.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
 		// Cleanup.
 		wp_delete_post( $post_id );
 	}
 
-    /**
-     * Successful remote_post request returns original response.
-     */
-    public function test_remote_post_success() {
-        $success_response = $this->build_response( 'success' );
-        $request          = array(
+	/**
+	 * Successful remote_post request returns original response.
+	 */
+	public function test_remote_post_success() {
+		$success_response = $this->build_response( 'success' );
+		$request          = array(
 			'response' => $success_response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
-        $response = $this->publish->remote_post( ...self::$remote_post_params );
-        $this->assertEquals( $response, $success_response );
-    }
+		);
+		$this->mock_remote_post( $request );
+		$response = $this->publish->remote_post( ...self::$remote_post_params );
+		$this->assertEquals( $response, $success_response );
+	}
 
-    /**
-     * Forbidden remote_post request returns standardised WP_Error and creates correct log.
-     */
-    public function test_remote_post_forbidden() {
-        $raw_response = $this->build_response( 'forbidden' );
-        $request      = array(
+	/**
+	 * Forbidden remote_post request returns standardised WP_Error and creates correct log.
+	 */
+	public function test_remote_post_forbidden() {
+		$raw_response = $this->build_response( 'forbidden' );
+		$request      = array(
 			'response' => $raw_response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        $response = $this->publish->remote_post( ...self::$remote_post_params );
-        $this->assertEquals( $response, $this->build_post_error() );
+		$response = $this->publish->remote_post( ...self::$remote_post_params );
+		$this->assertEquals( $response, $this->build_post_error() );
 
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-        $this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-    }
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+	}
 
-    /**
-     * Unprocessable remote_post request returns standardised WP_Error and creates correct log.
-     */
-    public function test_remote_post_unprocessable() {
-        $raw_response = $this->build_response( 'unprocessable', 'title' );
-        $request      = array(
+	/**
+	 * Unprocessable remote_post request returns standardised WP_Error and creates correct log.
+	 */
+	public function test_remote_post_unprocessable() {
+		$raw_response = $this->build_response( 'unprocessable', 'title' );
+		$request      = array(
 			'response' => $raw_response,
 			'method'   => 'POST',
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        $response = $this->publish->remote_post( ...self::$remote_post_params );
-        $this->assertEquals( $response, $this->build_post_error() );
+		$response = $this->publish->remote_post( ...self::$remote_post_params );
+		$this->assertEquals( $response, $this->build_post_error() );
 
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-        $this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-    }
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+	}
 
-    /**
-     * Forbidden remote_post request returns standardised WP_Error and creates correct log.
-     */
-    public function test_remote_post_failed_to_connect() {
-        $request = array(
+	/**
+	 * Forbidden remote_post request returns standardised WP_Error and creates correct log.
+	 */
+	public function test_remote_post_failed_to_connect() {
+		$request = array(
 			'method'   => 'POST',
 			'response' => new \WP_Error(
 				'http_request_failed',
 				'cURL error 7: Failed to connect to localhost port 3000: Connection refused'
 			),
-        );
-        $this->mock_remote_post( $request );
+		);
+		$this->mock_remote_post( $request );
 
-        $response = $this->publish->remote_post( ...self::$remote_post_params );
-        $this->assertEquals( $response, $this->build_post_error() );
+		$response = $this->publish->remote_post( ...self::$remote_post_params );
+		$this->assertEquals( $response, $this->build_post_error() );
 
-        $log = $this->get_last_log();
-        $this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-    }
+		$log = $this->get_last_log();
+		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+	}
 
-    /**
-     * Build error returned by discourse-publish when post request fails.
-     */
-    protected function build_post_error() {
-        $message = __( 'An error occurred when communicating with Discourse', 'wp-discourse' );
-        return new \WP_Error( 'discourse_publishing_response_error', $message );
-    }
+	/**
+	 * Build error returned by discourse-publish when post request fails.
+	 */
+	protected function build_post_error() {
+		$message = __( 'An error occurred when communicating with Discourse', 'wp-discourse' );
+		return new \WP_Error( 'discourse_publishing_response_error', $message );
+	}
 
-    /**
-     * Build error returned by discourse-publish when response body is invalid.
-     */
-    protected function build_body_error() {
-        $message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
-        return new \WP_Error( 'discourse_publishing_response_error', $message );
-    }
+	/**
+	 * Build error returned by discourse-publish when response body is invalid.
+	 */
+	protected function build_body_error() {
+		$message = __( 'An invalid response was returned from Discourse', 'wp-discourse' );
+		return new \WP_Error( 'discourse_publishing_response_error', $message );
+	}
 
-    /**
-     * Build an error notice returned by discourse-publish when post queued or topic deleted.
-     */
-    protected function build_notice( $message ) {
-        return new \WP_Error( 'discourse_publishing_response_notice', $message );
-    }
+	/**
+	 * Build an error notice returned by discourse-publish when post queued or topic deleted.
+	 */
+	protected function build_notice( $message ) {
+		return new \WP_Error( 'discourse_publishing_response_notice', $message );
+	}
 
-    /**
-     * Initialize static variables used by test class.
-     */
-    public static function initialize_variables() {
-        self::$remote_post_params = array(
-            self::$discourse_url,
+	/**
+	 * Initialize static variables used by test class.
+	 */
+	public static function initialize_variables() {
+		self::$remote_post_params = array(
+			self::$discourse_url,
 			array(
 				'timeout' => 30,
 				'method'  => 'POST',
@@ -925,6 +965,6 @@ class DiscoursePublishTest extends UnitTest {
 			),
 			'create_post',
 			1,
-        );
-    }
+		);
+	}
 }
