@@ -48,7 +48,7 @@ class DiscoursePublish extends DiscourseBase {
 	 * @access public
 	 * @var bool
 	 */
-	public bool $force_publish_allowed = false;
+	public $force_publish_allowed = false;
 
 
 
