@@ -97,19 +97,13 @@ class DiscoursePublish extends DiscourseBase {
 		$publish_new_post_to_discourse = ( $post_marked_to_be_published || $post_should_be_auto_published ) && ! $post_already_published;
 		$topic_should_be_updated       = $this->dc_get_post_meta( $post_id, 'update_discourse_topic', true );
 		$force_publish_post            = $this->force_publish_post( $post );
-		if ( $force_publish_post ) {
-			// All force published posts are published to the default publish-category.
-			update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
-		}
-
-		$publish_to_discourse = $publish_new_post_to_discourse || $topic_should_be_updated || $force_publish_post;
-		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
+		$publish_to_discourse          = $publish_new_post_to_discourse || $topic_should_be_updated || $force_publish_post;
+		$publish_to_discourse          = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
 
 		if ( $publish_to_discourse ) {
-			$title = $this->sanitize_title( $post->post_title );
-			$title = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 			// Clear existing publishing errors.
 			delete_post_meta( $post_id, 'wpdc_publishing_error' );
+			$title = $post->title;
 			$this->sync_to_discourse( $post_id, $title, $post->post_content );
 		}
 		return null;
@@ -189,35 +183,35 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * For publishing by xmlrpc.
+	 * For publishing via xmlrpc.
 	 *
-	 * Hooks into 'xmlrpc_publish_post'. Publishing through this hook is disabled. This is to prevent
-	 * posts being inadvertently published to Discourse when they are edited using blogging software.
-	 * This can be overridden by hooking into the `wp_discourse_before_xmlrpc_publish` filter and setting
-	 * `$publish_to_discourse` to true based on some condition - testing for the presence of a tag can
-	 * work for this.
+	 * Hooks into the 'xmlrpc_publish_post' action. Publishing via xmlrpc is disabled by default. It can be enabled  by
+	 * adding a function that hooks into 'wp_discourse_before_xmlrpc_publish'. This method exists for historical reasons.
+	 * Its main purpose is to allow a publish-failure-notice to be sent when authors publish posts from blogging software.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int $post_id The post ID.
+	 *
+	 * @return null|bool
 	 */
 	public function xmlrpc_publish_post_to_discourse( $post_id ) {
 		$post                 = get_post( $post_id );
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
-		$title                = $this->sanitize_title( $post->post_title );
-		$title                = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) && ! $this->has_excluded_tag( $post ) ) {
+		if ( $publish_to_discourse ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+			$this->publish_post_after_save( $post_id, $post );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
-			$this->email_notifier->publish_failure_notification(
+			// Allows a notification to be sent about posts that have been published from a blogging app.
+			$success = $this->email_notifier->publish_failure_notification(
 				$post,
 				array(
 					'location' => 'after_xmlrpc_publish',
 				)
 			);
+			return $success;
 		}
+		return null;
 	}
 
 	/**
@@ -268,6 +262,8 @@ class DiscoursePublish extends DiscourseBase {
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration-enabled'] );
 		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
+		$title                       = $this->sanitize_title( $title );
+		$title                       = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 
 		$this->log_args = array(
 			'wp_title'     => $title,
