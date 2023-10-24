@@ -26,6 +26,12 @@ class DiscoursePublishTest extends UnitTest {
 	 */
 	protected $publish;
 
+	/**
+	 * A partial mock instance of EmailNotification.
+	 *
+	 * @access protected
+	 * @var \Mockery\Mock
+	 */
 	protected $email_notifier;
 
 	/**
@@ -855,6 +861,10 @@ class DiscoursePublishTest extends UnitTest {
 		return true;
 	}
 
+	/**
+	 * Posts can only be published via XMLRPC by hooking into the wp_discourse_before_xmlrpc_publish filter with a function
+	 * that returns `true`.
+	 */
 	public function test_wp_discourse_before_xmlrpc_publish_filter() {
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
 		$discourse_post_id = $body->id;
@@ -881,6 +891,9 @@ class DiscoursePublishTest extends UnitTest {
 		remove_filter( 'wp_discourse_before_xmlrpc_publish', array( $this, 'override_wp_discourse_before_xmlrpc_publish' ), 10, 1 );
 	}
 
+	/**
+	 * When the auto-publish option is enabled, posts published via XMLRPC will trigger a publish_failure_notification.
+	 */
 	public function test_xmlrpc_publish_failure_notification() {
 		$plugin_options = self::$plugin_options;
 		// The  xmlrpc failure notification will only be triggered if the auto-publish option is set.
