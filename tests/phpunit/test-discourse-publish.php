@@ -855,13 +855,6 @@ class DiscoursePublishTest extends UnitTest {
 	}
 
 	/**
-	 * Used in test_wp_discourse_before_xmlrpc_publish_filter.
-	 */
-	public function override_wp_discourse_before_xmlrpc_publish( $publish_to_discourse ) {
-		return true;
-	}
-
-	/**
 	 * Posts can only be published via XMLRPC by hooking into the wp_discourse_before_xmlrpc_publish filter with a function
 	 * that returns `true`.
 	 */
@@ -879,7 +872,7 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
 
 		// Hook into the filter to allow for xmlrpc publishing.
-		add_filter( 'wp_discourse_before_xmlrpc_publish', array( $this, 'override_wp_discourse_before_xmlrpc_publish' ), 10, 1 );
+		add_filter( 'wp_discourse_before_xmlrpc_publish', '__return_true' );
 
 		$this->publish->xmlrpc_publish_post_to_discourse( $post_id );
 
@@ -888,7 +881,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Cleanup.
 		wp_delete_post( $post_id );
-		remove_filter( 'wp_discourse_before_xmlrpc_publish', array( $this, 'override_wp_discourse_before_xmlrpc_publish' ), 10, 1 );
+		remove_filter( 'wp_discourse_before_xmlrpc_publish', '__return_true' );
 	}
 
 	/**

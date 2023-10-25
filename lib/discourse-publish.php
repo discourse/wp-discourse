@@ -103,8 +103,7 @@ class DiscoursePublish extends DiscourseBase {
 		if ( $publish_to_discourse ) {
 			// Clear existing publishing errors.
 			delete_post_meta( $post_id, 'wpdc_publishing_error' );
-			$title = $post->post_title;
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+			$this->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
 		}
 		return null;
 	}
