@@ -27,6 +27,14 @@ class DiscoursePublishTest extends UnitTest {
 	protected $publish;
 
 	/**
+	 * A partial mock instance of EmailNotification.
+	 *
+	 * @access protected
+	 * @var \Mockery\Mock
+	 */
+	protected $email_notifier;
+
+	/**
 	 * Setup test class
 	 */
 	public static function setUpBeforeClass() {
@@ -40,9 +48,9 @@ class DiscoursePublishTest extends UnitTest {
 	 */
 	public function setUp() {
 		parent::setUp();
-
-		$register_actions = false;
-		$this->publish    = new DiscoursePublish( new EmailNotification(), $register_actions );
+		$register_actions     = false;
+		$this->email_notifier = \Mockery::mock( EmailNotification::class )->makePartial();
+		$this->publish        = new DiscoursePublish( $this->email_notifier, $register_actions );
 		$this->publish->setup_options( self::$plugin_options );
 		$this->publish->setup_logger();
 	}
@@ -726,8 +734,9 @@ class DiscoursePublishTest extends UnitTest {
 	 */
 	public function test_force_publish_allowed_property() {
 		// Enable the force-publish option, but don't override default value of the force_publish_allowed property.
-		self::$plugin_options['force-publish'] = 1;
-		$this->publish->setup_options( self::$plugin_options );
+		$plugin_options                  = self::$plugin_options;
+		$plugin_options['force-publish'] = 1;
+		$this->publish->setup_options( $plugin_options );
 
 		// Set up a response body for creating a new post.
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
@@ -765,8 +774,9 @@ class DiscoursePublishTest extends UnitTest {
 	public function test_force_publish_option() {
 		$this->publish->force_publish_allowed = true;
 		// Explicitly disable the force-publish option.
-		self::$plugin_options['force-publish'] = 0;
-		$this->publish->setup_options( self::$plugin_options );
+		$plugin_options                  = self::$plugin_options;
+		$plugin_options['force-publish'] = 0;
+		$this->publish->setup_options( $plugin_options );
 
 		// Set up a response body for creating a new post.
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
@@ -785,8 +795,9 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
 
 		// Enable the force-publish option.
-		self::$plugin_options['force-publish'] = 1;
-		$this->publish->setup_options( self::$plugin_options );
+		$plugin_options                  = self::$plugin_options;
+		$plugin_options['force-publish'] = 1;
+		$this->publish->setup_options( $plugin_options );
 
 		// Trigger the publish_post_after_save method.
 		$this->publish->publish_post_after_save( $post_id, $post );
@@ -804,10 +815,11 @@ class DiscoursePublishTest extends UnitTest {
 	 */
 	public function test_force_publish_max_age_prevents_older_posts_from_being_published() {
 		$this->publish->force_publish_allowed = true;
-		self::$plugin_options['force-publish'] = 1;
+		$plugin_options                       = self::$plugin_options;
+		$plugin_options['force-publish']      = 1;
 		// Don't publish posts that were created greater than 2 days ago.
-		self::$plugin_options['force-publish-max-age'] = 2;
-		$this->publish->setup_options( self::$plugin_options );
+		$plugin_options['force-publish-max-age'] = 2;
+		$this->publish->setup_options( $plugin_options );
 
 		// Set up a response hook for creating a new post.
 		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
@@ -828,8 +840,8 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
 
 		// Change force-publish-max-age to 20.
-		self::$plugin_options['force-publish-max-age'] = 20;
-		$this->publish->setup_options( self::$plugin_options );
+		$plugin_options['force-publish-max-age'] = 20;
+		$this->publish->setup_options( $plugin_options );
 
 		// Trigger the publish_post_after_save method.
 		$this->publish->publish_post_after_save( $post_id, $post );
@@ -837,6 +849,56 @@ class DiscoursePublishTest extends UnitTest {
 		// Ensure that publication has occurred.
 		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
 		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+	}
+
+	/**
+	 * Posts can only be published via XMLRPC by hooking into the wp_discourse_before_xmlrpc_publish filter with a function
+	 * that returns `true`.
+	 */
+	public function test_wp_discourse_before_xmlrpc_publish_filter() {
+		$body              = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id = $body->id;
+		// Note: `self::$post_atts['meta_input']['publish_to_discourse'] === 1`.
+		$post_atts = self::$post_atts;
+		$post_id   = wp_insert_post( $post_atts, false, false );
+
+		// Call xmlrpc_publish_post_to_discourse without hooking into the wp_discourse_before_xmlrpc_publish filter.
+		$this->publish->xmlrpc_publish_post_to_discourse( $post_id );
+
+		// Ensure that publication has not occurred.
+		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
+
+		// Hook into the filter to allow for xmlrpc publishing.
+		add_filter( 'wp_discourse_before_xmlrpc_publish', '__return_true' );
+
+		$this->publish->xmlrpc_publish_post_to_discourse( $post_id );
+
+		// Ensure that publication has occurred.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+		remove_filter( 'wp_discourse_before_xmlrpc_publish', '__return_true' );
+	}
+
+	/**
+	 * When the auto-publish option is enabled, posts published via XMLRPC will trigger a publish_failure_notification.
+	 */
+	public function test_xmlrpc_publish_failure_notification() {
+		$plugin_options = self::$plugin_options;
+		// The  xmlrpc failure notification will only be triggered if the auto-publish option is set.
+		$plugin_options['auto-publish'] = 1;
+		$this->publish->setup_options( $plugin_options );
+
+		$post_atts = self::$post_atts;
+		$post_id   = wp_insert_post( $post_atts, false, false );
+
+		$this->email_notifier->shouldReceive( 'publish_failure_notification' )->withSomeOfArgs( array( 'location' => 'after_xmlrpc_publish' ) )->andReturn( true );
+
+		$this->assertTrue( $this->publish->xmlrpc_publish_post_to_discourse( $post_id ) );
 
 		// Cleanup.
 		wp_delete_post( $post_id );
