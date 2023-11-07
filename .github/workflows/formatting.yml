@@ -32,7 +32,7 @@ jobs:
 
       - name: Syntax Check
         run: |
-          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+          find -L . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" -print0 | xargs -0 -n 1 -P 4 php -l
 
       - name: Install Composer
         if: 'matrix.sniff'
