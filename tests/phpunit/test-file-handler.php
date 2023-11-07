@@ -73,7 +73,7 @@ class FileHandlerTest extends UnitTest {
 
 				$log_file = $log_files[0];
 		    $last_entry   = shell_exec( "tail -n 1 $log_file" );
-		    $this->assertRegExp( '/New Log/', $last_entry );
+		    $this->assertMatchesRegularExpression( '/New Log/', $last_entry );
 		}
 
 		/**
@@ -136,8 +136,8 @@ class FileHandlerTest extends UnitTest {
 				$todays_date    = $todays_datetime->format( FileHandler::DATE_FORMAT );
 
 				$files = $file_handler->list_files();
-				$this->assertRegExp( '/' . $tomorrows_date . '/', $files[0] );
-				$this->assertRegExp( '/' . $todays_date . '/', $files[1] );
+				$this->assertMatchesRegularExpression( '/' . $tomorrows_date . '/', $files[0] );
+				$this->assertMatchesRegularExpression( '/' . $todays_date . '/', $files[1] );
 		}
 
 		/**

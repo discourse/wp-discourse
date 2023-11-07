@@ -24,9 +24,33 @@ class SyncDiscourseTopicTest extends UnitTest {
     protected $sync_topic;
 
     /**
+     * Request
+     *
+     * @access protected
+     * @var WP_REST_Request
+     */
+    protected $request;
+
+    /**
+     * Signaure
+     *
+     * @access protected
+     * @var string
+     */
+    protected $signature;
+
+    /**
+     * Payload
+     *
+     * @access protected
+     * @var array
+     */
+    protected $payload;
+
+    /**
      * Setup each test.
      */
-    public function setUp() {
+    public function setUp(): void {
       parent::setUp();
 
       self::$plugin_options['webhook-secret']        = '1234567891011';

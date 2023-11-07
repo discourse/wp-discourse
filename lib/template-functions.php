@@ -331,7 +331,10 @@ trait TemplateFunctions {
 		$use_internal_errors   = libxml_use_internal_errors( true );
 		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
 		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
-		$doc->loadHTML( mb_convert_encoding( $content, 'HTML-ENTITIES', 'UTF-8' ) );
+		$html 								 = htmlentities( $content, ENT_COMPAT, 'utf-8', false );
+		$html									 = mb_convert_encoding( $html, 'UTF-8', mb_detect_encoding( $html ) );
+		$html                  = htmlspecialchars_decode( $html );
+		$doc->loadHTML( $html );
 
 		$finder = new \DOMXPath( $doc );
 		$avatars_in_quotes = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ')]" );

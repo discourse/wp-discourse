@@ -21,7 +21,7 @@ class LoggerTest extends UnitTest {
 		/**
 		 * Teardown each test.
 		 */
-		public function tearDown() {
+		public function tearDown(): void {
 			parent::tearDown();
 
 			self::$plugin_options['logs-enabled'] = 1;

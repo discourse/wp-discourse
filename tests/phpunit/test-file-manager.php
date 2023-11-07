@@ -17,7 +17,7 @@ class FileManagerTest extends UnitTest {
 		/**
 		 * Setup test class.
 		 */
-		public function setUp() {
+		public function setUp(): void {
 				parent::setUp();
 				static::reset_permissions();
 		}
@@ -25,7 +25,7 @@ class FileManagerTest extends UnitTest {
 		/**
 		 * Teardown test class.
 		 */
-		public function tearDown() {
+		public function tearDown(): void {
 				parent::tearDown();
 				static::reset_permissions();
 		}
@@ -37,7 +37,7 @@ class FileManagerTest extends UnitTest {
 				$file_manager = new FileManager();
 
 				$this->recursive_rmdir( $file_manager->upload_dir );
-				$this->assertDirectoryNotExists( $file_manager->upload_dir );
+				$this->assertDirectoryDoesNotExist( $file_manager->upload_dir );
 
 				$file_manager->validate();
 
@@ -52,7 +52,7 @@ class FileManagerTest extends UnitTest {
 				$file_manager = new FileManager();
 
 				$this->recursive_rmdir( $file_manager->logs_dir );
-				$this->assertDirectoryNotExists( $file_manager->logs_dir );
+				$this->assertDirectoryDoesNotExist( $file_manager->logs_dir );
 
 				$file_manager->validate();
 

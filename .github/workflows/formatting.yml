@@ -44,7 +44,7 @@ jobs:
       - name: WordPress Coding Standards
         if: 'matrix.sniff'
         run: |
-          vendor/bin/phpcs -p -s -v -n .
+          vendor/bin/phpcs -p -s -v -n . -d error_reporting=E_ALL^E_DEPRECATED
 
       - name: JSHint
         if: 'matrix.jshint'
