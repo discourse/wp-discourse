@@ -14,13 +14,11 @@ jobs:
       matrix:
         include:
           - php: '5.6'
-            sniff: true
           - php: '7.0'
-            sniff: true
           - php: '7.4'
+          - php: '8.0'
             sniff: true
             jshint: true
-          - php: '8.0'
 
     steps:
       - uses: actions/checkout@v3
