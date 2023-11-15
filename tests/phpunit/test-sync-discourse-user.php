@@ -24,9 +24,33 @@ class SyncDiscourseUserTest extends UnitTest {
     protected $sync_user;
 
     /**
+     * Request
+     *
+     * @access protected
+     * @var WP_REST_Request
+     */
+    protected $request;
+
+    /**
+     * Signaure
+     *
+     * @access protected
+     * @var string
+     */
+    protected $signature;
+
+    /**
+     * Payload
+     *
+     * @access protected
+     * @var array
+     */
+    protected $payload;
+
+    /**
      * Setup each test.
      */
-    public function setUp() {
+    public function setUp(): void {
       parent::setUp();
 
       self::$plugin_options['webhook-secret']             = '1234567891011';
@@ -48,7 +72,7 @@ class SyncDiscourseUserTest extends UnitTest {
       $this->request->set_body( $this->payload );
   	}
 
-    public function tearDown() {
+    public function tearDown(): void {
       parent::tearDown();
 
       $payload = json_decode( $this->payload );
@@ -151,7 +175,7 @@ class SyncDiscourseUserTest extends UnitTest {
 
       // Ensure the right log is created.
       $log = $this->get_last_log();
-      $this->assertRegExp( '/webhook_user.WARNING: update_user.user_not_found/', $log );
+      $this->assertMatchesRegularExpression( '/webhook_user.WARNING: update_user.user_not_found/', $log );
     }
 }
 

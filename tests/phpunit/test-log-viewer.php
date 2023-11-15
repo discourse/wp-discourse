@@ -7,6 +7,7 @@
 
 namespace WPDiscourse\Test;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use \WPDiscourse\Logs\FileManager;
 use \WPDiscourse\Logs\FileHandler;
 use \WPDiscourse\Logs\Logger;
@@ -18,6 +19,7 @@ use \WPDiscourse\Test\UnitTest;
  * Logger test case.
  */
 class LogViewerTest extends UnitTest {
+    use ArraySubsetAsserts;
 
     /**
      * Instance of LogViewer.
@@ -30,7 +32,7 @@ class LogViewerTest extends UnitTest {
     /**
      * Setup each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $this->viewer = new LogViewer( FormHelper::get_instance() );
@@ -40,7 +42,7 @@ class LogViewerTest extends UnitTest {
     /**
      * Teardown each test.
      */
-    public function tearDown() {
+    public function tearDown(): void {
       parent::tearDown();
 
       self::$plugin_options['logs-enabled'] = 1;

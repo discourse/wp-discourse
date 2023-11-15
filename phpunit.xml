@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit
-	bootstrap="tests/phpunit/bootstrap.php"
-	backupGlobals="false"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	convertDeprecationsToExceptions="false"
-	>
-	<testsuites>
-		<testsuite name="unit">
-			<directory prefix="test-" suffix=".php">tests/phpunit/</directory>
-			<exclude>tests/phpunit/multisite/</exclude>
-		</testsuite>
-	</testsuites>
-	<filter>
-	  <whitelist processUncoveredFilesFromWhitelist="true">
-	    <directory suffix=".php">lib</directory>
-	  </whitelist>
-	</filter>
-	<php>
-	  <server name="REQUEST_URI" value="https://wordpress.discourse.org"/>
-	</php>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/phpunit/bootstrap.php" backupGlobals="false" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">lib</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="unit">
+      <directory prefix="test-" suffix=".php">tests/phpunit/</directory>
+      <exclude>tests/phpunit/multisite/</exclude>
+    </testsuite>
+  </testsuites>
+  <php>
+    <server name="REQUEST_URI" value="https://wordpress.discourse.org"/>
+  </php>
 </phpunit>

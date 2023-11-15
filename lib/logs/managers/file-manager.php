@@ -113,6 +113,10 @@ class FileManager {
      */
     protected function create_files( $files ) {
         foreach ( $files as $file ) {
+            if ( ! $file['base'] ) {
+              continue;
+            }
+
     		    $file_path = trailingslashit( $file['base'] ) . $file['file'];
             $dir_exists    = wp_mkdir_p( $file['base'] );
             $dir_writable  = is_writable( $file['base'] );
@@ -140,6 +144,10 @@ class FileManager {
      */
     protected function files_are_ready( $files ) {
     		foreach ( $files as $file ) {
+            if ( ! $file['base'] ) {
+              return false;
+            }
+
             $directory_path = trailingslashit( $file['base'] );
             $file_path      = $directory_path . $file['file'];
 

@@ -14,13 +14,11 @@ jobs:
       matrix:
         include:
           - php: '5.6'
-            sniff: true
           - php: '7.0'
-            sniff: true
           - php: '7.4'
+          - php: '8.0'
             sniff: true
             jshint: true
-          - php: '8.0'
 
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +30,7 @@ jobs:
 
       - name: Syntax Check
         run: |
-          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+          find -L . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" -print0 | xargs -0 -n 1 -P 4 php -l
 
       - name: Install Composer
         if: 'matrix.sniff'
@@ -44,7 +42,7 @@ jobs:
       - name: WordPress Coding Standards
         if: 'matrix.sniff'
         run: |
-          vendor/bin/phpcs -p -s -v -n .
+          vendor/bin/phpcs -p -s -v -n . -d error_reporting=E_ALL^E_DEPRECATED
 
       - name: JSHint
         if: 'matrix.jshint'

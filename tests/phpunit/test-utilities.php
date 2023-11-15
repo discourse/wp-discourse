@@ -14,7 +14,15 @@ use WPDiscourse\Utilities\Utilities;
  */
 class UtilitiesTest extends UnitTest {
 
-  public function setUp() {
+  /**
+   * User id
+   *
+   * @access protected
+   * @var int
+   */
+  protected $user_id;
+
+  public function setUp(): void {
 		$connection_options = get_option( 'discourse_connect' );
 		$connection_options = array_merge( $connection_options, self::$connection_options );
 		update_option( 'discourse_connect', $connection_options );

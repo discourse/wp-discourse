@@ -26,7 +26,7 @@ class DiscourseConnectionTest extends UnitTest {
 		/**
 		 * Setup each test.
 		 */
-		public function setUp() {
+		public function setUp(): void {
 		  parent::setUp();
 		  $this->form_helper                       = FormHelper::get_instance();
 		  self::$plugin_options['connection-logs'] = 1;
@@ -78,7 +78,7 @@ class DiscourseConnectionTest extends UnitTest {
 		  $this->assertFalse( $result );
 
 		  $log = $this->get_last_log();
-		  $this->assertRegExp( '/connection.INFO: check_connection_status.failed_to_connect/', $log );
+		  $this->assertMatchesRegularExpression( '/connection.INFO: check_connection_status.failed_to_connect/', $log );
 		}
 
 		/**
@@ -101,7 +101,7 @@ class DiscourseConnectionTest extends UnitTest {
 		  $this->assertFalse( $result );
 
 		  $log = $this->get_last_log();
-		  $this->assertRegExp( '/connection.INFO: check_connection_status.failed_to_connect/', $log );
+		  $this->assertMatchesRegularExpression( '/connection.INFO: check_connection_status.failed_to_connect/', $log );
 		}
 
 		/**
@@ -130,7 +130,7 @@ class DiscourseConnectionTest extends UnitTest {
 		  $this->assertFalse( $result );
 
 		  $log = $this->get_last_log();
-		  $this->assertRegExp( '/connection.INFO: check_connection_status.invalid_scopes/', $log );
+		  $this->assertMatchesRegularExpression( '/connection.INFO: check_connection_status.invalid_scopes/', $log );
 
 		  self::$plugin_options['enable-discourse-comments'] = 0;
 		  $this->form_helper->setup_options( self::$plugin_options );
@@ -139,6 +139,6 @@ class DiscourseConnectionTest extends UnitTest {
 		  $this->assertTrue( $result );
 
 		  $log = $this->get_last_log();
-		  $this->assertRegExp( '/connection.INFO: check_connection_status.valid_scopes/', $log );
+		  $this->assertMatchesRegularExpression( '/connection.INFO: check_connection_status.valid_scopes/', $log );
 		}
 }

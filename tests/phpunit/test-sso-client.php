@@ -16,7 +16,71 @@ use \WPDiscourse\Test\UnitTest;
  */
 class SSOClientTest extends UnitTest {
 
-  public static function setUpBeforeClass() {
+  /**
+   * Discourse user id
+   *
+   * @access protected
+   * @var int
+   */
+  protected $discourse_user_id;
+
+  /**
+   * User id
+   *
+   * @access protected
+   * @var int
+   */
+  protected $user_id;
+
+  /**
+   * Secret
+   *
+   * @access protected
+   * @var string
+   */
+  protected $secret;
+
+  /**
+   * Nonce
+   *
+   * @access protected
+   * @var string
+   */
+  protected $nonce;
+
+  /**
+   * Query args
+   *
+   * @access protected
+   * @var array
+   */
+  protected $query_args;
+
+  /**
+   * Client
+   *
+   * @access protected
+   * @var \WPDiscourse\SSOClient\Client
+   */
+  protected $sso_client;
+
+  /**
+   * Signaure
+   *
+   * @access protected
+   * @var string
+   */
+  protected $signature;
+
+  /**
+   * Payload
+   *
+   * @access protected
+   * @var array
+   */
+  protected $payload;
+
+  public static function setUpBeforeClass(): void {
 		parent::initialize_shared_variables();
 		wp_logout();
 
@@ -26,7 +90,7 @@ class SSOClientTest extends UnitTest {
 			}
   }
 
-  public function setUp() {
+  public function setUp(): void {
 		parent::setUp();
 
 		$this->discourse_user_id = 5;
@@ -60,7 +124,7 @@ class SSOClientTest extends UnitTest {
 		$_GET['sig'] = rawurlencode( $this->signature );
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
 		parent::tearDown();
 
 		$_GET['sso'] = null;
@@ -101,7 +165,7 @@ class SSOClientTest extends UnitTest {
 		$this->assertNotEquals( $user->ID, $this->user_id );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_client.ERROR: parse_request.invalid_signature/', $log );
+		$this->assertMatchesRegularExpression( '/sso_client.ERROR: parse_request.invalid_signature/', $log );
   }
 
   /**
@@ -120,7 +184,7 @@ class SSOClientTest extends UnitTest {
 		$this->assertNotEquals( $user->ID, $this->user_id );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_client.ERROR: parse_request.get_user_id/', $log );
+		$this->assertMatchesRegularExpression( '/sso_client.ERROR: parse_request.get_user_id/', $log );
   }
 
   /**
@@ -135,7 +199,7 @@ class SSOClientTest extends UnitTest {
 		$this->assertNotEquals( $user->ID, $this->user_id );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_client.ERROR: parse_request.update_user/', $log );
+		$this->assertMatchesRegularExpression( '/sso_client.ERROR: parse_request.update_user/', $log );
 
 		remove_filter( 'wpdc_sso_client_updated_user', array( $this, 'invalid_update_user_filter' ), 10 );
   }

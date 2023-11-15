@@ -76,20 +76,20 @@ class UnitTest extends \WP_UnitTestCase {
   /**
    * Setup test class
    */
-  public static function setUpBeforeClass() {
+  public static function setUpBeforeClass(): void {
 		self::initialize_shared_variables();
   }
 
   /**
    * Setup each test.
    */
-  public function setUp() {
+  public function setUp(): void {
 	}
 
   /**
    * Teardown each test.
    */
-  public function tearDown() {
+  public function tearDown(): void {
 		$this->clear_logs();
 		remove_all_filters( 'pre_http_request' );
 		\Mockery::close();

@@ -37,7 +37,7 @@ class DiscoursePublishTest extends UnitTest {
 	/**
 	 * Setup test class
 	 */
-	public static function setUpBeforeClass() {
+	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
 		self::initialize_variables();
 
@@ -46,7 +46,7 @@ class DiscoursePublishTest extends UnitTest {
 	/**
 	 * Setup each test.
 	 */
-	public function setUp() {
+	public function setUp(): void {
 		parent::setUp();
 		$register_actions     = false;
 		$this->email_notifier = \Mockery::mock( EmailNotification::class )->makePartial();
@@ -118,9 +118,9 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Ensure the right log is created.
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-		$this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertMatchesRegularExpression( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertMatchesRegularExpression( '/"response_message":"' . $error_message . '"/', $log );
 
 		// Cleanup.
 		wp_delete_post( $post_id );
@@ -159,9 +159,9 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Ensure the right log is created.
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
-		$this->assertRegExp( '/"response_message":"' . $error_message . '"/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertMatchesRegularExpression( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertMatchesRegularExpression( '/"response_message":"' . $error_message . '"/', $log );
 
 		// cleanup.
 		wp_delete_post( $post_id );
@@ -201,7 +201,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Ensure the right log is created.
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.body_validation_error/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.body_validation_error/', $log );
 
 		// cleanup.
 		wp_delete_post( $post_id );
@@ -242,7 +242,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Ensure the right log is created.
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.WARNING: create_post.queued_topic_notice/', $log );
+		$this->assertMatchesRegularExpression( '/publish.WARNING: create_post.queued_topic_notice/', $log );
 
 		// cleanup.
 		wp_delete_post( $post_id );
@@ -501,7 +501,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Ensure the right log is created.
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.WARNING: update_post.deleted_topic_notice/', $log );
+		$this->assertMatchesRegularExpression( '/publish.WARNING: update_post.deleted_topic_notice/', $log );
 
 		// cleanup.
 		wp_delete_post( $post_id );
@@ -933,8 +933,8 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEquals( $response, $this->build_post_error() );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertMatchesRegularExpression( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
 	}
 
 	/**
@@ -952,8 +952,8 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEquals( $response, $this->build_post_error() );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
-		$this->assertRegExp( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertMatchesRegularExpression( '/"http_code":' . $raw_response['response']['code'] . '/', $log );
 	}
 
 	/**
@@ -973,7 +973,7 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertEquals( $response, $this->build_post_error() );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/publish.ERROR: create_post.post_error/', $log );
+		$this->assertMatchesRegularExpression( '/publish.ERROR: create_post.post_error/', $log );
 	}
 
 	/**
