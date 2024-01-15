@@ -410,7 +410,7 @@ class Utilities {
    *
    * @param string $post_id ID of the post to publish.
    *
-   * @return void;
+   * @return void|\WP_Error;
    */
   public static function publish_to_discourse( $post_id ) {
 		$post = get_post( $post_id );
@@ -423,8 +423,6 @@ class Utilities {
 		$publish        = new \WPDiscourse\DiscoursePublish\DiscoursePublish( $email_notifier, false );
 		$publish->setup_options();
 		$publish->setup_logger();
-
-		return $publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
-
+		$publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
   }
 }
