@@ -409,10 +409,11 @@ class Utilities {
    * Publishes a post to a Discourse.
    *
    * @param string $post_id ID of the post to publish.
+   * @param array  $options An optional array of options to pass to DiscoursePublish.
    *
    * @return void|\WP_Error;
    */
-  public static function publish_to_discourse( $post_id ) {
+  public static function publish_to_discourse( $post_id, $options = array() ) {
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
@@ -421,7 +422,7 @@ class Utilities {
 
 		$email_notifier = new \WPDiscourse\EmailNotification\EmailNotification();
 		$publish        = new \WPDiscourse\DiscoursePublish\DiscoursePublish( $email_notifier, false );
-		$publish->setup_options();
+		$publish->setup_options( $options );
 		$publish->setup_logger();
 		$publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
   }
