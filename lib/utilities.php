@@ -404,4 +404,26 @@ class Utilities {
 
 		return $result;
 	}
+
+  /**
+	 * Publishes a post to a Discourse.
+	 *
+	 * @param string $post_id ID of the post to publish.
+	 *
+	 * @return void;
+	 */
+  public static function publish_to_discourse( $post_id ) {
+    $post = get_post( $post_id );
+
+    if ( !$post ) {
+      return new \WP_Error( 'wpdc_param_error', 'There is no WordPress post with the supplied id.' );
+    }
+
+		$email_notifier = new \WPDiscourse\EmailNotification\EmailNotification();
+    $publish = new \WPDiscourse\DiscoursePublish\DiscoursePublish( $email_notifier, false );
+		$publish->setup_options();
+		$publish->setup_logger();
+
+    return $publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );;
+  }
 }
