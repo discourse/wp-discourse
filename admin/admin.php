@@ -62,8 +62,8 @@ function enqueue_admin_scripts() {
 	$script_path = '/js/admin.js';
 	wp_register_script( 'admin_js', plugins_url( $script_path, __FILE__ ), array( 'jquery', 'tags-box' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 	wp_enqueue_script( 'admin_js' );
-	$commenting_options = get_option( 'discourse-comment' );
-	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];
+	$publishing_options = get_option( 'discourse_publish' );
+	$max_tags           = ! isset( $publishing_options['max-tags'] ) ? 5 : $publishing_options['max-tags'];
 	$data               = array(
 		'maxTags' => $max_tags,
 		'ajax'    => admin_url( 'admin-ajax.php' ),
