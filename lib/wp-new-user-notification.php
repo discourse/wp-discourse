@@ -13,7 +13,8 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 	 * @since 2.0.0
 	 * @since 4.3.0 The `$plaintext_pass` parameter was changed to `$notify`.
 	 * @since 4.3.1 The `$plaintext_pass` parameter was deprecated. `$notify` added as a third parameter.
-	 *
+	 * @since 4.6.0 The `$notify` parameter accepts 'user' for sending notification only to the user created.
+   * 
 	 * @global wpdb         $wpdb      WordPress database object for queries.
 	 * @global PasswordHash $wp_hasher Portable PHP password hashing framework instance.
 	 *
@@ -31,6 +32,11 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 				_deprecated_argument( __FUNCTION__, '4.3.1' );
 			}
 
+      // Accepts only 'user', 'admin' , 'both' or default '' as $notify.
+      if ( ! in_array( $notify, array( 'user', 'admin', 'both', '' ), true ) ) {
+        return;
+      }
+
 			global $wpdb, $wp_hasher;
 			$user = get_userdata( $user_id );
 
@@ -38,7 +44,17 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 			// we want to reverse this for the plain text arena of emails.
 			$blogname = wp_specialchars_decode( get_option( 'blogname' ), ENT_QUOTES );
 
-			if ( 'user' !== $notify ) {
+      /**
+       * Filters whether the admin is notified of a new user registration.
+       *
+       * @since 6.1.0
+       *
+       * @param bool    $send Whether to send the email. Default true.
+       * @param WP_User $user User object for new user.
+       */
+      $send_notification_to_admin = apply_filters( 'wp_send_new_user_notification_to_admin', true, $user );
+
+			if ( 'user' !== $notify && true === $send_notification_to_admin ) {
 				$switched_locale = switch_to_locale( get_locale() );
 
 				/* translators: %s: site title */
@@ -87,26 +103,27 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 				}
 			}
 
+      /**
+       * Filters whether the user is notified of their new user registration.
+       *
+       * @since 6.1.0
+       *
+       * @param bool    $send Whether to send the email. Default true.
+       * @param WP_User $user User object for new user.
+       */
+      $send_notification_to_user = apply_filters( 'wp_send_new_user_notification_to_user', true, $user );
+
 			// `$deprecated was pre-4.3 `$plaintext_pass`. An empty `$plaintext_pass` didn't sent a user notification.
 			if ( 'admin' === $notify || ( empty( $deprecated ) && empty( $notify ) ) ) {
 				return;
 			}
 
-			// Generate something random for a password reset key.
-			$key = wp_generate_password( 20, false );
+			$key = get_password_reset_key( $user );
+      if ( is_wp_error( $key ) ) {
+        return;
+      }
 
-			/** This action is documented in wp-login.php */
-			do_action( 'retrieve_password_key', $user->user_login, $key );
-
-			// Now insert the key, hashed, into the DB.
-			if ( empty( $wp_hasher ) ) {
-				require_once ABSPATH . WPINC . '/class-phpass.php';
-				$wp_hasher = new PasswordHash( 8, true );
-			}
-			$hashed = time() . ':' . $wp_hasher->HashPassword( $key );
-			$wpdb->update( $wpdb->users, array( 'user_activation_key' => $hashed ), array( 'user_login' => $user->user_login ) );
-
-			$switched_locale = switch_to_locale( get_user_locale( $user ) );
+			$switched_locale = switch_to_user_locale( $user_id );
 
 			// Added by the wp-discourse plugin.
 			$email_verification_sig = time() . '_' . wp_generate_password( 20, false );
@@ -115,7 +132,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 			/* translators: %s: user login */
 			$message  = sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
 			$message .= __( 'To set your password, visit the following address:' ) . "\r\n\r\n";
-			$message .= '<' . esc_url_raw( network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ) ), 'login' ) . ">\r\n\r\n";
+			$message .= esc_url_raw( network_site_url( "wp-login.php?action=rp&key=$key&mail_key=$email_verification_sig&login=" . rawurlencode( $user->user_login ) ), 'login' ) . "\r\n\r\n";
 
 			$message .= esc_url( wp_login_url() ) . "\r\n";
 
