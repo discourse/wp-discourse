@@ -2,9 +2,9 @@
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
 Requires at least: 5.1
-Tested up to: 6.1
+Tested up to: 6.4
 Requires PHP: 5.6
-Stable tag: 2.5.0
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,12 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.5.1 25/01/2024
+
+- Fix DiscourseConnect user registration email verification link
+- Fix publish max tags setting
+- Add publish_to_discourse utility function
 
 #### 2.5.0 12/11/2023
 
