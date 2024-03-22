@@ -854,6 +854,46 @@ class DiscoursePublishTest extends UnitTest {
 		wp_delete_post( $post_id );
 	}
 
+  /**
+	 * Test that HTML entities are converted to their special characters.
+	 */
+  public function test_conversion_of_html_entities_in_title() {
+    $title_with_entities = "Title with &amp;";
+    $title_with_decoded_entities = "Title with &";
+    self::$post_atts['post_title'] = $title_with_entities;
+
+	  $response         = $this->build_response( 'success' );
+		$response['body'] = $this->response_body_json( 'post_create' );
+
+    add_filter(
+			'pre_http_request',
+			function( $prempt, $args, $url ) use ( $response, $title_with_decoded_entities ) {
+				$body = json_decode( $args['body'] );
+
+				if ( $body->title !== $title_with_decoded_entities ) {
+						return new \WP_Error( 'http_request_failed', 'Failed to decode title' );
+				} else {
+					return $response;
+				}
+			},
+			10,
+			3
+		);
+
+		// Setup post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
+
+		// Run the publication.
+		$post = get_post( $post_id );
+		$this->publish->publish_post_after_save( $post_id, $post );
+
+		// Ensure publication occurs.
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+  }
+
 	/**
 	 * Posts can only be published via XMLRPC by hooking into the wp_discourse_before_xmlrpc_publish filter with a function
 	 * that returns `true`.

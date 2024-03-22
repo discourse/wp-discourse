@@ -839,14 +839,14 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Strip html tags from titles before passing them to Discourse.
+	 * Strip html tags and convert HTML entities before passing them to Discourse.
 	 *
 	 * @param string $title The title of the post.
 	 *
 	 * @return string
 	 */
 	protected function sanitize_title( $title ) {
-		return wp_strip_all_tags( $title );
+		return wp_specialchars_decode( wp_strip_all_tags( $title ) );
 	}
 
 	/**
