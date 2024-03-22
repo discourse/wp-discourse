@@ -855,17 +855,17 @@ class DiscoursePublishTest extends UnitTest {
 	}
 
   /**
-	 * Test that HTML entities are converted to their special characters.
-	 */
+   * Test that HTML entities are converted to their special characters.
+   */
   public function test_conversion_of_html_entities_in_title() {
-    $title_with_entities = "Title with &amp;";
-    $title_with_decoded_entities = "Title with &";
-    self::$post_atts['post_title'] = $title_with_entities;
+		$title_with_entities = 'Title with &amp;';
+		$title_with_decoded_entities = 'Title with &';
+		self::$post_atts['post_title'] = $title_with_entities;
 
-	  $response         = $this->build_response( 'success' );
+		$response         = $this->build_response( 'success' );
 		$response['body'] = $this->response_body_json( 'post_create' );
 
-    add_filter(
+		add_filter(
 			'pre_http_request',
 			function( $prempt, $args, $url ) use ( $response, $title_with_decoded_entities ) {
 				$body = json_decode( $args['body'] );
@@ -875,7 +875,7 @@ class DiscoursePublishTest extends UnitTest {
 				} else {
 					return $response;
 				}
-			},
+				},
 			10,
 			3
 		);
