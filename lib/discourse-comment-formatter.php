@@ -36,15 +36,17 @@ class DiscourseCommentFormatter extends DiscourseBase {
 	/**
 	 * Formats the Discourse comments for a given post.
 	 *
-	 * @param int  $post_id The post_id to retrieve comments for.
-	 * @param bool $perform_sync Determines whether sync is performed.
+	 * @param int    $post_id The post_id to retrieve comments for.
+	 * @param bool   $perform_sync Determines whether sync is performed.
+	 * @param bool   $force_sync Determines whether sync is forced.
+	 * @param string $comment_type Set comment type for the post.
 	 *
 	 * @return string
 	 */
-	public function format( $post_id, $perform_sync = true ) {
+	public function format( $post_id, $perform_sync = true, $force_sync = false, $comment_type = null ) {
 		// Sync the comments.
 		if ( $perform_sync ) {
-			do_action( 'wpdc_sync_discourse_comments', $post_id );
+			do_action( 'wpdc_sync_discourse_comments', $post_id, $force_sync, $comment_type );
 		}
 		$options = $this->options;
 
@@ -59,7 +61,8 @@ class DiscourseCommentFormatter extends DiscourseBase {
 		}
 
 		if ( ! empty( $missing_post_custom ) ) {
-			$this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );
+			// TO FIX: This call is involved in errors on multiple sites.
+			// $this->logger->error( 'format.missing_post_data', array( 'keys' => implode( ',', $missing_post_custom ) ) );.
 			return wp_kses_post( Templates::bad_response_html() );
 		}
 
@@ -130,6 +133,7 @@ class DiscourseCommentFormatter extends DiscourseBase {
 				$comment_body   = $this->convert_relative_urls_to_absolute( $discourse_url, $post->cooked );
 				$comment_body   = $this->add_poll_links( $comment_body, $post_url );
 				$comment_body   = $this->fix_youtube_onebox_links( $comment_body );
+				$comment_body   = $this->fix_avatars_in_quotes( $comment_body, $discourse_url );
 				$comment_body   = wp_kses_post( apply_filters( 'wpdc_comment_body', $comment_body ) );
 				$comment_body   = str_replace( '{comment_url}', $post_url, $comment_body );
 				$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );

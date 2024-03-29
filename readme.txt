@@ -1,10 +1,10 @@
 === WP Discourse ===
 Contributors: scossar, cdck, angusmcleod, samsaffron, techapj
 Tags: discourse, forum, comments, sso
-Requires at least: 4.7
-Tested up to: 5.9
-Requires PHP: 5.6.0
-Stable tag: 2.4.1
+Requires at least: 5.1
+Tested up to: 6.4
+Requires PHP: 5.6
+Stable tag: 2.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -122,6 +122,61 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 8. Configuring the plugin: the DiscourseConnect Client settings tab.
 
 == Changelog ==
+
+#### 2.5.1 25/01/2024
+
+- Fix DiscourseConnect user registration email verification link
+- Fix publish max tags setting
+- Add publish_to_discourse utility function
+
+#### 2.5.0 12/11/2023
+
+- Post publishing code improvements
+- PHPUnit updated to PHPUnit 9
+
+#### 2.4.9 02/16/2023
+
+- Fix optional parameter handling in get_discourse_comments.
+- Fix compatibility with S3 uploads plugin.
+- Fix usage of get_the_excerpt filter.
+- Fixed HTML of avatars in quotes in comments.
+- Verified backwards compatibility for WP > 5.1
+
+#### 2.4.8 12/27/2022
+
+- Improve logs metafile handling.
+- Add logs enabled setting.
+
+#### 2.4.7 12/05/2022
+
+- Adds Discourse Comments block for the Block Editor.
+
+#### 2.4.6 09/20/2022
+
+- Improvements to the functionality and interface of the get_discourse_comments utility function.
+- Adds wpdc_after_webhook_post_update action for use with caching solutions.
+
+#### 2.4.5 07/06/2022
+
+- Fix logout when WP is the DiscourseConnect client and sync logout is enabled.
+- Improve the wpdc_publish_body filter.
+
+#### 2.4.4 06/30/2022
+
+- Add after_publication actions and logging
+
+#### 2.4.3 05/23/2022
+
+- Wordpress 6.0 support
+- Granular API Key support (backwards compatible)
+- DiscourseConnect copy fix
+- Add wpdc_publish_body filter
+
+#### 2.4.2 05/11/2022
+
+- Temporarily remove comment formatter log call causing issues on some sites.
+- If comments are disabled return comment template without running comment formatter.
+- Update Github Actions to support Action changes
 
 #### 2.4.1 02/28/2022
 

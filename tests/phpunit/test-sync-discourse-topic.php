@@ -24,17 +24,41 @@ class SyncDiscourseTopicTest extends UnitTest {
     protected $sync_topic;
 
     /**
+     * Request
+     *
+     * @access protected
+     * @var WP_REST_Request
+     */
+    protected $request;
+
+    /**
+     * Signaure
+     *
+     * @access protected
+     * @var string
+     */
+    protected $signature;
+
+    /**
+     * Payload
+     *
+     * @access protected
+     * @var array
+     */
+    protected $payload;
+
+    /**
      * Setup each test.
      */
-    public function setUp() {
+    public function setUp(): void {
       parent::setUp();
 
       self::$plugin_options['webhook-secret']        = '1234567891011';
       self::$plugin_options['use-discourse-webhook'] = 1;
 
       $this->sync_topic = new SyncDiscourseTopic();
-      $this->sync_topic->setup_logger();
       $this->sync_topic->setup_options( self::$plugin_options );
+      $this->sync_topic->setup_logger();
 
       $this->payload   = $this->response_body_file( 'webhook_post' );
       $this->signature = hash_hmac( 'sha256', $this->payload, self::$plugin_options['webhook-secret'] );

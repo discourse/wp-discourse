@@ -53,9 +53,17 @@ class FormHelper {
 
 	/**
 	 * Sets the plugin options.
+	 *
+	 * @param object $extra_options Extra options used for testing.
 	 */
-	public function setup_options() {
+	public function setup_options( $extra_options = null ) {
 		$this->options = $this->get_options();
+
+		if ( ! empty( $extra_options ) ) {
+			foreach ( $extra_options as $key => $value ) {
+				$this->options[ $key ] = $value;
+			}
+		}
 	}
 
 	/**
@@ -317,23 +325,28 @@ class FormHelper {
 			$current_page = null;
 		}
 
-		if ( $current_page && ( 'sso_provider' === $current_page ) ) {
-			// Check if the user saving the options has an email address on Discourse.
-			$current_user_email = wp_get_current_user()->user_email;
-			$discourse_user     = $this->get_discourse_user_by_email( $current_user_email );
-			if ( is_wp_error( $discourse_user ) || empty( $discourse_user->admin ) ) {
-				add_action( 'admin_notices', array( $this, 'no_matching_discourse_user' ) );
-			}
-		}
+		$check_connection_on = array(
+			'wp_discourse_options',
+			'connection_options',
+			'sso_provider',
+		);
 
-		// Only check the connection status on the main settings tab.
-		if ( $current_page && ( 'wp_discourse_options' === $current_page || 'connection_options' === $current_page ) ) {
+		if ( $current_page && in_array( $current_page, $check_connection_on ) ) {
 			$connection_status = $this->check_connection_status();
 
 			if ( is_wp_error( $connection_status ) || empty( $connection_status ) || 0 === $connection_status ) {
 				add_action( 'admin_notices', array( $this, 'disconnected' ) );
 			} else {
 				add_action( 'admin_notices', array( $this, 'connected' ) );
+			}
+		}
+
+		if ( $current_page && 'sso_provider' === $current_page && ! empty( $this->options['enable-sso'] ) ) {
+			// Check if the user saving the options has an email address on Discourse.
+			$current_user_email = wp_get_current_user()->user_email;
+			$discourse_user     = $this->get_discourse_user_by_email( $current_user_email );
+			if ( is_wp_error( $discourse_user ) || empty( $discourse_user->admin ) ) {
+				add_action( 'admin_notices', array( $this, 'no_matching_discourse_user' ) );
 			}
 		}
 	}
@@ -379,11 +392,7 @@ class FormHelper {
 			<p>
 				<strong>
 				<?php
-				esc_html_e(
-					'You are not connected to Discourse. If you are setting up the plugin, this
-                notice should go away after completing the form on this page.',
-					'wp-discourse'
-				);
+				esc_html_e( 'You are not connected to Discourse. Check that your connection settings are correct. If the issue persists, enable connection logs and check Logs.', 'wp-discourse' );
 				?>
 </strong>
 			</p>

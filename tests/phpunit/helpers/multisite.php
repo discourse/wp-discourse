@@ -15,7 +15,7 @@ trait Multisite {
   /**
    * Setup multisite tests
    */
-  public function setUp() {
+  public function setUp(): void {
 		parent::setUp();
 		$this->create_topic_blog_table();
   }
@@ -23,7 +23,7 @@ trait Multisite {
   /**
    * Teardown multisite tests
    */
-  public function tearDown() {
+  public function tearDown(): void {
 		parent::tearDown();
 		$this->clear_topic_blog_table();
   }

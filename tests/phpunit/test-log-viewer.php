@@ -7,32 +7,80 @@
 
 namespace WPDiscourse\Test;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use \WPDiscourse\Logs\FileManager;
 use \WPDiscourse\Logs\FileHandler;
 use \WPDiscourse\Logs\Logger;
 use \WPDiscourse\Admin\LogViewer;
+use \WPDiscourse\Admin\FormHelper;
 use \WPDiscourse\Test\UnitTest;
 
 /**
  * Logger test case.
  */
 class LogViewerTest extends UnitTest {
+    use ArraySubsetAsserts;
+
+    /**
+     * Instance of LogViewer.
+     *
+     * @access protected
+     * @var \WPDiscourse\LogViewer\LogViewer
+     */
+    protected $viewer;
+
+    /**
+     * Setup each test.
+     */
+    public function setUp(): void {
+        parent::setUp();
+
+        $this->viewer = new LogViewer( FormHelper::get_instance() );
+        $this->viewer->setup_options( self::$plugin_options );
+    }
+
+    /**
+     * Teardown each test.
+     */
+    public function tearDown(): void {
+      parent::tearDown();
+
+      self::$plugin_options['logs-enabled'] = 1;
+      $this->viewer->setup_options( self::$plugin_options );
+    }
 
     /**
      * It should be disabled if file handler is disabled
      */
-    public function test_enabled() {
+    public function test_file_handler_not_enabled() {
         $handler        = new FileHandler( new FileManager() );
         $handler_double = \Mockery::mock( $handler )->makePartial();
         $handler_double->shouldReceive( 'enabled' )->andReturn( false );
 
-        $viewer = new LogViewer();
-        $viewer->setup_log_viewer( $handler_double );
+        $this->viewer->setup_log_viewer( $handler_double );
 
-        $this->assertFalse( $viewer->is_enabled() );
+        $this->assertFalse( $this->viewer->is_enabled() );
 
         ob_start();
-        $viewer->log_viewer_markup();
+        $this->viewer->log_viewer_markup();
+        $markup = ob_get_contents();
+        ob_end_clean();
+
+        $this->assertXmlStringEqualsXmlString( $markup, '<div class="inline"><p>Logs are disabled.</p></div>' );
+    }
+
+    /**
+     * It should be disabled if logs are not enabled
+     */
+    public function test_logs_not_enabled() {
+        self::$plugin_options['logs-enabled'] = 0;
+        $this->viewer->setup_options( self::$plugin_options );
+        $this->viewer->setup_log_viewer();
+
+        $this->assertFalse( $this->viewer->is_enabled() );
+
+        ob_start();
+        $this->viewer->log_viewer_markup();
         $markup = ob_get_contents();
         ob_end_clean();
 
@@ -44,11 +92,10 @@ class LogViewerTest extends UnitTest {
   	 */
   	public function test_log_retrieval() {
         $handler = new FileHandler( new FileManager() );
-        $logger  = Logger::create( 'test', $handler );
+        $logger  = Logger::create( 'test', self::$plugin_options, $handler );
         $logger->info( 'New Log' );
 
-        $viewer = new LogViewer();
-        $viewer->setup_log_viewer();
+        $this->viewer->setup_log_viewer();
 
         $date   = $handler->get_date();
         $number = $handler->current_file_number();
@@ -62,7 +109,7 @@ class LogViewerTest extends UnitTest {
                     'file'   => $file,
                 ),
             ),
-            $viewer->get_logs()
+            $this->viewer->get_logs()
         );
     }
 }

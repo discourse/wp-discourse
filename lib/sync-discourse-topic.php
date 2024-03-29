@@ -86,6 +86,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 		if ( ! is_wp_error( $json ) && ! empty( $json['post'] ) ) {
 			$post_data                   = $json['post'];
 			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+			$post_ids                    = array();
 
 			if ( $use_multisite_configuration ) {
 				global $wpdb;
@@ -96,12 +97,14 @@ class SyncDiscourseTopic extends DiscourseBase {
 
 				if ( $blog_id ) {
 					switch_to_blog( $blog_id );
-					$this->update_post_metadata( $post_data );
+					$post_ids = $this->update_post_metadata( $post_data );
 					restore_current_blog();
 				}
 			} else {
-				$this->update_post_metadata( $post_data );
+				$post_ids = $this->update_post_metadata( $post_data );
 			}
+
+			do_action( 'wpdc_after_webhook_post_update', $post_ids );
 		} else {
 			$this->logger->error( 'update_topic_content.response_body_error' );
 		}
@@ -161,6 +164,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 		$post_title     = ! empty( $post_data['topic_title'] ) ? sanitize_text_field( $post_data['topic_title'] ) : null;
 		$comments_count = ! empty( $post_data['topic_posts_count'] ) ? intval( $post_data['topic_posts_count'] ) - 1 : null;
 		$post_type      = ! empty( $post_data['post_type'] ) ? intval( $post_data['post_type'] ) : null;
+		$post_ids       = array();
 
 		if ( $topic_id && $post_number && $post_title ) {
 
@@ -201,7 +205,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 			}
 		}
 
-		return null;
+		return $post_ids;
 	}
 
 	/**

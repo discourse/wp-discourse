@@ -234,6 +234,11 @@ class DiscourseSSO extends DiscourseBase {
 			$user_id = get_current_user_id();
 			wp_logout();
 
+			if ( version_compare( get_bloginfo( 'version' ), '5.3', '<' ) ) {
+				// See https://core.trac.wordpress.org/ticket/35488.
+				wp_set_current_user( 0 );
+			}
+
 			if ( $user_id && ! empty( $this->options['verbose-sso-logs'] ) ) {
 				$this->logger->info( 'handle_logout_request.success', array( 'user_id' => $user_id ) );
 			}

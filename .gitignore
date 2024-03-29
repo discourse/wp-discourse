@@ -14,3 +14,4 @@ wpcs/*
 *.sublime-project
 
 node_modules
+.phpunit.result.cache

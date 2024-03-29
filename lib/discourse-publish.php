@@ -27,12 +27,12 @@ class DiscoursePublish extends DiscourseBase {
 	protected $email_notifier;
 
 	/**
-     * Logger context
-     *
-     * @access protected
-     * @var string
-     */
-  protected $logger_context = 'publish';
+	 * Logger context
+	 *
+	 * @access protected
+	 * @var string
+	 */
+	protected $logger_context = 'publish';
 
 	/**
 	 * Instance store for log args
@@ -41,6 +41,16 @@ class DiscoursePublish extends DiscourseBase {
 	 * @var mixed|void
 	 */
 	protected $log_args;
+
+	/**
+	 * Allows the `force_publish_allowed` method to return `true` in unit tests.
+	 *
+	 * @access public
+	 * @var bool
+	 */
+	public $force_publish_allowed = false;
+
+
 
 	/**
 	 * DiscoursePublish constructor.
@@ -69,96 +79,138 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Published a post to Discourse after it has been saved.
+	 * Determines if a post should be published to Discourse after it is saved on WordPress.
 	 *
-	 * @param int    $post_id The id of the post that has been saved.
-	 * @param object $post The Post object.
+	 * @param int      $post_id The id of the post that has been saved.
+	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return null
 	 */
 	public function publish_post_after_save( $post_id, $post ) {
-		$plugin_unconfigured    = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
-		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
-		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
-		if ( wp_is_post_revision( $post_id )
-			 || ( $publish_status_not_set && ! $publish_private )
-			 || $plugin_unconfigured
-			 || empty( $post->post_title )
-			 || ! $this->is_valid_sync_post_type( $post_id )
-			 || $this->has_excluded_tag( $post_id, $post )
-		) {
-
+		if ( $this->exclude_post( $post_id, $post ) ) {
 			return null;
 		}
 
-		// Clear existing publishing errors.
-		delete_post_meta( $post_id, 'wpdc_publishing_error' );
+		$post_should_be_auto_published = $this->auto_publish( $post_id );
+		$post_already_published        = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
+		$post_marked_to_be_published   = $this->dc_get_post_meta( $post_id, 'publish_to_discourse', true );
+		$publish_new_post_to_discourse = ( $post_marked_to_be_published || $post_should_be_auto_published ) && ! $post_already_published;
+		$topic_should_be_updated       = $this->dc_get_post_meta( $post_id, 'update_discourse_topic', true );
+		$force_publish_post            = $this->force_publish_post( $post );
+		$publish_to_discourse          = $publish_new_post_to_discourse || $topic_should_be_updated || $force_publish_post;
+		$publish_to_discourse          = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
 
-		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
-		$auto_publish_overridden = intval( get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
-		$auto_publish            = ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
-
-		$publish_to_discourse = get_post_meta( $post_id, 'publish_to_discourse', true ) || $auto_publish;
-		$publish_to_discourse = apply_filters( 'wpdc_publish_after_save', $publish_to_discourse, $post_id, $post );
-
-		$force_publish_enabled = ! empty( $this->options['force-publish'] );
-		$force_publish_post    = false;
-		if ( $force_publish_enabled ) {
-			// The Force Publish setting can't be easily supported with both the Block and Classic editors. The $is_rest_request
-			// variable is used to only allow the Force Publish setting to be respected for posts published with the Block Editor.
-			$is_rest_request       = defined( 'REST_REQUEST' ) && REST_REQUEST;
-			$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
-			$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
-			$post_time             = strtotime( $post->post_date );
-
-			if ( ( ( 0 === $force_publish_max_age ) || $post_time >= $min_date ) && $is_rest_request ) {
-				$force_publish_post = true;
-				update_post_meta( $post_id, 'publish_post_category', intval( $this->options['publish-category'] ) );
-			}
+		if ( $publish_to_discourse ) {
+			// Clear existing publishing errors.
+			delete_post_meta( $post_id, 'wpdc_publishing_error' );
+			$this->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
 		}
-
-		$already_published      = $this->dc_get_post_meta( $post_id, 'discourse_post_id', true );
-		$update_discourse_topic = get_post_meta( $post_id, 'update_discourse_topic', true );
-		$title                  = $this->sanitize_title( $post->post_title );
-		$title                  = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
-		if ( $force_publish_post || ( ! $already_published && $publish_to_discourse ) || $update_discourse_topic ) {
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
-		}
-
 		return null;
 	}
 
 	/**
-	 * For publishing by xmlrpc.
+	 * Excludes a post from being published under various conditions.
 	 *
-	 * Hooks into 'xmlrpc_publish_post'. Publishing through this hook is disabled. This is to prevent
-	 * posts being inadvertently published to Discourse when they are edited using blogging software.
-	 * This can be overridden by hooking into the `wp_discourse_before_xmlrpc_publish` filter and setting
-	 * `$publish_to_discourse` to true based on some condition - testing for the presence of a tag can
-	 * work for this.
+	 * Posts are excluded from publishing if the plugin is unconfigured, the post's status is not set to 'publish',
+	 * the post is a revision, doesn't have a title, is not a valid post type, or has an excluded tag.
 	 *
-	 * @param int $post_id The post id.
+	 * @param int      $post_id The ID of the post.
+	 * @param \WP_Post $post The Post object.
+	 *
+	 * @return bool
+	 */
+	protected function exclude_post( $post_id, $post ) {
+		$plugin_unconfigured    = empty( $this->options['url'] ) || empty( $this->options['api-key'] ) || empty( $this->options['publish-username'] );
+		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
+		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
+		return wp_is_post_revision( $post_id )
+			 || ( $publish_status_not_set && ! $publish_private )
+			 || $plugin_unconfigured
+			 || empty( $post->post_title )
+			 || ! $this->is_valid_sync_post_type( $post_id )
+			 || $this->has_excluded_tag( $post );
+	}
+
+	/**
+	 * Determines if the plugin's 'auto-publish' option is enabled and if it has been overridden for a particular post.
+	 *
+	 * The auto-publish option causes the 'Publish to Discourse' checkbox in the post editor to be pre-checked for all new
+	 * posts. It is 'overridden' if the checkbox is manually unchecked.
+	 *
+	 * @param int $post_id The ID of the post.
+	 *
+	 * @return bool
+	 */
+	protected function auto_publish( $post_id ) {
+		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
+		$auto_publish_overridden = intval( $this->dc_get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
+		return ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
+	}
+
+	/**
+	 * Determines if a post should be 'force published.'
+	 *
+	 * Posts are force published if the 'force-publish' option is enabled and the post was created within the time period
+	 * set by the 'force-publish-max-age' setting (ignored when 'force-publish-max-age is set to 0.)
+	 *
+	 * @param object $post The Post object.
+	 *
+	 * @return bool
+	 */
+	protected function force_publish_post( $post ) {
+		if ( empty( $this->options['force-publish'] ) || ! $this->force_publish_allowed() ) {
+			return false;
+		}
+
+		$force_publish_max_age = ! empty( $this->options['force-publish-max-age'] ) ? intval( $this->options['force-publish-max-age'] ) : 0;
+		$min_date              = date_create()->modify( "-{$force_publish_max_age} day" )->format( 'U' );
+		$post_time             = strtotime( $post->post_date );
+
+		return 0 === $force_publish_max_age || $post_time >= $min_date;
+	}
+
+	/**
+	 * Checks if the post was published via REST_REQUEST.
+	 *
+	 * Currently, the force-publish option is only supported for posts published via the Block editor (a REST_REQUEST.)
+	 * The `force_publish_allowed` property is used in unit tests.
+	 *
+	 * @return bool
+	 */
+	protected function force_publish_allowed() {
+		return ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || $this->force_publish_allowed;
+	}
+
+	/**
+	 * For publishing via xmlrpc.
+	 *
+	 * Hooks into the 'xmlrpc_publish_post' action. Publishing via xmlrpc is disabled by default. It can be enabled  by
+	 * adding a function that hooks into 'wp_discourse_before_xmlrpc_publish'. This method exists for historical reasons.
+	 * Its main purpose is to allow a publish-failure-notice to be sent when authors publish posts from blogging software.
+	 *
+	 * @param int $post_id The post ID.
+	 *
+	 * @return null|bool
 	 */
 	public function xmlrpc_publish_post_to_discourse( $post_id ) {
 		$post                 = get_post( $post_id );
 		$post_is_published    = 'publish' === get_post_status( $post_id );
 		$publish_to_discourse = false;
 		$publish_to_discourse = apply_filters( 'wp_discourse_before_xmlrpc_publish', $publish_to_discourse, $post );
-		$title                = $this->sanitize_title( $post->post_title );
-		$title                = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
-
-		if ( $publish_to_discourse && $post_is_published && $this->is_valid_sync_post_type( $post_id ) && ! empty( $title ) && ! $this->has_excluded_tag( $post_id ) ) {
+		if ( $publish_to_discourse ) {
 			update_post_meta( $post_id, 'publish_to_discourse', 1 );
-			$this->sync_to_discourse( $post_id, $title, $post->post_content );
+			$this->publish_post_after_save( $post_id, $post );
 		} elseif ( $post_is_published && ! empty( $this->options['auto-publish'] ) ) {
-			$this->email_notifier->publish_failure_notification(
+			// Allows a notification to be sent about posts that have been published from a blogging app.
+			$success = $this->email_notifier->publish_failure_notification(
 				$post,
 				array(
 					'location' => 'after_xmlrpc_publish',
 				)
 			);
+			return $success;
 		}
+		return null;
 	}
 
 	/**
@@ -209,12 +261,13 @@ class DiscoursePublish extends DiscourseBase {
 		$use_multisite_configuration = is_multisite() && ! empty( $options['multisite-configuration-enabled'] );
 		$add_featured_link           = ! empty( $options['add-featured-link'] );
 		$permalink                   = get_permalink( $post_id );
+		$title                       = $this->sanitize_title( $title );
+		$title                       = apply_filters( 'wpdc_publish_format_title', $title, $post_id );
 
 		$this->log_args = array(
-			'wp_title'          => $title,
-			'wp_author_id'      => $author_id,
-			'wp_post_id'        => $post_id,
-			'discourse_post_id' => $discourse_id,
+			'wp_title'     => $title,
+			'wp_author_id' => $author_id,
+			'wp_post_id'   => $post_id,
 		);
 
 		if ( $use_full_post ) {
@@ -236,7 +289,7 @@ class DiscoursePublish extends DiscourseBase {
 			$excerpt = apply_filters( 'wp_discourse_excerpt', $parsed, $options['custom-excerpt-length'], $use_full_post );
 		} else {
 			if ( has_excerpt( $post_id ) ) {
-				$wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt );
+				$wp_excerpt = apply_filters( 'get_the_excerpt', $post->post_excerpt, $post );
 				$excerpt    = apply_filters( 'wp_discourse_excerpt', $wp_excerpt, $options['custom-excerpt-length'], $use_full_post );
 			}
 
@@ -329,6 +382,8 @@ class DiscoursePublish extends DiscourseBase {
 			$remote_post_type    = 'update_post';
 		}
 
+		$remote_post_options['body'] = apply_filters( 'wpdc_publish_body', $remote_post_options['body'], $remote_post_type, $post_id );
+
 		$username            = apply_filters( 'wpdc_discourse_username', get_the_author_meta( 'discourse_username', $post->post_author ), $author_id );
 		$username_exists     = $username && strlen( $username ) > 1;
 		$single_user_api_key = ! empty( $this->options['single-user-api-key-publication'] );
@@ -386,6 +441,8 @@ class DiscoursePublish extends DiscourseBase {
 				}
 			}
 
+			$this->after_publish( $post_id, $remote_post_type );
+
 			// The topic has been created and its associated post's metadata has been updated.
 			return null;
 		}
@@ -426,6 +483,8 @@ class DiscoursePublish extends DiscourseBase {
 					return $featured_response;
 				}
 			}
+
+			$this->after_publish( $post_id, $remote_post_type );
 
 			// The topic has been updated, and its associated post's metadata has been updated.
 			return null;
@@ -723,12 +782,11 @@ class DiscoursePublish extends DiscourseBase {
 	/**
 	 * Checks if a post has an excluded tag.
 	 *
-	 * @param int      $post_id The ID of the post in question.
 	 * @param \WP_Post $post The Post object.
 	 *
 	 * @return bool
 	 */
-	protected function has_excluded_tag( $post_id, $post ) {
+	protected function has_excluded_tag( $post ) {
 		if ( version_compare( get_bloginfo( 'version' ), '5.6', '<' ) ) {
 			return false;
 		}
@@ -781,14 +839,14 @@ class DiscoursePublish extends DiscourseBase {
 	}
 
 	/**
-	 * Strip html tags from titles before passing them to Discourse.
+	 * Strip html tags and convert HTML entities before passing them to Discourse.
 	 *
 	 * @param string $title The title of the post.
 	 *
 	 * @return string
 	 */
 	protected function sanitize_title( $title ) {
-		return wp_strip_all_tags( $title );
+		return wp_specialchars_decode( wp_strip_all_tags( $title ) );
 	}
 
 	/**
@@ -882,5 +940,28 @@ class DiscoursePublish extends DiscourseBase {
 		// phpcs:disable WordPress.DB.DirectDatabaseQuery
 
 		return $result ? true : false;
+	}
+
+	/**
+	 * Runs after publication successfully completes
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $remote_post_type The remote post type.
+	 *
+	 * @return void
+	 */
+	protected function after_publish( $post_id, $remote_post_type ) {
+		if ( ! empty( $this->options['verbose-publication-logs'] ) ) {
+			$log_args = array(
+				'post_id'             => $post_id,
+				'remote_post_type'    => $remote_post_type,
+				'discourse_post_id'   => get_post_meta( $post_id, 'discourse_post_id', true ),
+				'discourse_topic_id'  => get_post_meta( $post_id, 'discourse_topic_id', true ),
+				'discourse_permalink' => get_post_meta( $post_id, 'discourse_permalink', true ),
+			);
+			$this->logger->info( "$remote_post_type.after_publish", $log_args );
+		}
+
+		do_action( 'wp_discourse_after_publish', $post_id, $remote_post_type );
 	}
 }

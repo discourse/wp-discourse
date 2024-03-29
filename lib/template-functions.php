@@ -316,6 +316,61 @@ trait TemplateFunctions {
 	}
 
 	/**
+	 * Fixes attributes of avatars in quotes.
+	 *
+	 * @param string $content       The comment's content.
+	 * @param string $discourse_url The Discourse URL.
+	 *
+	 * @return string
+	 */
+	protected function fix_avatars_in_quotes( $content, $discourse_url ) {
+		if ( ! extension_loaded( 'libxml' ) ) {
+			return $content;
+		}
+
+		$use_internal_errors   = libxml_use_internal_errors( true );
+		$disable_entity_loader = $this->libxml_disable_entity_loader( true );
+		$doc                   = new \DOMDocument( '1.0', 'utf-8' );
+		$html 								 = htmlentities( $content, ENT_COMPAT, 'utf-8', false );
+		$html									 = mb_convert_encoding( $html, 'UTF-8', mb_detect_encoding( $html ) );
+		$html                  = htmlspecialchars_decode( $html );
+		$doc->loadHTML( $html );
+
+		$finder = new \DOMXPath( $doc );
+		$avatars_in_quotes = $finder->query( "//aside[contains(concat(' ', normalize-space(@class), ' '), ' quote ')]//img[contains(concat(' ', normalize-space(@class), ' '), ' avatar ')]" );
+		if ( $avatars_in_quotes->length ) {
+			foreach ( $avatars_in_quotes as $avatar ) {
+				$alt = __( 'Avatar for', 'wp-discourse' ) . ' ';
+				$src = $avatar->getAttribute( 'src' );
+				if ( preg_match(
+					'/\/\/[^\/]+\/user_avatar\/[^\/]+\/([^\/]+)\//',
+					$src,
+					$matches
+				) ) {
+					$alt .= esc_attr( $matches[1] );
+				} else {
+					$alt .= __('Discourse user', 'wp-discourse' );
+				}
+				$avatar->setAttribute( 'alt', $alt );
+
+				// Discourse may send protocol-relative URLs for avatars in quotes.
+				if ( substr( $src, 0, 2 ) === "//" ) {
+					$protocol = strpos( $discourse_url, 'https://' ) !== false ? "https" : "http";
+					$src = $protocol . ":" . $src;
+					$avatar->setAttribute( 'src', $src );
+				}
+			}
+
+			$content = $doc->saveHTML( $doc->documentElement );
+			$content = $this->remove_outer_html_elements( $content );
+		}
+
+		$this->clear_libxml_errors( $use_internal_errors, $disable_entity_loader );
+
+		return $content;
+	}
+
+	/**
 	 * Format the Discourse created_at date based on the WordPress site's timezone.
 	 *
 	 * @param string $string The datetime string returned from Discourse.

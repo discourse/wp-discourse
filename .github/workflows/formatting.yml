@@ -13,16 +13,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - php: "5.6"
-            sniff: true
-          - php: "7.0"
-            sniff: true
-          - php: "7.4"
+          - php: '5.6'
+          - php: '7.0'
+          - php: '7.4'
+          - php: '8.0'
             sniff: true
             jshint: true
-          - php: "8.0"
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -30,29 +30,22 @@ jobs:
 
       - name: Syntax Check
         run: |
-          find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+          find -L . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" -print0 | xargs -0 -n 1 -P 4 php -l
 
       - name: Install Composer
-        if: "matrix.sniff"
-        uses: ramsey/composer-install@v1
+        if: 'matrix.sniff'
+        uses: ramsey/composer-install@v2
         with:
-          dependency-versions: "highest"
-          composer-options: "--ignore-platform-reqs"
-
-      - name: Install PHPEnv
-        if: "matrix.sniff"
-        run: |
-          git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
-          export PATH="$HOME/.phpenv/bin:$PATH"
-          phpenv rehash
+          dependency-versions: 'highest'
+          composer-options: '--ignore-platform-reqs'
 
       - name: WordPress Coding Standards
-        if: "matrix.sniff"
+        if: 'matrix.sniff'
         run: |
-          vendor/bin/phpcs -p -s -v -n .
+          vendor/bin/phpcs -p -s -v -n . -d error_reporting=E_ALL^E_DEPRECATED
 
       - name: JSHint
-        if: "matrix.jshint"
+        if: 'matrix.jshint'
         run: |
           sudo npm install -g jshint
           wget https://develop.svn.wordpress.org/trunk/.jshintrc

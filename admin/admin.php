@@ -42,7 +42,7 @@ if ( is_admin() ) {
 	new AdminNotice();
 	new MetaBox();
 	new UserProfile();
-	new LogViewer();
+	new LogViewer( $form_helper );
 
 	add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\\enqueue_admin_scripts' );
 	if ( is_multisite() ) {
@@ -62,12 +62,12 @@ function enqueue_admin_scripts() {
 	$script_path = '/js/admin.js';
 	wp_register_script( 'admin_js', plugins_url( $script_path, __FILE__ ), array( 'jquery', 'tags-box' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
 	wp_enqueue_script( 'admin_js' );
-	$commenting_options = get_option( 'discourse-comment' );
-	$max_tags           = ! isset( $commenting_options['max-tags'] ) ? 5 : $commenting_options['max-tags'];
+	$publishing_options = get_option( 'discourse_publish' );
+	$max_tags           = ! isset( $publishing_options['max-tags'] ) ? 5 : $publishing_options['max-tags'];
 	$data               = array(
 		'maxTags' => $max_tags,
-		'ajax' => admin_url( 'admin-ajax.php' ),
-		'nonce' => wp_create_nonce( 'admin-ajax-nonce' ),
+		'ajax'    => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'admin-ajax-nonce' ),
 	);
 	wp_localize_script( 'admin_js', 'wpdc', $data );
 }

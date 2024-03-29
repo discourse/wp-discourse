@@ -472,7 +472,7 @@ class SSOSettings {
 			'discourse_sso_provider',
 			__(
 				"(Optional) If your site doesn't use the
-		default WordPress login page at '/wp-login.php', you can set the path to your login page here. 
+		default WordPress login page at '/wp-login.php', you can set the path to your login page here.
 		It should start with '/'. Leave blank to use the default WordPress login page.",
 				'wp-discourse'
 			)
@@ -758,7 +758,7 @@ class SSOSettings {
 		<ul class="wpdc-documentation-list">
 			<em>
 				<li>
-					<?php esc_html_e( "select the 'enable sso provider' setting", 'wp-discourse' ); ?>
+					<?php esc_html_e( "select the 'enable discourse connect provider' setting", 'wp-discourse' ); ?>
 				</li>
 				<li>
 					<?php esc_html_e( "add your 'DiscourseConnect Secret Key' to the 'discourse connect provider secrets' setting (use your WordPress domain for the domain field)", 'wp-discourse' ); ?>

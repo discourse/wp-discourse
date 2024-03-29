@@ -27,16 +27,37 @@ class DiscourseCommentTest extends UnitTest {
     /**
      * Setup each test.
      */
-    public function setUp() {
+    public function setUp(): void {
         parent::setUp();
 
         $comment_formatter = new DiscourseCommentFormatter();
         $this->comment     = new DiscourseComment( $comment_formatter );
-        $this->comment->setup_logger();
-
         self::$plugin_options['enable-discourse-comments'] = true;
         $this->comment->setup_options( self::$plugin_options );
+        $this->comment->setup_logger();
   	}
+
+    public function test_comments_disabled() {
+        global $post; // phpcs:disable WordPress.WP.GlobalVariablesOverride
+        $post_id = wp_insert_post( self::$post_atts, false, false );
+        $post    = get_post( $post_id, OBJECT );
+        setup_postdata( $post );
+
+        // Setup plugin options
+        self::$plugin_options['comment-type'] = 0;
+        $this->comment->setup_options( self::$plugin_options );
+
+        // Run comments_template
+        $template_path = get_stylesheet_directory() . '/comments.php';
+        $result        = $this->comment->comments_template( $template_path );
+
+        // Ensure we got the old template.
+        $this->assertEquals( $result, $template_path );
+
+        // Cleanup
+        wp_delete_post( $post_id );
+        wp_reset_postdata();
+    }
 
     public function test_sync_comments() {
         // Mock objects and endpoints
@@ -89,11 +110,11 @@ class DiscourseCommentTest extends UnitTest {
 
         // Ensure we've made the right logs
         $log = $this->get_last_log();
-        $this->assertRegExp( '/comment.ERROR: sync_comments.response_error/', $log );
-        $this->assertRegExp( '/"message":"Not found"/', $log );
-        $this->assertRegExp( '/"discourse_topic_id":"' . $discourse_topic_id . '"/', $log );
-        $this->assertRegExp( '/"wp_post_id":' . $post_id . '/', $log );
-        $this->assertRegExp( '/"http_code":404/', $log );
+        $this->assertMatchesRegularExpression( '/comment.ERROR: sync_comments.response_error/', $log );
+        $this->assertMatchesRegularExpression( '/"message":"Not found"/', $log );
+        $this->assertMatchesRegularExpression( '/"discourse_topic_id":"' . $discourse_topic_id . '"/', $log );
+        $this->assertMatchesRegularExpression( '/"wp_post_id":' . $post_id . '/', $log );
+        $this->assertMatchesRegularExpression( '/"http_code":404/', $log );
 
         // Cleanup
         wp_delete_post( $post_id );
@@ -209,8 +230,8 @@ class DiscourseCommentTest extends UnitTest {
 
         // Ensure we've made the right logs
         $log = $this->get_last_log();
-        $this->assertRegExp( "/comment.ERROR: $context.get_discourse_category/", $log );
-        $this->assertRegExp( '/"message":"An invalid response was returned from Discourse"/', $log );
+        $this->assertMatchesRegularExpression( "/comment.ERROR: $context.get_discourse_category/", $log );
+        $this->assertMatchesRegularExpression( '/"message":"An invalid response was returned from Discourse"/', $log );
 
         // Cleanup.
         wp_delete_post( $public_post_id );

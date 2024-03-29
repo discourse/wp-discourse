@@ -14,7 +14,15 @@ use WPDiscourse\Utilities\Utilities;
  */
 class UtilitiesTest extends UnitTest {
 
-  public function setUp() {
+  /**
+   * User id
+   *
+   * @access protected
+   * @var int
+   */
+  protected $user_id;
+
+  public function setUp(): void {
 		$connection_options = get_option( 'discourse_connect' );
 		$connection_options = array_merge( $connection_options, self::$connection_options );
 		update_option( 'discourse_connect', $connection_options );
@@ -23,7 +31,7 @@ class UtilitiesTest extends UnitTest {
 		$publish_options = array_merge( $publish_options, self::$publish_options );
 		update_option( 'discourse_publish', $publish_options );
 
-		$this->user_id = $this->factory->user->create();
+		$this->user_id = self::factory()->user->create();
   }
 
   /**
@@ -155,12 +163,30 @@ class UtilitiesTest extends UnitTest {
   }
 
   /**
-   * get_discourse_comments gets discourse comment html.
-   * test would be exect duplicate of test-discourse-comment-formatter test_format.
+   *  publish_to_discourse Publishes a post to Discourse.
    */
+  public function test_publish_to_discourse() {
+    // Set up a response body for creating a new post.
+		$body                = $this->mock_remote_post_success( 'post_create', 'POST' );
+		$discourse_post_id   = $body->id;
+		$discourse_topic_id  = $body->topic_id;
+		$discourse_permalink = self::$discourse_url . '/t/' . $body->topic_slug . '/' . $body->topic_id;
+		$discourse_category  = self::$post_atts['meta_input']['publish_post_category'];
 
-  /**
-   * discourse_request performs a discourse request.
-   * test would be duplicative of other tests.
-   */
+		// Add the post.
+		$post_id = wp_insert_post( self::$post_atts, false, false );
+
+		// Run the publication.
+		$response = Utilities::publish_to_discourse( $post_id );
+
+		// Ensure the right post meta is created.
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_post_id', true ), $discourse_post_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_topic_id', true ), $discourse_topic_id );
+		$this->assertEquals( get_post_meta( $post_id, 'discourse_permalink', true ), $discourse_permalink );
+		$this->assertEquals( get_post_meta( $post_id, 'publish_post_category', true ), $discourse_category );
+		$this->assertEquals( get_post_meta( $post_id, 'wpdc_publishing_response', true ), 'success' );
+
+		// Cleanup.
+		wp_delete_post( $post_id );
+  }
 }

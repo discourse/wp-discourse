@@ -30,23 +30,32 @@ class Nonce {
 	private static $instance = null;
 
 	/**
+	 * One can override the default nonce life.
+	 *
+	 * The default is set to 10 minutes, which is plenty for most of the cases
+	 *
+	 * @access private
+	 * @var int
+	 */
+	private $nonce_life;
+
+	/**
+	 * Wpdb
+	 *
+	 * @access private
+	 * @var mixed
+	 */
+	private $wpdb;
+
+	/**
 	 * Constructor
 	 *
 	 * @method __construct
 	 */
 	private function __construct() {
 		global $wpdb;
-		$this->wpdb = $wpdb;
-
-		/**
-		 * One can override the default nonce life.
-		 *
-		 * The default is set to 10 minutes, which is plenty for most of the cases
-		 *
-		 * @var int
-		 */
+		$this->wpdb       = $wpdb;
 		$this->nonce_life = intval( apply_filters( 'wpdc_nonce_life', 600 ) );
-
 		$this->maybe_create_db();
 	}
 

@@ -476,7 +476,12 @@ class Client extends SSOClientBase {
 		}
 
 		$path     = "/admin/users/$discourse_user_id/log_out";
-		$response = $this->discourse_request( $path, array( 'method' => 'POST' ) );
+		$response = $this->discourse_request(
+             $path, array(
+				 'method' => 'POST',
+				 'raw'    => true,
+			 )
+            );
 
 		if ( ! $this->validate( $response ) ) {
 			return new \WP_Error( 'wpdc_response_error', 'There was an error in logging out the current user from Discourse.' );

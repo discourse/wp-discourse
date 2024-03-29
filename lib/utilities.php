@@ -328,14 +328,19 @@ class Utilities {
 	/**
 	 * Get the Discourse comment HTML so that it can be displayed without loading the comments template.
 	 *
-	 * @param int $post_id The post ID to display the comments for.
+	 * @param int    $post_id The post ID to display the comments for.
+	 * @param bool   $perform_sync Determines whether a comment sync is maybe performed when loading comments.
+	 * @param bool   $force_sync Determines whether comment sync cache is bypassed when loading comments.
+	 * @param string $comment_type Type of comment display.
 	 *
 	 * @return string
 	 */
-	public static function get_discourse_comments( $post_id ) {
+	public static function get_discourse_comments( $post_id, $perform_sync = true, $force_sync = false, $comment_type = null ) {
 		$comment_formatter = new \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter();
+		$comment_formatter->setup_options();
+		$comment_formatter->setup_logger();
 
-		return $comment_formatter->format( $post_id );
+		return $comment_formatter->format( $post_id, $perform_sync, $force_sync, $comment_type );
 	}
 
 	/**
@@ -399,4 +404,26 @@ class Utilities {
 
 		return $result;
 	}
+
+  /**
+   * Publishes a post to a Discourse.
+   *
+   * @param string $post_id ID of the post to publish.
+   * @param array  $options An optional array of options to pass to DiscoursePublish.
+   *
+   * @return void|\WP_Error;
+   */
+  public static function publish_to_discourse( $post_id, $options = array() ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post ) {
+		  return new \WP_Error( 'wpdc_param_error', 'There is no WordPress post with the supplied id.' );
+			}
+
+		$email_notifier = new \WPDiscourse\EmailNotification\EmailNotification();
+		$publish        = new \WPDiscourse\DiscoursePublish\DiscoursePublish( $email_notifier, false );
+		$publish->setup_options( $options );
+		$publish->setup_logger();
+		$publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
+  }
 }

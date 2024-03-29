@@ -42,6 +42,8 @@ class EmailNotification {
 	 *
 	 * @param object $post $discourse_post The post where the failure occurred.
 	 * @param array  $args Optional arguments for the function. The 'location' argument can be used to indicate where the failure occurred.
+	 *
+	 * @return void|bool
 	 */
 	public function publish_failure_notification( $post, $args ) {
 		$post_id  = $post->ID;
@@ -110,7 +112,11 @@ class EmailNotification {
 			// translators: Discourse publishing email. Placeholder: Discourse support URL.
 			$message .= sprintf( __( '<%1$s>', 'wp-discourse' ), esc_url( $support_url ) ) . "\r\n";
 			// translators: Discourse publishing email. Placeholder: blogname, email message.
-			wp_mail( $publish_failure_email, sprintf( __( '[%s] Discourse Publishing Failure' ), $blogname ), $message );
+			$success = wp_mail( $publish_failure_email, sprintf( __( '[%s] Discourse Publishing Failure' ), $blogname ), $message );
+
+			return $success;
 		}// End if().
+
+		return false;
 	}
 }

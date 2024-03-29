@@ -12,31 +12,26 @@ jobs:
     name: Tests on PHP ${{ matrix.php }}
     strategy:
       matrix:
-        include:
-          - php: "7.4"
+        php: ['8.2']
+        wordpress: ['latest']
+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
 
       - name: Install Composer
-        uses: ramsey/composer-install@v1
+        uses: ramsey/composer-install@v2
         with:
-          dependency-versions: "highest"
-          composer-options: "--ignore-platform-reqs"
-
-      - name: Install PHPEnv
-        run: |
-          git clone --depth 1 git://github.com/phpenv/phpenv.git ~/.phpenv
-          export PATH="$HOME/.phpenv/bin:$PATH"
-          phpenv rehash
+          dependency-versions: 'highest'
+          composer-options: '--ignore-platform-reqs'
 
       - name: PHPUnit
         run: |
           sudo /etc/init.d/mysql start
-          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost latest
+          bash bin/install-wp-tests.sh wordpress_test root 'root' localhost ${{ matrix.wordpress }}
           vendor/bin/phpunit
 
       - name: PHPUnit Multisite

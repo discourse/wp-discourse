@@ -169,6 +169,16 @@ class Discourse {
 	);
 
 	/**
+	 * The discourse_logs options.
+	 *
+	 * @access protected
+	 * @var array
+	 */
+	protected $discourse_logs = array(
+		'logs-enabled' => 1,
+	);
+
+	/**
 	 * The array of option groups, used for assembling the options into a single array.
 	 *
 	 * @var array
@@ -182,6 +192,7 @@ class Discourse {
 		'discourse_sso_common',
 		'discourse_sso_provider',
 		'discourse_sso_client',
+		'discourse_logs',
 	);
 
 	/**
@@ -191,6 +202,7 @@ class Discourse {
 		add_action( 'init', array( $this, 'initialize_plugin' ) );
 		add_filter( 'allowed_redirect_hosts', array( $this, 'allow_discourse_redirect' ) );
 		add_filter( 'wp_kses_allowed_html', array( $this, 'allow_time_tag' ) );
+		add_action( 'admin_head', array( $this, 'wpdc_admin_head' ) );
 	}
 
 	/**
@@ -231,6 +243,8 @@ class Discourse {
 		// Create a backup for the discourse_configurable_text option.
 		update_option( 'discourse_configurable_text_backup', $this->discourse_configurable_text );
 		update_option( 'discourse_version', WPDISCOURSE_VERSION );
+
+		$this->register_assets();
 	}
 
 	/**
@@ -263,5 +277,38 @@ class Discourse {
 		);
 
 		return $allowedposttags;
+	}
+
+	/**
+	 * Adds WP Discourse tags to the <head> in the admin panel.
+	 */
+	public function wpdc_admin_head() {
+		$this->wpdc_icon();
+		$this->wpdc_url();
+	}
+
+	/**
+	 * Adds the WP Discourse icon to the <head> for use in the client.
+	 */
+	public function wpdc_icon() {
+		echo '<meta name="wpdc-icon" content="' . esc_html( WPDISCOURSE_LOGO ) . '" />';
+	}
+
+	/**
+	 * Adds the WP Discourse URL to the <head> for use in the client.
+	 */
+	public function wpdc_url() {
+		echo '<meta name="wpdc-url" content="' . esc_html( $this->options['url'] ) . '" />';
+	}
+
+	/**
+	 * Registers assets on initialization
+	 */
+	public function register_assets() {
+		$style_path  = '../css/comments.css';
+		$script_path = '../js/load-comments.js';
+
+		wp_register_script( 'load_comments_js', plugins_url( $script_path, __FILE__ ), array( 'jquery' ), filemtime( plugin_dir_path( __FILE__ ) . $script_path ), true );
+		wp_register_style( 'comment_styles', plugins_url( $style_path, __FILE__ ), array(), filemtime( plugin_dir_path( __FILE__ ) . $style_path ) );
 	}
 }

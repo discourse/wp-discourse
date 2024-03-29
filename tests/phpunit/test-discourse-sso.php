@@ -15,7 +15,63 @@ use \WPDiscourse\Test\UnitTest;
  */
 class DiscourseSSOTest extends UnitTest {
 
-  public function setUp() {
+  /**
+   * User id
+   *
+   * @access protected
+   * @var int
+   */
+  protected $user_id;
+
+  /**
+   * Secret
+   *
+   * @access protected
+   * @var string
+   */
+  protected $secret;
+
+  /**
+   * Nonce
+   *
+   * @access protected
+   * @var string
+   */
+  protected $nonce;
+
+  /**
+   * Query vars
+   *
+   * @access protected
+   * @var array
+   */
+  protected $query_vars;
+
+  /**
+   * Client
+   *
+   * @access protected
+   * @var \WPDiscourse\DiscourseSSO\DiscourseSSO
+   */
+  protected $discourse_sso;
+
+  /**
+   * Signaure
+   *
+   * @access protected
+   * @var string
+   */
+  protected $signature;
+
+  /**
+   * Payload
+   *
+   * @access protected
+   * @var string
+   */
+  protected $payload;
+
+  public function setUp(): void {
 		$this->secret = 'secret';
 		$this->nonce = 'abcd';
 		$this->payload = base64_encode( "nonce={$this->nonce}" );
@@ -32,10 +88,10 @@ class DiscourseSSOTest extends UnitTest {
 			'sso' => $this->payload,
 			'sig' => rawurlencode( $this->signature ),
 		);
-		$this->user_id = $this->factory->user->create();
+		$this->user_id = self::factory()->user->create();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
 		parent::tearDown();
 
 		$_GET['request'] = null;
@@ -104,7 +160,7 @@ class DiscourseSSOTest extends UnitTest {
 		$this->assertEquals( $parse_result->get_error_message(), 'SSO error' );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
+		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
   }
 
   /**
@@ -126,8 +182,8 @@ class DiscourseSSOTest extends UnitTest {
 		$this->assertEquals( $parse_result->get_error_message(), $error_message );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
-		$this->assertRegExp( '/"message":"' . $error_message . '"/', $log );
+		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
+		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
   }
 
   /**
@@ -171,8 +227,8 @@ class DiscourseSSOTest extends UnitTest {
 		$this->assertEquals( $logout_result->get_error_message(), $error_message );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_provider.ERROR: logout.discourse_user/', $log );
-		$this->assertRegExp( '/"message":"' . $error_message . '"/', $log );
+		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: logout.discourse_user/', $log );
+		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
   }
 
   /**
@@ -196,7 +252,7 @@ class DiscourseSSOTest extends UnitTest {
 		$this->assertEquals( $logout_result->get_error_message(), $error_message );
 
 		$log = $this->get_last_log();
-		$this->assertRegExp( '/sso_provider.ERROR: logout.response_error/', $log );
-		$this->assertRegExp( '/"message":"' . $error_message . '"/', $log );
+		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: logout.response_error/', $log );
+		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
   }
 }
