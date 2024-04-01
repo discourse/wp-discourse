@@ -1,25 +1,12 @@
 <?xml version="1.0"?>
-<phpunit
-	bootstrap="bootstrap.php"
-	backupGlobals="false"
-	colors="true"
-	convertErrorsToExceptions="true"
-	convertNoticesToExceptions="true"
-	convertWarningsToExceptions="true"
-	convertDeprecationsToExceptions="false"
-	>
-	<php>
-     <const name="WP_TESTS_MULTISITE" value="1" />
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="bootstrap.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" convertDeprecationsToExceptions="true" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage/>
+  <php>
+    <const name="WP_TESTS_MULTISITE" value="1"/>
   </php>
-	<testsuites>
-		<testsuite name="multisite">
-			<directory prefix="test-" suffix=".php">multisite/</directory>
-		</testsuite>
-	</testsuites>
-	<filter>
-	  <whitelist processUncoveredFilesFromWhitelist="true">
-			<file>lib/discourse-publish.php</file>
-			<file>lib/sync-discourse-topic.php</file>
-	  </whitelist>
-	</filter>
+  <testsuites>
+    <testsuite name="multisite">
+      <directory prefix="test-" suffix=".php">multisite/</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
