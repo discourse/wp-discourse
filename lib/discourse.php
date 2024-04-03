@@ -164,7 +164,7 @@ class Discourse {
 		'sso-client-login-form-change'   => 0,
 		'sso-client-login-form-redirect' => '',
 		'sso-client-sync-by-email'       => 0,
-		'sso-client-no-user-creation'    => 0,
+		'sso-client-disable-create-user' => 0,
 		'sso-client-sync-logout'         => 0,
 	);
 

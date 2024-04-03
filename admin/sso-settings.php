@@ -261,16 +261,16 @@ class SSOSettings {
 				'discourse_sso_client_settings_section'
 			);
 
-			add_settings_field(
-				'discourse_disable_sso_user_creation',
-				__( 'Disable creation of users', 'wp-discourse' ),
+    add_settings_field(
+			  'discourse_sso_disable_create_user',
+			  __( 'Disable user creation', 'wp-discourse' ),
 				array(
 					$this,
-					'sso_client_user_creation_checkbox',
+					'sso_client_disable_create_user_checkbox',
 				),
-				'discourse_sso_client',
-				'discourse_sso_client_settings_section'
-			);			
+			  'discourse_sso_client',
+			  'discourse_sso_client_settings_section'
+			);
 
 			add_settings_field(
 				'discourse_sso_client_sync_logout',
@@ -596,20 +596,20 @@ class SSOSettings {
 	}
 
 	/**
-	 * Outputs markup for sso-client-no-user-creation checkbox.
+	 * Outputs markup for sso-client-disable-create-user checkbox.
 	 */
-	public function sso_client_user_creation_checkbox() {
+	public function sso_client_disable_create_user_checkbox() {
 		$this->form_helper->checkbox_input(
-			'sso-client-no-user-creation',
+			'sso-client-disable-create-user',
 			'discourse_sso_client',
-			__( 'If a user is not matched by email in wordpress, don\'t create a new user', 'wp-discourse' ),
+			__( 'Disable creation of new WordPress users', 'wp-discourse' ),
 			__(
-				"If a user is not found to be existing in wordpress, don't create one. This can be useful if you limit wordpress login to a few admins/editors but still want to use the sso client.",
+				'Only Discourse users with an email or id matching an existing WordPress user will be allowed to log in with Discourse.',
 				'wp-discourse'
 			)
 		);
 	}
-	
+
 	/**
 	 * Outputs markup for sso-client-sync-by-email checkbox.
 	 */

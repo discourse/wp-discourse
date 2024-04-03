@@ -231,22 +231,22 @@ class Client extends SSOClientBase {
 				}
 			}
 
+      if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-disable-create-user'] ) ) {
+					return new \WP_Error( 'no_matching_user' );
+      }
+
 			if ( empty( $user_query_results ) ) {
-				if ( empty( $this->options['sso-client-no-user-creation'] ) ) {
-					$user_password = wp_generate_password( 12, true );
-	
-					$user_id = wp_create_user(
-						$this->get_sso_response( 'username' ),
-						$user_password,
-						$this->get_sso_response( 'email' )
-					);
-	
-					do_action( 'wpdc_sso_client_after_create_user', $user_id );
-	
-					return $user_id;
-				} else {
-					return new \WP_Error( 'no_such_user' );
-				}
+        $user_password = wp_generate_password( 12, true );
+
+        $user_id = wp_create_user(
+          $this->get_sso_response( 'username' ),
+          $user_password,
+          $this->get_sso_response( 'email' )
+        );
+
+        do_action( 'wpdc_sso_client_after_create_user', $user_id );
+
+        return $user_id;
 			}
 
 			return $user_query_results[0]->ID;
@@ -368,7 +368,12 @@ class Client extends SSOClientBase {
 				case 'existing_user_login':
 					$message = __( 'There is already an account registered with the username supplied by Discourse. If this is you, login through WordPress and visit your profile page to sync your account with Discourse', 'wp-discourse' );
 					$errors->add( 'existing_user_login', $message );
-					break;
+				    break;
+
+        case 'no_matching_user':
+					$message = __( 'No WordPress user matches your Discourse user.', 'wp-discourse' );
+					$errors->add( 'discourse_sso_no_matching_user', $message );
+            break;
 
 				default:
 					$message = __( 'Unhandled Error', 'wp-discourse' );
