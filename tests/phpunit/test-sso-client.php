@@ -204,6 +204,20 @@ class SSOClientTest extends UnitTest {
 		remove_filter( 'wpdc_sso_client_updated_user', array( $this, 'invalid_update_user_filter' ), 10 );
   }
 
+  /**
+   * parse_request does not create new users if user creation is disabled.
+   */
+  public function test_parse_request_disable_create_user() {
+		self::$plugin_options['sso-client-disable-create-user'] = 1;
+		$this->sso_client->setup_options( self::$plugin_options );
+
+    $parse_result = $this->sso_client->parse_request();
+
+    $log = $this->get_last_log();
+		$this->assertMatchesRegularExpression( '/sso_client.ERROR: parse_request.get_user_id/', $log );
+		$this->assertMatchesRegularExpression( '/"code":"no_matching_user"/', $log );
+  }
+
   public function invalid_update_user_filter( $updated_user, $query ) {
 		$updated_user['ID'] = 23;
 		return $updated_user;

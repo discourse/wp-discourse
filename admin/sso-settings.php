@@ -261,6 +261,17 @@ class SSOSettings {
 				'discourse_sso_client_settings_section'
 			);
 
+    add_settings_field(
+			  'discourse_sso_disable_create_user',
+			  __( 'Disable user creation', 'wp-discourse' ),
+				array(
+					$this,
+					'sso_client_disable_create_user_checkbox',
+				),
+			  'discourse_sso_client',
+			  'discourse_sso_client_settings_section'
+			);
+
 			add_settings_field(
 				'discourse_sso_client_sync_logout',
 				__( 'Sync Logout with Discourse', 'wp-discourse' ),
@@ -581,6 +592,21 @@ class SSOSettings {
 				'wp-discourse'
 			),
 			'url'
+		);
+	}
+
+	/**
+	 * Outputs markup for sso-client-disable-create-user checkbox.
+	 */
+	public function sso_client_disable_create_user_checkbox() {
+		$this->form_helper->checkbox_input(
+			'sso-client-disable-create-user',
+			'discourse_sso_client',
+			__( 'Disable creation of new WordPress users', 'wp-discourse' ),
+			__(
+				'Only Discourse users with an email or id matching an existing WordPress user will be allowed to log in with Discourse.',
+				'wp-discourse'
+			)
 		);
 	}
 
