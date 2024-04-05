@@ -196,7 +196,8 @@
 			url: wpdc.ajax,
 			type: 'post',
 			data: {
-				action: 'wpdc_view_logs_metafile'
+				action: 'wpdc_view_logs_metafile',
+        nonce: wpdc.nonce
 			},
 			success: function(response) {
 				if (response.success) {
@@ -208,7 +209,7 @@
 	
 	$logControls.find('.button.download-logs').on('click', function() {		
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', wpdc.ajax + '?action=wpdc_download_logs', true);
+		xhr.open('POST', wpdc.ajax + `?action=wpdc_download_logs&nonce=${wpdc.nonce}`, true);
 		xhr.onload = function() {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				var blob = new Blob([ xhr.response ], { type: 'application/zip' });
