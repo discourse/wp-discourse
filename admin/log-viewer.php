@@ -109,7 +109,7 @@ class LogViewer {
 				}
 
 				$handler_enabled = $this->file_handler->enabled();
-				$this->enabled = ! empty( $this->options['logs-enabled'] ) && $handler_enabled;
+				$this->enabled   = ! empty( $this->options['logs-enabled'] ) && $handler_enabled;
 
 				if ( $this->enabled ) {
 						$this->setup_logs();
@@ -254,8 +254,14 @@ class LogViewer {
 		 * Return log file contents for selected key.
 		 */
 		public function log_file_contents() {
-				// See further https://github.com/WordPress/WordPress-Coding-Standards/issues/869.
-				if ( ! isset( $_REQUEST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'admin-ajax-nonce' ) || ! isset( $_POST['key'] ) ) {
+        if ( ! current_user_can( 'manage_options' ) ||
+             ! isset( $_REQUEST['nonce'] ) ||
+             ! wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'admin-ajax-nonce' ) ) {
+          wp_send_json_error();
+          return;
+        }
+
+				if ( ! isset( $_POST['key'] ) ) {
 						wp_send_json_error();
 						return;
 				}
@@ -281,6 +287,13 @@ class LogViewer {
 		 * Return log meta file contents.
 		 */
 		public function meta_file_contents() {
+        if ( ! current_user_can( 'manage_options' ) ||
+             ! isset( $_REQUEST['nonce'] ) ||
+             ! wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'admin-ajax-nonce' ) ) {
+          wp_send_json_error();
+          return;
+        }
+
 				$metafile_contents = $this->build_metafile_contents();
 
 				$response = array(
@@ -294,6 +307,13 @@ class LogViewer {
 		 * Download bundled log files.
 		 */
 		public function download_logs() {
+        if ( ! current_user_can( 'manage_options' ) ||
+             ! isset( $_REQUEST['nonce'] ) ||
+             ! wp_verify_nonce( sanitize_key( $_REQUEST['nonce'] ), 'admin-ajax-nonce' ) ) {
+          wp_send_json_error();
+          return;
+        }
+
 				$log_files  = $this->file_handler->list_files();
 				$date_range = $this->build_date_range( $log_files );
 
