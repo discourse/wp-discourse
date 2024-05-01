@@ -846,7 +846,7 @@ class DiscoursePublish extends DiscourseBase {
 	 * @return string
 	 */
 	protected function sanitize_title( $title ) {
-		return wp_specialchars_decode( wp_strip_all_tags( $title ) );
+		return html_entity_decode( wp_strip_all_tags( $title ), ENT_COMPAT, 'UTF-8' );
 	}
 
 	/**
