@@ -858,8 +858,8 @@ class DiscoursePublishTest extends UnitTest {
    * Test that HTML entities are converted to their special characters.
    */
   public function test_conversion_of_html_entities_in_title() {
-		$title_with_entities = 'Title with &amp;';
-		$title_with_decoded_entities = 'Title with &';
+		$title_with_entities = 'Title with &amp; and &#8211;';
+		$title_with_decoded_entities = 'Title with & and –';
 		self::$post_atts['post_title'] = $title_with_entities;
 
 		$response         = $this->build_response( 'success' );
