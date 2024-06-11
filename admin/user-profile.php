@@ -13,6 +13,7 @@ use WPDiscourse\Shared\PluginUtilities;
  */
 class UserProfile {
 	use PluginUtilities;
+
 	/**
 	 * Gives access to the plugin options.
 	 *

@@ -287,7 +287,6 @@ class CommentSettings {
 		</label>
 		</div>
 		<?php
-
 	}
 
 	/**

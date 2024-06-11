@@ -8,7 +8,7 @@
 namespace WPDiscourse\DiscourseSSO;
 
 use WPDiscourse\DiscourseBase;
-use \WPDiscourse\SSO\SSO;
+use WPDiscourse\SSO\SSO;
 
 /**
  * Class DiscourseSSO
@@ -94,7 +94,6 @@ class DiscourseSSO extends DiscourseBase {
 		} else {
 			return esc_url_raw( $login_url );
 		}
-
 	}
 
 	/**

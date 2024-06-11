@@ -7,7 +7,7 @@
 
 use WPDiscourse\Test\Multisite;
 use WPDiscourse\Test\SyncDiscourseTopicTest;
-use \WPDiscourse\DiscoursePublish\DiscoursePublish;
+use WPDiscourse\DiscoursePublish\DiscoursePublish;
 
 /**
  * SyncDiscourseTopicMultisiteTest test case.

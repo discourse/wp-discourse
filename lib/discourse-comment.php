@@ -77,7 +77,7 @@ class DiscourseComment extends DiscourseBase {
 				array(
 					array(
 						'methods'             => \WP_REST_Server::READABLE,
-						'permission_callback' => function() {
+						'permission_callback' => function () {
 							return true;
 						},
 						'callback'            => array( $this, 'get_discourse_comments' ),

@@ -5,8 +5,8 @@
  * @package WPDiscourse
  */
 
- use \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
- use \WPDiscourse\DiscourseComment\DiscourseComment;
+ use WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
+ use WPDiscourse\DiscourseComment\DiscourseComment;
 
  /**
   * Renders the `wp-discourse/comments` block on the server.

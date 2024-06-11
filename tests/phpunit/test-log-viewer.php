@@ -8,12 +8,12 @@
 namespace WPDiscourse\Test;
 
 use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
-use \WPDiscourse\Logs\FileManager;
-use \WPDiscourse\Logs\FileHandler;
-use \WPDiscourse\Logs\Logger;
-use \WPDiscourse\Admin\LogViewer;
-use \WPDiscourse\Admin\FormHelper;
-use \WPDiscourse\Test\UnitTest;
+use WPDiscourse\Logs\FileManager;
+use WPDiscourse\Logs\FileHandler;
+use WPDiscourse\Logs\Logger;
+use WPDiscourse\Admin\LogViewer;
+use WPDiscourse\Admin\FormHelper;
+use WPDiscourse\Test\UnitTest;
 
 /**
  * Logger test case.

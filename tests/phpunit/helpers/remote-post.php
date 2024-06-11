@@ -102,7 +102,7 @@ trait RemotePost {
   protected function mock_remote_post( $first_request, $second_request = null ) {
 		add_filter(
           'pre_http_request',
-          function( $prempt, $args, $url ) use ( $first_request, $second_request ) {
+          function ( $prempt, $args, $url ) use ( $first_request, $second_request ) {
 				$is_sr   = ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false );
 				$request = $is_sr ? $second_request : $first_request;
 

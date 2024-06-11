@@ -268,7 +268,6 @@ class FormHelper {
 				  name='<?php echo esc_attr( $option ); ?>'><?php echo esc_textarea( $value ); ?></textarea>
 		<p class="description"><?php echo esc_html( $description ); ?></p>
 		<?php
-
 	}
 
 	/**

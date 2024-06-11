@@ -463,4 +463,3 @@ class WordPressEmailVerification {
 		exit;
 	}
 }
-

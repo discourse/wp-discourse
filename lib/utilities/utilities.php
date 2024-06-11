@@ -7,32 +7,7 @@
 
 namespace WPDiscourse\Utilities;
 
-use WPDiscourse\Shared\PluginUtilities;
-use WPDiscourse\Shared\WebhookUtilities;
-
-/**
- * Class PublicPluginUtilities
- *
- * @package WPDiscourse
- */
-class PublicPluginUtilities {
-	use PluginUtilities {
-		get_options as public;
-		validate as public;
-		get_discourse_categories as public;
-		get_discourse_user as public;
-		get_discourse_user_by_email as public;
-		sync_sso as public;
-		discourse_request as public;
-		get_api_credentials as public;
-		get_sso_params as public;
-	}
-
-    use WebhookUtilities {
-		get_discourse_webhook_data as public;
-		verify_discourse_webhook_request as public;
-    }
-}
+use WPDiscourse\Utilities\PublicUtilities;
 
 /**
  * Class Utilities
@@ -46,7 +21,7 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_options() {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_options();
 	}
 
@@ -58,7 +33,7 @@ class Utilities {
 	 * @return int
 	 */
 	public static function validate( $response ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->validate( $response );
 	}
 
@@ -68,7 +43,7 @@ class Utilities {
 	 * @return \WP_Error|array
 	 */
 	public static function get_discourse_categories() {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_categories();
 	}
 
@@ -81,7 +56,7 @@ class Utilities {
 	 * @return int|string|\WP_Error
 	 */
 	public static function sync_sso_record( $sso_params, $user_id = null ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->sync_sso( $sso_params, $user_id );
 	}
 
@@ -94,7 +69,7 @@ class Utilities {
 	 * @return array|mixed|object|\WP_Error
 	 */
 	public static function get_discourse_user( $user_id, $match_by_email = false ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_user( $user_id, $match_by_email );
 	}
 
@@ -106,7 +81,7 @@ class Utilities {
 	 * @return object \WP_Error
 	 */
 	public static function get_discourse_user_by_email( $email ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_user_by_email( $email );
 	}
 
@@ -119,7 +94,7 @@ class Utilities {
 	 * @return array|\WP_Error|void
 	 */
 	public static function discourse_request( $path, $args = array() ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->discourse_request( $path, $args );
 	}
 
@@ -132,7 +107,7 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_sso_params( $user, $sso_options = array() ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_sso_params( $user, $sso_options );
 	}
 
@@ -146,7 +121,7 @@ class Utilities {
      * @return object|\WP_Error
      */
 	public static function get_discourse_webhook_data( $request, $supported_events = null, $logger_context = null ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_webhook_data( $request, $supported_events, $logger_context );
 	}
 
@@ -158,7 +133,7 @@ class Utilities {
 	 * @return \WP_Error|\WP_REST_Request
 	 */
 	public static function verify_discourse_webhook_request( $request ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->verify_discourse_webhook_request( $request );
 	}
 
@@ -171,7 +146,7 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
-		$utils           = new PublicPluginUtilities();
+		$utils           = new PublicUtilities();
 		$api_credentials = $utils->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {

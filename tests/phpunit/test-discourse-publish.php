@@ -7,10 +7,10 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\EmailNotification\EmailNotification;
-use \WPDiscourse\DiscoursePublish\DiscoursePublish;
-use \WPDiscourse\Logs\FileHandler;
-use \WPDiscourse\Test\UnitTest;
+use WPDiscourse\EmailNotification\EmailNotification;
+use WPDiscourse\DiscoursePublish\DiscoursePublish;
+use WPDiscourse\Logs\FileHandler;
+use WPDiscourse\Test\UnitTest;
 
 /**
  * DiscoursePublish test case.
@@ -40,7 +40,6 @@ class DiscoursePublishTest extends UnitTest {
 	public static function setUpBeforeClass(): void {
 		parent::setUpBeforeClass();
 		self::initialize_variables();
-
 	}
 
 	/**
@@ -682,7 +681,7 @@ class DiscoursePublishTest extends UnitTest {
 		// Add filter.
 		add_filter(
 			'wpdc_publish_body',
-			function( $body, $remote_post_type ) use ( $tags ) {
+			function ( $body, $remote_post_type ) use ( $tags ) {
 				if ( 'create_post' === $remote_post_type ) {
 					$body['tags'] = $tags;
 				}
@@ -700,7 +699,7 @@ class DiscoursePublishTest extends UnitTest {
 		// Check tags are in the body passed to request.
 		add_filter(
 			'pre_http_request',
-			function( $prempt, $args, $url ) use ( $tags, $response ) {
+			function ( $prempt, $args, $url ) use ( $tags, $response ) {
 				$body = json_decode( $args['body'] );
 
 				if ( ! isset( $body->tags ) || ! ( $tags === $body->tags ) ) {
@@ -867,7 +866,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		add_filter(
 			'pre_http_request',
-			function( $prempt, $args, $url ) use ( $response, $title_with_decoded_entities ) {
+			function ( $prempt, $args, $url ) use ( $response, $title_with_decoded_entities ) {
 				$body = json_decode( $args['body'] );
 
 				if ( $body->title !== $title_with_decoded_entities ) {
