@@ -42,6 +42,7 @@ $base64 = base64_encode( file_get_contents( WPDISCOURSE_LOGO_URL ) );
 define( 'WPDISCOURSE_LOGO', "data:image/svg+xml;base64,$base64" );
 
 require_once WPDISCOURSE_PATH . 'lib/plugin-utilities.php';
+require_once WPDISCOURSE_PATH . 'lib/webhook-utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/template-functions.php';
 require_once WPDISCOURSE_PATH . 'lib/utilities.php';
 require_once WPDISCOURSE_PATH . 'lib/discourse.php';

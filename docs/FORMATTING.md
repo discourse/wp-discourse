@@ -9,8 +9,6 @@ These formatters will be applied on each pull request in Github Actions (via ``.
 
 #### PHPCS
 
-> Note: Use -d error_reporting=E_ALL^E_DEPRECATED until https://github.com/PHPCompatibility/PHPCompatibility/issues/1651 is resolved
-
 The ``phpcs`` configuration is handled in the ``.phpcs.xml`` file, a type of [Annotated Ruleset](https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-Ruleset). Install the development composer packages by running ``composer install`` prior to using ``phpcs``, and run it using ``vendor/bin/phpcs``, for example
 
 ```
