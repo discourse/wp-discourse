@@ -215,7 +215,7 @@ class WebhookSettings {
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
-        '<strong>URL:</strong><code>%2$s</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        '<strong>URL:</strong><code>%2$s</code>
          <strong>Events:</strong> "User is created", "User is Updated".',
 				'wp-discourse'
 			),
