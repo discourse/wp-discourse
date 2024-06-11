@@ -456,14 +456,10 @@ class NetworkOptions {
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
-		$description = sprintf(
-			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
-			__(
-				'String of text at least 12 characters long.',
-				'wp-discourse'
-        ),
-		);
-
+    $description = __(
+        'String of text at least 12 characters long.',
+        'wp-discourse'
+    );
 		$this->input( 'webhook-secret', $description );
 	}
 

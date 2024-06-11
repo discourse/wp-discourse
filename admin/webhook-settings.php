@@ -256,14 +256,10 @@ class WebhookSettings {
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
-		$description = sprintf(
-			// translators: Webhook secret input.
-			__(
-				'String of text at least 12 characters long.',
-				'wp-discourse'
-			),
-		);
-
+		$description = __(
+        'String of text at least 12 characters long.',
+        'wp-discourse'
+    );
 		$this->form_helper->input( 'webhook-secret', 'discourse_webhook', $description );
 	}
 
@@ -286,7 +282,7 @@ class WebhookSettings {
 	 * Details for the 'webhook_options' tab.
 	 */
 	public function webhook_settings_tab_details() {
-		$setup_howto_url = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
+		$setup_howto_url = 'https://meta.discourse.org/t/311552';
 		?>
     <p class="wpdc-options-documentation">
 			<em>

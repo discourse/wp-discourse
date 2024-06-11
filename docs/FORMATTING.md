@@ -26,7 +26,7 @@ All errors must be addressed, and all warnings should be addressed as far as pos
 The ``.github/workflows/ci.yml`` applies a syntax check for each supported version of PHP by searching for all ``.php`` files in the repository, running the relevant version of the PHP interpreter, and catching syntax errors via  ``xargs``:
 
 ```
-find -L . -name '*.php' -not -path "./vendor/*" -print0 | xargs -0 -n 1 -P 4 php -l
+find -L . -name '*.php' -not -path "./vendor/*" -not -path "./tests/*" -print0 | xargs -0 -n 1 -P 4 php -l
 ```
 
 To perform this locally:
