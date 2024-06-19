@@ -209,7 +209,7 @@ class Discourse {
 	 * Initializes the plugin configuration, loads the text domain etc.
 	 */
 	public function initialize_plugin() {
-		load_plugin_textdomain( 'wp-discourse', false, basename( dirname( __FILE__ ) ) . '/languages' );
+		load_plugin_textdomain( 'wp-discourse', false, basename( __DIR__ ) . '/languages' );
 		$this->options = $this->get_options();
 
 		// Set the Discourse domain name option.

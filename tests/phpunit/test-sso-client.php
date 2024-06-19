@@ -7,9 +7,9 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\SSOClient\Client;
-use \WPDiscourse\SSOClient\Nonce;
-use \WPDiscourse\Test\UnitTest;
+use WPDiscourse\SSOClient\Client;
+use WPDiscourse\SSOClient\Nonce;
+use WPDiscourse\Test\UnitTest;
 
 /**
  * SSOClient test case.
@@ -211,9 +211,9 @@ class SSOClientTest extends UnitTest {
 		self::$plugin_options['sso-client-disable-create-user'] = 1;
 		$this->sso_client->setup_options( self::$plugin_options );
 
-    $parse_result = $this->sso_client->parse_request();
+		$parse_result = $this->sso_client->parse_request();
 
-    $log = $this->get_last_log();
+		$log = $this->get_last_log();
 		$this->assertMatchesRegularExpression( '/sso_client.ERROR: parse_request.get_user_id/', $log );
 		$this->assertMatchesRegularExpression( '/"code":"no_matching_user"/', $log );
   }

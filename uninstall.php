@@ -33,4 +33,3 @@ delete_site_option( 'wpdc_topic_blog_db_version' );
 global $wpdb;
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}discourse_nonce" );
 $wpdb->query( "DROP TABLE IF EXISTS {$wpdb->base_prefix}wpdc_topic_blog" );
-

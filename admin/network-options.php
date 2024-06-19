@@ -111,7 +111,7 @@ class NetworkOptions {
 
 		add_settings_field(
 			'discourse_webhook_match_old_topics',
-			__( 'Match Old Topics', 'wp-discourse' ),
+			__( 'Match Topics by Title', 'wp-discourse' ),
 			array(
 				$this,
 				'webhook_match_old_topics_checkbox',
@@ -302,7 +302,7 @@ class NetworkOptions {
 			$this->input(
 				'api-key',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $url ) .
-									 '/admin/api/keys" target="_blank" rel="noreferrer noopener">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
+									'/admin/api/keys" target="_blank" rel="noreferrer noopener">' . esc_url( $url ) . '/admin/api/keys</a>. ' .
 				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'Single User', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
@@ -365,7 +365,7 @@ class NetworkOptions {
 		$discourse_url       = $this->get_site_option( 'url' );
 		if ( ! empty( $discourse_url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $discourse_url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
-									  esc_url( $discourse_url ) . '/admin/api/web_hooks</a>';
+										esc_url( $discourse_url ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
@@ -373,8 +373,8 @@ class NetworkOptions {
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
-				'Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
- URL <code>%2$s</code>. Make sure that the \'Post Event\' and the \'Active\' checkboxes are enabled.',
+				'<strong>URL:</strong><code>%2$s</code>
+         <strong>Events:</strong> "Post is created", "Post is updated".',
 				'wp-discourse'
 			),
 			$discourse_webhooks_url,
@@ -384,8 +384,7 @@ class NetworkOptions {
 		$this->checkbox_input(
 			'use-discourse-webhook',
 			__(
-				'Use a webhook
-		to sync comment data between Discourse and WordPress.',
+				'Enable the Sync Comment Data webhook endpoint.',
 				'wp-discourse'
 			),
 			$description
@@ -399,15 +398,11 @@ class NetworkOptions {
 		$this->checkbox_input(
 			'webhook-match-old-topics',
 			__(
-				'Match WordPress posts
-	    published prior to WP Discourse version 1.4.0.',
+				'Match WordPress posts with Discourse topics by title.',
 				'wp-discourse'
 			),
 			__(
-				"By default, posts
-	    are matched to Discourse topics through their discourse_topic_id metadata. That value isn't available for posts
-	    published through WP Discourse prior to version 1.4.0. Enabling this setting will match posts with the post_type
-	    'post' to Discourse topics through their titles.",
+				'Sync Comment Data will attempt to match posts to topics by title if other methods of matching have not worked.',
 				'wp-discourse'
 			)
 		);
@@ -421,7 +416,7 @@ class NetworkOptions {
 		$url                 = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
 			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
-									  esc_url( $url ) . '/admin/api/web_hooks</a>';
+										esc_url( $url ) . '/admin/api/web_hooks</a>';
 		} else {
 			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
 		}
@@ -429,17 +424,15 @@ class NetworkOptions {
 		$description = sprintf(
 			// translators: Discourse webhook description. Placeholder: discourse_webhook_url, webhook_payload_url.
 			__(
-				'This webhook is only active when WordPress is enabled as the DiscourseConnect Provider for Discourse (this can be overridden by
-hooking into the \'wpdc_use_discourse_user_webhook\' filter.) It supplies the Discourse username to WordPress when a user is created or updated on your forum.
-Before enabling this setting, create a new webhook on your forum (found at %1$s.) In the webhook\'s Payload URL field, enter the
-URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enabled.',
+				'<strong>URL:</strong><code>%2$s</code>
+         <strong>Events:</strong> "User is created", "User is Updated".',
 				'wp-discourse'
 			),
 			$discourse_webhooks_url,
 			$webhook_payload_url
 		);
 
-		$this->checkbox_input( 'use-discourse-user-webhook', __( 'Use a webhook to sync user data with Discourse.', 'wp-discourse' ), $description );
+		$this->checkbox_input( 'use-discourse-user-webhook', __( 'Enable the Update Userdata webhook endpoint.', 'wp-discourse' ), $description );
 	}
 
 	/**
@@ -449,43 +442,24 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$this->checkbox_input(
 			'webhook-match-user-email',
 			__(
-				'Match users with Discourse
-        through their email address.',
+				'Match WordPress users with Discourse users by email.',
 				'wp-discourse'
 			),
 			__(
-				'Used for syncing accounts that were created before enabling the
-        Update Userdata webhook. Existing accounts are synced when the user updates and saves their profile on Discourse.
-        <strong>Note: only enable this setting if you are certain that email addresses match between Discourse
-        and WordPress.</strong>',
+				'Update Userdata will attempt to match users by email if other methods of matching have not worked.',
 				'wp-discourse'
 			)
 		);
-
 	}
 
 	/**
 	 * Outputs markup for webhook-secret input.
 	 */
 	public function webhook_secret_input() {
-		$url = $this->get_site_option( 'url' );
-		if ( ! empty( $url ) ) {
-			$discourse_webhooks_url = '<a href="' . esc_url( $url ) . '/admin/api/web_hooks" target="_blank" rel="noreferrer noopener">' .
-									  esc_url( $url ) . '/admin/api/web_hooks</a>';
-		} else {
-			$discourse_webhooks_url = 'http://forum.example.com/admin/api/web_hooks';
-		}
-
-		$description = sprintf(
-			// translators: Webhook secret input. Placeholder: discourse_webhooks_url.
-			__(
-				'The secret key used to verify Discourse webhook requests. Set it to a string of text, at least 12
-		        characters long. It needs to match the key set at %1$s.',
-				'wp-discourse'
-			),
-			$discourse_webhooks_url
-		);
-
+    $description = __(
+        'String of text at least 12 characters long.',
+        'wp-discourse'
+    );
 		$this->input( 'webhook-secret', $description );
 	}
 
@@ -517,13 +491,13 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$this->checkbox_input(
 			'hide-discourse-name-field',
 			__(
-				'Removes the Discourse Name field
+				'Removes the Discourse Username field
 	    from the WordPress user profile page.',
 				'wp-discourse'
 			),
 			__(
 				'If you enable this setting and also enable the Update
-        Userdata webhook, new users created on Discourse will have the their Discourse Name automatically filled in and be
+        Userdata webhook, new users created on Discourse will have the their Discourse Username automatically filled in and be
         uneditable on WordPress.',
 				'wp-discourse'
 			)
@@ -610,7 +584,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		$url = $this->get_site_option( 'url' );
 		if ( ! empty( $url ) ) {
 			$discourse_sso_url = '<a href="' . esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso" target="_blank" rel="noreferrer noopener">' .
-								 esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso</a>';
+								esc_url( $url ) . '/admin/site_settings/category/all_results?filter=sso</a>';
 		} else {
 			$discourse_sso_url = 'http://forum.example.com/admin/site_settings/category/all_results?filter=sso';
 		}
@@ -664,7 +638,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			</h2>
 
 			<form class="wp-discourse-network-options-form" action="<?php echo esc_url( $action_url ); ?>"
-				  method="post">
+					method="post">
 				<?php wp_nonce_field( 'update_discourse_network_options', 'update_discourse_network_options_nonce' ); ?>
 				<?php
 				settings_fields( 'discourse_network_options' );
@@ -683,7 +657,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 	 */
 	public function save_network_settings() {
 		if ( ! isset( $_POST['update_discourse_network_options_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_network_options_nonce'] ) ), 'update_discourse_network_options' ) // Input var okay.
+			! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_network_options_nonce'] ) ), 'update_discourse_network_options' ) // Input var okay.
 		) {
 
 			return null;
@@ -855,7 +829,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 			}
 
 			if ( ( ! empty( $use_discourse_webhook ) && empty( $webhook_secret ) ) ||
-				 ( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
+				( ! empty( $use_discourse_user_webhook ) && empty( $webhook_secret ) )
 			) {
 				$notices .= '<div class="notice notice-error is-dismissible"><p>' .
 							__( 'To use Discourse webhooks, you need to supply a webhook secret key.', 'wp-discourse' ) .
@@ -942,8 +916,8 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 
 		?>
 		<input id='discourse-<?php echo esc_attr( $option ); ?>'
-			   name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-			   type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
+				name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
+				type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php
 			if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
@@ -954,7 +928,7 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 				echo 'max="' . esc_attr( $max ) . '"';
 			}
 			?>
-			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
+				value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
 	}
@@ -982,12 +956,12 @@ URL <code>%2$s</code>. Make sure that only the \'User Event\' checkbox is enable
 		?>
 		<label>
 			<input name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-				   type='hidden'
-				   value='0'/>
+					type='hidden'
+					value='0'/>
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
-				   name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
-				   type='checkbox'
-				   value='1' <?php echo esc_attr( $checked ); ?> />
+					name='<?php echo 'wpdc_site_options[' . esc_attr( $option ) . ']'; ?>'
+					type='checkbox'
+					value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo wp_kses( $label, $allowed ); ?>
 		</label>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>

@@ -7,8 +7,8 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\DiscourseSSO\DiscourseSSO;
-use \WPDiscourse\Test\UnitTest;
+use WPDiscourse\DiscourseSSO\DiscourseSSO;
+use WPDiscourse\Test\UnitTest;
 
 /**
  * DiscourseSSO test case.

@@ -8,7 +8,7 @@
 
 namespace WPDiscourse\Logs;
 
-use \WPDiscourse\Monolog\Handler\StreamHandler;
+use WPDiscourse\Monolog\Handler\StreamHandler;
 
 /**
  * Class FileHandler
@@ -189,7 +189,7 @@ class FileHandler extends StreamHandler {
         				$b_date = $this->get_date_from_url( $b );
 
         				if ( $a_date > $b_date ) {
-        				    return -1;
+					return -1;
         				}
 
                 if ( $a_date < $b_date ) {
@@ -200,7 +200,7 @@ class FileHandler extends StreamHandler {
         				$b_number = $this->get_number_from_url( $b );
 
         				if ( $a_number > $b_number ) {
-        				    return -1;
+					return -1;
         				}
 
                 if ( $a_number < $b_number ) {
@@ -252,17 +252,17 @@ class FileHandler extends StreamHandler {
             foreach ( array_slice( $files, ( $this->max_files - 1 ) ) as $file ) {
         				if ( is_writable( $file ) ) {
                     // Note from monolog/monolog:
-          					// "suppress errors here as unlink() might fail if two processes
-          					// are cleaning up/rotating at the same time.".
+					// "suppress errors here as unlink() might fail if two processes
+					// are cleaning up/rotating at the same time.".
                     // phpcs:disable WordPress.PHP.DevelopmentFunctions
-          					set_error_handler(
-                        function () {
+					set_error_handler(
+				function () {
               							return false;
-              					}
-                    );
-          					unlink( $file );
-          					restore_error_handler();
-                    // phpcs:enabled WordPress.PHP.DevelopmentFunctions
+						}
+			);
+			unlink( $file );
+			restore_error_handler();
+			// phpcs:enabled WordPress.PHP.DevelopmentFunctions
         				}
             }
         }

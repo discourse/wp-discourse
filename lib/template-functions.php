@@ -141,7 +141,7 @@ trait TemplateFunctions {
 					$poll->parentNode->removeChild( $poll );
 				}
 
-				$poll_number ++;
+				$poll_number++;
 			}
 
 			$parsed = $doc->saveHTML( $doc->documentElement );

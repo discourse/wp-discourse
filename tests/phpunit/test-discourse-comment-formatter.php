@@ -7,8 +7,8 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
-use \WPDiscourse\Test\UnitTest;
+use WPDiscourse\DiscourseCommentFormatter\DiscourseCommentFormatter;
+use WPDiscourse\Test\UnitTest;
 
 /**
  * DiscourseComment test case.

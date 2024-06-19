@@ -7,8 +7,8 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\Test\UnitTest;
-use \WPDiscourse\Admin\FormHelper;
+use WPDiscourse\Test\UnitTest;
+use WPDiscourse\Admin\FormHelper;
 
 /**
  * DiscourseComment test case.
@@ -114,7 +114,7 @@ class DiscourseConnectionTest extends UnitTest {
 		  $raw_body         = $this->response_body_json( 'scopes' );
 		  $body             = json_decode( $raw_body );
 			$scopes         = array_filter(
-		 		$body->scopes, function( $scope ) {
+		 		$body->scopes, function ( $scope ) {
 					return 'commenting' !== $scope->key;
 				}
 			);

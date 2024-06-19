@@ -7,7 +7,7 @@
 
 namespace WPDiscourse\Test;
 
-use \WPDiscourse\Logs\FileManager;
+use WPDiscourse\Logs\FileManager;
 
 /**
  * Logging methods for WPDiscourse unit tests

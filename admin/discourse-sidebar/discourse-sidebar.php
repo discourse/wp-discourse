@@ -168,7 +168,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::READABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 
 						return $this->get_api_category_permissions( $data, 'get_categories_nonce' );
 					},
@@ -183,7 +183,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 						return $this->get_api_post_permissions( $data, 'update_topic_nonce' );
 					},
 					'callback'            => array( $this, 'update_topic' ),
@@ -197,7 +197,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 						return $this->get_api_post_permissions( $data, 'publish_topic_nonce' );
 					},
 					'callback'            => array( $this, 'publish_topic' ),
@@ -211,7 +211,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 						return $this->get_api_post_permissions( $data, 'unlink_post_nonce' );
 					},
 					'callback'            => array( $this, 'unlink_post' ),
@@ -225,7 +225,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 						return $this->get_api_post_permissions( $data, 'link_topic_nonce' );
 					},
 					'callback'            => array( $this, 'link_topic' ),
@@ -239,7 +239,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 						return $this->get_api_post_permissions( $data, 'set_publish_meta_nonce' );
 					},
 					'callback'            => array( $this, 'set_publish_meta' ),
@@ -253,7 +253,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 
 						return $this->get_api_post_permissions( $data, 'set_category_meta_nonce' );
 					},
@@ -268,7 +268,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 
 						return $this->get_api_post_permissions( $data, 'set_tag_meta_nonce' );
 					},
@@ -283,7 +283,7 @@ class DiscourseSidebar {
 			array(
 				array(
 					'methods'             => \WP_REST_Server::CREATABLE,
-					'permission_callback' => function( $data ) {
+					'permission_callback' => function ( $data ) {
 
 						return $this->get_api_post_permissions( $data, 'set_pin_meta_nonce' );
 					},

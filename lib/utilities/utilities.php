@@ -7,27 +7,7 @@
 
 namespace WPDiscourse\Utilities;
 
-use WPDiscourse\Shared\PluginUtilities;
-
-/**
- * Class PublicPluginUtilities
- *
- * @package WPDiscourse
- */
-class PublicPluginUtilities {
-	use PluginUtilities {
-		get_options as public;
-		validate as public;
-		get_discourse_categories as public;
-		get_discourse_user as public;
-		get_discourse_user_by_email as public;
-		sync_sso as public;
-		discourse_request as public;
-		get_api_credentials as public;
-		get_sso_params as public;
-		verify_discourse_webhook_request as public;
-	}
-}
+use WPDiscourse\Utilities\PublicUtilities;
 
 /**
  * Class Utilities
@@ -41,7 +21,7 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_options() {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_options();
 	}
 
@@ -53,7 +33,7 @@ class Utilities {
 	 * @return int
 	 */
 	public static function validate( $response ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->validate( $response );
 	}
 
@@ -63,7 +43,7 @@ class Utilities {
 	 * @return \WP_Error|array
 	 */
 	public static function get_discourse_categories() {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_categories();
 	}
 
@@ -76,7 +56,7 @@ class Utilities {
 	 * @return int|string|\WP_Error
 	 */
 	public static function sync_sso_record( $sso_params, $user_id = null ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->sync_sso( $sso_params, $user_id );
 	}
 
@@ -89,7 +69,7 @@ class Utilities {
 	 * @return array|mixed|object|\WP_Error
 	 */
 	public static function get_discourse_user( $user_id, $match_by_email = false ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_user( $user_id, $match_by_email );
 	}
 
@@ -101,7 +81,7 @@ class Utilities {
 	 * @return object \WP_Error
 	 */
 	public static function get_discourse_user_by_email( $email ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_discourse_user_by_email( $email );
 	}
 
@@ -114,7 +94,7 @@ class Utilities {
 	 * @return array|\WP_Error|void
 	 */
 	public static function discourse_request( $path, $args = array() ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->discourse_request( $path, $args );
 	}
 
@@ -127,20 +107,34 @@ class Utilities {
 	 * @return array
 	 */
 	public static function get_sso_params( $user, $sso_options = array() ) {
-		$utils = new PublicPluginUtilities();
+		$utils = new PublicUtilities();
 		return $utils->get_sso_params( $user, $sso_options );
 	}
 
+    /**
+     * Get data from a request originating from a Discourse webhook.
+     *
+     * @param \WP_REST_Request $request The WP_REST_Request object.
+     * @param array            $supported_events An optional array of supported events.
+     * @param string           $logger_context An optional logger context.
+     *
+     * @return object|\WP_Error
+     */
+	public static function get_discourse_webhook_data( $request, $supported_events = null, $logger_context = null ) {
+		$utils = new PublicUtilities();
+		return $utils->get_discourse_webhook_data( $request, $supported_events, $logger_context );
+	}
+
 	/**
-	 * Verify that the request originated from a Discourse webhook and the the secret keys match.
+	 * Verify that the request originated from a Discourse webhook and the secret keys match.
 	 *
-	 * @param \WP_REST_Request $data The WP_REST_Request object.
+	 * @param \WP_REST_Request $request The WP_REST_Request object.
 	 *
 	 * @return \WP_Error|\WP_REST_Request
 	 */
-	public static function verify_discourse_webhook_request( $data ) {
-		$utils = new PublicPluginUtilities();
-		return $utils->verify_discourse_webhook_request( $data );
+	public static function verify_discourse_webhook_request( $request ) {
+		$utils = new PublicUtilities();
+		return $utils->verify_discourse_webhook_request( $request );
 	}
 
 	/**
@@ -152,7 +146,7 @@ class Utilities {
 	 * @return int|\WP_Error
 	 */
 	public static function create_discourse_user( $user, $require_activation = true ) {
-		$utils           = new PublicPluginUtilities();
+		$utils           = new PublicUtilities();
 		$api_credentials = $utils->get_api_credentials();
 
 		if ( is_wp_error( $api_credentials ) ) {
@@ -179,10 +173,10 @@ class Utilities {
 		);
 
 		$user_data = static::discourse_request(
-             $create_user_url, array(
-				 'body'   => $body,
-				 'method' => 'POST',
-			 )
+            $create_user_url, array(
+				'body'   => $body,
+				'method' => 'POST',
+			)
             );
 
 		if ( is_wp_error( $user_data ) ) {
@@ -352,8 +346,8 @@ class Utilities {
 	 */
 	public static function extract_groups( $raw_groups ) {
 		return array_reduce(
-						 $raw_groups,
-						function( $result, $group ) {
+						$raw_groups,
+						function ( $result, $group ) {
 			if ( empty( $group->automatic ) ) {
 									$result[] = static::discourse_munge( $group, static::GROUP_SCHEMA );
 			}
@@ -382,7 +376,7 @@ class Utilities {
 												$result->{$key} = intval( $value );
                             break;
 						case 'bool':
-												$result->{$key} = true == $value;
+												$result->{$key} = true === $value;
                             break;
 						case 'text':
 												$result->{$key} = sanitize_text_field( $value );
@@ -405,19 +399,19 @@ class Utilities {
 		return $result;
 	}
 
-  /**
-   * Publishes a post to a Discourse.
-   *
-   * @param string $post_id ID of the post to publish.
-   * @param array  $options An optional array of options to pass to DiscoursePublish.
-   *
-   * @return void|\WP_Error;
-   */
-  public static function publish_to_discourse( $post_id, $options = array() ) {
+    /**
+     * Publishes a post to a Discourse.
+     *
+     * @param string $post_id ID of the post to publish.
+     * @param array  $options An optional array of options to pass to DiscoursePublish.
+     *
+     * @return void|\WP_Error;
+     */
+    public static function publish_to_discourse( $post_id, $options = array() ) {
 		$post = get_post( $post_id );
 
 		if ( ! $post ) {
-		  return new \WP_Error( 'wpdc_param_error', 'There is no WordPress post with the supplied id.' );
+			return new \WP_Error( 'wpdc_param_error', 'There is no WordPress post with the supplied id.' );
 			}
 
 		$email_notifier = new \WPDiscourse\EmailNotification\EmailNotification();
@@ -425,5 +419,5 @@ class Utilities {
 		$publish->setup_options( $options );
 		$publish->setup_logger();
 		$publish->sync_to_discourse( $post_id, $post->post_title, $post->post_content );
-  }
+    }
 }

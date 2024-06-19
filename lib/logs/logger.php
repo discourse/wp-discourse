@@ -12,10 +12,10 @@ require_once __DIR__ . '/handlers/file-handler.php';
 require_once __DIR__ . '/handlers/null-handler.php';
 require_once __DIR__ . '/formatters/line-formatter.php';
 
-use \WPDiscourse\Logs\NullHandler;
-use \WPDiscourse\Logs\FileHandler;
-use \WPDiscourse\Logs\FileManager;
-use \WPDiscourse\Logs\LineFormatter;
+use WPDiscourse\Logs\NullHandler;
+use WPDiscourse\Logs\FileHandler;
+use WPDiscourse\Logs\FileManager;
+use WPDiscourse\Logs\LineFormatter;
 
 /**
  * Class Logger.

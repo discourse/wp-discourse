@@ -11,11 +11,13 @@
 namespace WPDiscourse\SyncDiscourseTopic;
 
 use WPDiscourse\DiscourseBase;
+use WPDiscourse\Shared\WebhookUtilities;
 
 /**
  * Class SyncDiscourseTopic
  */
 class SyncDiscourseTopic extends DiscourseBase {
+    use WebhookUtilities;
 
 	/**
 	 * The current version of the wpdc_topic_blog database table.
@@ -41,20 +43,25 @@ class SyncDiscourseTopic extends DiscourseBase {
 		add_action( 'init', array( $this, 'setup_logger' ) );
 		add_action( 'rest_api_init', array( $this, 'initialize_update_content_route' ) );
 		add_action( 'plugins_loaded', array( $this, 'maybe_create_db' ) );
+
+    $this->supported_events = array(
+        'post_created',
+        'post_updated',
+    );
 	}
 
 	/**
 	 * Registers the Rest API route wp-discourse/v1/update-topic-content.
 	 */
 	public function initialize_update_content_route() {
-		if ( ! empty( $this->options['use-discourse-webhook'] ) ) {
+		if ( $this->webhook_enabled() ) {
 			register_rest_route(
 				'wp-discourse/v1',
 				'update-topic-content',
 				array(
 					array(
 						'methods'             => \WP_REST_Server::CREATABLE,
-						'permission_callback' => function() {
+						'permission_callback' => function () {
 							return true;
 						},
 						'callback'            => array( $this, 'update_topic_content' ),
@@ -67,28 +74,24 @@ class SyncDiscourseTopic extends DiscourseBase {
 	/**
 	 * Handles the REST request.
 	 *
-	 * @param \WP_REST_Request $data The WP_REST_Request data object.
+	 * @param \WP_REST_Request $request The WP_REST_Request data object.
 	 *
 	 * @return null|\WP_Error
 	 */
-	public function update_topic_content( $data ) {
-		// This function call is used to verify the request. For clarity, the permission callback should be updated to call this function.
-		$data = $this->verify_discourse_webhook_request( $data );
+	public function update_topic_content( $request ) {
+    $data = $this->get_webhook_data( $request );
 
-		if ( is_wp_error( $data ) ) {
-			$this->logger->error( 'update_topic_content.webhook_verification_error', array( 'message', $data->get_error_message() ) );
-			return $data;
-		}
+    if ( is_wp_error( $data ) ) {
+				return $this->failed_response( $data->get_error_message() );
+    }
 
-		$json = $data->get_json_params();
-		do_action( 'wpdc_before_webhook_post_update', $json );
+		do_action( 'wpdc_before_webhook_post_update', $data->json );
 
-		if ( ! is_wp_error( $json ) && ! empty( $json['post'] ) ) {
-			$post_data                   = $json['post'];
-			$use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
-			$post_ids                    = array();
+    $post_data                   = $data->json['post'];
+    $use_multisite_configuration = is_multisite() && ! empty( $this->options['multisite-configuration-enabled'] );
+    $post_ids                    = array();
 
-			if ( $use_multisite_configuration ) {
+    if ( $use_multisite_configuration ) {
 				global $wpdb;
 				$table_name = $wpdb->base_prefix . 'wpdc_topic_blog';
 				$topic_id   = intval( $post_data['topic_id'] );
@@ -96,20 +99,21 @@ class SyncDiscourseTopic extends DiscourseBase {
 				$blog_id    = $wpdb->get_var( $wpdb->prepare( $query, $topic_id ) );
 
 				if ( $blog_id ) {
-					switch_to_blog( $blog_id );
-					$post_ids = $this->update_post_metadata( $post_data );
-					restore_current_blog();
-				}
-			} else {
+			switch_to_blog( $blog_id );
+			$post_ids = $this->update_post_metadata( $post_data );
+			restore_current_blog();
+					}
+    } else {
 				$post_ids = $this->update_post_metadata( $post_data );
-			}
+    }
 
-			do_action( 'wpdc_after_webhook_post_update', $post_ids );
-		} else {
-			$this->logger->error( 'update_topic_content.response_body_error' );
-		}
+    do_action( 'wpdc_after_webhook_post_update', $post_ids );
 
-		return null;
+		if ( ! empty( $post_ids ) ) {
+        return $this->success_response( 'The posts have been updated.' );
+    } else {
+				return $this->failed_response( 'No posts were found.' );
+    }
 	}
 
 	/**
@@ -294,4 +298,11 @@ class SyncDiscourseTopic extends DiscourseBase {
 
 		return null;
 	}
+
+    /**
+     * Common webhook enabled function.
+     */
+    protected function webhook_enabled() {
+			return ! empty( $this->options['use-discourse-webhook'] );
+    }
 }
