@@ -10,6 +10,6 @@
 	"author": "Discourse",
 	"license": "GPL",
 	"devDependencies": {
-		"@wordpress/scripts": "^27.5.0"
+		"@wordpress/scripts": "^29.0.0"
 	}
 }
