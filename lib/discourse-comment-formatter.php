@@ -139,7 +139,7 @@ class DiscourseCommentFormatter extends DiscourseBase {
 				$comment_html   = str_replace( '{comment_body}', $comment_body, $comment_html );
 				$comment_html   = str_replace( '{comment_created_at}', $this->format_date( $post->created_at, $datetime_format ), $comment_html );
 				$comments_html .= $comment_html;
-				$displayed_comment_number++;
+				++$displayed_comment_number;
 			}
 			foreach ( $participants as $participant ) {
 				$participant_html   = wp_kses_post( Templates::participant_html() );
@@ -213,7 +213,8 @@ class DiscourseCommentFormatter extends DiscourseBase {
 		}
 
 		$link_text = apply_filters( 'wpdc_join_discussion_link_text', $link_text, $comments_count, $post_id );
-
-		return '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '"' . $new_tab . '>' . esc_html( $link_text ) . '</a></div>';
+    $link_html     = '<div class="wpdc-join-discussion"><a class="wpdc-join-discussion-link" href="' . esc_url_raw( $discourse_permalink ) . '"' . $new_tab . '>' . esc_html( $link_text ) . '</a></div>';
+    $link_html     = apply_filters( 'wpdc_join_discussion_link_html', $link_html, $discourse_permalink, $new_tab, $link_text );
+		return $link_html;
 	}
 }
