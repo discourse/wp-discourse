@@ -124,11 +124,11 @@ class DiscoursePublish extends DiscourseBase {
 		$publish_status_not_set = 'publish' !== get_post_status( $post_id );
 		$publish_private        = apply_filters( 'wpdc_publish_private_post', false, $post_id );
 		return wp_is_post_revision( $post_id )
-			 || ( $publish_status_not_set && ! $publish_private )
-			 || $plugin_unconfigured
-			 || empty( $post->post_title )
-			 || ! $this->is_valid_sync_post_type( $post_id )
-			 || $this->has_excluded_tag( $post );
+			|| ( $publish_status_not_set && ! $publish_private )
+			|| $plugin_unconfigured
+			|| empty( $post->post_title )
+			|| ! $this->is_valid_sync_post_type( $post_id )
+			|| $this->has_excluded_tag( $post );
 	}
 
 	/**
@@ -142,6 +142,10 @@ class DiscoursePublish extends DiscourseBase {
 	 * @return bool
 	 */
 	protected function auto_publish( $post_id ) {
+    // Don't auto-publish quick edits.
+    if ( $this->quick_edit() ) {
+				return false;
+    }
 		// If the auto-publish option is enabled publish unpublished topics, unless the setting has been overridden.
 		$auto_publish_overridden = intval( $this->dc_get_post_meta( $post_id, 'wpdc_auto_publish_overridden', true ) ) === 1;
 		return ! $auto_publish_overridden && ! empty( $this->options['auto-publish'] );
@@ -871,6 +875,15 @@ class DiscoursePublish extends DiscourseBase {
 
 		return $row ? true : false;
 	}
+
+    /**
+     * Determines if request is a quick edit.
+     *
+     * @return bool
+     */
+    public function quick_edit() {
+		return check_ajax_referer( 'inlineeditnonce', '_inline_edit', false );
+    }
 
 	/**
 	 * Gets post metadata via wp method, or directly from db, depending on the direct-db-publication-flags option.

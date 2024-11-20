@@ -54,9 +54,9 @@ class DiscoursePublishTest extends UnitTest {
 		$this->publish->setup_logger();
 	}
 
-	 /**
-	  * Sync_to_discourse handles new posts correctly.
-	  */
+	/**
+	 * Sync_to_discourse handles new posts correctly.
+	 */
 	public function test_sync_to_discourse_when_creating() {
 		// Set up a response body for creating a new post.
 		$body                = $this->mock_remote_post_success( 'post_create', 'POST' );
@@ -853,12 +853,12 @@ class DiscoursePublishTest extends UnitTest {
 		wp_delete_post( $post_id );
 	}
 
-  /**
-   * Test that HTML entities are converted to their special characters.
-   */
-  public function test_conversion_of_html_entities_in_title() {
-		$title_with_entities = 'Title with &amp; and &#8211;';
-		$title_with_decoded_entities = 'Title with & and –';
+    /**
+     * Test that HTML entities are converted to their special characters.
+     */
+    public function test_conversion_of_html_entities_in_title() {
+		$title_with_entities           = 'Title with &amp; and &#8211;';
+		$title_with_decoded_entities   = 'Title with & and –';
 		self::$post_atts['post_title'] = $title_with_entities;
 
 		$response         = $this->build_response( 'success' );
@@ -891,7 +891,7 @@ class DiscoursePublishTest extends UnitTest {
 
 		// Cleanup.
 		wp_delete_post( $post_id );
-  }
+    }
 
 	/**
 	 * Posts can only be published via XMLRPC by hooking into the wp_discourse_before_xmlrpc_publish filter with a function
@@ -940,6 +940,31 @@ class DiscoursePublishTest extends UnitTest {
 		$this->assertTrue( $this->publish->xmlrpc_publish_post_to_discourse( $post_id ) );
 
 		// Cleanup.
+		wp_delete_post( $post_id );
+	}
+
+    /**
+     * When the auto-publish option is enabled, quick edits of un-published posts are not published
+     */
+    public function test_quick_edits_of_unpublished_posts() {
+		$plugin_options                 = self::$plugin_options;
+		$plugin_options['auto-publish'] = 1;
+
+		$publish = \Mockery::mock( $this->publish )->makePartial();
+		$publish->setup_options( $plugin_options );
+
+		$post_atts = self::$post_atts;
+		$post_id   = wp_insert_post( $post_atts, false, false );
+
+		$publish->shouldReceive( 'quick_edit' )->andReturn( true );
+
+		$post = get_post( $post_id );
+		$publish->publish_post_after_save( $post_id, $post );
+
+		$publish->shouldNotReceive( 'sync_to_discourse' );
+
+		$this->assertEmpty( get_post_meta( $post_id, 'discourse_post_id', true ) );
+
 		wp_delete_post( $post_id );
 	}
 
