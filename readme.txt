@@ -123,7 +123,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-#### 2.5.6 10/10/2024
+#### 2.5.6 11/12/2024
 
 - Security updates.
 - Fix incorrect auto-publish of quick edits.
