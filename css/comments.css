@@ -159,6 +159,10 @@ span.badge-category-bg {
 	text-align: left;
 }
 
+.discourse-comments-area .comment-reply-title .wpdc-discourse-topic-link {
+	margin-left: 0.25em;
+}
+
 .discourse-comments-area .comment-respond p:not(.comment-notes) {
 	max-width: none;
 }

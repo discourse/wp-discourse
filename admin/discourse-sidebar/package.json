@@ -4,12 +4,18 @@
 	"description": "Adds a Discourse Sidebar to the Block Editor",
 	"main": "build/index.js",
 	"scripts": {
-		"start": "wp-scripts start",
-		"build": "wp-scripts build"
+		"dev": "nodemon --watch src --exec 'wp-scripts start'",
+		"build": "wp-scripts build",
+		"format:css": "wp-scripts lint-style --fix",
+		"format:js": "wp-scripts format",
+		"lint:css": "wp-scripts lint-style",
+		"lint:js": "wp-scripts lint-js",
+		"start": "wp-scripts start"
 	},
 	"author": "Discourse",
 	"license": "GPL",
 	"devDependencies": {
-		"@wordpress/scripts": "^29.0.0"
+		"@wordpress/scripts": "^30.12.0",
+		"nodemon": "3.1.9"
 	}
 }

@@ -5,6 +5,7 @@
 .wpdc-permalink {
 	margin-bottom: 16px;
 }
+
 a.wpdc-permalink-link {
 	text-decoration: none;
 }
@@ -12,7 +13,7 @@ a.wpdc-permalink-link {
 button.components-button.is-button.is-default.is-primary.is-large.active {
 	color: #fff;
 	background-size: 100px 100%;
-	background-image: linear-gradient(-45deg,#0085ba 28%,#005d82 28%,#005d82 72%,#0085ba 72%);
+	background-image: linear-gradient(-45deg, #0085ba 28%, #005d82 28%, #005d82 72%, #0085ba 72%);
 	border-color: #00435d;
 	animation: components-button__busy-animation 2.5s infinite linear;
 	animation-name: components-button__busy-animation;
@@ -27,11 +28,11 @@ button.components-button.is-button.is-default.is-primary.is-large.active {
 }
 
 .wpdc-button {
-  margin-bottom: 16px;
+	margin-bottom: 16px;
 }
 
 input.wpdc-topic-url-input {
-  margin-bottom: 16px;
+	margin-bottom: 16px;
 }
 
 .wpdc-publishing-options {
@@ -79,20 +80,20 @@ input.wpdc-topic-url-input {
 }
 
 h2.wpdc-panel-section-title {
-  color: #555d66;
-  display: block;
-  padding: 0;
-  font-size: inherit;
-  margin-top: 0;
-  margin-bottom: 0;
-  margin-left: -15px;
-  margin-right: -15px;
-  transition: .1s background ease-in-out;
-  border-top: 1px solid #e2e4e7;
+	color: #555d66;
+	display: block;
+	padding: 0;
+	font-size: inherit;
+	margin-top: 0;
+	margin-bottom: 0;
+	margin-left: -15px;
+	margin-right: -15px;
+	transition: 0.1s background ease-in-out;
+	border-top: 1px solid #e2e4e7;
 }
 
 h2.wpdc-panel-section-title:hover {
-  background: #f8f9f9;
+	background: #f8f9f9;
 }
 
 hr.wpdc-sidebar-hr {
@@ -102,7 +103,7 @@ hr.wpdc-sidebar-hr {
 }
 
 /* tags */
-.wpdc-sidebar .components-form-token-field__input-container input[type=text].components-form-token-field__input {
+.wpdc-sidebar .components-form-token-field__input-container input[type="text"].components-form-token-field__input {
 	width: auto;
 }
 

@@ -4,6 +4,7 @@
 	"description": "WP Discourse Comments",
 	"main": "build/index.js",
 	"scripts": {
+		"dev": "nodemon --watch src --exec 'wp-scripts start'",
 		"build": "wp-scripts build",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
@@ -13,7 +14,8 @@
 	"author": "Discourse",
 	"license": "GPL",
 	"devDependencies": {
-		"@wordpress/scripts": "*"
+		"@wordpress/scripts": "^30.12.0",
+		"nodemon": "3.1.9"
 	},
 	"dependencies": {
 		"date-fns": "^2.29.3",
