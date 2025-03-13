@@ -10,4 +10,4 @@ namespace WPDiscourse\Logs;
 /**
  * Class NullHandler
  */
-class NullHandler extends \WPDiscourse\Monolog\Handler\NullHandler {};
+class NullHandler extends \WPDiscourse\Monolog\Handler\NullHandler {}

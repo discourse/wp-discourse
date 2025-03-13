@@ -32,7 +32,7 @@ class DiscourseCommentFormatterTest extends UnitTest {
     protected $discourse_post;
 
     /**
-     * Wordpress post id
+     * WordPress post id
      *
      * @access protected
      * @var int

@@ -308,7 +308,7 @@ class SettingsValidator {
 		$output = array();
 
 		if ( is_string( $input ) ) {
-			$input  = explode( ',', $input );
+			$input = explode( ',', $input );
 		}
 
 		foreach ( $input as $tag_slug ) {

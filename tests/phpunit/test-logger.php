@@ -82,8 +82,8 @@ class LoggerTest extends UnitTest {
 		 */
 		public function test_create_logs_not_enabled() {
 		self::$plugin_options['logs-enabled'] = 0;
-		$logger   = Logger::create( 'test', self::$plugin_options );
-		$handlers = $logger->getHandlers();
+		$logger                               = Logger::create( 'test', self::$plugin_options );
+		$handlers                             = $logger->getHandlers();
 
 		$this->assertCount( 1, $handlers );
 		$this->assertContainsOnlyInstancesOf( NullHandler::class, $handlers );

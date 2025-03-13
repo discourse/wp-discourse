@@ -76,29 +76,29 @@ class OptionsPage {
 
 			<h2 class="nav-tab-wrapper nav-tab-first-level">
 				<a href="?page=wp_discourse_options&tab=connection_options"
-				   class="nav-tab <?php echo 'connection_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Connection', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'connection_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Connection', 'wp-discourse' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=publishing_options"
-				   class="nav-tab <?php echo 'publishing_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Publishing', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'publishing_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Publishing', 'wp-discourse' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=commenting_options"
-				   class="nav-tab <?php echo 'commenting_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Commenting', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'commenting_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Commenting', 'wp-discourse' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=text_content_options"
-				   class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'text_content_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Text Content', 'wp-discourse' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=webhook_options"
-				   class="nav-tab <?php echo 'webhook_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'webhook_options' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Webhooks', 'wp-discourse' ); ?>
 				</a>
 
 				<?php $sso_active = 'sso_options' === $tab || 'sso_options' === $parent; ?>
 
 				<a href="?page=wp_discourse_options&tab=sso_options"
-				   class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo $sso_active ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'DiscourseConnect', 'wp-discourse' ); ?>
 				</a>
 
 				<a href="?page=wp_discourse_options&tab=log_viewer"
-				   class="nav-tab <?php echo 'log_viewer' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Logs', 'wp-discourse' ); ?>
+					class="nav-tab <?php echo 'log_viewer' === $tab ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Logs', 'wp-discourse' ); ?>
 				</a>
 
 				<?php
@@ -161,8 +161,8 @@ class OptionsPage {
 
 					$multisite_configuration = get_site_option( 'wpdc_multisite_configuration' );
 					$hide_submit_button      = ( is_multisite() &&
-										  ( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
-										  ! empty( $multisite_configuration ) );
+											( 'connection_options' === $tab || 'webhook_options' === $tab || 'sso_options' === $tab || 'sso_common' === $tab ) &&
+											! empty( $multisite_configuration ) );
 
 					if ( ! $hide_submit_button ) {
 						submit_button( 'Save Options', 'primary', 'discourse_save_options', false );

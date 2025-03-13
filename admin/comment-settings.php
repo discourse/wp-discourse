@@ -466,8 +466,8 @@ class CommentSettings {
 			'custom-datetime-format',
 			'discourse_comment',
 			__( 'The datetime format used for displaying the comment date/time. (default: "', 'wp-discourse' ) .
-																				  get_option( 'date_format' ) . '").' .
-																				  __( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank" rel="noreferrer noopener">' .
+																					get_option( 'date_format' ) . '").' .
+																					__( ' See ', 'wp-discourse' ) . '<a href="https://codex.wordpress.org/Formatting_Date_and_Time" target="_blank" rel="noreferrer noopener">' .
 			__( 'this page', 'wp-discourse' ) . '</a>' . __( ' for more information.', 'wp-discourse' )
 		);
 	}
@@ -494,10 +494,10 @@ class CommentSettings {
 			<em>
 				<?php esc_html_e( 'For detailed instructions, see the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+					target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'and', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $template_customization_url ); ?>"
-				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
+					target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse template customization', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topics on the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>

@@ -262,14 +262,14 @@ class SSOSettings {
 			);
 
     add_settings_field(
-			  'discourse_sso_disable_create_user',
-			  __( 'Disable user creation', 'wp-discourse' ),
+				'discourse_sso_disable_create_user',
+				__( 'Disable user creation', 'wp-discourse' ),
 				array(
 					$this,
 					'sso_client_disable_create_user_checkbox',
 				),
-			  'discourse_sso_client',
-			  'discourse_sso_client_settings_section'
+				'discourse_sso_client',
+				'discourse_sso_client_settings_section'
 			);
 
 			add_settings_field(
@@ -338,16 +338,16 @@ class SSOSettings {
 			?>
 			<h3 class="nav-tab-wrapper nav-tab-second-level">
 				<a href="?page=wp_discourse_options&tab=sso_common&parent_tab=sso_options"
-				   class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
+					class="nav-tab <?php echo 'sso_common' === $tab || 'sso_options' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'DiscourseConnect Secret Key', 'wpdc' ); ?>
 				</a>
 				<a href="?page=wp_discourse_options&tab=sso_provider&parent_tab=sso_options"
-				   class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
+					class="nav-tab <?php echo 'sso_provider' === $tab ? 'nav-tab-active' : ''; ?>">
 					<?php esc_html_e( 'DiscourseConnect Provider', 'wpdc' ); ?>
 				</a>
 				<?php if ( ! $this->remove_sso_client_settings ) : ?>
 					<a href="?page=wp_discourse_options&tab=sso_client&parent_tab=sso_options"
-					   class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
+						class="nav-tab <?php echo 'sso_client' === $tab ? 'nav-tab-active' : ''; ?>">
 						<?php esc_html_e( 'DiscourseConnect Client', 'wpdc' ); ?>
 					</a>
 				<?php endif; ?>
@@ -672,7 +672,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "You can find your forum's DiscourseConnect settings ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+						target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>
@@ -725,7 +725,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "Your forum's DiscourseConnect settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+						target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>
@@ -817,7 +817,7 @@ class SSOSettings {
 				<em>
 					<?php esc_html_e( "Your forum's DiscourseConnect settings are ", 'wp-discourse' ); ?>
 					<a href="<?php echo esc_url( $this->discourse_sso_settings_url ); ?>"
-					   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
+						target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'here', 'wp-discourse' ); ?></a><?php echo esc_html( '.' ); ?>
 				</em>
 			</p>
 		<?php endif; ?>

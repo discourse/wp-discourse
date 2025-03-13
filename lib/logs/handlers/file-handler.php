@@ -159,7 +159,7 @@ class FileHandler extends StreamHandler {
 
         // Ensure the log file is not too large.
         if ( file_exists( $this->url ) && ! $this->validate_size() ) {
-            $this->file_number++;
+            ++$this->file_number;
             $this->must_rotate = true;
             $this->close();
         }

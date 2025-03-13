@@ -140,7 +140,7 @@ class ConnectionSettings {
 				'api-key',
 				'discourse_connect',
 				__( 'Found on your forum at ', 'wp-discourse' ) . '<a href="' . esc_url( $discourse_options['url'] ) .
-																	   '/admin/api/keys" target="_blank" rel="norefferer noopener">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
+																		'/admin/api/keys" target="_blank" rel="norefferer noopener">' . esc_url( $discourse_options['url'] ) . '/admin/api/keys</a>. ' .
 				"If you haven't yet created an API key, Click 'New API Key', set User Level to 'All Users', set 'User' to an admin account, select 'Global Key' and click 'Save'. Copy and paste the API key here.",
 				'wp-discourse'
 			);
@@ -228,7 +228,7 @@ class ConnectionSettings {
 			<em>
 				<?php esc_html_e( 'For detailed instructions on setting up the plugin, please see the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $setup_howto_url ); ?>"
-				   target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
+					target="_blank" rel="noreferrer noopener"><?php esc_html_e( 'WP Discourse plugin installation and setup', 'wp-discourse' ); ?></a>
 				<?php esc_html_e( 'topic on the ', 'wp-discourse' ); ?>
 				<a href="<?php echo esc_url( $discourse_meta_url ); ?>" target="_blank" rel="noreferrer noopener">Discourse Meta</a>
 				<?php esc_html_e( 'forum.', 'wp-discourse' ); ?>

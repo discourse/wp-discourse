@@ -147,10 +147,10 @@ class HTMLTemplates {
 				<footer class="comment-meta">
 					<div class="comment-author vcard">
 						<img alt="Avatar for {username}" src="{avatar_url}" class="avatar avatar-64 photo avatar-default"
-							 height="64"
-							 width="64">
+							height="64"
+							width="64">
 						<b class="fn"><a href="{topic_url}" rel="external"
-										 class="url">{username}</a></b>
+										class="url">{username}</a></b>
 						<span class="says screen-reader-text"><?php echo esc_html( 'says:', 'wp-discourse' ); ?></span><!-- screen reader text -->
 					</div>
 					<div class="comment-metadata">
