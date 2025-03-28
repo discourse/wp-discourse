@@ -8,7 +8,8 @@ const { __ } = wp.i18n;
 const { PluginSidebar, PluginSidebarMoreMenuItem } = wp.editor;
 const { PanelBody } = wp.components;
 const { Component, Fragment } = wp.element;
-const { withSelect } = wp.data;
+const { withSelect, withDispatch } = wp.data;
+const { compose } = wp.compose;
 const { registerPlugin } = wp.plugins;
 
 const el = wp.element.createElement;
@@ -791,6 +792,7 @@ class PinTopic extends Component {
 class DiscourseSidebar extends Component {
 	constructor( props ) {
 		super( props );
+		this.initializePostMeta();
 		this.state = this.initializePostState( this.props.post );
 		this.getDiscourseCategories();
 
@@ -839,6 +841,17 @@ class DiscourseSidebar extends Component {
 			'wpdc_publishing_response',
 			'wpdc_publishing_error',
 		].some( ( attr ) => post.meta[ attr ] !== prev.meta[ attr ] );
+	}
+
+	initializePostMeta() {
+		if ( ! this.isAllowedPostType() ) {
+			return;
+		}
+
+		// If the post is already published and auto publish option is enabled, set auto publish overridden.
+		if ( this.props.post && this.props.post.status === 'publish' ) {
+			this.props.setAutoPublishOverridden( '1' );
+		}
 	}
 
 	initializePostState( post ) {
@@ -1378,20 +1391,31 @@ class DiscourseSidebar extends Component {
 	}
 }
 
-const HOC = withSelect(
-	(
-		select,
-		{
-			/*forceIsSaving*/
+const HOC = compose( [
+	withSelect(
+		(
+			select,
+			{
+				/*forceIsSaving*/
+			}
+		) => {
+			const { getCurrentPostId, getCurrentPost } =
+				select( 'core/editor' );
+			return {
+				postId: getCurrentPostId(),
+				post: getCurrentPost(),
+			};
 		}
-	) => {
-		const { getCurrentPostId, getCurrentPost } = select( 'core/editor' );
+	),
+	withDispatch( ( dispatch ) => {
+		const { editPost } = dispatch( 'core/editor' );
 		return {
-			postId: getCurrentPostId(),
-			post: getCurrentPost(),
+			setAutoPublishOverridden( value ) {
+				editPost( { meta: { wpdc_auto_publish_overridden: value } } );
+			},
 		};
-	}
-)( DiscourseSidebar );
+	} ),
+] )( DiscourseSidebar );
 
 registerPlugin( 'discourse-sidebar', {
 	icon: iconEl,
