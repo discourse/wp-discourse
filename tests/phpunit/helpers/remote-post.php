@@ -36,8 +36,8 @@ trait RemotePost {
 			$body = $this->response_body_json( $type, $sub_type );
 			} else {
 			$body = array(
-			'success'   => '{}',
-			'forbidden' => 'You are not permitted to view the requested resource. The API username or key is invalid.',
+				'success'   => '{}',
+				'forbidden' => 'You are not permitted to view the requested resource. The API username or key is invalid.',
 			)[ $type ];
 			}
 		return array(
@@ -69,9 +69,9 @@ trait RemotePost {
 			$message_type = $sub_type;
 			} else {
 			$messages     = array(
-			'invalid_parameters' => "You supplied invalid parameters to the request: $sub_type",
-			'not_found'          => "Sorry, that resource doesn't exist in our system.",
-			'forbidden'          => 'You are not permitted to view the requested resource. The API username or key is invalid.',
+				'invalid_parameters' => "You supplied invalid parameters to the request: $sub_type",
+				'not_found'          => "Sorry, that resource doesn't exist in our system.",
+				'forbidden'          => 'You are not permitted to view the requested resource. The API username or key is invalid.',
 			);
 			$message_type = $type;
 			}
@@ -106,15 +106,15 @@ trait RemotePost {
 				$is_sr   = ! empty( $second_request ) && ( strpos( $url, $second_request['url'] ) !== false );
 				$request = $is_sr ? $second_request : $first_request;
 
-				if ( $request['method'] != $args['method'] ) {
+				if ( $request['method'] !== $args['method'] ) {
 					return new \WP_Error( 'http_request_failed', 'Incorrect method' );
 					}
 
-				if ( isset( $request['headers'] ) && $request['headers'] != $args['headers'] ) {
+				if ( isset( $request['headers'] ) && $request['headers'] !== $args['headers'] ) {
 					return new \WP_Error( 'http_request_failed', 'Incorrect headers' );
 					}
 
-				if ( isset( $request['body'] ) && $request['body'] != $args['body'] ) {
+				if ( isset( $request['body'] ) && $request['body'] !== $args['body'] ) {
 					return new \WP_Error( 'http_request_failed', 'Incorrect body' );
 					}
 
