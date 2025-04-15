@@ -130,7 +130,7 @@ class Client extends SSOClientBase {
 					} else {
 
 						echo wp_kses_data( $this->get_discourse_sso_link_markup() ) .
-							 ' <em>' . esc_html__( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
+							' <em>' . esc_html__( 'To link accounts, your Discourse email address needs to match your WordPress email address', 'wp-discourse' ) . '</em>';
 					}
 					?>
 				</td>
@@ -231,17 +231,17 @@ class Client extends SSOClientBase {
 				}
 			}
 
-      if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-disable-create-user'] ) ) {
+        if ( empty( $user_query_results ) && ! empty( $this->options['sso-client-disable-create-user'] ) ) {
 					return new \WP_Error( 'no_matching_user' );
-      }
+        }
 
 			if ( empty( $user_query_results ) ) {
         $user_password = wp_generate_password( 12, true );
 
         $user_id = wp_create_user(
-          $this->get_sso_response( 'username' ),
-          $user_password,
-          $this->get_sso_response( 'email' )
+            $this->get_sso_response( 'username' ),
+            $user_password,
+            $this->get_sso_response( 'email' )
         );
 
         do_action( 'wpdc_sso_client_after_create_user', $user_id );
@@ -482,10 +482,10 @@ class Client extends SSOClientBase {
 
 		$path     = "/admin/users/$discourse_user_id/log_out";
 		$response = $this->discourse_request(
-             $path, array(
-				 'method' => 'POST',
-				 'raw'    => true,
-			 )
+            $path, array(
+				'method' => 'POST',
+				'raw'    => true,
+			)
             );
 
 		if ( ! $this->validate( $response ) ) {

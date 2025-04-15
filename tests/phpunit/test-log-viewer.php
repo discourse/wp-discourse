@@ -43,10 +43,10 @@ class LogViewerTest extends UnitTest {
      * Teardown each test.
      */
     public function tearDown(): void {
-      parent::tearDown();
+        parent::tearDown();
 
-      self::$plugin_options['logs-enabled'] = 1;
-      $this->viewer->setup_options( self::$plugin_options );
+        self::$plugin_options['logs-enabled'] = 1;
+        $this->viewer->setup_options( self::$plugin_options );
     }
 
     /**

@@ -14,91 +14,91 @@ use WPDiscourse\Test\RemotePost;
  * Base class for WPDiscourse unit tests
  */
 class UnitTest extends \WP_UnitTestCase {
-  use Logging;
-  use RemotePost;
+    use Logging;
+    use RemotePost;
 
-  /**
-   * Connection options.
-   *
-   * @access public
-   * @var object
-   */
-  public static $connection_options;
+    /**
+     * Connection options.
+     *
+     * @access public
+     * @var object
+     */
+    public static $connection_options;
 
-  /**
-   * Publish options.
-   *
-   * @access public
-   * @var object
-   */
-  public static $publish_options;
+    /**
+     * Publish options.
+     *
+     * @access public
+     * @var object
+     */
+    public static $publish_options;
 
-  /**
-   * Log options.
-   *
-   * @access public
-   * @var object
-   */
-  public static $log_options;
+    /**
+     * Log options.
+     *
+     * @access public
+     * @var object
+     */
+    public static $log_options;
 
-  /**
-   * Plugin options.
-   *
-   * @access public
-   * @var object
-   */
-  public static $plugin_options;
+    /**
+     * Plugin options.
+     *
+     * @access public
+     * @var object
+     */
+    public static $plugin_options;
 
-  /**
-   * WP_Post attributes.
-   *
-   * @access public
-   * @var object
-   */
-  public static $post_atts;
+    /**
+     * WP_Post attributes.
+     *
+     * @access public
+     * @var object
+     */
+    public static $post_atts;
 
-  /**
-   * Params used in remote posts.
-   *
-   * @access public
-   * @var object
-   */
-  public static $remote_post_params;
+    /**
+     * Params used in remote posts.
+     *
+     * @access public
+     * @var object
+     */
+    public static $remote_post_params;
 
-  /**
-   * URL of mock discourse instance.
-   *
-   * @access public
-   * @var string
-   */
-  public static $discourse_url;
+    /**
+     * URL of mock discourse instance.
+     *
+     * @access public
+     * @var string
+     */
+    public static $discourse_url;
 
-  /**
-   * Setup test class
-   */
-  public static function setUpBeforeClass(): void {
+    /**
+     * Setup test class
+     */
+    public static function setUpBeforeClass(): void {
 		self::initialize_shared_variables();
-  }
+    }
 
-  /**
-   * Setup each test.
-   */
-  public function setUp(): void {
+    /**
+     * Setup each test.
+     */
+    public function setUp(): void {
 	}
 
-  /**
-   * Teardown each test.
-   */
-  public function tearDown(): void {
+    /**
+     * Teardown each test.
+     */
+    public function tearDown(): void {
 		$this->clear_logs();
 		remove_all_filters( 'pre_http_request' );
 		\Mockery::close();
-  }
+    }
 
-  /**
-   * Initialize shared tests.
-   */
-  public static function initialize_shared_variables() {
+    /**
+     * Initialize shared tests.
+     */
+    public static function initialize_shared_variables() {
 		self::$discourse_url      = 'http://meta.discourse.org';
 		self::$connection_options = array(
 			'url'              => self::$discourse_url,
@@ -124,5 +124,5 @@ class UnitTest extends \WP_UnitTestCase {
 			),
 			'post_status'  => 'publish',
 		);
-  }
+    }
 }

@@ -12,7 +12,7 @@ use WPDiscourse\Test\DiscoursePublishTest;
  * DiscoursePublishMultisite test case.
  */
 class DiscoursePublishMultisiteTest extends DiscoursePublishTest {
-  use Multisite;
+    use Multisite;
 
     /**
      * Sync_to_discourse handles new posts correctly in multisite

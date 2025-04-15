@@ -30,8 +30,8 @@ class DiscourseCommentTest extends UnitTest {
     public function setUp(): void {
         parent::setUp();
 
-        $comment_formatter = new DiscourseCommentFormatter();
-        $this->comment     = new DiscourseComment( $comment_formatter );
+        $comment_formatter                                 = new DiscourseCommentFormatter();
+        $this->comment                                     = new DiscourseComment( $comment_formatter );
         self::$plugin_options['enable-discourse-comments'] = true;
         $this->comment->setup_options( self::$plugin_options );
         $this->comment->setup_logger();
@@ -145,12 +145,12 @@ class DiscourseCommentTest extends UnitTest {
         $private_category_id = null;
 
         foreach ( $categories as $category ) {
-          if ( false === $category->read_restricted ) {
+            if ( false === $category->read_restricted ) {
 				$public_category_id = $category->id;
-          }
-          if ( true === $category->read_restricted ) {
+            }
+            if ( true === $category->read_restricted ) {
 				$private_category_id = $category->id;
-          }
+            }
         }
 
         // Add the posts.
@@ -202,12 +202,12 @@ class DiscourseCommentTest extends UnitTest {
         $private_category_id = null;
 
         foreach ( $categories as $category ) {
-          if ( false === $category->read_restricted ) {
+            if ( false === $category->read_restricted ) {
 				$public_category_id = $category->id;
-          }
-          if ( true === $category->read_restricted ) {
+            }
+            if ( true === $category->read_restricted ) {
 				$private_category_id = $category->id;
-          }
+            }
         }
 
         // Add the posts.

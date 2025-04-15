@@ -15,66 +15,66 @@ use WPDiscourse\Test\UnitTest;
  */
 class DiscourseSSOTest extends UnitTest {
 
-  /**
-   * User id
-   *
-   * @access protected
-   * @var int
-   */
-  protected $user_id;
+    /**
+     * User id
+     *
+     * @access protected
+     * @var int
+     */
+    protected $user_id;
 
-  /**
-   * Secret
-   *
-   * @access protected
-   * @var string
-   */
-  protected $secret;
+    /**
+     * Secret
+     *
+     * @access protected
+     * @var string
+     */
+    protected $secret;
 
-  /**
-   * Nonce
-   *
-   * @access protected
-   * @var string
-   */
-  protected $nonce;
+    /**
+     * Nonce
+     *
+     * @access protected
+     * @var string
+     */
+    protected $nonce;
 
-  /**
-   * Query vars
-   *
-   * @access protected
-   * @var array
-   */
-  protected $query_vars;
+    /**
+     * Query vars
+     *
+     * @access protected
+     * @var array
+     */
+    protected $query_vars;
 
-  /**
-   * Client
-   *
-   * @access protected
-   * @var \WPDiscourse\DiscourseSSO\DiscourseSSO
-   */
-  protected $discourse_sso;
+    /**
+     * Client
+     *
+     * @access protected
+     * @var \WPDiscourse\DiscourseSSO\DiscourseSSO
+     */
+    protected $discourse_sso;
 
-  /**
-   * Signaure
-   *
-   * @access protected
-   * @var string
-   */
-  protected $signature;
+    /**
+     * Signaure
+     *
+     * @access protected
+     * @var string
+     */
+    protected $signature;
 
-  /**
-   * Payload
-   *
-   * @access protected
-   * @var string
-   */
-  protected $payload;
+    /**
+     * Payload
+     *
+     * @access protected
+     * @var string
+     */
+    protected $payload;
 
-  public function setUp(): void {
-		$this->secret = 'secret';
-		$this->nonce = 'abcd';
-		$this->payload = base64_encode( "nonce={$this->nonce}" );
+    public function setUp(): void {
+		$this->secret    = 'secret';
+		$this->nonce     = 'abcd';
+		$this->payload   = base64_encode( "nonce={$this->nonce}" );
 		$this->signature = hash_hmac( 'sha256', $this->payload, $this->secret );
 
 		self::$plugin_options['sso-secret'] = $this->secret;
@@ -88,69 +88,69 @@ class DiscourseSSOTest extends UnitTest {
 			'sso' => $this->payload,
 			'sig' => rawurlencode( $this->signature ),
 		);
-		$this->user_id = self::factory()->user->create();
-  }
+		$this->user_id    = self::factory()->user->create();
+    }
 
-  public function tearDown(): void {
+    public function tearDown(): void {
 		parent::tearDown();
 
 		$_GET['request'] = null;
 		delete_user_meta( $this->user_id, 'discourse_sso_user_id', true );
-  }
+    }
 
-  /**
-   * sso_parse_request without a user redirects to login with correct redirect_to url.
-   *
-   */
-  public function test_sso_parse_request_no_user() {
-		$parse_result = $this->discourse_sso->sso_parse_request( (object) array( 'query_vars' => $this->query_vars ) );
+    /**
+     * sso_parse_request without a user redirects to login with correct redirect_to url.
+     *
+     */
+    public function test_sso_parse_request_no_user() {
+		$parse_result    = $this->discourse_sso->sso_parse_request( (object) array( 'query_vars' => $this->query_vars ) );
 		$wp_redirect_url = add_query_arg( $this->payload, rawurlencode( $this->signature ) );
-		$wp_login_url = wp_login_url( esc_url_raw( $wp_redirect_url ) );
+		$wp_login_url    = wp_login_url( esc_url_raw( $wp_redirect_url ) );
 
 		$this->assertEquals( $parse_result, $wp_login_url );
-  }
+    }
 
-  /**
-   * sso_parse_request with a user validates payload and redirects to Discourse.
-   *
-   */
-  public function test_sso_parse_request_user() {
-		$user = wp_set_current_user( $this->user_id );
+    /**
+     * sso_parse_request with a user validates payload and redirects to Discourse.
+     *
+     */
+    public function test_sso_parse_request_user() {
+		$user         = wp_set_current_user( $this->user_id );
 		$parse_result = $this->discourse_sso->sso_parse_request( (object) array( 'query_vars' => $this->query_vars ) );
 
-		$params = array_merge( $this->discourse_sso->get_sso_params( $user ), array( 'nonce' => $this->nonce ) );
-		$payload = base64_encode( http_build_query( $params ) );
-		$signature = hash_hmac( 'sha256', $payload, $this->secret );
-		$query_vars = array(
+		$params        = array_merge( $this->discourse_sso->get_sso_params( $user ), array( 'nonce' => $this->nonce ) );
+		$payload       = base64_encode( http_build_query( $params ) );
+		$signature     = hash_hmac( 'sha256', $payload, $this->secret );
+		$query_vars    = array(
 			'sso' => $payload,
 			'sig' => $signature,
 		);
 		$discourse_url = self::$plugin_options['url'] . '/session/sso_login?' . http_build_query( $query_vars );
 
 		$this->assertEquals( $parse_result, $discourse_url );
-  }
+    }
 
-  /**
-   * sso_parse_request handles logout requests from Discourse
-   *
-   */
-  public function test_sso_parse_request_logout() {
+    /**
+     * sso_parse_request handles logout requests from Discourse
+     *
+     */
+    public function test_sso_parse_request_logout() {
 		$user = wp_set_current_user( $this->user_id );
 
 		$_GET['request'] = 'logout';
 		$this->discourse_sso->sso_parse_request( (object) array( 'query_vars' => array() ) );
 
 		$this->assertEquals( is_user_logged_in(), false );
-  }
+    }
 
-  /**
-   * sso_parse_request handles invalid signature
-   *
-   */
-  public function test_sso_parse_request_invalid_signature() {
+    /**
+     * sso_parse_request handles invalid signature
+     *
+     */
+    public function test_sso_parse_request_invalid_signature() {
 		$user = wp_set_current_user( $this->user_id );
 
-		$query_vars = array(
+		$query_vars   = array(
 			'sso' => $this->query_vars['sso'],
 			'sig' => 'i2v0a8l9i6d',
 		);
@@ -161,17 +161,17 @@ class DiscourseSSOTest extends UnitTest {
 
 		$log = $this->get_last_log();
 		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
-  }
+    }
 
-  /**
-   * sso_parse_request handles invalid nonce
-   *
-   */
-  public function test_sso_parse_request_invalid_nonce() {
+    /**
+     * sso_parse_request handles invalid nonce
+     *
+     */
+    public function test_sso_parse_request_invalid_nonce() {
 		$user = wp_set_current_user( $this->user_id );
 
-		$payload = base64_encode( "not_nonce={$this->nonce}" );
-		$query_vars = array(
+		$payload      = base64_encode( "not_nonce={$this->nonce}" );
+		$query_vars   = array(
 			'sso' => $payload,
 			'sig' => hash_hmac( 'sha256', $payload, $this->secret ),
 		);
@@ -184,13 +184,13 @@ class DiscourseSSOTest extends UnitTest {
 		$log = $this->get_last_log();
 		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: parse_request.invalid_sso/', $log );
 		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
-  }
+    }
 
-  /**
-   * logout_from_discourse logs out user from Discourse
-   *
-   */
-  public function test_logout_from_discourse() {
+    /**
+     * logout_from_discourse logs out user from Discourse
+     *
+     */
+    public function test_logout_from_discourse() {
 		$user = wp_set_current_user( $this->user_id );
 
 		$second_request = array(
@@ -205,13 +205,13 @@ class DiscourseSSOTest extends UnitTest {
 
 		$discourse_user_id = get_user_meta( $user->ID, 'discourse_sso_user_id', true );
 		$this->assertEquals( $discourse_user_id, $discourse_user->user->id );
-  }
+    }
 
-  /**
-   * logout_from_discourse handles failure to get Discourse user
-   *
-   */
-  public function test_logout_from_discourse_failed_to_get_discourse_user() {
+    /**
+     * logout_from_discourse handles failure to get Discourse user
+     *
+     */
+    public function test_logout_from_discourse_failed_to_get_discourse_user() {
 		$user = wp_set_current_user( $this->user_id );
 
 		$request = array(
@@ -229,15 +229,15 @@ class DiscourseSSOTest extends UnitTest {
 		$log = $this->get_last_log();
 		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: logout.discourse_user/', $log );
 		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
-  }
+    }
 
-  /**
-   * logout_from_discourse handles failure to logout
-   *
-   */
-  public function test_logout_from_discourse_failed_to_logout() {
-		$user = wp_set_current_user( $this->user_id );
-		$response = $this->build_response( 'not_found' );
+    /**
+     * logout_from_discourse handles failure to logout
+     *
+     */
+    public function test_logout_from_discourse_failed_to_logout() {
+		$user           = wp_set_current_user( $this->user_id );
+		$response       = $this->build_response( 'not_found' );
 		$second_request = array(
 			'url'      => 'log_out',
 			'method'   => 'POST',
@@ -254,5 +254,5 @@ class DiscourseSSOTest extends UnitTest {
 		$log = $this->get_last_log();
 		$this->assertMatchesRegularExpression( '/sso_provider.ERROR: logout.response_error/', $log );
 		$this->assertMatchesRegularExpression( '/"message":"' . $error_message . '"/', $log );
-  }
+    }
 }

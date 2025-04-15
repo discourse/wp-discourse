@@ -13,12 +13,12 @@ use WPDiscourse\DiscoursePublish\DiscoursePublish;
  * SyncDiscourseTopicMultisiteTest test case.
  */
 class SyncDiscourseTopicMultisiteTest extends SyncDiscourseTopicTest {
-  use Multisite;
+    use Multisite;
 
-  /**
-   * update_topic_content handles webhook results correctly in multisite.
-   */
-  public function test_update_topic_content() {
+    /**
+     * update_topic_content handles webhook results correctly in multisite.
+     */
+    public function test_update_topic_content() {
 		// Set as multisite.
 		self::$plugin_options['multisite-configuration-enabled'] = 1;
 		$this->sync_topic->setup_options( self::$plugin_options );
@@ -46,5 +46,5 @@ class SyncDiscourseTopicMultisiteTest extends SyncDiscourseTopicTest {
 		// Cleanup
 		wp_delete_post( $post_id );
 		restore_current_blog();
-  }
+    }
 }

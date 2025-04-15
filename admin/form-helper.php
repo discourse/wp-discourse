@@ -97,8 +97,8 @@ class FormHelper {
 
 		?>
 		<input id='discourse-<?php echo esc_attr( $option ); ?>'
-			   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-			   type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
+				name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+				type="<?php echo isset( $type ) ? esc_attr( $type ) : 'text'; ?>"
 			<?php
 			if ( isset( $min ) ) {
 				echo 'min="' . esc_attr( $min ) . '"';
@@ -109,7 +109,7 @@ class FormHelper {
 				echo 'max="' . esc_attr( $max ) . '"';
 			}
 			?>
-			   value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
+				value='<?php echo esc_attr( $value ); ?>' class="regular-text ltr"/>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
 		<?php
 	}
@@ -143,12 +143,12 @@ class FormHelper {
 		?>
 		<label>
 			<input name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-				   type='hidden'
-				   value='0'/>
+					type='hidden'
+					value='0'/>
 			<input id='discourse-<?php echo esc_attr( $option ); ?>'
-				   name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
-				   type='checkbox'
-				   value='1' <?php echo esc_attr( $checked ); ?> />
+					name='<?php echo esc_attr( $this->option_name( $option, $option_group ) ); ?>'
+					type='checkbox'
+					value='1' <?php echo esc_attr( $checked ); ?> />
 			<?php echo wp_kses( $label, $allowed ); ?>
 		</label>
 		<p class="description"><?php echo wp_kses( $description, $allowed ); ?></p>
@@ -265,7 +265,7 @@ class FormHelper {
 
 		?>
 		<textarea cols=100 rows=6 id='discourse_<?php echo esc_attr( $option ); ?>'
-				  name='<?php echo esc_attr( $option ); ?>'><?php echo esc_textarea( $value ); ?></textarea>
+					name='<?php echo esc_attr( $option ); ?>'><?php echo esc_textarea( $value ); ?></textarea>
 		<p class="description"><?php echo esc_html( $description ); ?></p>
 		<?php
 	}

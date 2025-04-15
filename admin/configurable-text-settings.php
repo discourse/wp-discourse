@@ -478,7 +478,7 @@ class ConfigurableTextSettings {
 		if ( 'text_content_options' === $tab ) {
 			?>
 			<form action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>"
-				  method="post">
+					method="post">
 				<?php wp_nonce_field( 'text_options_reset', 'text_options_reset_nonce' ); ?>
 
 				<input type="hidden" name="action" value="text_options_reset">
@@ -493,7 +493,7 @@ class ConfigurableTextSettings {
 	 */
 	public function process_text_options_reset() {
 		if ( ! isset( $_POST['text_options_reset_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
+			! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['text_options_reset_nonce'] ) ), 'text_options_reset' ) // Input var okay.
 		) {
 
 			exit;

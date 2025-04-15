@@ -60,4 +60,4 @@ class Logger extends \WPDiscourse\Monolog\Logger {
 
     		return $logger;
     }
-};
+}

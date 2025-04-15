@@ -114,7 +114,7 @@ class FileManager {
     protected function create_files( $files ) {
         foreach ( $files as $file ) {
             if ( ! $file['base'] ) {
-              continue;
+                continue;
             }
 
     		    $file_path = trailingslashit( $file['base'] ) . $file['file'];
@@ -130,7 +130,7 @@ class FileManager {
                 if ( $file_handle ) {
           					fwrite( $file_handle, $file['content'] );
           					fclose( $file_handle );
-        				}
+					}
         		}
             // phpcs:enable Wordpress.WP.AlternativeFunctions
     		}
@@ -145,7 +145,7 @@ class FileManager {
     protected function files_are_ready( $files ) {
     		foreach ( $files as $file ) {
             if ( ! $file['base'] ) {
-              return false;
+                return false;
             }
 
             $directory_path = trailingslashit( $file['base'] );

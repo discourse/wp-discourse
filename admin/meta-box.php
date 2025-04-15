@@ -62,7 +62,7 @@ class MetaBox {
 			return null;
 		}
 		if ( isset( $this->options['allowed_post_types'] ) &&
-				 in_array( $post_type, $this->options['allowed_post_types'], true )
+				in_array( $post_type, $this->options['allowed_post_types'], true )
 			) {
 			add_meta_box(
 				'discourse-publish-meta-box',
@@ -108,10 +108,10 @@ class MetaBox {
 		$published        = get_post_meta( $post_id, 'discourse_post_id', true );
 		$publishing_error = get_post_meta( $post_id, 'wpdc_publishing_error', true );
 		$saved            = 'publish' === get_post_status( $post_id ) ||
-							   'future' === get_post_status( $post_id ) ||
-							   'draft' === get_post_status( $post_id ) ||
-							   'private' === get_post_status( $post_id ) ||
-							   'pending' === get_post_status( $post_id );
+								'future' === get_post_status( $post_id ) ||
+								'draft' === get_post_status( $post_id ) ||
+								'private' === get_post_status( $post_id ) ||
+								'pending' === get_post_status( $post_id );
 		// Todo: these values are incorrect if a draft was saved when the plugin wasn't enabled.
 		$publish_to_discourse = $saved ? get_post_meta( $post_id, 'publish_to_discourse', true ) : $this->options['auto-publish'];
 		$publish_category_id  = $saved ? get_post_meta( $post_id, 'publish_post_category', true ) : $this->options['publish-category'];
@@ -194,7 +194,7 @@ class MetaBox {
 	 */
 	public function save_meta_box( $post_id ) {
 		if ( ! isset( $_POST['publish_to_discourse_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
+			! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['publish_to_discourse_nonce'] ) ), 'publish_to_discourse' ) // Input var okay.
 		) {
 
 			return 0;

@@ -70,7 +70,7 @@ class UserProfile {
 						</th>
 						<td>
 							<input type="text" name="discourse_username"
-								   value="<?php echo esc_attr( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
+									value="<?php echo esc_attr( $discourse_username ); ?>" <?php echo disabled( $username_editable, false, false ); ?>>
 							<em><?php echo esc_html( $discourse_username_description ); ?></em>
 						</td>
 					</tr>
@@ -80,7 +80,7 @@ class UserProfile {
                 $sso_enabled = ! empty( $this->options['enable-sso'] );
 				if ( $is_admin && $sso_enabled ) :
 					$email_verified_meta = get_user_meta( $profile_user->ID, 'discourse_email_not_verified', true );
-                    $email_verified = empty( $email_verified_meta );
+                    $email_verified      = empty( $email_verified_meta );
 					?>
 					<tr>
 						<th>
@@ -105,19 +105,19 @@ class UserProfile {
 	 */
 	public function update_discourse_user_metadata( $user_id ) {
 		if ( ! isset( $_POST['update_discourse_usermeta_nonce'] ) || // Input var okay.
-			 ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_usermeta_nonce'] ) ), 'update_discourse_usermeta' ) // Input var okay.
+			! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['update_discourse_usermeta_nonce'] ) ), 'update_discourse_usermeta' ) // Input var okay.
 		) {
 
 			return 0;
 		}
-		$is_admin = current_user_can( 'manage_options' );
+		$is_admin    = current_user_can( 'manage_options' );
 		$sso_enabled = ! empty( $this->options['enable-sso'] );
 		if ( $is_admin && $sso_enabled ) {
 		    // This gets ugly because of support for php 5.4.
 		    $email_verified = false;
 		    if ( isset( $_POST['email_verified'] ) ) {
 		        $email_verified_value = intval( wp_unslash( $_POST['email_verified'] ) );
-		        $email_verified = ! empty( $email_verified_value );
+		        $email_verified       = ! empty( $email_verified_value );
             }
 			if ( $email_verified ) {
 				delete_user_meta( $user_id, 'discourse_email_not_verified' );

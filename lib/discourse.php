@@ -298,6 +298,9 @@ class Discourse {
 	 * Adds the WP Discourse URL to the <head> for use in the client.
 	 */
 	public function wpdc_url() {
+    if ( empty( $this->options['url'] ) ) {
+				return;
+    }
 		echo '<meta name="wpdc-url" content="' . esc_html( $this->options['url'] ) . '" />';
 	}
 

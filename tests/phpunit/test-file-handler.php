@@ -71,8 +71,8 @@ class FileHandlerTest extends UnitTest {
 		$log_files = glob( $manager->logs_dir . '/*.log' );
 		$this->assertCount( 1, $log_files );
 
-		$log_file = $log_files[0];
-		$last_entry   = shell_exec( "tail -n 1 $log_file" );
+		$log_file   = $log_files[0];
+		$last_entry = shell_exec( "tail -n 1 $log_file" );
 		$this->assertMatchesRegularExpression( '/New Log/', $last_entry );
 		}
 
@@ -97,7 +97,7 @@ class FileHandlerTest extends UnitTest {
 			$line = fgets( $handle );
 
 			if ( strpos( $line, 'Multi Log' ) !== false ) {
-						$matching_line_count++;
+						++$matching_line_count;
 				}
 			}
 		fclose( $handle );
