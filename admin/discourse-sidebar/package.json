@@ -15,7 +15,7 @@
 	"author": "Discourse",
 	"license": "GPL",
 	"devDependencies": {
-		"@wordpress/scripts": "^30.12.0",
-		"nodemon": "3.1.9"
+		"@wordpress/scripts": "^30.16.0",
+		"nodemon": "3.1.10"
 	}
 }
