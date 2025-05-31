@@ -335,6 +335,11 @@ class DiscoursePublish extends DiscourseBase {
 			$tags = array();
 		}
 
+    $featured_link = null;
+    if ( $add_featured_link ) {
+				$featured_link = apply_filters( 'wpdc_publish_featured_link', $permalink, $post_id );
+    }
+
 		$remote_post_type = '';
 
 		// The post hasn't been published to Discourse yet.
@@ -349,7 +354,7 @@ class DiscoursePublish extends DiscourseBase {
 
 			$body = array(
 				'embed_url'        => $permalink,
-				'featured_link'    => $add_featured_link ? $permalink : null,
+				'featured_link'    => $featured_link,
 				'title'            => $title,
 				'raw'              => $baked,
 				'category'         => $category,
@@ -472,9 +477,9 @@ class DiscoursePublish extends DiscourseBase {
 			}
 
 			// Update the topic's featured_link property.
-			if ( ! empty( $options['add-featured-link'] ) ) {
+			if ( $add_featured_link ) {
 				$body                = array(
-					'featured_link' => $permalink,
+					'featured_link' => $featured_link,
 				);
 				$remote_post_options = array(
 					'method' => 'PUT',

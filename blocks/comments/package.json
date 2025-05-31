@@ -14,12 +14,12 @@
 	"author": "Discourse",
 	"license": "GPL",
 	"devDependencies": {
-		"@wordpress/scripts": "^30.12.0",
-		"nodemon": "3.1.9"
+		"@wordpress/scripts": "^30.16.0",
+		"nodemon": "3.1.10"
 	},
 	"dependencies": {
-		"date-fns": "^2.29.3",
-		"html-react-parser": "^3.0.4",
-		"react-inlinesvg": "^3.0.1"
+		"date-fns": "^4.1.0",
+		"html-react-parser": "^5.2.5",
+		"react-inlinesvg": "^4.2.0"
 	}
 }
