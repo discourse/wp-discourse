@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WP-Discourse
  * Description: Use Discourse as a community engine for your WordPress blog
- * Version: 2.5.8
+ * Version: 2.5.9
  * Requires at least: 5.1
  * Requires PHP: 5.6
  * Author: Discourse
