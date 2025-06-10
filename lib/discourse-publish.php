@@ -932,7 +932,7 @@ class DiscoursePublish extends DiscourseBase {
 	 */
 	protected function dc_add_post_meta( $post_id, $key, $value, $unique = false ) {
 		if ( empty( $this->options['direct-db-publication-flags'] ) ) {
-			return add_post_meta( $post_id, $key, $value, $unique );
+			return update_post_meta( $post_id, $key, $value );
 		}
 
 		global $wpdb;
