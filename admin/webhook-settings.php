@@ -80,17 +80,6 @@ class WebhookSettings {
 			);
 
 			add_settings_field(
-				'discourse_webhook_match_old_topics',
-				__( 'Match Posts by Title', 'wp-discourse' ),
-				array(
-					$this,
-					'webhook_match_old_topics_checkbox',
-				),
-				'discourse_webhook',
-				'discourse_webhook_settings_section'
-			);
-
-			add_settings_field(
 				'discourse_use_discourse_user_webhook',
 				__( 'Update Userdata', 'wp-discourse' ),
 				array(
@@ -179,24 +168,6 @@ class WebhookSettings {
 				'wp-discourse'
 			),
 			$description
-		);
-	}
-
-	/**
-	 * Outputs markup for webhook-match-old-topics input.
-	 */
-	public function webhook_match_old_topics_checkbox() {
-		$this->form_helper->checkbox_input(
-			'webhook-match-old-topics',
-			'discourse_webhook',
-			__(
-				'Match WordPress posts with Discourse topics by title.',
-				'wp-discourse'
-			),
-			__(
-				'Sync Comment Data will attempt to match posts to topics by title if other methods of matching have not worked.',
-				'wp-discourse'
-			)
 		);
 	}
 

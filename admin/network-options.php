@@ -392,23 +392,6 @@ class NetworkOptions {
 	}
 
 	/**
-	 * Outputs markup for webhook-match-old-topics input.
-	 */
-	public function webhook_match_old_topics_checkbox() {
-		$this->checkbox_input(
-			'webhook-match-old-topics',
-			__(
-				'Match WordPress posts with Discourse topics by title.',
-				'wp-discourse'
-			),
-			__(
-				'Sync Comment Data will attempt to match posts to topics by title if other methods of matching have not worked.',
-				'wp-discourse'
-			)
-		);
-	}
-
-	/**
 	 * Outputs markup for use-discourse-user-webhook checkbox.
 	 */
 	public function use_discourse_user_webhook_checkbox() {
