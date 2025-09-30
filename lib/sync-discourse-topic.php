@@ -174,14 +174,6 @@ class SyncDiscourseTopic extends DiscourseBase {
 
 			$post_ids = $this->get_post_ids_from_topic_id( $topic_id );
 
-			// For matching posts that were published before the plugin was saving the discourse_topic_id as post_metadata.
-			if ( ! $post_ids && ! empty( $this->options['webhook-match-old-topics'] ) ) {
-				$post_id = $this->get_post_id_by_title( $post_title, $topic_id );
-				if ( $post_id ) {
-					$post_ids[] = $post_id;
-				}
-			}
-
 			if ( $post_ids ) {
 				foreach ( $post_ids as $post_id ) {
 					update_post_meta( $post_id, 'wpdc_sync_post_comments', 1 );
@@ -242,35 +234,6 @@ class SyncDiscourseTopic extends DiscourseBase {
 		delete_post_meta( $post_id, 'wpdc_unlisted_topic' );
 
 		return null;
-	}
-
-	/**
-	 * Tries to match a WordPress post with a Discourse topic by the topic title.
-	 *
-	 * This function is used to match posts that have been published through the WP Discourse plugin prior to version 1.4.0
-	 * with their associated Discourse topics. It assumes that the posts are using the 'post' type. There is a filter
-	 * available to change the post type. There's also an action that can be hooked into if you'd like to try to match
-	 * more than one post type.
-	 *
-	 * @param string $title The topic_title returned from Discourse.
-	 * @param int    $topic_id The topic_id returned from Discourse.
-	 *
-	 * @return int|null
-	 */
-	protected function get_post_id_by_title( $title, $topic_id ) {
-		$id        = null;
-		$title     = strtolower( $title );
-		$post_type = apply_filters( 'wpdc_webhook_get_page_by_title_post_type', 'post' );
-		$post      = get_page_by_title( $title, 'OBJECT', $post_type );
-		if ( $post && ! is_wp_error( $post ) ) {
-			$id = $post->ID;
-			// Update the 'discourse_topic_id' metadata so that it can be used on the next webhook request.
-			update_post_meta( $id, 'discourse_topic_id', $topic_id );
-		}
-
-		do_action( 'wpdc_webhook_after_get_page_by_title', $title );
-
-		return $id;
 	}
 
 	/**
