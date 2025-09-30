@@ -9,8 +9,12 @@
 	$( document ).ready(
 		function() {
 			var commentsURL  = wpdc.commentsURL,
-				$commentArea = $( '#wpdc-comments' ),
+      $commentArea = $( '#wpdc-comments' ),
 				postId       = $commentArea.data( 'post-id' );
+
+      if (!postId) {
+        return;
+      }
 
 			$.ajax(
 				{
