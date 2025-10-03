@@ -193,7 +193,7 @@ class ConnectionSettings {
 	public function connection_settings_tab_details() {
 		$self_install_url          = 'https://github.com/discourse/discourse/blob/master/docs/INSTALL-cloud.md';
 		$community_install_url     = 'https://www.literatecomputing.com/product/discourse-install/';
-		$discourse_org_install_url = 'https://payments.discourse.org/buy/';
+		$discourse_org_install_url = 'https://discourse.org/pricing/';
 		$setup_howto_url           = 'https://meta.discourse.org/t/wp-discourse-plugin-installation-and-setup/50752';
 		$discourse_meta_url        = 'https://meta.discourse.org/';
 		?>
