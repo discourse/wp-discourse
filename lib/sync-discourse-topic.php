@@ -46,7 +46,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 
     $this->supported_events = array(
         'post_created',
-        'post_updated',
+        'post_edited',
     );
 	}
 
