@@ -504,10 +504,14 @@ trait PluginUtilities {
 
 		$opts['headers'] = $headers;
 
-		// support relative paths.
-		if ( strpos( $url, '://' ) === false ) {
-			$url = esc_url_raw( $api_credentials['url'] . $url );
+		if ( strpos( $url, '://' ) !== false ) {
+			$path  = wp_parse_url( $url, PHP_URL_PATH );
+			$path  = $path ? $path : '/';
+			$query = wp_parse_url( $url, PHP_URL_QUERY );
+			$url   = $query ? $path . '?' . $query : $path;
 		}
+
+		$url = esc_url_raw( $api_credentials['url'] . $url );
 
 		if ( isset( $args['method'] ) ) {
 			$opts['method'] = strtoupper( $args['method'] ); // default GET.
