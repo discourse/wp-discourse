@@ -14,7 +14,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
 	 * @since 4.3.0 The `$plaintext_pass` parameter was changed to `$notify`.
 	 * @since 4.3.1 The `$plaintext_pass` parameter was deprecated. `$notify` added as a third parameter.
 	 * @since 4.6.0 The `$notify` parameter accepts 'user' for sending notification only to the user created.
-   * 
+   *
 	 * @global wpdb         $wpdb      WordPress database object for queries.
 	 * @global PasswordHash $wp_hasher Portable PHP password hashing framework instance.
 	 *
@@ -114,7 +114,7 @@ if ( ! function_exists( 'wp_new_user_notification' ) ) :
       $send_notification_to_user = apply_filters( 'wp_send_new_user_notification_to_user', true, $user );
 
 			// `$deprecated was pre-4.3 `$plaintext_pass`. An empty `$plaintext_pass` didn't sent a user notification.
-			if ( 'admin' === $notify || ( empty( $deprecated ) && empty( $notify ) ) ) {
+			if ( 'admin' === $notify || true !== $send_notification_to_user || ( empty( $deprecated ) && empty( $notify ) ) ) {
 				return;
 			}
 
