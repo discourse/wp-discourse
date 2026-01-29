@@ -126,6 +126,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 #### 2.6.1 29/01/2026
 
 - Support for Wordpress 6.9.0
+- Respect wp_send_new_user_notification_to_user filter
 
 #### 2.6.0 20/10/2025
 
