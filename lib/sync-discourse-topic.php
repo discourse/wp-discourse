@@ -223,7 +223,7 @@ class SyncDiscourseTopic extends DiscourseBase {
 			'method' => 'PUT',
 		);
 
-		$response = $this->discourse_request( $status_url, $args );
+		$response = $this->discourse_request( $status_path, $args );
 
 		if ( is_wp_error( $response ) ) {
 			return $response;
