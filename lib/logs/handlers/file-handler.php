@@ -298,8 +298,20 @@ class FileHandler extends StreamHandler {
     protected function validate_size() {
         // Note https://github.com/WordPress/WordPress-Coding-Standards/pull/1265#issuecomment-405143028.
         // Note https://github.com/woocommerce/woocommerce/issues/6091.
-        $handle                = fopen( $this->url, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
-        $stat                  = fstat( $handle );
+        $handle = fopen( $this->url, 'r' ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
+        if ( false === $handle ) {
+            // The file could not be opened, so its size cannot be determined. Return true
+            // (treat it as within the limit) rather than false: a false return makes the
+            // caller increment the file number and rotate, and rotate() unlinks old log
+            // files. A failed open is often transient on network-backed filesystems, so
+            // skipping this size check is preferable to discarding logs because of it.
+            return true;
+        }
+
+        $stat = fstat( $handle );
+        fclose( $handle ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+
         $last_line_byte_buffer = 100;
         return $stat['size'] <= ( $this->file_size_limit - $last_line_byte_buffer );
     }
