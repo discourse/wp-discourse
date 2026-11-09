@@ -8,8 +8,6 @@ Before starting development, make sure you read [composer.md](https://github.com
 
 All changes to the WP Discourse codebase need to come with accompanying PHPUnit tests. We recommend you use test-driven development, particularly if you're writing new features. All changes must also support the PHP versions the plugin supports, which are listed in the [formatting workflow](https://github.com/discourse/wp-discourse/blob/main/.github/workflows/formatting.yml), however the most common PHP version to work with locally is ``PHP 7.4``. Note that ``PHP 8.0`` introduces some new syntax that is incompatible with older versions.
 
-The JavaScript build tools require Node.js 22.22.2 or later in the 22.x series, 24.15.0 or later in the 24.x series, or 26.0.0 and later. The sidebar and comments block are separate npm projects in `admin/discourse-sidebar` and `blocks/comments`. Run `npm ci`, `npm run build` and `npm run lint:js` in each directory after updating dependencies, and commit the lockfiles and generated assets together. Both projects override vulnerable transitive dependencies whose parent packages still require older versions; review those overrides when upgrading `@wordpress/scripts`.
-
 ### Pull Requests
 
 All changes to the WP Discourse plugin are done via pull requests. The [formatting](https://github.com/discourse/wp-discourse/blob/main/.github/workflows/formatting.yml), [metadata](https://github.com/discourse/wp-discourse/blob/main/.github/workflows/metadata.yml) and [tests](https://github.com/discourse/wp-discourse/blob/main/.github/workflows/formatting.yml) workflows will be run against all pull requests. They will:
