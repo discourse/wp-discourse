@@ -646,7 +646,7 @@ class TagTopic extends Component {
 				? __(
 						'You have exceeded the maximum number of allowed tags for your site. Remove a tag to add more.',
 						'wp-discourse'
-				  )
+					)
 				: '';
 			let tagDisplay = TagTopic.sanitizeArray( this.state.chosenTags );
 			tagDisplay = tagDisplay.map( ( tag ) => (
@@ -1131,7 +1131,7 @@ class DiscourseSidebar extends Component {
 						: __(
 								'There has been an error linking your post with Discourse.',
 								'wp-discourse'
-						  );
+							);
 				this.setState( {
 					busyLinking: false,
 					published: false,
@@ -1206,7 +1206,7 @@ class DiscourseSidebar extends Component {
 						: __(
 								'There has been an error linking your post with Discourse.',
 								'wp-discourse'
-						  );
+							);
 				this.setState( {
 					busyPublishing: false,
 					published: false,
@@ -1392,21 +1392,13 @@ class DiscourseSidebar extends Component {
 }
 
 const HOC = compose( [
-	withSelect(
-		(
-			select,
-			{
-				/*forceIsSaving*/
-			}
-		) => {
-			const { getCurrentPostId, getCurrentPost } =
-				select( 'core/editor' );
-			return {
-				postId: getCurrentPostId(),
-				post: getCurrentPost(),
-			};
-		}
-	),
+	withSelect( ( select, { /*forceIsSaving*/ } ) => {
+		const { getCurrentPostId, getCurrentPost } = select( 'core/editor' );
+		return {
+			postId: getCurrentPostId(),
+			post: getCurrentPost(),
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost } = dispatch( 'core/editor' );
 		return {

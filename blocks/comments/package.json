@@ -13,13 +13,25 @@
 	},
 	"author": "Discourse",
 	"license": "GPL",
+	"engines": {
+		"node": "^22.22.2 || ^24.15.0 || >=26.0.0"
+	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.16.0",
+		"@wordpress/scripts": "^37.1.0",
 		"nodemon": "3.1.10"
 	},
 	"dependencies": {
 		"date-fns": "^4.1.0",
 		"html-react-parser": "^5.2.5",
 		"react-inlinesvg": "^4.2.0"
+	},
+	"overrides": {
+		"copy-webpack-plugin": {
+			"serialize-javascript": "^7.0.5"
+		},
+		"js-yaml@>=5.0.0 <5.4.1": "^5.4.1",
+		"katex@<0.18.2": "^0.18.2",
+		"minimatch@>=7.0.0 <11.0.1": "^11.0.1",
+		"smol-toml@<1.9.0": "^1.9.0"
 	}
 }
