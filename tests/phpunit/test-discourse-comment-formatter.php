@@ -92,15 +92,15 @@ class DiscourseCommentFormatterTest extends UnitTest {
         // Perform format.
         $result_html = $this->comment_formatter->format( $this->post_id, false );
 
-        // Ensure right html is returned.
+        // Compare canonical markup so attribute order does not affect the assertion.
         libxml_use_internal_errors( true );
         $expected_dom = new \DomDocument();
         $expected_dom->loadHTMLFile( __DIR__ . '/../fixtures/templates/comment.html', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $expected_html = $this->sanitize_html( $expected_dom->saveHTML() );
+        $expected_html = $this->sanitize_html( $expected_dom->C14N() );
 
         $actual_dom = new \DomDocument();
         $actual_dom->loadHTML( $result_html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $actual_html = $this->sanitize_html( $actual_dom->saveHTML() );
+        $actual_html = $this->sanitize_html( $actual_dom->C14N() );
         libxml_clear_errors();
 
         $this->assertEquals( $expected_html, $actual_html );
@@ -116,15 +116,15 @@ class DiscourseCommentFormatterTest extends UnitTest {
         // Get cached.
         $cached_html = get_transient( "wpdc_comment_html_{$this->discourse_topic_id}" );
 
-        // Ensure right html is cached.
+        // Compare canonical markup so attribute order does not affect the assertion.
         libxml_use_internal_errors( true );
         $expected_dom = new \DomDocument();
         $expected_dom->loadHTMLFile( __DIR__ . '/../fixtures/templates/comment.html', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $expected_html = $this->sanitize_html( $expected_dom->saveHTML() );
+        $expected_html = $this->sanitize_html( $expected_dom->C14N() );
 
         $actual_dom = new \DomDocument();
         $actual_dom->loadHTML( $cached_html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $actual_html = $this->sanitize_html( $actual_dom->saveHTML() );
+        $actual_html = $this->sanitize_html( $actual_dom->C14N() );
         libxml_clear_errors();
 
         $this->assertEquals( $expected_html, $actual_html );
@@ -137,15 +137,15 @@ class DiscourseCommentFormatterTest extends UnitTest {
         // Perform format.
         $result_html = $this->comment_formatter->format( $this->post_id, false );
 
-        // Ensure right html is returned.
+        // Compare canonical markup so attribute order does not affect the assertion.
         libxml_use_internal_errors( true );
         $expected_dom = new \DomDocument();
         $expected_dom->loadHTMLFile( __DIR__ . '/../fixtures/templates/bad_response.html', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $expected_html = $this->sanitize_html( $expected_dom->saveHTML() );
+        $expected_html = $this->sanitize_html( $expected_dom->C14N() );
 
         $actual_dom = new \DomDocument();
         $actual_dom->loadHTML( $result_html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOBLANKS );
-        $actual_html = $this->sanitize_html( $actual_dom->saveHTML() );
+        $actual_html = $this->sanitize_html( $actual_dom->C14N() );
         libxml_clear_errors();
 
         $this->assertEquals( $expected_html, $actual_html );
