@@ -123,7 +123,7 @@ To create a coherent top menu, see our tutorial on how to make a [Custom nav hea
 
 == Changelog ==
 
-#### 2.6.5
+#### 2.6.5 11/25/2026
 
 - Support WordPress 7.2.
 - Fix topic re-listing and the logging link translation.
